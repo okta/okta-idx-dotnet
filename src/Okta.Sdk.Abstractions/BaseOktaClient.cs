@@ -128,11 +128,13 @@ namespace Okta.Sdk.Abstractions
             return compiledConfig;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets the Okta configuration.
+        /// </summary>
         public OktaClientConfiguration Configuration { get; protected set; }
 
         /// <inheritdoc/>
-        public IOktaClient CreatedScoped(RequestContext requestContext)
+        public IOktaClient CreateScoped(RequestContext requestContext)
             => new BaseOktaClient(_dataStore, Configuration, requestContext);
 
         /// <summary>

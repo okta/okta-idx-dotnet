@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.IdentityEngine.Sdk.Uni
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.IdentityEngine.Sdk.IntegrationTests", "Okta.IdentityEngine.Sdk.IntegrationTests\Okta.IdentityEngine.Sdk.IntegrationTests.csproj", "{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{81822F9A-3ED7-4025-ADB9-AE35A6717261}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81822F9A-3ED7-4025-ADB9-AE35A6717261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81822F9A-3ED7-4025-ADB9-AE35A6717261}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81822F9A-3ED7-4025-ADB9-AE35A6717261}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81822F9A-3ED7-4025-ADB9-AE35A6717261}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

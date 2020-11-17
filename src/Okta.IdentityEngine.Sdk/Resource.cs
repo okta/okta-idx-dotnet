@@ -19,7 +19,7 @@ namespace Okta.IdentityEngine.Sdk
         }
 
         internal void Initialize(
-            IOktaIdentityEngineClient client,
+            IOktaClient client,
             ResourceFactory resourceFactory,
             IDictionary<string, object> data,
             ILogger logger)

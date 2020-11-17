@@ -23,12 +23,7 @@ namespace Okta.IdentityEngine.Sdk
 
         public IList<IFormValue> Form => GetArrayProperty<IFormValue>("value");
 
-        public Task Finalize()
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IOktaIdentityEngineResponse> Proceed(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken =  default)
+        public async Task<IOktaIdentityEngineResponse> ProceedAsync(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken =  default)
         {
             var request = new HttpRequest
             {

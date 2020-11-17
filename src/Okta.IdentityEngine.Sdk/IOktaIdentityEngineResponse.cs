@@ -34,10 +34,17 @@ namespace Okta.IdentityEngine.Sdk
         IRemediation Remediation { get; }
 
         /// <summary>
+        /// Gets a success response object after `loginSuccess()` returns true.
+        /// </summary>
+        IOktaIdentityEngineSuccessResponse SuccessWithInteractionCode { get;  }
+
+        /// <summary>
         /// The method to call when you want to cancel the Okta Identity Engine flow. This will return an OktaIdentityEngineResponse
         /// </summary>
         /// <returns>An OktaIdentityEngineResponse.</returns>
-        Task<IOktaIdentityEngineResponse> Cancel();
+        Task<IOktaIdentityEngineResponse> CancelAsync();
+
+        bool LoginSuccess { get; }
 
         
     }

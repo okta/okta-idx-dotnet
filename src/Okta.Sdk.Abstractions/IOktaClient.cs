@@ -21,7 +21,7 @@ namespace Okta.Sdk.Abstractions
         /// The client configuration.
         /// </value>
         /// <remarks>The configuration is immutable after the client is initialized. This property references a copy of the configuration.</remarks>
-        OktaClientConfiguration Configuration { get; }
+        //OktaClientConfiguration Configuration { get; }
 
         /// <summary>
         /// Creates a new <see cref="IOktaClient">OktaClient</see> scoped to the given request context.
@@ -29,7 +29,7 @@ namespace Okta.Sdk.Abstractions
         /// <param name="requestContext">The request context</param>
         /// <remarks>This method is used to temporarily create a copy of the client in order to pass information about the current request to the Okta API.</remarks>
         /// <returns>The new client.</returns>
-        IOktaClient CreatedScoped(RequestContext requestContext);
+        IOktaClient CreateScoped(RequestContext requestContext);
 
         /// <summary>
         /// Gets a resource by URL and deserializes it to a <see cref="BaseResource"/> type.

@@ -10,7 +10,7 @@ namespace Okta.Sdk.Abstractions.Configuration
     /// <summary>
     /// Configuration for an <see cref="IOktaClient">OktaClient</see>.
     /// </summary>
-    public sealed class OktaClientConfiguration : IDeepCloneable<OktaClientConfiguration>
+    public class OktaClientConfiguration : IDeepCloneable<OktaClientConfiguration>
     {
         private bool _disableHttpsCheck = false;
 

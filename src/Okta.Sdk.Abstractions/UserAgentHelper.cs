@@ -21,7 +21,7 @@ namespace Okta.Sdk.Abstractions
         /// </summary>
         public static Version SdkVersion
         {
-            get { return typeof(BaseOktaClient).GetTypeInfo().Assembly.GetName().Version; }
+            get { return typeof(IOktaClient).GetTypeInfo().Assembly.GetName().Version; }
         }
 
         /// <summary>

@@ -89,7 +89,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
             var testClient = new TesteableIdentityEngineClient(mockRequestExecutor);
 
-            var response = await testClient.Introspect("foo");
+            var response = await testClient.StartAsync("foo");
             response.StateHandle.Should().NotBeNullOrEmpty();
             response.Version.Should().NotBeNullOrEmpty();
             response.ExpiresAt.Value.Should().Be(DateTimeOffset.Parse("2020-10-16T16:56:45.000Z"));
@@ -110,7 +110,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             var stateHandleFormItem = response.Remediation.RemediationOptions.FirstOrDefault().Form.FirstOrDefault(x => x.Name == "stateHandle");
             stateHandleFormItem.Should().NotBeNull();
             stateHandleFormItem.Required.Should().BeTrue();
-            stateHandleFormItem.Value.Should().Be("021iDhVt8b_iJouYV-MBpEshNgBNbVui06Uhn_8v63");
+            stateHandleFormItem.GetProperty<string>("value").Should().Be("021iDhVt8b_iJouYV-MBpEshNgBNbVui06Uhn_8v63");
             stateHandleFormItem.Visible.Should().BeFalse();
             stateHandleFormItem.Mutable.Should().BeFalse();
 
@@ -434,7 +434,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             remediationProceedRequest.SetProperty("rememberMe", false);
 
             // Proceed with "identifier"
-            var identifyProcessedResponse =  await identifyRemediationOption.Proceed(remediationProceedRequest);
+            var identifyProcessedResponse =  await identifyRemediationOption.ProceedAsync(remediationProceedRequest);
 
             identifyProcessedResponse.Should().NotBeNull();
             identifyProcessedResponse.StateHandle.Should().NotBeNullOrEmpty();
@@ -456,7 +456,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             var stateHandleFormItem = identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Form.FirstOrDefault(x => x.Name == "stateHandle");
             stateHandleFormItem.Should().NotBeNull();
             stateHandleFormItem.Required.Should().BeTrue();
-            stateHandleFormItem.Value.Should().Be("02mOEmmIhklxzTn5W3erSQ0y9RwhjjPDHbvMTfgF5b");
+            stateHandleFormItem.GetProperty<string>("value").Should().Be("02mOEmmIhklxzTn5W3erSQ0y9RwhjjPDHbvMTfgF5b");
             stateHandleFormItem.Visible.Should().BeFalse();
             stateHandleFormItem.Mutable.Should().BeFalse();
 
@@ -480,13 +480,13 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             var idFormItem = emailOptionFormValueValues.FirstOrDefault(x => x.Name == "id");
             idFormItem.Should().NotBeNull();
             idFormItem.Required.Should().BeTrue();
-            idFormItem.Value.Should().Be("aut2ihzk1gHl7ynhd1d6");
+            idFormItem.GetProperty<string>("value").Should().Be("aut2ihzk1gHl7ynhd1d6");
             idFormItem.Mutable.Should().BeFalse();
 
             var methodTypeFormItem = emailOptionFormValueValues.FirstOrDefault(x => x.Name == "methodType");
             methodTypeFormItem.Should().NotBeNull();
             methodTypeFormItem.Required.Should().BeFalse();
-            methodTypeFormItem.Value.Should().Be("email");
+            methodTypeFormItem.GetProperty<string>("value").Should().Be("email");
             methodTypeFormItem.Mutable.Should().BeFalse();
 
             // Password
@@ -504,13 +504,13 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             idFormItem = passwordOptionFormValueValues.FirstOrDefault(x => x.Name == "id");
             idFormItem.Should().NotBeNull();
             idFormItem.Required.Should().BeTrue();
-            idFormItem.Value.Should().Be("aut2ihzk2n15tsQnQ1d6");
+            idFormItem.GetProperty<string>("value").Should().Be("aut2ihzk2n15tsQnQ1d6");
             idFormItem.Mutable.Should().BeFalse();
 
             methodTypeFormItem = passwordOptionFormValueValues.FirstOrDefault(x => x.Name == "methodType");
             methodTypeFormItem.Should().NotBeNull();
             methodTypeFormItem.Required.Should().BeFalse();
-            methodTypeFormItem.Value.Should().Be("password");
+            methodTypeFormItem.GetProperty<string>("value").Should().Be("password");
             methodTypeFormItem.Mutable.Should().BeFalse();
 
             // Security Question
@@ -528,13 +528,13 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             idFormItem = securityQuestionOptionFormValueValues.FirstOrDefault(x => x.Name == "id");
             idFormItem.Should().NotBeNull();
             idFormItem.Required.Should().BeTrue();
-            idFormItem.Value.Should().Be("aut2ihzk4hgf9sIQa1d6");
+            idFormItem.GetProperty<string>("value").Should().Be("aut2ihzk4hgf9sIQa1d6");
             idFormItem.Mutable.Should().BeFalse();
 
             methodTypeFormItem = securityQuestionOptionFormValueValues.FirstOrDefault(x => x.Name == "methodType");
             methodTypeFormItem.Should().NotBeNull();
             methodTypeFormItem.Required.Should().BeFalse();
-            methodTypeFormItem.Value.Should().Be("security_question");
+            methodTypeFormItem.GetProperty<string>("value").Should().Be("security_question");
             methodTypeFormItem.Mutable.Should().BeFalse();
 
             // TODO: authenticators
@@ -1067,7 +1067,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             
 
             // Proceed with "identifier"
-            var identifyProcessedResponse = await identifyRemediationOption.Proceed(remediationProceedRequest);
+            var identifyProcessedResponse = await identifyRemediationOption.ProceedAsync(remediationProceedRequest);
 
             identifyProcessedResponse.Should().NotBeNull();
             identifyProcessedResponse.StateHandle.Should().NotBeNullOrEmpty();
@@ -1093,7 +1093,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             var stateHandleFormItem = identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Form.FirstOrDefault(x => x.Name == "stateHandle");
             stateHandleFormItem.Should().NotBeNull();
             stateHandleFormItem.Required.Should().BeTrue();
-            stateHandleFormItem.Value.Should().Be("02R5z3MS5d0kDVJnNNi3EeY1FUQ1CWUcrPW9Bxlj_C");
+            stateHandleFormItem.GetProperty<string>("value").Should().Be("02R5z3MS5d0kDVJnNNi3EeY1FUQ1CWUcrPW9Bxlj_C");
             stateHandleFormItem.Visible.Should().BeFalse();
             stateHandleFormItem.Mutable.Should().BeFalse();
 
@@ -1146,13 +1146,13 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             var idFormItem = authenticatorOptionsEmailFormValues.FirstOrDefault(x => x.Name == "id");
             idFormItem.Should().NotBeNull();
             idFormItem.Required.Should().BeTrue();
-            idFormItem.Value.Should().Be("aut2ihzk1gHl7ynhd1d6");
+            idFormItem.GetProperty<string>("value").Should().Be("aut2ihzk1gHl7ynhd1d6");
             idFormItem.Mutable.Should().BeFalse();
 
             var methodTypeFormItem = authenticatorOptionsEmailFormValues.FirstOrDefault(x => x.Name == "methodType");
             methodTypeFormItem.Should().NotBeNull();
             methodTypeFormItem.Required.Should().BeFalse();
-            methodTypeFormItem.Value.Should().Be("email");
+            methodTypeFormItem.GetProperty<string>("value").Should().Be("email");
             methodTypeFormItem.Mutable.Should().BeFalse();
 
             // Password
@@ -1165,13 +1165,13 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             idFormItem = authenticatorOptionsPasswordFormValues.FirstOrDefault(x => x.Name == "id");
             idFormItem.Should().NotBeNull();
             idFormItem.Required.Should().BeTrue();
-            idFormItem.Value.Should().Be("aut2ihzk2n15tsQnQ1d6");
+            idFormItem.GetProperty<string>("value").Should().Be("aut2ihzk2n15tsQnQ1d6");
             idFormItem.Mutable.Should().BeFalse();
 
             methodTypeFormItem = authenticatorOptionsPasswordFormValues.FirstOrDefault(x => x.Name == "methodType");
             methodTypeFormItem.Should().NotBeNull();
             methodTypeFormItem.Required.Should().BeFalse();
-            methodTypeFormItem.Value.Should().Be("password");
+            methodTypeFormItem.GetProperty<string>("value").Should().Be("password");
             methodTypeFormItem.Mutable.Should().BeFalse();
 
             // Security Question
@@ -1184,13 +1184,13 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             idFormItem = authenticatorOptionsSecurityQuestionFormValues.FirstOrDefault(x => x.Name == "id");
             idFormItem.Should().NotBeNull();
             idFormItem.Required.Should().BeTrue();
-            idFormItem.Value.Should().Be("aut2ihzk4hgf9sIQa1d6");
+            idFormItem.GetProperty<string>("value").Should().Be("aut2ihzk4hgf9sIQa1d6");
             idFormItem.Mutable.Should().BeFalse();
 
             methodTypeFormItem = authenticatorOptionsSecurityQuestionFormValues.FirstOrDefault(x => x.Name == "methodType");
             methodTypeFormItem.Should().NotBeNull();
             methodTypeFormItem.Required.Should().BeFalse();
-            methodTypeFormItem.Value.Should().Be("security_question");
+            methodTypeFormItem.GetProperty<string>("value").Should().Be("security_question");
             methodTypeFormItem.Mutable.Should().BeFalse();
         }
 
@@ -1630,7 +1630,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
 
 
             // Proceed with "identifier"
-            var identifyProcessedResponse = await identifyRemediationOption.Proceed(remediationProceedRequest);
+            var identifyProcessedResponse = await identifyRemediationOption.ProceedAsync(remediationProceedRequest);
 
             identifyProcessedResponse.Should().NotBeNull();
             identifyProcessedResponse.StateHandle.Should().NotBeNullOrEmpty();
@@ -1652,7 +1652,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             var stateHandleFormItem = identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Form.FirstOrDefault(x => x.Name == "stateHandle");
             stateHandleFormItem.Should().NotBeNull();
             stateHandleFormItem.Required.Should().BeTrue();
-            stateHandleFormItem.Value.Should().Be("02SgqMQY8JRJoPgvvME2CYBWjCASB_cuQbZXAWLMo3");
+            stateHandleFormItem.GetProperty<string>("value").Should().Be("02SgqMQY8JRJoPgvvME2CYBWjCASB_cuQbZXAWLMo3");
             stateHandleFormItem.Visible.Should().BeFalse();
             stateHandleFormItem.Mutable.Should().BeFalse();
 
@@ -1694,13 +1694,13 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             var idFormItem = authenticatorOptionsEmailFormValues.FirstOrDefault(x => x.Name == "id");
             idFormItem.Should().NotBeNull();
             idFormItem.Required.Should().BeTrue();
-            idFormItem.Value.Should().Be("aut2ihzk1gHl7ynhd1d6");
+            idFormItem.GetProperty<string>("value").Should().Be("aut2ihzk1gHl7ynhd1d6");
             idFormItem.Mutable.Should().BeFalse();
 
             var methodTypeFormItem = authenticatorOptionsEmailFormValues.FirstOrDefault(x => x.Name == "methodType");
             methodTypeFormItem.Should().NotBeNull();
             methodTypeFormItem.Required.Should().BeFalse();
-            methodTypeFormItem.Value.Should().Be("email");
+            methodTypeFormItem.GetProperty<string>("value").Should().Be("email");
             methodTypeFormItem.Mutable.Should().BeFalse();
 
         }
@@ -2028,7 +2028,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             });
 
 
-            var identifyProcessedResponse = await identifyRemediationOption.Proceed(remediationProceedRequest);
+            var identifyProcessedResponse = await identifyRemediationOption.ProceedAsync(remediationProceedRequest);
 
             identifyProcessedResponse.Should().NotBeNull();
             identifyProcessedResponse.StateHandle.Should().NotBeNullOrEmpty();
@@ -2050,7 +2050,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             var stateHandleFormItem = identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Form.FirstOrDefault(x => x.Name == "stateHandle");
             stateHandleFormItem.Should().NotBeNull();
             stateHandleFormItem.Required.Should().BeTrue();
-            stateHandleFormItem.Value.Should().Be("02zLArAwt9TEyKx8rvNzIREZTf6OCvoCbRf9gH4tU1");
+            stateHandleFormItem.GetProperty<string>("value").Should().Be("02zLArAwt9TEyKx8rvNzIREZTf6OCvoCbRf9gH4tU1");
             stateHandleFormItem.Visible.Should().BeFalse();
             stateHandleFormItem.Mutable.Should().BeFalse();
 
@@ -2306,7 +2306,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
                 passcode = "31416",
             });
 
-            var identifyProcessedResponse = await identifyRemediationOption.Proceed(remediationProceedRequest);
+            var identifyProcessedResponse = await identifyRemediationOption.ProceedAsync(remediationProceedRequest);
 
             identifyProcessedResponse.Should().NotBeNull();
             identifyProcessedResponse.StateHandle.Should().NotBeNullOrEmpty();
@@ -2317,7 +2317,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             // TODO: Revisit this is not null now
             //identifyProcessedResponse.Remediation.Should().BeNull();
 
-            // TODO: Define an object for success
+            // TODO: UPDATE test with successWithInteractionCode
             var success = identifyProcessedResponse.GetProperty<Resource>("success");
             success.Should().NotBeNull();
             success.GetProperty<string>("name").Should().Be("success-redirect");

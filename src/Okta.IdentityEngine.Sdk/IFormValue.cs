@@ -23,11 +23,6 @@ namespace Okta.IdentityEngine.Sdk
         string Type { get; }
 
         /// <summary>
-        /// Gets the default value for the current form value
-        /// </summary>
-        string Value { get; }
-
-        /// <summary>
         /// Gets the value that indicates if this form value should be visible in a UI
         /// </summary>
         bool? Visible { get; }

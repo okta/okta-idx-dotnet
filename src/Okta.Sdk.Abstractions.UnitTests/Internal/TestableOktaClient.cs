@@ -19,7 +19,7 @@ namespace Okta.Sdk.Abstractions.UnitTests.Internal
 
         public TestableOktaClient(IRequestExecutor requestExecutor)
             : base(
-                new DefaultDataStore(requestExecutor, new DefaultSerializer(), new ResourceFactory(null, null, null), NullLogger.Instance, new UserAgentBuilder("test", typeof(BaseOktaClient).GetTypeInfo().Assembly.GetName().Version)),
+                new DefaultDataStore(requestExecutor, new DefaultSerializer(), new ResourceFactory(null, null, null), NullLogger.Instance, new UserAgentBuilder("test", typeof(IOktaClient).GetTypeInfo().Assembly.GetName().Version)),
                 DefaultFakeConfiguration,
                 new RequestContext())
         {

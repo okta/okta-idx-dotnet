@@ -1,18 +1,44 @@
-﻿using Microsoft.Extensions.Logging;
-using Okta.Sdk.Abstractions;
-using Okta.Sdk.Abstractions.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FlexibleConfiguration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Okta.IdentityEngine.Sdk.Configuration;
+using Okta.Sdk.Abstractions;
+using Okta.Sdk.Abstractions.Configuration;
 
 namespace Okta.IdentityEngine.Sdk
 {
-    public class OktaIdentityEngineClient : BaseOktaClient, IOktaIdentityEngineClient
+    public class OktaIdentityEngineClient : IOktaIdentityEngineClient
     {
+        /// <summary>
+        /// The <code>IDataStore</code> implementation to be used for making requests.
+        /// </summary>
+        protected IDataStore _dataStore;
+
+        /// <summary>
+        /// The request context to be used when making requests.
+        /// </summary>
+        protected RequestContext _requestContext;
+
+        static OktaIdentityEngineClient()
+        {
+            System.AppContext.SetSwitch("Switch.System.Net.DontEnableSystemDefaultTlsVersions", false);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OktaIdentityEngineClient"/> class.
+        /// </summary>
+        public OktaIdentityEngineClient()
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OktaIdentityEngineClient"/> class using the specified <see cref="HttpClient"/>.
         /// </summary>
@@ -23,16 +49,61 @@ namespace Okta.IdentityEngine.Sdk
         /// <param name="httpClient">The HTTP client to use for requests to the Okta API.</param>
         /// <param name="logger">The logging interface to use, if any.</param>
         public OktaIdentityEngineClient(
-            OktaClientConfiguration apiClientConfiguration = null,
+            OktaIdentityEngineConfiguration configuration = null,
             HttpClient httpClient = null,
             ILogger logger = null)
-            : base(
-                apiClientConfiguration,
-                httpClient,
-                logger,
-                new UserAgentBuilder("okta-identity-engine-dotnet", typeof(OktaIdentityEngineClient).GetTypeInfo().Assembly.GetName().Version),
-                new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))))
         {
+            Configuration = GetConfigurationOrDefault(configuration);
+            OktaIdentityEngineConfigurationValidator.Validate(Configuration);
+
+            logger = logger ?? NullLogger.Instance;
+
+            var userAgentBuilder = new UserAgentBuilder("okta-identity-engine-dotnet", typeof(OktaIdentityEngineClient).GetTypeInfo().Assembly.GetName().Version);
+
+            httpClient = httpClient ?? DefaultHttpClient.Create(
+                Configuration.ConnectionTimeout,
+                Configuration.Proxy,
+                logger);
+
+            var oktaBaseConfiguration = OktaConfigurationConverter.Convert(configuration);
+            var resourceTypeResolverFactory = new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource)));
+            var requestExecutor = new DefaultRequestExecutor(oktaBaseConfiguration, httpClient, logger);
+            var resourceFactory = new ResourceFactory(this, logger, resourceTypeResolverFactory);
+
+            _dataStore = new DefaultDataStore(
+                requestExecutor,
+                new DefaultSerializer(),
+                resourceFactory,
+                logger,
+                userAgentBuilder);
+        }
+
+        protected static OktaIdentityEngineConfiguration GetConfigurationOrDefault(OktaIdentityEngineConfiguration configuration)
+        {
+            string configurationFileRoot = Directory.GetCurrentDirectory();
+
+            var homeOktaYamlLocation = HomePath.Resolve("~", ".okta", "okta.yaml");
+
+            var applicationAppSettingsLocation = Path.Combine(configurationFileRoot ?? string.Empty, "appsettings.json");
+            var applicationOktaYamlLocation = Path.Combine(configurationFileRoot ?? string.Empty, "okta.yaml");
+
+            var configBuilder = new ConfigurationBuilder()
+                .AddYamlFile(homeOktaYamlLocation, optional: true)
+                .AddJsonFile(applicationAppSettingsLocation, optional: true)
+                .AddYamlFile(applicationOktaYamlLocation, optional: true)
+                .AddEnvironmentVariables("okta", "_", root: "okta")
+                .AddEnvironmentVariables("okta_testing", "_", root: "okta")
+                //.AddObject(configuration, root: "okta:client")
+                .AddObject(configuration, root: "okta:client:idx")
+                .AddObject(configuration, root: "okta:testing")
+                .AddObject(configuration);
+
+            var compiledConfig = new OktaIdentityEngineConfiguration();
+            //configBuilder.Build().GetSection("okta").GetSection("client").Bind(compiledConfig);
+            configBuilder.Build().GetSection("okta").GetSection("client").GetSection("idx").Bind(compiledConfig);
+            configBuilder.Build().GetSection("okta").GetSection("testing").Bind(compiledConfig);
+
+            return compiledConfig;
         }
 
         /// <summary>
@@ -42,25 +113,47 @@ namespace Okta.IdentityEngine.Sdk
         /// <param name="configuration">The client configuration.</param>
         /// <param name="requestContext">The request context, if any.</param>
         /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
-        protected OktaIdentityEngineClient(IDataStore dataStore, OktaClientConfiguration configuration, RequestContext requestContext)
-            : base(dataStore, configuration, requestContext)
+        protected OktaIdentityEngineClient(IDataStore dataStore, OktaIdentityEngineConfiguration configuration, RequestContext requestContext)
         {
+            _dataStore = dataStore ?? throw new ArgumentNullException(nameof(dataStore));
+            Configuration = configuration;
+            _requestContext = requestContext;
         }
 
 
-        public Task<Resource> Interact(string issuer, string clientId, IList<string> scopes)
+        /// <summary>
+        /// Gets or sets the Okta configuration.
+        /// </summary>
+        public OktaIdentityEngineConfiguration Configuration { get; protected set; }
+
+        private async Task<IOktaIdentityEngineResponse> InteractAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var payload = new {
+                Scope = string.Join(" ", this.Configuration.Scopes),
+                // TODO: login_hint
+            }; 
+
+            var uri = $"{this.Configuration.Issuer}/interact";
+            var request = new HttpRequest
+            {
+                Uri = uri,
+                Payload = payload,
+            };
+            // TODO: define a response for this call
+            return await PostAsync<OktaIdentityEngineResponse>(
+                request, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<IOktaIdentityEngineResponse> Introspect(string interactionHandle, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<IOktaIdentityEngineResponse> IntrospectAsync(string interactionHandle, CancellationToken cancellationToken = default(CancellationToken))
         {
             var payload = new IdentityEngineRequest()
             {
                 StateHandle = interactionHandle,
             };
 
-            var uri = $"{this.Configuration.OktaDomain}/idp/idx/introspect";
+            var oktaDomain = UrlHelper.GetOktaDomain(this.Configuration.Issuer);
+
+            var uri = $"{oktaDomain}/idp/idx/introspect";
             var request = new HttpRequest
             {
                 Uri = uri,
@@ -69,11 +162,127 @@ namespace Okta.IdentityEngine.Sdk
 
             return await PostAsync<OktaIdentityEngineResponse>(
                 request, cancellationToken).ConfigureAwait(false);
+
         }
 
-        public Task<IOktaIdentityEngineResponse> Start(string issuer, string clientId, IList<string> scopes)
+        public async Task<IOktaIdentityEngineResponse> StartAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(interactionHandle))
+            {
+                interactionHandle = "GET via interact";
+            }
+
+            return await IntrospectAsync(interactionHandle, cancellationToken);
+            
+        }
+
+        public IOktaClient CreateScoped(RequestContext requestContext)
+            => new OktaIdentityEngineClient(_dataStore, Configuration, requestContext);
+
+        /// <summary>
+        /// Creates a new <see cref="CollectionClient{T}"/> given an initial HTTP request.
+        /// </summary>
+        /// <typeparam name="T">The collection client item type.</typeparam>
+        /// <param name="initialRequest">The initial HTTP request.</param>
+        /// <returns>The collection client.</returns>
+        protected CollectionClient<T> GetCollectionClient<T>(HttpRequest initialRequest)
+            where T : IResource
+            => new CollectionClient<T>(_dataStore, initialRequest, _requestContext);
+
+        /// <inheritdoc/>
+        public Task<T> GetAsync<T>(string href, CancellationToken cancellationToken = default(CancellationToken))
+            where T : BaseResource, new()
+            => GetAsync<T>(new HttpRequest { Uri = href }, cancellationToken);
+
+        /// <inheritdoc/>
+        public async Task<T> GetAsync<T>(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
+            where T : BaseResource, new()
+        {
+            var response = await _dataStore.GetAsync<T>(request, _requestContext, cancellationToken).ConfigureAwait(false);
+            return response?.Payload;
+        }
+
+        /// <inheritdoc/>
+        public CollectionClient<T> GetCollection<T>(string href)
+            where T : IResource
+            => GetCollection<T>(new HttpRequest
+            {
+                Uri = href,
+            });
+
+        /// <inheritdoc/>
+        public CollectionClient<T> GetCollection<T>(HttpRequest request)
+            where T : IResource
+            => GetCollectionClient<T>(request);
+
+        /// <inheritdoc/>
+        public Task PostAsync(string href, object model, CancellationToken cancellationToken = default(CancellationToken))
+            => PostAsync(new HttpRequest { Uri = href, Payload = model }, cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<TResponse> PostAsync<TResponse>(string href, object model, CancellationToken cancellationToken = default(CancellationToken))
+            where TResponse : BaseResource, new()
+            => PostAsync<TResponse>(new HttpRequest { Uri = href, Payload = model }, cancellationToken);
+
+        /// <inheritdoc/>
+        public Task PostAsync(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
+            => PostAsync<BaseResource>(request, cancellationToken);
+
+        /// <inheritdoc/>
+        public async Task<TResponse> PostAsync<TResponse>(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
+            where TResponse : BaseResource, new()
+        {
+            var response = await _dataStore.PostAsync<TResponse>(request, _requestContext, cancellationToken).ConfigureAwait(false);
+            return response?.Payload;
+        }
+
+        /// <inheritdoc/>
+        public Task PutAsync(string href, object model, CancellationToken cancellationToken = default(CancellationToken))
+            => PutAsync(new HttpRequest { Uri = href, Payload = model }, cancellationToken);
+
+        /// <inheritdoc/>
+        public Task<TResponse> PutAsync<TResponse>(string href, object model, CancellationToken cancellationToken = default(CancellationToken))
+            where TResponse : BaseResource, new()
+            => PutAsync<TResponse>(new HttpRequest { Uri = href, Payload = model }, cancellationToken);
+
+        /// <inheritdoc/>
+        public Task PutAsync(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
+            => PutAsync<BaseResource>(request, cancellationToken);
+
+        /// <inheritdoc/>
+        public async Task<TResponse> PutAsync<TResponse>(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
+            where TResponse : BaseResource, new()
+        {
+            var response = await _dataStore.PutAsync<TResponse>(request, _requestContext, cancellationToken).ConfigureAwait(false);
+            return response?.Payload;
+        }
+
+        /// <inheritdoc/>
+        public Task DeleteAsync(string href, CancellationToken cancellationToken = default(CancellationToken))
+            => DeleteAsync(new HttpRequest { Uri = href }, cancellationToken);
+
+        /// <inheritdoc/>
+        public Task DeleteAsync(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
+            => _dataStore.DeleteAsync(request, _requestContext, cancellationToken);
+
+        /// <inheritdoc/>
+        public async Task<TResponse> SendAsync<TResponse>(HttpRequest request, HttpVerb httpVerb, CancellationToken cancellationToken = default)
+            where TResponse : BaseResource, new()
+        {
+            switch (httpVerb)
+            {
+                case HttpVerb.Get:
+                    return await GetAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
+                case HttpVerb.Post:
+                    return await PostAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
+                case HttpVerb.Put:
+                    return await PutAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
+                case HttpVerb.Delete:
+                    await DeleteAsync(request, cancellationToken).ConfigureAwait(false);
+                    return null;
+                default:
+                    return await GetAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 }

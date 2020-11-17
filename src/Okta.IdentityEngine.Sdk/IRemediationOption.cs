@@ -10,7 +10,7 @@ namespace Okta.IdentityEngine.Sdk
     public interface IRemediationOption : IResource
     {
         /// <summary>
-        /// Gets the ION spec rel member based around the (form structure)[https://ionspec.org/#form-structure] rules
+        /// Gets the ION spec rel member based around the [form structure](https://ionspec.org/#form-structure) rules
         /// </summary>
         IList<string> Rel { get; }
 
@@ -50,12 +50,6 @@ namespace Okta.IdentityEngine.Sdk
         /// </summary>
         /// <param name="dataFromUi">The data returned from the enduser</param>
         /// <returns>An OktaIdentityEngineResponse. </returns>
-        Task<IOktaIdentityEngineResponse> Proceed(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Call this function after all remediation options have been completed. This method calls and handles the success of a login.
-        /// </summary>
-        /// <returns></returns>
-        Task Finalize();
+        Task<IOktaIdentityEngineResponse> ProceedAsync(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken = default);
     }
 }

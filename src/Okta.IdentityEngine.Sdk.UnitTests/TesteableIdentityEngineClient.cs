@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
+using Okta.IdentityEngine.Sdk.Configuration;
 using Okta.Sdk.Abstractions;
 using Okta.Sdk.Abstractions.Configuration;
 
@@ -10,9 +11,10 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
 {
     public class TesteableIdentityEngineClient : OktaIdentityEngineClient
     {
-        public static readonly OktaClientConfiguration DefaultFakeConfiguration = new OktaClientConfiguration
+        public static readonly OktaIdentityEngineConfiguration DefaultFakeConfiguration = new OktaIdentityEngineConfiguration
         {
-            OktaDomain = "https://fake.example.com",
+            Issuer = "https://fake.example.com",
+            ClientId = "foo",
         };
 
         public TesteableIdentityEngineClient(IRequestExecutor requestExecutor)

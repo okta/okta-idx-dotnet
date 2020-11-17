@@ -19,7 +19,16 @@ namespace Okta.IdentityEngine.Sdk
 
         public string Raw => GetStringProperty("raw");
 
-        public Task<IOktaIdentityEngineResponse> Cancel()
+        public bool LoginSuccess {
+            get
+            {
+                return this.GetData().ContainsKey("successWithInteractionCode");
+            }
+        }
+
+        public IOktaIdentityEngineSuccessResponse SuccessWithInteractionCode => GetResourceProperty<OktaIdentityEngineSuccessResponse>("successWithInteractionCode");
+
+        public Task<IOktaIdentityEngineResponse> CancelAsync()
         {
             throw new NotImplementedException();
         }

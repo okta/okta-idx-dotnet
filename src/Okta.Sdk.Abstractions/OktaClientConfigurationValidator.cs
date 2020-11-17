@@ -25,7 +25,7 @@ namespace Okta.Sdk.Abstractions
                 throw new ArgumentNullException(nameof(configuration.OktaDomain), "Your Okta URL is missing. You can copy your domain from the Okta Developer Console. Follow these instructions to find it: https://bit.ly/finding-okta-domain");
             }
 
-            configuration.OktaDomain = EnsureTrailingSlash(configuration.OktaDomain);
+            configuration.OktaDomain = UrlHelper.EnsureTrailingSlash(configuration.OktaDomain);
 
             if (!configuration.DisableHttpsCheck && !configuration.OktaDomain.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
             {
@@ -53,21 +53,6 @@ namespace Okta.Sdk.Abstractions
             {
                 throw new ArgumentNullException(nameof(configuration.OktaDomain), $"It looks like there's a typo in your Okta domain. Current value: {configuration.OktaDomain}. You can copy your domain from the Okta Developer Console. Follow these instructions to find it: https://bit.ly/finding-okta-domain");
             }
-        }
-
-        /// <summary>
-        /// Ensures that this URI ends with a trailing slash <c>/</c>
-        /// </summary>
-        /// <param name="oktaDomain">The okta domain URI string</param>
-        /// <returns>The URI string, appended with <c>/</c> if necessary.</returns>
-        public static string EnsureTrailingSlash(string oktaDomain)
-        {
-            if (!oktaDomain.EndsWith("/"))
-            {
-                oktaDomain += "/";
-            }
-
-            return oktaDomain;
         }
     }
 }

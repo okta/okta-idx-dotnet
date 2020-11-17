@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Okta.IdentityEngine.Sdk.Configuration;
 using Okta.Sdk.Abstractions.Configuration;
 using System;
 using System.Linq;
@@ -13,9 +14,9 @@ namespace Okta.IdentityEngine.Sdk.IntegrationTests
         public async Task CallIntrospectEndpoint()
         {
             var stateHandle = "{stateHandlePlaceholder}";
-            var client = TestIdentityEngineClient.Create(new OktaClientConfiguration() { OktaDomain = "https://devex-idx-testing.oktapreview.com" });
+            var client = TestIdentityEngineClient.Create(new OktaIdentityEngineConfiguration() { Issuer = "https://devex-idx-testing.oktapreview.com/oauth2/default" });
 
-            var response = await client.Introspect(stateHandle);
+            var response = await client.StartAsync(stateHandle);
 
             response.StateHandle.Should().Be(stateHandle);
             response.Version.Should().NotBeNullOrEmpty();
@@ -43,7 +44,7 @@ namespace Okta.IdentityEngine.Sdk.IntegrationTests
             resourceData.StateHandle = stateHandle;
             resourceData.SetProperty("rememberMe", false);
 
-            var response2 =  await response.Remediation.RemediationOptions.FirstOrDefault().Proceed(resourceData);
+            var response2 =  await response.Remediation.RemediationOptions.FirstOrDefault().ProceedAsync(resourceData);
 
         }
     }

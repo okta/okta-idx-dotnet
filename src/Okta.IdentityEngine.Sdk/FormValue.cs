@@ -15,9 +15,6 @@ namespace Okta.IdentityEngine.Sdk
         /// <inheritdoc/>
         public string Type => GetStringProperty("type");
 
-        // TODO: Potential Resource
-        public string Value => GetStringProperty("value");
-
         /// <inheritdoc/>
         public bool? Visible => GetBooleanProperty("visible");
 
