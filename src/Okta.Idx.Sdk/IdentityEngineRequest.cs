@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Okta.Idx.Sdk
 {
-    public class IdentityEngineRequest : Resource
+    public class IdxRequestPayload : Resource
     {
         public string StateHandle
         {

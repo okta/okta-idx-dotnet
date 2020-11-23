@@ -425,7 +425,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var identifyRemediationOption = introspectResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
-            var remediationProceedRequest = new IdentityEngineRequest()
+            var remediationProceedRequest = new IdxRequestPayload()
             {
                 StateHandle = "02mOEmmIhklxzTn5W3erSQ0y9RwhjjPDHbvMTfgF5b",
             };
@@ -1054,7 +1054,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var identifyRemediationOption = identifyResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
-            var remediationProceedRequest = new IdentityEngineRequest()
+            var remediationProceedRequest = new IdxRequestPayload()
             {
                 StateHandle = "02mOEmmIhklxzTn5W3erSQ0y9RwhjjPDHbvMTfgF5b",
             };
@@ -1619,7 +1619,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var identifyRemediationOption = challengeResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
-            var remediationProceedRequest = new IdentityEngineRequest()
+            var remediationProceedRequest = new IdxRequestPayload()
             {
                 StateHandle = "02SgqMQY8JRJoPgvvME2CYBWjCASB_cuQbZXAWLMo3",
             };
@@ -2018,7 +2018,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var identifyRemediationOption = challengeResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
-            var remediationProceedRequest = new IdentityEngineRequest()
+            var remediationProceedRequest = new IdxRequestPayload()
             {
                 StateHandle = "02SgqMQY8JRJoPgvvME2CYBWjCASB_cuQbZXAWLMo3",
             };
@@ -2324,7 +2324,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var identifyRemediationOption = challengeResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
-            var remediationProceedRequest = new IdentityEngineRequest()
+            var remediationProceedRequest = new IdxRequestPayload()
             {
                 StateHandle = "02eYb3-CKPkh3l9SMxym9zyPZt1bLo5q_yab6ahhFg",
             };

@@ -42,7 +42,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
             formItem.Should().NotBeNull();
 
 
-            var resourceData = new IdentityEngineRequest();
+            var resourceData = new IdxRequestPayload();
             resourceData.SetProperty("identifier", "{emailPlaceHolder}");
             resourceData.StateHandle = stateHandle;
             resourceData.SetProperty("rememberMe", false);

@@ -13,7 +13,7 @@ namespace Okta.Idx.Sdk
         /// null, the SDK MUST make an api call to the interact endpoint to get the initial inteactionHandle.
         /// </summary>
         /// <param name="interactionHandle">The interaction handle that was returned by the `interact()` call</param>
-        /// <returns>The OktaIdentityEngineResponse.</returns>
+        /// <returns>The IdxResponse.</returns>
         Task<IIdxResponse> StartAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

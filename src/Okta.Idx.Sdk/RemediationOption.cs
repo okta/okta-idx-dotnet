@@ -23,7 +23,7 @@ namespace Okta.Idx.Sdk
 
         public IList<IFormValue> Form => GetArrayProperty<IFormValue>("value");
 
-        public async Task<IIdxResponse> ProceedAsync(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken =  default)
+        public async Task<IIdxResponse> ProceedAsync(IdxRequestPayload dataFromUi, CancellationToken cancellationToken =  default)
         {
             var request = new HttpRequest
             {

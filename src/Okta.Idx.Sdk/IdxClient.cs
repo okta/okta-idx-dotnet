@@ -155,7 +155,7 @@ namespace Okta.Idx.Sdk
 
         private async Task<IIdxResponse> IntrospectAsync(string interactionHandle, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var payload = new IdentityEngineRequest()
+            var payload = new IdxRequestPayload()
             {
                 StateHandle = interactionHandle,
             };

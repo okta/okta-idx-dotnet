@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Okta.Idx.Sdk
@@ -39,10 +40,10 @@ namespace Okta.Idx.Sdk
         IIdxSuccessResponse SuccessWithInteractionCode { get;  }
 
         /// <summary>
-        /// The method to call when you want to cancel the Okta Identity Engine flow. This will return an OktaIdentityEngineResponse
+        /// The method to call when you want to cancel the Okta Identity Engine flow. This will return an IdxResponse
         /// </summary>
-        /// <returns>An OktaIdentityEngineResponse.</returns>
-        Task<IIdxResponse> CancelAsync();
+        /// <returns>An IdxResponse.</returns>
+        Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken);
 
         bool IsLoginSuccess { get; }
 

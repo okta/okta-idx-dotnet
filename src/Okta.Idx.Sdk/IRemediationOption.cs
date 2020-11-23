@@ -49,7 +49,7 @@ namespace Okta.Idx.Sdk
         /// Allows you to continue the remediation with this option.
         /// </summary>
         /// <param name="dataFromUi">The data returned from the enduser</param>
-        /// <returns>An OktaIdentityEngineResponse. </returns>
-        Task<IIdxResponse> ProceedAsync(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken = default);
+        /// <returns>An IdxResponse. </returns>
+        Task<IIdxResponse> ProceedAsync(IdxRequestPayload dataFromUi, CancellationToken cancellationToken = default);
     }
 }

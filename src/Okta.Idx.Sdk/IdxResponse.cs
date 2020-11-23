@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Okta.Sdk.Abstractions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Okta.Idx.Sdk
@@ -28,9 +31,27 @@ namespace Okta.Idx.Sdk
 
         public IIdxSuccessResponse SuccessWithInteractionCode => GetResourceProperty<IdxSuccessResponse>("successWithInteractionCode");
 
-        public Task<IIdxResponse> CancelAsync()
+        public async Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken = default)
         {
-            return null;
+            var cancelResponse = this.GetResourceProperty<CancelResponse>("cancel");
+
+            var stateHandleFormValue = cancelResponse.GetArrayProperty<FormValue>("value").FirstOrDefault(x => x.Name == "stateHandle");
+
+
+            var payload = new IdxRequestPayload()
+            {
+                StateHandle = stateHandleFormValue.GetProperty<string>("value"),
+            };
+
+            var request = new HttpRequest
+            {
+                Uri = cancelResponse.Href,
+                Payload = payload,
+            };
+
+            var httpVerb = (HttpVerb)Enum.Parse(typeof(HttpVerb), cancelResponse.Method, true);
+
+            return await _client.SendAsync<IdxResponse>(request, httpVerb, cancellationToken).ConfigureAwait(false);
         }
     }
 }
