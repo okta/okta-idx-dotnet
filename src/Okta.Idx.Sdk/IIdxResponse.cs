@@ -44,7 +44,7 @@ namespace Okta.Idx.Sdk
         /// <returns>An OktaIdentityEngineResponse.</returns>
         Task<IIdxResponse> CancelAsync();
 
-        bool LoginSuccess { get; }
+        bool IsLoginSuccess { get; }
 
         
     }

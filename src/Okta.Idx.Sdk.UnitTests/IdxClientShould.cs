@@ -1074,6 +1074,7 @@ namespace Okta.Idx.Sdk.UnitTests
             identifyProcessedResponse.Version.Should().NotBeNullOrEmpty();
             identifyProcessedResponse.ExpiresAt.Value.Should().Be(DateTimeOffset.Parse("2020-10-20T19:11:05.000Z"));
             identifyProcessedResponse.Intent.Should().Be("LOGIN");
+            identifyProcessedResponse.IsLoginSuccess.Should().BeFalse();
 
             identifyProcessedResponse.Remediation.GetRaw().Should().NotBeNullOrEmpty();
             identifyProcessedResponse.Remediation.Type.Should().Be("array");
@@ -1637,6 +1638,7 @@ namespace Okta.Idx.Sdk.UnitTests
             identifyProcessedResponse.Version.Should().NotBeNullOrEmpty();
             identifyProcessedResponse.ExpiresAt.Value.Should().Be(DateTimeOffset.Parse("2020-10-21T20:25:36.000Z"));
             identifyProcessedResponse.Intent.Should().Be("LOGIN");
+            identifyProcessedResponse.IsLoginSuccess.Should().BeFalse();
 
             identifyProcessedResponse.Remediation.GetRaw().Should().NotBeNullOrEmpty();
             identifyProcessedResponse.Remediation.Type.Should().Be("array");
@@ -2045,6 +2047,7 @@ namespace Okta.Idx.Sdk.UnitTests
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Method.Should().Be("POST");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Accepts.Should().Be("application/ion+json; okta-version=1.0.0");
+            identifyProcessedResponse.IsLoginSuccess.Should().BeFalse();
 
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Form.Should().NotBeNullOrEmpty();
             var stateHandleFormItem = identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Form.FirstOrDefault(x => x.Name == "stateHandle");
@@ -2248,9 +2251,34 @@ namespace Okta.Idx.Sdk.UnitTests
                             ""id"": ""00u36qtuuODvRg5Tx1d6""
                         }
                     },
-                    ""success"": {
-                        ""name"": ""success-redirect"",
-                        ""href"": ""https://devex-idx-testing.oktapreview.com/login/token/redirect?stateToken=02eYb3-CKPkh3l9SMxym9zyPZt1bLo5q_yab6ahhFg""
+                    ""successWithInteractionCode"": {
+                        ""rel"": [
+                            ""create-form""
+                        ],
+                        ""name"": ""issue"",
+                        ""href"": ""https://devex-idx-testing.oktapreview.com/oauth2/v1/token"",
+                        ""method"": ""POST"",
+                        ""value"": [
+                            {
+                                ""name"": ""grant_type"",
+                                ""label"": ""Grant Type"",
+                                ""required"": true,
+                                ""value"": ""interaction_code""
+                            },
+                            {
+                                ""name"": ""interaction_code"",
+                                ""label"": ""Interaction Code"",
+                                ""required"": true,
+                                ""value"": ""dUJHngn125_NsSyr86zpFZg8PJWNUgzAKK88GKw781U""
+                            },
+                            {
+                                ""name"": ""client_id"",
+                                ""label"": ""Client Id"",
+                                ""required"": true,
+                                ""value"": ""000000""
+                            }
+                        ],
+                        ""accepts"": ""application/x-www-form-urlencoded""
                     },
                     ""cancel"": {
                         ""rel"": [
@@ -2317,11 +2345,32 @@ namespace Okta.Idx.Sdk.UnitTests
             // TODO: Revisit this is not null now
             //identifyProcessedResponse.Remediation.Should().BeNull();
 
-            // TODO: UPDATE test with successWithInteractionCode
-            var success = identifyProcessedResponse.GetProperty<Resource>("success");
-            success.Should().NotBeNull();
-            success.GetProperty<string>("name").Should().Be("success-redirect");
-            success.GetProperty<string>("href").Should().Be("https://devex-idx-testing.oktapreview.com/login/token/redirect?stateToken=02eYb3-CKPkh3l9SMxym9zyPZt1bLo5q_yab6ahhFg");
+            identifyProcessedResponse.IsLoginSuccess.Should().BeTrue();
+            identifyProcessedResponse.SuccessWithInteractionCode.Should().NotBeNull();
+            identifyProcessedResponse.SuccessWithInteractionCode.Rel.Should().Contain("create-form");
+            identifyProcessedResponse.SuccessWithInteractionCode.Name.Should().Be("issue");
+            identifyProcessedResponse.SuccessWithInteractionCode.Href.Should().Be("https://devex-idx-testing.oktapreview.com/oauth2/v1/token");
+            identifyProcessedResponse.SuccessWithInteractionCode.Method.Should().Be("POST");
+            identifyProcessedResponse.SuccessWithInteractionCode.Accepts.Should().Be("application/x-www-form-urlencoded");
+
+            var successFormValues = identifyProcessedResponse.SuccessWithInteractionCode.GetArrayProperty<FormValue>("value");
+
+            var grantTypeFormValue = successFormValues.FirstOrDefault(x => x.Name == "grant_type");
+            grantTypeFormValue.Label.Should().Be("Grant Type");
+            grantTypeFormValue.Required.Should().BeTrue();
+            grantTypeFormValue.GetProperty<string>("value").Should().Be("interaction_code");
+
+            var interactionCodeFormValue = successFormValues.FirstOrDefault(x => x.Name == "interaction_code");
+            interactionCodeFormValue.Label.Should().Be("Interaction Code");
+            interactionCodeFormValue.Required.Should().BeTrue();
+            interactionCodeFormValue.GetProperty<string>("value").Should().Be("dUJHngn125_NsSyr86zpFZg8PJWNUgzAKK88GKw781U");
+
+            var clientIdFormValue = successFormValues.FirstOrDefault(x => x.Name == "client_id");
+            clientIdFormValue.Label.Should().Be("Client Id");
+            clientIdFormValue.Required.Should().BeTrue();
+            clientIdFormValue.GetProperty<string>("value").Should().Be("000000");
+
+
         }
     }
 }

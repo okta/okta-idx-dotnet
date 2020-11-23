@@ -178,7 +178,9 @@ namespace Okta.Idx.Sdk
         {
             if (string.IsNullOrEmpty(interactionHandle))
             {
-                interactionHandle = "GET via interact";
+                var interactResponse = await InteractAsync(cancellationToken);
+
+                interactionHandle = interactResponse.InteractionHandle;
             }
 
             return await IntrospectAsync(interactionHandle, cancellationToken);

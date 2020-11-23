@@ -19,7 +19,7 @@ namespace Okta.Idx.Sdk
 
         public string Raw => GetStringProperty("raw");
 
-        public bool LoginSuccess {
+        public bool IsLoginSuccess {
             get
             {
                 return this.GetData().ContainsKey("successWithInteractionCode");
