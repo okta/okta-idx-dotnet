@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Okta.IdentityEngine.Sdk
+namespace Okta.Idx.Sdk
 {
     public interface IRemediationOption : IResource
     {
@@ -50,6 +50,6 @@ namespace Okta.IdentityEngine.Sdk
         /// </summary>
         /// <param name="dataFromUi">The data returned from the enduser</param>
         /// <returns>An OktaIdentityEngineResponse. </returns>
-        Task<IOktaIdentityEngineResponse> ProceedAsync(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken = default);
+        Task<IIdxResponse> ProceedAsync(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken = default);
     }
 }

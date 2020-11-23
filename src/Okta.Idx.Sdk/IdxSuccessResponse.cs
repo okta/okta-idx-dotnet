@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Okta.IdentityEngine.Sdk
+namespace Okta.Idx.Sdk
 {
-    public class OktaIdentityEngineSuccessResponse : Resource, IOktaIdentityEngineSuccessResponse
+    public class IdxSuccessResponse : Resource, IIdxSuccessResponse
     {
         public IList<string> Rel => GetArrayProperty<string>("rel");
 

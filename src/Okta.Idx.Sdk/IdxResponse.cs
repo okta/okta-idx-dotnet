@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Okta.IdentityEngine.Sdk
+namespace Okta.Idx.Sdk
 {
-    public class OktaIdentityEngineResponse : Resource, IOktaIdentityEngineResponse
+    public class IdxResponse : Resource, IIdxResponse
     {
         public string StateHandle => GetStringProperty("stateHandle");
 
@@ -26,11 +26,11 @@ namespace Okta.IdentityEngine.Sdk
             }
         }
 
-        public IOktaIdentityEngineSuccessResponse SuccessWithInteractionCode => GetResourceProperty<OktaIdentityEngineSuccessResponse>("successWithInteractionCode");
+        public IIdxSuccessResponse SuccessWithInteractionCode => GetResourceProperty<IdxSuccessResponse>("successWithInteractionCode");
 
-        public Task<IOktaIdentityEngineResponse> CancelAsync()
+        public Task<IIdxResponse> CancelAsync()
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

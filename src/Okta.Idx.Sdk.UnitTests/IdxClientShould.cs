@@ -7,9 +7,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Okta.IdentityEngine.Sdk.UnitTests
+namespace Okta.Idx.Sdk.UnitTests
 {
-    public class IdentityEngineClientShould
+    public class IdxClientShould
     {
         [Fact]
         // STEP 1
@@ -87,7 +87,7 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             #endregion
 
             var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
-            var testClient = new TesteableIdentityEngineClient(mockRequestExecutor);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
 
             var response = await testClient.StartAsync("foo");
             response.StateHandle.Should().NotBeNullOrEmpty();
@@ -413,12 +413,12 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             #endregion
 
             var mockRequestExecutor = new MockedStringRequestExecutor(rawIdentifyResponse);
-            var testClient = new TesteableIdentityEngineClient(mockRequestExecutor);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
 
             // Create a mock for an introspect response with "Identify" as a remediation option
             var resourceFactory = new ResourceFactory(testClient, NullLogger.Instance, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
             var data = new DefaultSerializer().Deserialize(rawIntrospectResponse);
-            var introspectResponse = resourceFactory.CreateNew<OktaIdentityEngineResponse>(data);
+            var introspectResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
             introspectResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/identify");
@@ -1042,12 +1042,12 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             #endregion
 
             var mockRequestExecutor = new MockedStringRequestExecutor(rawChallengeResponse);
-            var testClient = new TesteableIdentityEngineClient(mockRequestExecutor);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
 
             // Create a mock for an introspect response with "Identify" as a remediation option
             var resourceFactory = new ResourceFactory(testClient, NullLogger.Instance, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
             var data = new DefaultSerializer().Deserialize(rawIdentifyResponse);
-            var identifyResponse = resourceFactory.CreateNew<OktaIdentityEngineResponse>(data);
+            var identifyResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
             identifyResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge");
@@ -1606,12 +1606,12 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             #endregion
 
             var mockRequestExecutor = new MockedStringRequestExecutor(rawAnswerResponse);
-            var testClient = new TesteableIdentityEngineClient(mockRequestExecutor);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
 
             // Create a mock for an introspect response with "Identify" as a remediation option
             var resourceFactory = new ResourceFactory(testClient, NullLogger.Instance, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
             var data = new DefaultSerializer().Deserialize(rawChallengeResponse);
-            var challengeResponse = resourceFactory.CreateNew<OktaIdentityEngineResponse>(data);
+            var challengeResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
             challengeResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer");
@@ -2004,12 +2004,12 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             #endregion
 
             var mockRequestExecutor = new MockedStringRequestExecutor(rawChallengeEmailResponse);
-            var testClient = new TesteableIdentityEngineClient(mockRequestExecutor);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
 
             // Create a mock for an introspect response with "Identify" as a remediation option
             var resourceFactory = new ResourceFactory(testClient, NullLogger.Instance, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
             var data = new DefaultSerializer().Deserialize(rawAnswerResponse);
-            var challengeResponse = resourceFactory.CreateNew<OktaIdentityEngineResponse>(data);
+            var challengeResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
             challengeResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge");
@@ -2284,12 +2284,12 @@ namespace Okta.IdentityEngine.Sdk.UnitTests
             #endregion
 
             var mockRequestExecutor = new MockedStringRequestExecutor(rawSendEmailCodeResponse);
-            var testClient = new TesteableIdentityEngineClient(mockRequestExecutor);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
 
             // Create a mock for an introspect response with "Identify" as a remediation option
             var resourceFactory = new ResourceFactory(testClient, NullLogger.Instance, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
             var data = new DefaultSerializer().Deserialize(rawChallengeEmailResponse);
-            var challengeResponse = resourceFactory.CreateNew<OktaIdentityEngineResponse>(data);
+            var challengeResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
             challengeResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer");

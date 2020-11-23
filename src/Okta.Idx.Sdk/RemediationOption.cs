@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Okta.IdentityEngine.Sdk
+namespace Okta.Idx.Sdk
 {
     public class RemediationOption : Resource, IRemediationOption
     {
@@ -23,7 +23,7 @@ namespace Okta.IdentityEngine.Sdk
 
         public IList<IFormValue> Form => GetArrayProperty<IFormValue>("value");
 
-        public async Task<IOktaIdentityEngineResponse> ProceedAsync(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken =  default)
+        public async Task<IIdxResponse> ProceedAsync(IdentityEngineRequest dataFromUi, CancellationToken cancellationToken =  default)
         {
             var request = new HttpRequest
             {
@@ -33,7 +33,7 @@ namespace Okta.IdentityEngine.Sdk
 
             var httpVerb = (HttpVerb)Enum.Parse(typeof(HttpVerb), Method, true);
 
-            return await _client.SendAsync<OktaIdentityEngineResponse>(request, httpVerb, cancellationToken).ConfigureAwait(false);
+            return await _client.SendAsync<IdxResponse>(request, httpVerb, cancellationToken).ConfigureAwait(false);
         }
     }
 }

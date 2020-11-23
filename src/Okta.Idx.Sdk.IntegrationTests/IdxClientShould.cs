@@ -1,20 +1,23 @@
 using FluentAssertions;
-using Okta.IdentityEngine.Sdk.Configuration;
+using Okta.Idx.Sdk.Configuration;
 using Okta.Sdk.Abstractions.Configuration;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Okta.IdentityEngine.Sdk.IntegrationTests
+namespace Okta.Idx.Sdk.IntegrationTests
 {
-    public class OktaIdentityEngineClientShould
+    public class IdxClientShould
     {
         [Fact]
         public async Task CallIntrospectEndpoint()
         {
             var stateHandle = "{stateHandlePlaceholder}";
-            var client = TestIdentityEngineClient.Create(new OktaIdentityEngineConfiguration() { Issuer = "https://devex-idx-testing.oktapreview.com/oauth2/default" });
+            var client = TestIdxClient.Create(new IdxConfiguration() { Issuer = "https://idx-foo.com/oauth2/default/v1", ClientId = "foo" });
+
+            var res = await ((IdxClient)client).InteractAsync();
+
 
             var response = await client.StartAsync(stateHandle);
 
@@ -30,7 +33,7 @@ namespace Okta.IdentityEngine.Sdk.IntegrationTests
             response.Remediation.RemediationOptions.Should().NotBeNullOrEmpty();
             response.Remediation.RemediationOptions.FirstOrDefault().Rel.Should().Contain("create-form");
             response.Remediation.RemediationOptions.FirstOrDefault().Name.Should().Be("identify");
-            response.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/identify");
+            response.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://idx-foo.com.oktapreview.com/idp/idx/identify");
             response.Remediation.RemediationOptions.FirstOrDefault().Method.Should().Be("POST");
 
             response.Remediation.RemediationOptions.FirstOrDefault().Form.Should().NotBeNullOrEmpty();

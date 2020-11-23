@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Okta.IdentityEngine.Sdk
+namespace Okta.Idx.Sdk
 {
     public class Remediation : Resource, IRemediation
     {

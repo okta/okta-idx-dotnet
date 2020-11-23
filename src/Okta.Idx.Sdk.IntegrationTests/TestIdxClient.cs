@@ -1,18 +1,18 @@
-﻿using Okta.IdentityEngine.Sdk.Configuration;
+﻿using Okta.Idx.Sdk.Configuration;
 using Okta.Sdk.Abstractions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Okta.IdentityEngine.Sdk.IntegrationTests
+namespace Okta.Idx.Sdk.IntegrationTests
 {
-    public class TestIdentityEngineClient
+    public class TestIdxClient
     {
-        public static IOktaIdentityEngineClient Create(OktaIdentityEngineConfiguration configuration = null)
+        public static IIdxClient Create(IdxConfiguration configuration = null)
         {
             // Configuration is expected to be stored in environment variables on the test machine.
             // A few tests pass in a configuration object, but this is just to override and test specific things.
-            return new OktaIdentityEngineClient(configuration);
+            return new IdxClient(configuration);
         }
     }
 }

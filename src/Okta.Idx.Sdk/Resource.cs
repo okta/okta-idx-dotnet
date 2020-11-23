@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Okta.Sdk.Abstractions;
 
-namespace Okta.IdentityEngine.Sdk
+namespace Okta.Idx.Sdk
 {
     /// <summary>
     /// This class represents a resource
@@ -32,9 +32,9 @@ namespace Okta.IdentityEngine.Sdk
         /// Gets the <see cref="IOktaClient">OktaClient</see> that created this resource.
         /// </summary>
         /// <returns>The <see cref="IOktaClient">OktaClient</see> that created this resource.</returns>
-        protected new IOktaIdentityEngineClient GetClient()
+        protected new IIdxClient GetClient()
         {
-            return (IOktaIdentityEngineClient)_client ?? throw new InvalidOperationException("Only resources retrieved or saved through a Client object cna call server-side methods.");
+            return (IIdxClient)_client ?? throw new InvalidOperationException("Only resources retrieved or saved through a Client object cna call server-side methods.");
         }
     }
 }

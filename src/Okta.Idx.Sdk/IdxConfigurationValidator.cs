@@ -1,20 +1,20 @@
-﻿using Okta.IdentityEngine.Sdk.Configuration;
+﻿using Okta.Idx.Sdk.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Okta.IdentityEngine.Sdk.Configuration
+namespace Okta.Idx.Sdk.Configuration
 {
     /// <summary>
     /// Helper validator class for OktaClient settings
     /// </summary>
-    public class OktaIdentityEngineConfigurationValidator
+    public class IdxConfigurationValidator
     {
         /// <summary>
         /// Validates the Okta Identity Engine configuration
         /// </summary>
         /// <param name="configuration">The configuration to be validated</param>
-        public static void Validate(OktaIdentityEngineConfiguration configuration)
+        public static void Validate(IdxConfiguration configuration)
         {
             if (configuration.Issuer.IndexOf("{yourOktaIssuer}", StringComparison.OrdinalIgnoreCase) >= 0)
             {

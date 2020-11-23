@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FlexibleConfiguration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Okta.IdentityEngine.Sdk.Configuration;
+using Okta.Idx.Sdk.Configuration;
 using Okta.Sdk.Abstractions;
 using Okta.Sdk.Abstractions.Configuration;
 
-namespace Okta.IdentityEngine.Sdk
+namespace Okta.Idx.Sdk
 {
-    public class OktaIdentityEngineClient : IOktaIdentityEngineClient
+    public class IdxClient : IIdxClient
     {
         /// <summary>
         /// The <code>IDataStore</code> implementation to be used for making requests.
@@ -27,20 +29,20 @@ namespace Okta.IdentityEngine.Sdk
         /// </summary>
         protected RequestContext _requestContext;
 
-        static OktaIdentityEngineClient()
+        static IdxClient()
         {
             System.AppContext.SetSwitch("Switch.System.Net.DontEnableSystemDefaultTlsVersions", false);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OktaIdentityEngineClient"/> class.
+        /// Initializes a new instance of the <see cref="IdxClient"/> class.
         /// </summary>
-        public OktaIdentityEngineClient()
+        public IdxClient()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OktaIdentityEngineClient"/> class using the specified <see cref="HttpClient"/>.
+        /// Initializes a new instance of the <see cref="IdxClient"/> class using the specified <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="apiClientConfiguration">
         /// The client configuration. If <c>null</c>, the library will attempt to load
@@ -48,22 +50,22 @@ namespace Okta.IdentityEngine.Sdk
         /// </param>
         /// <param name="httpClient">The HTTP client to use for requests to the Okta API.</param>
         /// <param name="logger">The logging interface to use, if any.</param>
-        public OktaIdentityEngineClient(
-            OktaIdentityEngineConfiguration configuration = null,
+        public IdxClient(
+            IdxConfiguration configuration = null,
             HttpClient httpClient = null,
             ILogger logger = null)
         {
             Configuration = GetConfigurationOrDefault(configuration);
-            OktaIdentityEngineConfigurationValidator.Validate(Configuration);
+            IdxConfigurationValidator.Validate(Configuration);
 
             logger = logger ?? NullLogger.Instance;
 
-            var userAgentBuilder = new UserAgentBuilder("okta-identity-engine-dotnet", typeof(OktaIdentityEngineClient).GetTypeInfo().Assembly.GetName().Version);
+            var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
 
-            httpClient = httpClient ?? DefaultHttpClient.Create(
-                Configuration.ConnectionTimeout,
-                Configuration.Proxy,
-                logger);
+            // TODO: Allow proxy configuration
+            httpClient = httpClient ?? DefaultHttpClient.Create(connectionTimeout: null,
+                proxyConfiguration: null,
+                logger: logger);
 
             var oktaBaseConfiguration = OktaConfigurationConverter.Convert(configuration);
             var resourceTypeResolverFactory = new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource)));
@@ -78,7 +80,7 @@ namespace Okta.IdentityEngine.Sdk
                 userAgentBuilder);
         }
 
-        protected static OktaIdentityEngineConfiguration GetConfigurationOrDefault(OktaIdentityEngineConfiguration configuration)
+        protected static IdxConfiguration GetConfigurationOrDefault(IdxConfiguration configuration)
         {
             string configurationFileRoot = Directory.GetCurrentDirectory();
 
@@ -93,27 +95,25 @@ namespace Okta.IdentityEngine.Sdk
                 .AddYamlFile(applicationOktaYamlLocation, optional: true)
                 .AddEnvironmentVariables("okta", "_", root: "okta")
                 .AddEnvironmentVariables("okta_testing", "_", root: "okta")
-                //.AddObject(configuration, root: "okta:client")
-                .AddObject(configuration, root: "okta:client:idx")
+                .AddObject(configuration, root: "okta:idx")
                 .AddObject(configuration, root: "okta:testing")
                 .AddObject(configuration);
 
-            var compiledConfig = new OktaIdentityEngineConfiguration();
-            //configBuilder.Build().GetSection("okta").GetSection("client").Bind(compiledConfig);
-            configBuilder.Build().GetSection("okta").GetSection("client").GetSection("idx").Bind(compiledConfig);
+            var compiledConfig = new IdxConfiguration();
+            configBuilder.Build().GetSection("okta").GetSection("idx").Bind(compiledConfig);
             configBuilder.Build().GetSection("okta").GetSection("testing").Bind(compiledConfig);
 
             return compiledConfig;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OktaIdentityEngineClient"/> class.
+        /// Initializes a new instance of the <see cref="IdxClient"/> class.
         /// </summary>
         /// <param name="dataStore">The <see cref="IDataStore">DataStore</see> to use.</param>
         /// <param name="configuration">The client configuration.</param>
         /// <param name="requestContext">The request context, if any.</param>
         /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
-        protected OktaIdentityEngineClient(IDataStore dataStore, OktaIdentityEngineConfiguration configuration, RequestContext requestContext)
+        protected IdxClient(IDataStore dataStore, IdxConfiguration configuration, RequestContext requestContext)
         {
             _dataStore = dataStore ?? throw new ArgumentNullException(nameof(dataStore));
             Configuration = configuration;
@@ -124,27 +124,36 @@ namespace Okta.IdentityEngine.Sdk
         /// <summary>
         /// Gets or sets the Okta configuration.
         /// </summary>
-        public OktaIdentityEngineConfiguration Configuration { get; protected set; }
+        public IdxConfiguration Configuration { get; protected set; }
 
-        private async Task<IOktaIdentityEngineResponse> InteractAsync(CancellationToken cancellationToken)
+        public async Task<IInteractionHandleResponse> InteractAsync(CancellationToken cancellationToken = default)
         {
-            var payload = new {
-                Scope = string.Join(" ", this.Configuration.Scopes),
-                // TODO: login_hint
-            }; 
 
-            var uri = $"{this.Configuration.Issuer}/interact";
+            var payload = new Dictionary<string, string>();
+            payload.Add("scope", string.Join(" ", Configuration.Scopes));
+            
+            var authorizationHeaderString = $"{Configuration.ClientId}:{Configuration.ClientSecret}";
+            var byteArray = Encoding.ASCII.GetBytes($"{authorizationHeaderString}");
+
+            var uri = $"{Configuration.Issuer}/interact";
+            var headers = new Dictionary<string, string>();
+
+            headers.Add("Authorization", $"Basic {Convert.ToBase64String(byteArray)}");
+            headers.Add("Content-Type", HttpRequestContentBuilder.CONTENT_TYPE_X_WWW_FORM_URL_ENCODED);
+
+
             var request = new HttpRequest
             {
                 Uri = uri,
                 Payload = payload,
+                Headers = headers,
             };
-            // TODO: define a response for this call
-            return await PostAsync<OktaIdentityEngineResponse>(
+
+            return await PostAsync<InteractionHandleResponse>(
                 request, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<IOktaIdentityEngineResponse> IntrospectAsync(string interactionHandle, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<IIdxResponse> IntrospectAsync(string interactionHandle, CancellationToken cancellationToken = default(CancellationToken))
         {
             var payload = new IdentityEngineRequest()
             {
@@ -160,12 +169,12 @@ namespace Okta.IdentityEngine.Sdk
                 Payload = payload,
             };
 
-            return await PostAsync<OktaIdentityEngineResponse>(
+            return await PostAsync<IdxResponse>(
                 request, cancellationToken).ConfigureAwait(false);
 
         }
 
-        public async Task<IOktaIdentityEngineResponse> StartAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IIdxResponse> StartAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (string.IsNullOrEmpty(interactionHandle))
             {
@@ -177,7 +186,7 @@ namespace Okta.IdentityEngine.Sdk
         }
 
         public IOktaClient CreateScoped(RequestContext requestContext)
-            => new OktaIdentityEngineClient(_dataStore, Configuration, requestContext);
+            => new IdxClient(_dataStore, Configuration, requestContext);
 
         /// <summary>
         /// Creates a new <see cref="CollectionClient{T}"/> given an initial HTTP request.

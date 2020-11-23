@@ -71,6 +71,23 @@ namespace Okta.Sdk.Abstractions
             return uri.TrimStart('/');
         }
 
+        private string GetContentType(IEnumerable<KeyValuePair<string, string>> headers)
+        {
+            var contentType = HttpRequestContentBuilder.CONTENT_TYPE_JSON;
+
+            if (headers != null)
+            {
+                var header = headers.FirstOrDefault(x => string.Equals(x.Key, "Content-Type", StringComparison.OrdinalIgnoreCase));
+
+                if (!header.Equals(default(KeyValuePair<string, string>)))
+                {
+                    contentType = string.IsNullOrEmpty(header.Value) ? HttpRequestContentBuilder.CONTENT_TYPE_JSON : header.Value;
+                }
+            }
+
+            return contentType;
+        }
+
         private async Task<HttpResponse<string>> SendAsync(
             HttpRequestMessage request,
             CancellationToken cancellationToken)
@@ -105,7 +122,11 @@ namespace Okta.Sdk.Abstractions
 
             foreach (var header in headers)
             {
-                request.Headers.Add(header.Key, header.Value);
+                // Content-Type is set during the content creation. This is a limitation of .NET, that doesn't allow to set Content-Type as a request header.
+                if (!string.Equals(header.Key, "Content-Type", StringComparison.OrdinalIgnoreCase))
+                {
+                    request.Headers.Add(header.Key, header.Value);
+                }
             }
         }
 
@@ -127,13 +148,14 @@ namespace Okta.Sdk.Abstractions
         public Task<HttpResponse<string>> PostAsync(string href, IEnumerable<KeyValuePair<string, string>> headers, string body, CancellationToken cancellationToken)
         {
             var path = EnsureRelativeUrl(href);
+            var contentType = GetContentType(headers);
 
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri(path, UriKind.Relative));
             ApplyHeadersToRequest(request, headers);
 
             request.Content = string.IsNullOrEmpty(body)
                 ? null
-                : new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                : HttpRequestContentBuilder.GetRequestContent(contentType, body);
 
             return SendAsync(request, cancellationToken);
         }

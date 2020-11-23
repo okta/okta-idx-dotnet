@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Okta.Sdk.Abstractions;
 
-namespace Okta.IdentityEngine.Sdk.UnitTests
+namespace Okta.Idx.Sdk.UnitTests
 {
     public class MockedStringRequestExecutor : IRequestExecutor
     {

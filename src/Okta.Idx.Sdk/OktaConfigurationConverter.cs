@@ -1,11 +1,11 @@
-﻿using Okta.IdentityEngine.Sdk.Configuration;
+﻿using Okta.Idx.Sdk.Configuration;
 using Okta.Sdk.Abstractions;
 using Okta.Sdk.Abstractions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Okta.IdentityEngine.Sdk.Configuration
+namespace Okta.Idx.Sdk.Configuration
 {
     public class OktaConfigurationConverter
     {
@@ -14,7 +14,7 @@ namespace Okta.IdentityEngine.Sdk.Configuration
         /// </summary>
         /// <param name="configuration">The Okta Idx configuration.</param>
         /// <returns>The Okta client configuration.</returns>
-        public static OktaClientConfiguration Convert(OktaIdentityEngineConfiguration configuration)
+        public static OktaClientConfiguration Convert(IdxConfiguration configuration)
         {
             return new OktaClientConfiguration
             {

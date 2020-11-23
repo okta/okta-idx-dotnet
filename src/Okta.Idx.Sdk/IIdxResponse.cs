@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Okta.IdentityEngine.Sdk
+namespace Okta.Idx.Sdk
 {
-    public interface IOktaIdentityEngineResponse : IResource
+    public interface IIdxResponse : IResource
     {
         /// <summary>
         /// Gets the stateHandle is used for all calls for the flow.
@@ -36,13 +36,13 @@ namespace Okta.IdentityEngine.Sdk
         /// <summary>
         /// Gets a success response object after `loginSuccess()` returns true.
         /// </summary>
-        IOktaIdentityEngineSuccessResponse SuccessWithInteractionCode { get;  }
+        IIdxSuccessResponse SuccessWithInteractionCode { get;  }
 
         /// <summary>
         /// The method to call when you want to cancel the Okta Identity Engine flow. This will return an OktaIdentityEngineResponse
         /// </summary>
         /// <returns>An OktaIdentityEngineResponse.</returns>
-        Task<IOktaIdentityEngineResponse> CancelAsync();
+        Task<IIdxResponse> CancelAsync();
 
         bool LoginSuccess { get; }
 

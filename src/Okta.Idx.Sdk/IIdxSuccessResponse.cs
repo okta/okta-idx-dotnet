@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Okta.IdentityEngine.Sdk
+namespace Okta.Idx.Sdk
 {
-    public interface IOktaIdentityEngineSuccessResponse : IResource
+    public interface IIdxSuccessResponse : IResource
     {
         /// <summary>
         /// Gets the ION spec rel member based around the [form structure](https://ionspec.org/#form-structure) rules

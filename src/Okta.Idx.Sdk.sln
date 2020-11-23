@@ -7,13 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Sdk.Abstractions", "Ok
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Sdk.Abstractions.UnitTests", "Okta.Sdk.Abstractions.UnitTests\Okta.Sdk.Abstractions.UnitTests.csproj", "{5222746D-BA58-4BAB-83F8-28321450784B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.IdentityEngine.Sdk", "Okta.IdentityEngine.Sdk\Okta.IdentityEngine.Sdk.csproj", "{D1D9206A-DE77-489B-9DB4-435AFA4DB28B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk", "Okta.Idx.Sdk\Okta.Idx.Sdk.csproj", "{D1D9206A-DE77-489B-9DB4-435AFA4DB28B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.IdentityEngine.Sdk.UnitTests", "Okta.IdentityEngine.Sdk.UnitTests\Okta.IdentityEngine.Sdk.UnitTests.csproj", "{55D29521-F820-4281-8F75-A4A7D20AA81C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk.UnitTests", "Okta.Idx.Sdk.UnitTests\Okta.Idx.Sdk.UnitTests.csproj", "{55D29521-F820-4281-8F75-A4A7D20AA81C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.IdentityEngine.Sdk.IntegrationTests", "Okta.IdentityEngine.Sdk.IntegrationTests\Okta.IdentityEngine.Sdk.IntegrationTests.csproj", "{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{81822F9A-3ED7-4025-ADB9-AE35A6717261}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk.IntegrationTests", "Okta.Idx.Sdk.IntegrationTests\Okta.Idx.Sdk.IntegrationTests.csproj", "{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +39,6 @@ Global
 		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{81822F9A-3ED7-4025-ADB9-AE35A6717261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{81822F9A-3ED7-4025-ADB9-AE35A6717261}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{81822F9A-3ED7-4025-ADB9-AE35A6717261}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{81822F9A-3ED7-4025-ADB9-AE35A6717261}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
