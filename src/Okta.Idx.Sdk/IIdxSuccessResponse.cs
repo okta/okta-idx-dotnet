@@ -1,5 +1,6 @@
 ﻿using Okta.Sdk.Abstractions;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Okta.Idx.Sdk
@@ -31,7 +32,10 @@ namespace Okta.Idx.Sdk
         /// </summary>
         string Accepts { get; }
 
-        // TODO: Define TOken
-        Task<IResource> ExchangeCodeAsync();
+        /// <summary>
+        /// Exchange an interaction code for tokens.
+        /// </summary>
+        /// <returns></returns>
+        Task<ITokenResponse> ExchangeCodeAsync(CancellationToken cancellationToken);
     }
 }

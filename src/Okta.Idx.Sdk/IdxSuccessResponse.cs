@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Okta.Idx.Sdk
@@ -18,8 +19,9 @@ namespace Okta.Idx.Sdk
 
         public string Accepts => GetStringProperty("accepts");
 
-        public async Task<IResource> ExchangeCodeAsync()
+        public async Task<ITokenResponse> ExchangeCodeAsync(CancellationToken cancellationToken = default)
         {
+
             throw new NotImplementedException();
         }
     }
