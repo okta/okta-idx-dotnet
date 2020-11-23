@@ -12,6 +12,8 @@ namespace Okta.Idx.Sdk
 
         public string AccessToken => GetStringProperty("access_token");
 
+        public string RefreshToken => GetStringProperty("refresh_token");
+
         public string IdToken => GetStringProperty("id_token");
 
         public string Scope => GetStringProperty("scope");

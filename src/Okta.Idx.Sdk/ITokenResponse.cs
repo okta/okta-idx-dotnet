@@ -25,6 +25,11 @@ namespace Okta.Idx.Sdk
         string IdToken { get; }
 
         /// <summary>
+        /// Gets the refresh token.
+        /// </summary>
+        string RefreshToken { get; }
+
+        /// <summary>
         /// Gets the scope.
         /// </summary>
         string Scope { get; }
