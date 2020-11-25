@@ -19,7 +19,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
             var res = await ((IdxClient)client).InteractAsync();
 
 
-            var response = await client.StartAsync(stateHandle);
+            var response = await client.IntrospectAsync(stateHandle);
 
             response.StateHandle.Should().Be(stateHandle);
             response.Version.Should().NotBeNullOrEmpty();

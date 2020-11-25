@@ -21,7 +21,6 @@ namespace Okta.Idx.Sdk
 
         public async Task<ITokenResponse> ExchangeCodeAsync(CancellationToken cancellationToken = default)
         {
-
             throw new NotImplementedException();
         }
     }

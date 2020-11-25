@@ -26,5 +26,26 @@ namespace Okta.Idx.Sdk.Configuration
         /// Gets or sets the issuer.
         /// </summary>
         public string Issuer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the redirect URI.
+        /// </summary>
+        public string RedirectUri { get; set; }
+
+        public bool IsConfidentialClient
+        {
+            get
+            {
+                var isConfidentialClient = false;
+
+                if (!string.IsNullOrEmpty(ClientSecret) && ClientSecret.IndexOf("{ClientSecret}", StringComparison.OrdinalIgnoreCase) == -1)
+                {
+                    isConfidentialClient = true;
+                }
+
+                return isConfidentialClient;
+            }
+        }
+
     }
 }

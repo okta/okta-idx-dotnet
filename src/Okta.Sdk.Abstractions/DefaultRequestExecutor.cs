@@ -48,7 +48,6 @@ namespace Okta.Sdk.Abstractions
         private static void ApplyDefaultClientSettings(HttpClient client, string oktaDomain, OktaClientConfiguration configuration)
         {
             client.BaseAddress = new Uri(oktaDomain, UriKind.Absolute);
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("SSWS", configuration.Token);
         }
 
         private string EnsureRelativeUrl(string uri)
@@ -164,13 +163,14 @@ namespace Okta.Sdk.Abstractions
         public Task<HttpResponse<string>> PutAsync(string href, IEnumerable<KeyValuePair<string, string>> headers, string body, CancellationToken cancellationToken)
         {
             var path = EnsureRelativeUrl(href);
+            var contentType = GetContentType(headers);
 
             var request = new HttpRequestMessage(HttpMethod.Put, new Uri(path, UriKind.Relative));
             ApplyHeadersToRequest(request, headers);
 
             request.Content = string.IsNullOrEmpty(body)
                 ? null
-                : new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+                : HttpRequestContentBuilder.GetRequestContent(contentType, body);
 
             return SendAsync(request, cancellationToken);
         }
@@ -184,23 +184,6 @@ namespace Okta.Sdk.Abstractions
             ApplyHeadersToRequest(request, headers);
 
             return SendAsync(request, cancellationToken);
-        }
-
-        private void SetRequestMessageContent(HttpRequestMessage request, IEnumerable<KeyValuePair<string, string>> headers, string body)
-        {
-            if (!headers.Any(kvp => kvp.Key == "Content-Type"))
-            {
-                request.Content = string.IsNullOrEmpty(body)
-                ? null
-                : new StringContent(body, System.Text.Encoding.UTF8, "application/json");
-            }
-            else
-            {
-                // Assume JSON + ION for now
-                request.Content = string.IsNullOrEmpty(body)
-                ? null
-                : new StringContent(body, System.Text.Encoding.UTF8, headers.First(kvp => kvp.Key == "Content-Type").Value);
-            }
         }
     }
 }

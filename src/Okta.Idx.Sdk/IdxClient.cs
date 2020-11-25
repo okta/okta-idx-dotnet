@@ -29,6 +29,8 @@ namespace Okta.Idx.Sdk
         /// </summary>
         protected RequestContext _requestContext;
 
+        protected ILogger _logger;
+
         static IdxClient()
         {
             System.AppContext.SetSwitch("Switch.System.Net.DontEnableSystemDefaultTlsVersions", false);
@@ -58,25 +60,25 @@ namespace Okta.Idx.Sdk
             Configuration = GetConfigurationOrDefault(configuration);
             IdxConfigurationValidator.Validate(Configuration);
 
-            logger = logger ?? NullLogger.Instance;
+            _logger = logger ?? NullLogger.Instance;
 
             var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
 
             // TODO: Allow proxy configuration
             httpClient = httpClient ?? DefaultHttpClient.Create(connectionTimeout: null,
                 proxyConfiguration: null,
-                logger: logger);
+                logger: _logger);
 
             var oktaBaseConfiguration = OktaConfigurationConverter.Convert(configuration);
             var resourceTypeResolverFactory = new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource)));
-            var requestExecutor = new DefaultRequestExecutor(oktaBaseConfiguration, httpClient, logger);
-            var resourceFactory = new ResourceFactory(this, logger, resourceTypeResolverFactory);
+            var requestExecutor = new DefaultRequestExecutor(oktaBaseConfiguration, httpClient, _logger);
+            var resourceFactory = new ResourceFactory(this, _logger, resourceTypeResolverFactory);
 
             _dataStore = new DefaultDataStore(
                 requestExecutor,
                 new DefaultSerializer(),
                 resourceFactory,
-                logger,
+                _logger,
                 userAgentBuilder);
         }
 
@@ -121,30 +123,51 @@ namespace Okta.Idx.Sdk
         }
 
 
+
+
         /// <summary>
         /// Gets or sets the Okta configuration.
         /// </summary>
         public IdxConfiguration Configuration { get; protected set; }
 
+
         public async Task<IInteractionHandleResponse> InteractAsync(CancellationToken cancellationToken = default)
         {
+            //var idxClient = this;
+
+            //if (Configuration.IsConfidentialClient)
+            //{
+            //    var httpClient = DefaultHttpClient.Create(connectionTimeout: null,
+            //    proxyConfiguration: null,
+            //    logger: _logger);
+
+            //    var authorizationHeaderString = $"{Configuration.ClientId}:{Configuration.ClientSecret}";
+            //    var byteArray = Encoding.ASCII.GetBytes($"{authorizationHeaderString}");
+
+            //    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+            //    idxClient = new IdxClient(Configuration, httpClient, _logger);
+
+            //}
 
             var payload = new Dictionary<string, string>();
             payload.Add("scope", string.Join(" ", Configuration.Scopes));
+            payload.Add("client_id", Configuration.ClientId);
+
+            // TODO: Add PKCE params and state
+
+            if (Configuration.IsConfidentialClient)
+            {
+                payload.Add("client_secret", Configuration.ClientSecret);
+            }
             
-            var authorizationHeaderString = $"{Configuration.ClientId}:{Configuration.ClientSecret}";
-            var byteArray = Encoding.ASCII.GetBytes($"{authorizationHeaderString}");
-
-            var uri = $"{Configuration.Issuer}/interact";
             var headers = new Dictionary<string, string>();
-
-            headers.Add("Authorization", $"Basic {Convert.ToBase64String(byteArray)}");
             headers.Add("Content-Type", HttpRequestContentBuilder.CONTENT_TYPE_X_WWW_FORM_URL_ENCODED);
 
 
             var request = new HttpRequest
             {
-                Uri = uri,
+                Uri = $"{Configuration.Issuer}/interact",
                 Payload = payload,
                 Headers = headers,
             };
@@ -153,8 +176,15 @@ namespace Okta.Idx.Sdk
                 request, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<IIdxResponse> IntrospectAsync(string interactionHandle, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IIdxResponse> IntrospectAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (string.IsNullOrEmpty(interactionHandle))
+            {
+                var interactResponse = await InteractAsync(cancellationToken);
+
+                interactionHandle = interactResponse.InteractionHandle;
+            }
+
             var payload = new IdxRequestPayload()
             {
                 StateHandle = interactionHandle,
@@ -171,24 +201,13 @@ namespace Okta.Idx.Sdk
 
             return await PostAsync<IdxResponse>(
                 request, cancellationToken).ConfigureAwait(false);
-
-        }
-
-        public async Task<IIdxResponse> StartAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (string.IsNullOrEmpty(interactionHandle))
-            {
-                var interactResponse = await InteractAsync(cancellationToken);
-
-                interactionHandle = interactResponse.InteractionHandle;
-            }
-
-            return await IntrospectAsync(interactionHandle, cancellationToken);
-            
         }
 
         public IOktaClient CreateScoped(RequestContext requestContext)
-            => new IdxClient(_dataStore, Configuration, requestContext);
+        {
+            return new IdxClient(_dataStore, Configuration, requestContext);
+        }
+
 
         /// <summary>
         /// Creates a new <see cref="CollectionClient{T}"/> given an initial HTTP request.

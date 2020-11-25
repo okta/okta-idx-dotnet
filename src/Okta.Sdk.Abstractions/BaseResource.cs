@@ -63,7 +63,7 @@ namespace Okta.Sdk.Abstractions
         /// <returns>The <see cref="IOktaClient">OktaClient</see> that created this resource.</returns>
         protected IOktaClient GetClient()
         {
-            return _client ?? throw new InvalidOperationException("Only resources retrieved or saved through a Client object cna call server-side methods.");
+            return _client ?? throw new InvalidOperationException("Only resources retrieved or saved through a Client object can call server-side methods.");
         }
 
         /// <inheritdoc/>

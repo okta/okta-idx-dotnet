@@ -3,6 +3,8 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using Okta.Sdk.Abstractions.Configuration;
+
 namespace Okta.Sdk.Abstractions
 {
     /// <summary>
@@ -45,5 +47,10 @@ namespace Okta.Sdk.Abstractions
         /// The X-Forwarded-Port value.
         /// </value>
         public string XForwardedPort { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Authorization settings for the request. Default is None.
+        /// </summary>
+        public AuthorizationSettings AuthorizationSettings { get; set; } = AuthorizationSettings.GetDefault();
     }
 }

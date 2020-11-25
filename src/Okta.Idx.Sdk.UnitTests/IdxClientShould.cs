@@ -89,7 +89,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
             var testClient = new TesteableIdxClient(mockRequestExecutor);
 
-            var response = await testClient.StartAsync("foo");
+            var response = await testClient.IntrospectAsync("foo");
             response.StateHandle.Should().NotBeNullOrEmpty();
             response.Version.Should().NotBeNullOrEmpty();
             response.ExpiresAt.Value.Should().Be(DateTimeOffset.Parse("2020-10-16T16:56:45.000Z"));
