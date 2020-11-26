@@ -1,4 +1,5 @@
-﻿using Okta.Sdk.Abstractions;
+﻿using Okta.Idx.Sdk.Configuration;
+using Okta.Sdk.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -22,5 +23,11 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The Interaction Response.</returns>
         Task<IInteractionHandleResponse> InteractAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Gets the client configuration.
+        /// </summary>
+        IdxConfiguration Configuration { get; }
+        
     }
 }

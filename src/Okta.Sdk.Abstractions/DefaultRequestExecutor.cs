@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
@@ -112,7 +113,7 @@ namespace Okta.Sdk.Abstractions
             }
         }
 
-        private static void ApplyHeadersToRequest(HttpRequestMessage request, IEnumerable<KeyValuePair<string, string>> headers)
+        private void ApplyHeadersToRequest(HttpRequestMessage request, IEnumerable<KeyValuePair<string, string>> headers)
         {
             if (headers == null || !headers.Any())
             {
@@ -125,6 +126,12 @@ namespace Okta.Sdk.Abstractions
                 if (!string.Equals(header.Key, "Content-Type", StringComparison.OrdinalIgnoreCase))
                 {
                     request.Headers.Add(header.Key, header.Value);
+                }
+                // Authorization header is set with special via headers.Authorization.
+                if (string.Equals(header.Key, "Authorization-Scheme", StringComparison.OrdinalIgnoreCase))
+                {
+                    var authorizationHeaderValue = headers.FirstOrDefault(x => x.Key == "Authorization-Value").Value;
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(header.Value, authorizationHeaderValue);
                 }
             }
         }

@@ -133,23 +133,6 @@ namespace Okta.Idx.Sdk
 
         public async Task<IInteractionHandleResponse> InteractAsync(CancellationToken cancellationToken = default)
         {
-            //var idxClient = this;
-
-            //if (Configuration.IsConfidentialClient)
-            //{
-            //    var httpClient = DefaultHttpClient.Create(connectionTimeout: null,
-            //    proxyConfiguration: null,
-            //    logger: _logger);
-
-            //    var authorizationHeaderString = $"{Configuration.ClientId}:{Configuration.ClientSecret}";
-            //    var byteArray = Encoding.ASCII.GetBytes($"{authorizationHeaderString}");
-
-            //    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-
-            //    idxClient = new IdxClient(Configuration, httpClient, _logger);
-
-            //}
-
             var payload = new Dictionary<string, string>();
             payload.Add("scope", string.Join(" ", Configuration.Scopes));
             payload.Add("client_id", Configuration.ClientId);
@@ -185,10 +168,8 @@ namespace Okta.Idx.Sdk
                 interactionHandle = interactResponse.InteractionHandle;
             }
 
-            var payload = new IdxRequestPayload()
-            {
-                StateHandle = interactionHandle,
-            };
+            var payload = new IdxRequestPayload();
+            payload.SetProperty("interactionHandle", interactionHandle);
 
             var oktaDomain = UrlHelper.GetOktaDomain(this.Configuration.Issuer);
 
@@ -204,11 +185,8 @@ namespace Okta.Idx.Sdk
         }
 
         public IOktaClient CreateScoped(RequestContext requestContext)
-        {
-            return new IdxClient(_dataStore, Configuration, requestContext);
-        }
-
-
+            => new IdxClient(_dataStore, Configuration, requestContext);
+        
         /// <summary>
         /// Creates a new <see cref="CollectionClient{T}"/> given an initial HTTP request.
         /// </summary>
