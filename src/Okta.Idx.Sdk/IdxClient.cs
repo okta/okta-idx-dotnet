@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,6 +42,7 @@ namespace Okta.Idx.Sdk
         /// </summary>
         public IdxClient()
         {
+            GenerateStateCodeVerifierAndChallenge();
         }
 
         /// <summary>
@@ -59,6 +61,7 @@ namespace Okta.Idx.Sdk
         {
             Configuration = GetConfigurationOrDefault(configuration);
             IdxConfigurationValidator.Validate(Configuration);
+            GenerateStateCodeVerifierAndChallenge();
 
             _logger = logger ?? NullLogger.Instance;
 
@@ -117,6 +120,7 @@ namespace Okta.Idx.Sdk
         /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
         protected IdxClient(IDataStore dataStore, IdxConfiguration configuration, RequestContext requestContext)
         {
+            GenerateStateCodeVerifierAndChallenge();
             _dataStore = dataStore ?? throw new ArgumentNullException(nameof(dataStore));
             Configuration = configuration;
             _requestContext = requestContext;
@@ -131,13 +135,57 @@ namespace Okta.Idx.Sdk
         public IdxConfiguration Configuration { get; protected set; }
 
 
+        /// <summary>
+        /// The internal OAuth state used to track requests from this client
+        /// </summary>
+        private string State { get; set; }
+
+        /// <summary>
+        /// The PKCE code that is used to verify the integrity of the token exchange
+        /// </summary>
+        private string CodeVerifier { get; set; }
+
+        /// <summary>
+        /// A SHA256 hash of the <see cref="CodeVerifier"/> used for PKCE
+        /// </summary>
+        private string CodeChallenge { get; set; }
+
+        private string GenerateSecureRandomString(int byteCount)
+        {
+            using (RandomNumberGenerator randomNumberGenerator = new RNGCryptoServiceProvider())
+            {
+                byte[] data = new byte[byteCount];
+                randomNumberGenerator.GetBytes(data);
+
+                return Convert.ToBase64String(data);
+            }
+        }
+
+        /// <summary>
+        /// Generates a cryptographically random <see cref="State"/> and <see cref="CodeVerifier"/>, and computes the <see cref="CodeChallenge"/> for use in PKCE
+        /// </summary>
+        private void GenerateStateCodeVerifierAndChallenge()
+        {
+            State = GenerateSecureRandomString(16);
+            CodeVerifier = GenerateSecureRandomString(64);
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(CodeVerifier));
+                CodeChallenge = Convert.ToBase64String(bytes);
+            }
+        }
+
+
         public async Task<IInteractionHandleResponse> InteractAsync(CancellationToken cancellationToken = default)
         {
             var payload = new Dictionary<string, string>();
             payload.Add("scope", string.Join(" ", Configuration.Scopes));
             payload.Add("client_id", Configuration.ClientId);
 
-            // TODO: Add PKCE params and state
+            // Add PKCE params and state
+            //payload.Add("code_challenge_method", "S256");
+            //payload.Add("code_challenge", CodeChallenge);
+            //payload.Add("state", State);
 
             if (Configuration.IsConfidentialClient)
             {

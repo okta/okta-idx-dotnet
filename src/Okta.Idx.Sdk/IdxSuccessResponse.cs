@@ -36,7 +36,7 @@ namespace Okta.Idx.Sdk
             payload.Add("interaction_code", GetInteractionCode());
             payload.Add("grant_type", "interaction_code");
 
-            // TODO: Add PKCE params
+            // TODO: Add PKCE params - expose CodeVerifier?
 
             if (client.Configuration.IsConfidentialClient)
             {
