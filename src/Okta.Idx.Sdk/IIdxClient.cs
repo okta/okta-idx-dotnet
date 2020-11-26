@@ -28,6 +28,11 @@ namespace Okta.Idx.Sdk
         /// Gets the client configuration.
         /// </summary>
         IdxConfiguration Configuration { get; }
+
+        /// <summary>
+        /// Gets the Idx client context.
+        /// </summary>
+        IIdxClientContext Context { get; }
         
     }
 }

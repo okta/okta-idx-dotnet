@@ -45,6 +45,9 @@ namespace Okta.Idx.Sdk
         /// <returns>An IdxResponse.</returns>
         Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Returns if authentication succeed
+        /// </summary>
         bool IsLoginSuccess { get; }
 
         

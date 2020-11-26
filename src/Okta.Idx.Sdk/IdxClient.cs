@@ -32,6 +32,8 @@ namespace Okta.Idx.Sdk
 
         protected ILogger _logger;
 
+        protected IIdxClientContext _idxClientContext;
+
         static IdxClient()
         {
             System.AppContext.SetSwitch("Switch.System.Net.DontEnableSystemDefaultTlsVersions", false);
@@ -150,6 +152,8 @@ namespace Okta.Idx.Sdk
         /// </summary>
         private string CodeChallenge { get; set; }
 
+        public IIdxClientContext Context => throw new NotImplementedException();
+
         private string GenerateSecureRandomString(int byteCount)
         {
             using (RandomNumberGenerator randomNumberGenerator = new RNGCryptoServiceProvider())
@@ -173,8 +177,9 @@ namespace Okta.Idx.Sdk
                 byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(CodeVerifier));
                 CodeChallenge = Convert.ToBase64String(bytes);
             }
-        }
 
+            _idxClientContext = new IdxClientContext(CodeVerifier, CodeChallenge, "S256");
+        }
 
         public async Task<IInteractionHandleResponse> InteractAsync(CancellationToken cancellationToken = default)
         {
@@ -185,6 +190,7 @@ namespace Okta.Idx.Sdk
             // Add PKCE params and state
             //payload.Add("code_challenge_method", "S256");
             //payload.Add("code_challenge", CodeChallenge);
+            //payload.Add("redirect_uri", Configuration.RedirectUri);
             //payload.Add("state", State);
 
             if (Configuration.IsConfidentialClient)
