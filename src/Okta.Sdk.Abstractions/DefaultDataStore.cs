@@ -170,7 +170,7 @@ namespace Okta.Sdk.Abstractions
 
             // If error format is ION
             if (!contentTypeHeader.Equals(default(KeyValuePair<string, string>))
-                && contentTypeHeader.Value.Contains("application/ion+json"))
+                && contentTypeHeader.Value.FirstOrDefault().Contains("application/ion+json"))
             {
                 throw new OktaIonApiException(response.StatusCode, _resourceFactory.CreateNew<IonApiError>(errorData));
             }

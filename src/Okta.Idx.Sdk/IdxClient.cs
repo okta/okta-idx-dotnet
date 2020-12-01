@@ -235,10 +235,15 @@ namespace Okta.Idx.Sdk
             var oktaDomain = UrlHelper.GetOktaDomain(this.Configuration.Issuer);
 
             var uri = $"{UrlHelper.EnsureTrailingSlash(oktaDomain)}idp/idx/introspect";
+            
+            var headers = new Dictionary<string, string>();
+            headers.Add("Accept", "application/ion+json; okta-version=1.0.0");
+
             var request = new HttpRequest
             {
                 Uri = uri,
                 Payload = payload,
+                Headers = headers,
             };
 
             return await PostAsync<IdxResponse>(

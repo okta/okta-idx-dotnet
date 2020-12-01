@@ -43,10 +43,15 @@ namespace Okta.Idx.Sdk
                 StateHandle = stateHandleFormValue.GetProperty<string>("value"),
             };
 
+            // TODO: Get accept from Produces.
+            var headers = new Dictionary<string, string>();
+            headers.Add("Accept", "application/ion+json; okta-version=1.0.0");
+
             var request = new HttpRequest
             {
                 Uri = cancelResponse.Href,
                 Payload = payload,
+                Headers = headers,
             };
 
             var httpVerb = (HttpVerb)Enum.Parse(typeof(HttpVerb), cancelResponse.Method, true);
