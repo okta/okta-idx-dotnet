@@ -177,7 +177,6 @@ namespace Okta.Idx.Sdk
         /// </summary>
         private void GenerateStateCodeVerifierAndChallenge()
         {
-            char[] padding = { '=' };
             State = GenerateSecureRandomString(16);
             CodeVerifier = GenerateSecureRandomString(86);
             using (SHA256 sha256Hash = SHA256.Create())
