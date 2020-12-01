@@ -36,8 +36,12 @@ namespace Okta.Idx.Sdk.Configuration
                     "Replace {clientId} with the client ID of your Application. You can copy it from the Okta Developer Console in the details for the Application you created. Follow these instructions to find it: https://bit.ly/finding-okta-app-credentials");
             }
 
+            if (string.IsNullOrEmpty(configuration.RedirectUri) || configuration.RedirectUri.IndexOf("{redirectUri}", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                throw new ArgumentNullException(
+                    nameof(configuration.RedirectUri),
+                    "Your Okta Application redirect URI is missing.You can find it in the Okta Developer Console in the details for the Application you created.") ;
+            }
         }
-
-
     }
 }

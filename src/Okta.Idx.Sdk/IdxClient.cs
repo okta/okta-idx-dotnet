@@ -120,9 +120,16 @@ namespace Okta.Idx.Sdk
         /// <param name="configuration">The client configuration.</param>
         /// <param name="requestContext">The request context, if any.</param>
         /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
-        protected IdxClient(IDataStore dataStore, IdxConfiguration configuration, RequestContext requestContext)
+        protected IdxClient(IDataStore dataStore, IdxConfiguration configuration, RequestContext requestContext, IIdxClientContext idxClientContext = null)
         {
-            GenerateStateCodeVerifierAndChallenge();
+            if (idxClientContext != null)
+            {
+                _idxClientContext = idxClientContext;
+            }
+            else
+            {
+                GenerateStateCodeVerifierAndChallenge();
+            }
             _dataStore = dataStore ?? throw new ArgumentNullException(nameof(dataStore));
             Configuration = configuration;
             _requestContext = requestContext;
@@ -152,7 +159,7 @@ namespace Okta.Idx.Sdk
         /// </summary>
         private string CodeChallenge { get; set; }
 
-        public IIdxClientContext Context => throw new NotImplementedException();
+        public IIdxClientContext Context => _idxClientContext;
 
         private string GenerateSecureRandomString(int byteCount)
         {
@@ -161,7 +168,7 @@ namespace Okta.Idx.Sdk
                 byte[] data = new byte[byteCount];
                 randomNumberGenerator.GetBytes(data);
 
-                return Convert.ToBase64String(data);
+                return UrlFormatter.EncodeToBase64Url(data);
             }
         }
 
@@ -170,12 +177,13 @@ namespace Okta.Idx.Sdk
         /// </summary>
         private void GenerateStateCodeVerifierAndChallenge()
         {
+            char[] padding = { '=' };
             State = GenerateSecureRandomString(16);
-            CodeVerifier = GenerateSecureRandomString(64);
+            CodeVerifier = GenerateSecureRandomString(86);
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(CodeVerifier));
-                CodeChallenge = Convert.ToBase64String(bytes);
+                CodeChallenge =  UrlFormatter.EncodeToBase64Url(bytes);
             }
 
             _idxClientContext = new IdxClientContext(CodeVerifier, CodeChallenge, "S256");
@@ -188,10 +196,10 @@ namespace Okta.Idx.Sdk
             payload.Add("client_id", Configuration.ClientId);
 
             // Add PKCE params and state
-            //payload.Add("code_challenge_method", "S256");
-            //payload.Add("code_challenge", CodeChallenge);
-            //payload.Add("redirect_uri", Configuration.RedirectUri);
-            //payload.Add("state", State);
+            payload.Add("code_challenge_method", "S256");
+            payload.Add("code_challenge", CodeChallenge);
+            payload.Add("redirect_uri", Configuration.RedirectUri);
+            payload.Add("state", State);
 
             if (Configuration.IsConfidentialClient)
             {
@@ -204,7 +212,7 @@ namespace Okta.Idx.Sdk
 
             var request = new HttpRequest
             {
-                Uri = $"{Configuration.Issuer}/interact",
+                Uri = $"{UrlHelper.EnsureTrailingSlash(Configuration.Issuer)}v1/interact",
                 Payload = payload,
                 Headers = headers,
             };
@@ -227,7 +235,7 @@ namespace Okta.Idx.Sdk
 
             var oktaDomain = UrlHelper.GetOktaDomain(this.Configuration.Issuer);
 
-            var uri = $"{oktaDomain}/idp/idx/introspect";
+            var uri = $"{UrlHelper.EnsureTrailingSlash(oktaDomain)}idp/idx/introspect";
             var request = new HttpRequest
             {
                 Uri = uri,
@@ -239,7 +247,7 @@ namespace Okta.Idx.Sdk
         }
 
         public IOktaClient CreateScoped(RequestContext requestContext)
-            => new IdxClient(_dataStore, Configuration, requestContext);
+            => new IdxClient(_dataStore, Configuration, requestContext, _idxClientContext);
         
         /// <summary>
         /// Creates a new <see cref="CollectionClient{T}"/> given an initial HTTP request.

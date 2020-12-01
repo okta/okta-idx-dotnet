@@ -38,28 +38,36 @@ namespace Okta.Idx.Sdk
 
 
             // Add PKCE params
-            //payload.Add("code_verifier", client.Context.CodeVerifier);
-            //payload.Add("client_id", client.Configuration.ClientId);
+            payload.Add("code_verifier", client.Context.CodeVerifier);
+            payload.Add("client_id", client.Configuration.ClientId);
 
             if (client.Configuration.IsConfidentialClient)
             {
-                // Create scoped client.
-                var requestContext = new RequestContext();
-                requestContext.AuthorizationSettings = new AuthorizationSettings()
-                {
-                    AuthorizationType = AuthorizationType.Basic,
-                    Value = AuthorizationSettings.EncodeClientCredentials(client.Configuration.ClientId, client.Configuration.ClientSecret),
-                };
-
-                client = (IIdxClient)client.CreateScoped(requestContext);
+                payload.Add("client_secret", client.Configuration.ClientSecret);
             }
+
+            //if (client.Configuration.IsConfidentialClient)
+            //{
+            //    // Create scoped client.
+            //    var requestContext = new RequestContext();
+            //    requestContext.AuthorizationSettings = new AuthorizationSettings()
+            //    {
+            //        AuthorizationType = AuthorizationType.Basic,
+            //        Value = AuthorizationSettings.EncodeClientCredentials(client.Configuration.ClientId, client.Configuration.ClientSecret),
+            //    };
+
+            //    client = (IIdxClient)client.CreateScoped(requestContext);
+            //}
 
             var headers = new Dictionary<string, string>();
             headers.Add("Content-Type", HttpRequestContentBuilder.CONTENT_TYPE_X_WWW_FORM_URL_ENCODED);
 
+            // TODO: Use href when https://oktainc.atlassian.net/browse/OKTA-349894 is fixed
+
+            var uri = $"{UrlHelper.EnsureTrailingSlash(client.Configuration.Issuer)}v1/token";
             var request = new HttpRequest
             {
-                Uri = Href,
+                Uri = uri,
                 Payload = payload,
                 Headers = headers,
             };

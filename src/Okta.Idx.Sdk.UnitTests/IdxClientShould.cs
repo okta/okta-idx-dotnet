@@ -31,7 +31,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""identify"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/identify"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/identify"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -60,7 +60,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                             ""create-form""
                                         ],
                                         ""name"": ""cancel"",
-                                        ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                                        ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                                         ""method"": ""POST"",
                                         ""value"": [
                                             {
@@ -102,7 +102,7 @@ namespace Okta.Idx.Sdk.UnitTests
             response.Remediation.RemediationOptions.Should().NotBeNullOrEmpty();
             response.Remediation.RemediationOptions.FirstOrDefault().Rel.Should().Contain("create-form");
             response.Remediation.RemediationOptions.FirstOrDefault().Name.Should().Be("identify");
-            response.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/identify");
+            response.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/identify");
             response.Remediation.RemediationOptions.FirstOrDefault().Method.Should().Be("POST");
             response.Remediation.RemediationOptions.FirstOrDefault().Accepts.Should().Be("application/ion+json; okta-version=1.0.0");
 
@@ -144,7 +144,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""identify"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/identify"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/identify"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -173,7 +173,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                             ""create-form""
                                         ],
                                         ""name"": ""cancel"",
-                                        ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                                        ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                                         ""method"": ""POST"",
                                         ""value"": [
                                             {
@@ -211,7 +211,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                 ""create-form""
                             ],
                             ""name"": ""select-authenticator-authenticate"",
-                            ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge"",
+                            ""href"": ""https://foo.okta.com/idp/idx/challenge"",
                             ""method"": ""POST"",
                             ""value"": [
                                 {
@@ -338,7 +338,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""value"": [
                         {
                             ""profile"": {
-                                ""email"": ""r*************a@g***l.com""
+                                ""email"": ""*********""
                             },
                             ""type"": ""email"",
                             ""id"": ""eae36qtuvrCqeOcVn1d6"",
@@ -386,7 +386,7 @@ namespace Okta.Idx.Sdk.UnitTests
                         ""create-form""
                     ],
                     ""name"": ""cancel"",
-                    ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                    ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                     ""method"": ""POST"",
                     ""value"": [
                         {
@@ -421,7 +421,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var introspectResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
-            introspectResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/identify");
+            introspectResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/identify");
             var identifyRemediationOption = introspectResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
@@ -448,7 +448,7 @@ namespace Okta.Idx.Sdk.UnitTests
             identifyProcessedResponse.Remediation.RemediationOptions.Should().NotBeNullOrEmpty();
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Rel.Should().Contain("create-form");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Name.Should().Be("select-authenticator-authenticate");
-            identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge");
+            identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/challenge");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Method.Should().Be("POST");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Accepts.Should().Be("application/ion+json; okta-version=1.0.0");
 
@@ -564,7 +564,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                 ""relatesTo"": [
                                                     ""$.currentAuthenticatorEnrollment""
                                                 ],
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge/answer"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -596,7 +596,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""select-authenticator-authenticate"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -691,7 +691,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""recover"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/recover"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/recover"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -754,7 +754,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                         ""value"": [
                                             {
                                                 ""profile"": {
-                                                    ""email"": ""r*************a@g***l.com""
+                                                    ""email"": ""*********""
                                                 },
                                                 ""type"": ""email"",
                                                 ""id"": ""eae36qtuvrCqeOcVn1d6"",
@@ -802,7 +802,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                             ""create-form""
                                         ],
                                         ""name"": ""cancel"",
-                                        ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                                        ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                                         ""method"": ""POST"",
                                         ""value"": [
                                             {
@@ -840,7 +840,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                 ""create-form""
                             ],
                             ""name"": ""select-authenticator-authenticate"",
-                            ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge"",
+                            ""href"": ""https://foo.okta.com/idp/idx/challenge"",
                             ""method"": ""POST"",
                             ""value"": [
                                 {
@@ -967,7 +967,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""value"": [
                         {
                             ""profile"": {
-                                ""email"": ""r*************a@g***l.com""
+                                ""email"": ""*********""
                             },
                             ""type"": ""email"",
                             ""id"": ""eae36qtuvrCqeOcVn1d6"",
@@ -1015,7 +1015,7 @@ namespace Okta.Idx.Sdk.UnitTests
                         ""create-form""
                     ],
                     ""name"": ""cancel"",
-                    ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                    ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                     ""method"": ""POST"",
                     ""value"": [
                         {
@@ -1050,7 +1050,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var identifyResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
-            identifyResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge");
+            identifyResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/challenge");
             var identifyRemediationOption = identifyResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
@@ -1082,7 +1082,7 @@ namespace Okta.Idx.Sdk.UnitTests
             identifyProcessedResponse.Remediation.RemediationOptions.Should().NotBeNullOrEmpty();
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Rel.Should().Contain("create-form");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Name.Should().Be("challenge-authenticator");
-            identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer");
+            identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/challenge/answer");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Method.Should().Be("POST");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Accepts.Should().Be("application/ion+json; okta-version=1.0.0");
 
@@ -1112,7 +1112,7 @@ namespace Okta.Idx.Sdk.UnitTests
             // other authenticators
             var authenticatorOption = identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
             authenticatorOption.Rel.Should().Contain("create-form");
-            authenticatorOption.Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge");
+            authenticatorOption.Href.Should().Be("https://foo.okta.com/idp/idx/challenge");
             authenticatorOption.Method.Should().Be("POST");
 
             authenticatorOption.Form.Should().NotBeNullOrEmpty();
@@ -1218,7 +1218,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                 ""relatesTo"": [
                                                     ""$.currentAuthenticatorEnrollment""
                                                 ],
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge/answer"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -1250,7 +1250,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""select-authenticator-authenticate"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -1345,7 +1345,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""recover"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/recover"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/recover"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -1408,7 +1408,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                         ""value"": [
                                             {
                                                 ""profile"": {
-                                                    ""email"": ""r*************a@g***l.com""
+                                                    ""email"": ""*********""
                                                 },
                                                 ""type"": ""email"",
                                                 ""id"": ""eae36qtuvrCqeOcVn1d6"",
@@ -1456,7 +1456,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                             ""create-form""
                                         ],
                                         ""name"": ""cancel"",
-                                        ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                                        ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                                         ""method"": ""POST"",
                                         ""value"": [
                                             {
@@ -1494,7 +1494,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                 ""create-form""
                             ],
                             ""name"": ""select-authenticator-authenticate"",
-                            ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge"",
+                            ""href"": ""https://foo.okta.com/idp/idx/challenge"",
                             ""method"": ""POST"",
                             ""value"": [
                                 {
@@ -1557,7 +1557,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""value"": [
                         {
                             ""profile"": {
-                                ""email"": ""r*************a@g***l.com""
+                                ""email"": ""*********""
                             },
                             ""type"": ""email"",
                             ""id"": ""eae36qtuvrCqeOcVn1d6"",
@@ -1581,7 +1581,7 @@ namespace Okta.Idx.Sdk.UnitTests
                         ""create-form""
                     ],
                     ""name"": ""cancel"",
-                    ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                    ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                     ""method"": ""POST"",
                     ""value"": [
                         {
@@ -1615,7 +1615,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var challengeResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
-            challengeResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer");
+            challengeResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/challenge/answer");
             var identifyRemediationOption = challengeResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
@@ -1646,7 +1646,7 @@ namespace Okta.Idx.Sdk.UnitTests
             identifyProcessedResponse.Remediation.RemediationOptions.Should().NotBeNullOrEmpty();
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Rel.Should().Contain("create-form");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Name.Should().Be("select-authenticator-authenticate");
-            identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge");
+            identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/challenge");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Method.Should().Be("POST");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Accepts.Should().Be("application/ion+json; okta-version=1.0.0");
 
@@ -1661,7 +1661,7 @@ namespace Okta.Idx.Sdk.UnitTests
 
             var authenticatorOption = identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
             authenticatorOption.Rel.Should().Contain("create-form");
-            authenticatorOption.Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge");
+            authenticatorOption.Href.Should().Be("https://foo.okta.com/idp/idx/challenge");
             authenticatorOption.Method.Should().Be("POST");
 
             authenticatorOption.Form.Should().NotBeNullOrEmpty();
@@ -1730,7 +1730,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                 ""relatesTo"": [
                                                     ""$.currentAuthenticatorEnrollment""
                                                 ],
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge/answer"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -1762,14 +1762,14 @@ namespace Okta.Idx.Sdk.UnitTests
                                         ""type"": ""object"",
                                         ""value"": {
                                             ""profile"": {
-                                                ""email"": ""r*************a@g***l.com""
+                                                ""email"": ""*********""
                                             },
                                             ""resend"": {
                                                 ""rel"": [
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""resend"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge/resend"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge/resend"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -1787,7 +1787,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""poll"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge/poll"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge/poll"",
                                                 ""method"": ""POST"",
                                                 ""refresh"": 4000,
                                                 ""value"": [
@@ -1831,7 +1831,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                         ""value"": [
                                             {
                                                 ""profile"": {
-                                                    ""email"": ""r*************a@g***l.com""
+                                                    ""email"": ""*********""
                                                 },
                                                 ""type"": ""email"",
                                                 ""id"": ""eae36qtuvrCqeOcVn1d6"",
@@ -1855,7 +1855,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                             ""create-form""
                                         ],
                                         ""name"": ""cancel"",
-                                        ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                                        ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                                         ""method"": ""POST"",
                                         ""value"": [
                                             {
@@ -1893,7 +1893,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                 ""create-form""
                             ],
                             ""name"": ""select-authenticator-authenticate"",
-                            ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge"",
+                            ""href"": ""https://foo.okta.com/idp/idx/challenge"",
                             ""method"": ""POST"",
                             ""value"": [
                                 {
@@ -1956,7 +1956,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""value"": [
                         {
                             ""profile"": {
-                                ""email"": ""r*************a@g***l.com""
+                                ""email"": ""*********""
                             },
                             ""type"": ""email"",
                             ""id"": ""eae36qtuvrCqeOcVn1d6"",
@@ -1980,7 +1980,7 @@ namespace Okta.Idx.Sdk.UnitTests
                         ""create-form""
                     ],
                     ""name"": ""cancel"",
-                    ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                    ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                     ""method"": ""POST"",
                     ""value"": [
                         {
@@ -2014,7 +2014,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var challengeResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
-            challengeResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge");
+            challengeResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/challenge");
             var identifyRemediationOption = challengeResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
@@ -2044,7 +2044,7 @@ namespace Okta.Idx.Sdk.UnitTests
             identifyProcessedResponse.Remediation.RemediationOptions.Should().NotBeNullOrEmpty();
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Rel.Should().Contain("create-form");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Name.Should().Be("challenge-authenticator");
-            identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer");
+            identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/challenge/answer");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Method.Should().Be("POST");
             identifyProcessedResponse.Remediation.RemediationOptions.FirstOrDefault().Accepts.Should().Be("application/ion+json; okta-version=1.0.0");
             identifyProcessedResponse.IsLoginSuccess.Should().BeFalse();
@@ -2090,7 +2090,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                 ""relatesTo"": [
                                                     ""$.currentAuthenticatorEnrollment""
                                                 ],
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge/answer"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -2122,14 +2122,14 @@ namespace Okta.Idx.Sdk.UnitTests
                                         ""type"": ""object"",
                                         ""value"": {
                                             ""profile"": {
-                                                ""email"": ""r*************a@g***l.com""
+                                                ""email"": ""*********""
                                             },
                                             ""resend"": {
                                                 ""rel"": [
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""resend"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge/resend"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge/resend"",
                                                 ""method"": ""POST"",
                                                 ""value"": [
                                                     {
@@ -2147,7 +2147,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                                     ""create-form""
                                                 ],
                                                 ""name"": ""poll"",
-                                                ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/challenge/poll"",
+                                                ""href"": ""https://foo.okta.com/idp/idx/challenge/poll"",
                                                 ""method"": ""POST"",
                                                 ""refresh"": 4000,
                                                 ""value"": [
@@ -2191,7 +2191,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                         ""value"": [
                                             {
                                                 ""profile"": {
-                                                    ""email"": ""r*************a@g***l.com""
+                                                    ""email"": ""*********""
                                                 },
                                                 ""type"": ""email"",
                                                 ""id"": ""eae36qtuvrCqeOcVn1d6"",
@@ -2215,7 +2215,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                             ""create-form""
                                         ],
                                         ""name"": ""cancel"",
-                                        ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                                        ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                                         ""method"": ""POST"",
                                         ""value"": [
                                             {
@@ -2256,7 +2256,7 @@ namespace Okta.Idx.Sdk.UnitTests
                             ""create-form""
                         ],
                         ""name"": ""issue"",
-                        ""href"": ""https://devex-idx-testing.oktapreview.com/oauth2/v1/token"",
+                        ""href"": ""https://foo.okta.com/oauth2/v1/token"",
                         ""method"": ""POST"",
                         ""value"": [
                             {
@@ -2285,7 +2285,7 @@ namespace Okta.Idx.Sdk.UnitTests
                             ""create-form""
                         ],
                         ""name"": ""cancel"",
-                        ""href"": ""https://devex-idx-testing.oktapreview.com/idp/idx/cancel"",
+                        ""href"": ""https://foo.okta.com/idp/idx/cancel"",
                         ""method"": ""POST"",
                         ""value"": [
                             {
@@ -2320,7 +2320,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var challengeResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
 
-            challengeResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://devex-idx-testing.oktapreview.com/idp/idx/challenge/answer");
+            challengeResponse.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://foo.okta.com/idp/idx/challenge/answer");
             var identifyRemediationOption = challengeResponse.Remediation.RemediationOptions.FirstOrDefault();
 
             // Create a mock for a possible body when making a call to /identify
@@ -2349,7 +2349,7 @@ namespace Okta.Idx.Sdk.UnitTests
             identifyProcessedResponse.SuccessWithInteractionCode.Should().NotBeNull();
             identifyProcessedResponse.SuccessWithInteractionCode.Rel.Should().Contain("create-form");
             identifyProcessedResponse.SuccessWithInteractionCode.Name.Should().Be("issue");
-            identifyProcessedResponse.SuccessWithInteractionCode.Href.Should().Be("https://devex-idx-testing.oktapreview.com/oauth2/v1/token");
+            identifyProcessedResponse.SuccessWithInteractionCode.Href.Should().Be("https://foo.okta.com/oauth2/v1/token");
             identifyProcessedResponse.SuccessWithInteractionCode.Method.Should().Be("POST");
             identifyProcessedResponse.SuccessWithInteractionCode.Accepts.Should().Be("application/x-www-form-urlencoded");
 

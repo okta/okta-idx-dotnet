@@ -3,6 +3,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using System;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -35,6 +36,27 @@ namespace Okta.Sdk.Abstractions
             // TODO sanitize dates as ISO 8601
 
             return WebUtility.UrlEncode(value.ToString());
+        }
+
+        /// <summary>
+        /// Encode values in Base 64 URL
+        /// </summary>
+        /// <param name="bytes">The bytes to encode.</param>
+        /// <returns>The encoded value.</returns>
+        public static string EncodeToBase64Url(byte[] bytes)
+        {
+
+            if (bytes == null)
+            {
+                return string.Empty;
+            }
+
+            char[] padding = { '=' };
+
+            return Convert.ToBase64String(bytes)
+                .TrimEnd(padding)
+                .Replace('+', '-')
+                .Replace('/', '_');
         }
 
         /// <summary>
