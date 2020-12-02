@@ -199,11 +199,6 @@ namespace Okta.Idx.Sdk
             payload.Add("code_challenge", CodeChallenge);
             payload.Add("redirect_uri", Configuration.RedirectUri);
             payload.Add("state", State);
-
-            if (Configuration.IsConfidentialClient)
-            {
-                payload.Add("client_secret", Configuration.ClientSecret);
-            }
             
             var headers = new Dictionary<string, string>();
             headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
