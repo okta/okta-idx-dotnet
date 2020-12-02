@@ -33,6 +33,63 @@ namespace Okta.Sdk.Abstractions.UnitTests
         }
 
         [Fact]
+        public async Task ThrowIonApiExceptionWhenContentTypeIsJsonIon()
+        {
+            var response = @"{
+                              ""version"": ""1.0.0"",
+                              ""messages"": {
+                                ""type"": ""array"",
+                                ""value"": [
+                                  {
+                                    ""message"": ""'stateHandle' is required."",
+                                    ""i18n"": {
+                                      ""key"": ""api.error.field_required"",
+                                      ""params"": [
+                                        ""stateHandle""
+                                      ]
+                                    },
+                                    ""class"": ""ERROR""
+                                  }
+                                ]
+                              }
+                            }";
+
+            var mockResponseHeaders = new List<KeyValuePair<string, IEnumerable<string>>>();
+
+            mockResponseHeaders.Add(new KeyValuePair<string, IEnumerable<string>>("content-type", new List<string>() { "Accept: application/ion+json; okta-version=1.0.0" }));
+
+            var mockRequestExecutor = new MockedStringRequestExecutor(response, statusCode: 400, mockResponseHeaders);
+
+            var dataStore = new DefaultDataStore(mockRequestExecutor, new DefaultSerializer(), new ResourceFactory(null, null, null), NullLogger.Instance, new UserAgentBuilder("test", UserAgentHelper.SdkVersion));
+            var request = new HttpRequest { Uri = "https://foo.dev" };
+
+            await Assert.ThrowsAsync<OktaIonApiException>(
+                () => dataStore.PostAsync<TestResource>(request, new RequestContext(), CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task ThrowApiExceptionWhenContentTypeIsJson()
+        {
+            var response = @"
+                            {
+                                ""error"": ""invalid_grant"",
+                                ""error_description"": ""The interaction code is invalid or has expired.""
+                            }";
+
+            var mockResponseHeaders = new List<KeyValuePair<string, IEnumerable<string>>>();
+
+            mockResponseHeaders.Add(new KeyValuePair<string, IEnumerable<string>>("content-type", new List<string>() { "Accept: application/json" }));
+
+            var mockRequestExecutor = new MockedStringRequestExecutor(response, statusCode: 400, mockResponseHeaders);
+
+            var dataStore = new DefaultDataStore(mockRequestExecutor, new DefaultSerializer(), new ResourceFactory(null, null, null), NullLogger.Instance, new UserAgentBuilder("test", UserAgentHelper.SdkVersion));
+            var request = new HttpRequest { Uri = "https://foo.dev" };
+
+            await Assert.ThrowsAsync<OktaApiException>(
+                () => dataStore.PostAsync<TestResource>(request, new RequestContext(), CancellationToken.None));
+        }
+
+        [Fact]
         public async Task ThrowForNullExecutorResponseDuringGetArray()
         {
             // If the RequestExecutor returns a null HttpResponse, throw an informative exception.

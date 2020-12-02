@@ -73,7 +73,7 @@ namespace Okta.Sdk.Abstractions
 
         private string GetContentType(IEnumerable<KeyValuePair<string, string>> headers)
         {
-            var contentType = HttpRequestContentBuilder.CONTENT_TYPE_JSON;
+            var contentType = HttpRequestContentBuilder.ContentTypeJson;
 
             if (headers != null)
             {
@@ -81,7 +81,7 @@ namespace Okta.Sdk.Abstractions
 
                 if (!header.Equals(default(KeyValuePair<string, string>)))
                 {
-                    contentType = string.IsNullOrEmpty(header.Value) ? HttpRequestContentBuilder.CONTENT_TYPE_JSON : header.Value;
+                    contentType = string.IsNullOrEmpty(header.Value) ? HttpRequestContentBuilder.ContentTypeJson : header.Value;
                 }
             }
 
@@ -127,6 +127,7 @@ namespace Okta.Sdk.Abstractions
                 {
                     request.Headers.Add(header.Key, header.Value);
                 }
+
                 // Authorization header is set with special via headers.Authorization.
                 if (string.Equals(header.Key, "Authorization-Scheme", StringComparison.OrdinalIgnoreCase))
                 {

@@ -8,6 +8,9 @@ using System.Text;
 
 namespace Okta.Sdk.Abstractions
 {
+    /// <summary>
+    /// A class to configure the Authorization settings for a request.
+    /// </summary>
     public class AuthorizationSettings
     {
         /// <summary>

@@ -224,7 +224,7 @@ namespace Okta.Sdk.Abstractions
             => _dataStore.DeleteAsync(request, _requestContext, cancellationToken);
 
         /// <inheritdoc/>
-        public async Task<TResponse> SendAsync<TResponse>(HttpRequest request, HttpVerb httpVerb, CancellationToken cancellationToken = default) 
+        public async Task<TResponse> SendAsync<TResponse>(HttpRequest request, HttpVerb httpVerb, CancellationToken cancellationToken = default)
             where TResponse : BaseResource, new()
         {
             switch (httpVerb)

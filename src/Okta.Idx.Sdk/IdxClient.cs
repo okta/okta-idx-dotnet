@@ -206,7 +206,7 @@ namespace Okta.Idx.Sdk
             }
             
             var headers = new Dictionary<string, string>();
-            headers.Add("Content-Type", HttpRequestContentBuilder.CONTENT_TYPE_X_WWW_FORM_URL_ENCODED);
+            headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
 
 
             var request = new HttpRequest
