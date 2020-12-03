@@ -9,10 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk.UnitTests", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk.IntegrationTests", "Okta.Idx.Sdk.IntegrationTests\Okta.Idx.Sdk.IntegrationTests.csproj", "{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Sdk.Abstractions", "Okta.Sdk.Abstractions\Okta.Sdk.Abstractions.csproj", "{DE8987D8-5CD5-49C0-A75D-21C70DD09B1B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Sdk.Abstractions.UnitTests", "Okta.Sdk.Abstractions.UnitTests\Okta.Sdk.Abstractions.UnitTests.csproj", "{11F284EA-EA7E-41DC-B6CE-760CC900AAA1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,14 +27,6 @@ Global
 		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE8987D8-5CD5-49C0-A75D-21C70DD09B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE8987D8-5CD5-49C0-A75D-21C70DD09B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE8987D8-5CD5-49C0-A75D-21C70DD09B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE8987D8-5CD5-49C0-A75D-21C70DD09B1B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{11F284EA-EA7E-41DC-B6CE-760CC900AAA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{11F284EA-EA7E-41DC-B6CE-760CC900AAA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{11F284EA-EA7E-41DC-B6CE-760CC900AAA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{11F284EA-EA7E-41DC-B6CE-760CC900AAA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

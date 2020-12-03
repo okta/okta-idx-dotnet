@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Okta.Idx.Sdk\Okta.Idx.Sdk.csproj" />
-    <ProjectReference Include="..\Okta.Sdk.Abstractions\Okta.Sdk.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

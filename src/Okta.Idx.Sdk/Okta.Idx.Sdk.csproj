@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Okta.Sdk.Abstractions\Okta.Sdk.Abstractions.csproj" />
+    <PackageReference Include="Okta.Sdk.Abstractions" Version="3.0.0" />
   </ItemGroup>
 
 </Project>

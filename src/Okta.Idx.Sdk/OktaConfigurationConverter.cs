@@ -18,7 +18,7 @@ namespace Okta.Idx.Sdk.Configuration
         {
             return new OktaClientConfiguration
             {
-                OktaDomain = UrlHelper.GetOktaDomain(configuration.Issuer),
+                OktaDomain = UrlHelper.GetOktaRootUrl(configuration.Issuer),
             };
         }
     }

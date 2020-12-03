@@ -227,7 +227,7 @@ namespace Okta.Idx.Sdk
             var payload = new IdxRequestPayload();
             payload.SetProperty("interactionHandle", interactionHandle);
 
-            var oktaDomain = UrlHelper.GetOktaDomain(this.Configuration.Issuer);
+            var oktaDomain = UrlHelper.GetOktaRootUrl(this.Configuration.Issuer);
 
             var uri = $"{UrlHelper.EnsureTrailingSlash(oktaDomain)}idp/idx/introspect";
             

@@ -46,19 +46,6 @@ namespace Okta.Idx.Sdk
                 payload.Add("client_secret", client.Configuration.ClientSecret);
             }
 
-            //if (client.Configuration.IsConfidentialClient)
-            //{
-            //    // Create scoped client.
-            //    var requestContext = new RequestContext();
-            //    requestContext.AuthorizationSettings = new AuthorizationSettings()
-            //    {
-            //        AuthorizationType = AuthorizationType.Basic,
-            //        Value = AuthorizationSettings.EncodeClientCredentials(client.Configuration.ClientId, client.Configuration.ClientSecret),
-            //    };
-
-            //    client = (IIdxClient)client.CreateScoped(requestContext);
-            //}
-
             var headers = new Dictionary<string, string>();
             headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
 
