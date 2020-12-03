@@ -1,4 +1,9 @@
-﻿using System;
+﻿// <copyright file="Resource.cs" company="Okta, Inc">
+// Copyright (c) 2020 - present Okta, Inc. All rights reserved.
+// Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Okta.Sdk.Abstractions;
@@ -18,7 +23,7 @@ namespace Okta.Idx.Sdk
             Initialize(null, null, null, null);
         }
 
-        internal void Initialize(
+        internal new void Initialize(
             IOktaClient client,
             ResourceFactory resourceFactory,
             IDictionary<string, object> data,

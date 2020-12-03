@@ -1,9 +1,12 @@
-﻿using System;
+﻿// <copyright file="IdxClient.cs" company="Okta, Inc">
+// Copyright (c) 2020 - present Okta, Inc. All rights reserved.
+// Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,7 +17,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Sdk.Abstractions;
-using Okta.Sdk.Abstractions.Configuration;
 
 namespace Okta.Idx.Sdk
 {
@@ -23,16 +25,16 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// The <code>IDataStore</code> implementation to be used for making requests.
         /// </summary>
-        protected IDataStore _dataStore;
+        private IDataStore _dataStore;
 
         /// <summary>
         /// The request context to be used when making requests.
         /// </summary>
-        protected RequestContext _requestContext;
+        private RequestContext _requestContext;
 
-        protected ILogger _logger;
+        private ILogger _logger;
 
-        protected IIdxClientContext _idxClientContext;
+        private IIdxClientContext _idxClientContext;
 
         static IdxClient()
         {
@@ -70,7 +72,8 @@ namespace Okta.Idx.Sdk
             var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
 
             // TODO: Allow proxy configuration
-            httpClient = httpClient ?? DefaultHttpClient.Create(connectionTimeout: null,
+            httpClient = httpClient ?? DefaultHttpClient.Create(
+                connectionTimeout: null,
                 proxyConfiguration: null,
                 logger: _logger);
 
@@ -130,19 +133,16 @@ namespace Okta.Idx.Sdk
             {
                 GenerateStateCodeVerifierAndChallenge();
             }
+
             _dataStore = dataStore ?? throw new ArgumentNullException(nameof(dataStore));
             Configuration = configuration;
             _requestContext = requestContext;
         }
 
-
-
-
         /// <summary>
         /// Gets or sets the Okta configuration.
         /// </summary>
         public IdxConfiguration Configuration { get; protected set; }
-
 
         /// <summary>
         /// The internal OAuth state used to track requests from this client
@@ -182,7 +182,7 @@ namespace Okta.Idx.Sdk
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(CodeVerifier));
-                CodeChallenge =  UrlFormatter.EncodeToBase64Url(bytes);
+                CodeChallenge = UrlFormatter.EncodeToBase64Url(bytes);
             }
 
             _idxClientContext = new IdxClientContext(CodeVerifier, CodeChallenge, "S256");
@@ -199,10 +199,9 @@ namespace Okta.Idx.Sdk
             payload.Add("code_challenge", CodeChallenge);
             payload.Add("redirect_uri", Configuration.RedirectUri);
             payload.Add("state", State);
-            
+
             var headers = new Dictionary<string, string>();
             headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
-
 
             var request = new HttpRequest
             {
@@ -230,7 +229,7 @@ namespace Okta.Idx.Sdk
             var oktaDomain = UrlHelper.GetOktaRootUrl(this.Configuration.Issuer);
 
             var uri = $"{UrlHelper.EnsureTrailingSlash(oktaDomain)}idp/idx/introspect";
-            
+
             var headers = new Dictionary<string, string>();
             headers.Add("Accept", "application/ion+json; okta-version=1.0.0");
 
@@ -247,7 +246,7 @@ namespace Okta.Idx.Sdk
 
         public IOktaClient CreateScoped(RequestContext requestContext)
             => new IdxClient(_dataStore, Configuration, requestContext, _idxClientContext);
-        
+
         /// <summary>
         /// Creates a new <see cref="CollectionClient{T}"/> given an initial HTTP request.
         /// </summary>

@@ -1,7 +1,10 @@
-﻿using Okta.Sdk.Abstractions;
-using System;
+﻿// <copyright file="IFormValue.cs" company="Okta, Inc">
+// Copyright (c) 2020 - present Okta, Inc. All rights reserved.
+// Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
+// </copyright>
+
 using System.Collections.Generic;
-using System.Text;
+using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
@@ -38,7 +41,7 @@ namespace Okta.Idx.Sdk
         bool? Required { get; }
 
         /// <summary>
-        /// Returns an object that is populated from the json path.  
+        /// Returns an object that is populated from the json path.
         /// Example: `$.authenticatorEnrollments.value[0]` would relate to the jsonPath `OktaIdentityEngine->raw()->authenticatorEnrollments->value[0]`
         /// </summary>
         string RelatesTo { get; }
@@ -57,6 +60,5 @@ namespace Okta.Idx.Sdk
         /// Gets a list of options that is described as an array of formValue. Will be null if $this->type == "object" but `options` key does not exist
         /// </summary>
         IList<IFormValue> Options { get; }
-
     }
 }

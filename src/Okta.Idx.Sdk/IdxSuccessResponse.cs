@@ -1,10 +1,14 @@
-﻿using Okta.Sdk.Abstractions;
+﻿// <copyright file="IdxSuccessResponse.cs" company="Okta, Inc">
+// Copyright (c) 2020 - present Okta, Inc. All rights reserved.
+// Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
@@ -35,7 +39,6 @@ namespace Okta.Idx.Sdk
             var payload = new Dictionary<string, string>();
             payload.Add("interaction_code", GetInteractionCode());
             payload.Add("grant_type", "interaction_code");
-
 
             // Add PKCE params
             payload.Add("code_verifier", client.Context.CodeVerifier);

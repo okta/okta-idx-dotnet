@@ -1,9 +1,12 @@
-﻿using Okta.Sdk.Abstractions;
-using System;
+﻿// <copyright file="IRemediationOption.cs" company="Okta, Inc">
+// Copyright (c) 2020 - present Okta, Inc. All rights reserved.
+// Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
+// </copyright>
+
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
@@ -35,7 +38,7 @@ namespace Okta.Idx.Sdk
         string Accepts { get; }
 
         /// <summary>
-        /// Returns an object that is populated from the json path.  
+        /// Returns an object that is populated from the json path.
         /// Example: `$.authenticatorEnrollments.value[0]` would relate to the jsonPath `OktaIdentityEngine->raw()->authenticatorEnrollments->value[0]`
         /// </summary>
         string RelatesTo { get; }

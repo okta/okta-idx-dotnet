@@ -114,7 +114,7 @@
     <Rule Id="SA1512" Action="None" />
     <Rule Id="SA1515" Action="None" />
     <Rule Id="SA1603" Action="Error" />
-    <Rule Id="SA1609" Action="Warning" />
+    <Rule Id="SA1609" Action="None" />
     <Rule Id="SA1633" Action="Warning" /> <!-- Back to Error after MSBuild bug fix (.NET Core 2.0) -->
     <Rule Id="SA1629" Action="None" />
     <Rule Id="SA1636" Action="Error" />

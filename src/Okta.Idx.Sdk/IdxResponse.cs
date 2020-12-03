@@ -1,10 +1,14 @@
-﻿using Okta.Sdk.Abstractions;
+﻿// <copyright file="IdxResponse.cs" company="Okta, Inc">
+// Copyright (c) 2020 - present Okta, Inc. All rights reserved.
+// Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
@@ -22,12 +26,7 @@ namespace Okta.Idx.Sdk
 
         public string Raw => GetStringProperty("raw");
 
-        public bool IsLoginSuccess {
-            get
-            {
-                return this.GetData().ContainsKey("successWithInteractionCode");
-            }
-        }
+        public bool IsLoginSuccess => this.GetData().ContainsKey("successWithInteractionCode");
 
         public IIdxSuccessResponse SuccessWithInteractionCode => GetResourceProperty<IdxSuccessResponse>("successWithInteractionCode");
 
@@ -36,7 +35,6 @@ namespace Okta.Idx.Sdk
             var cancelResponse = this.GetResourceProperty<CancelResponse>("cancel");
 
             var stateHandleFormValue = cancelResponse.GetArrayProperty<FormValue>("value").FirstOrDefault(x => x.Name == "stateHandle");
-
 
             var payload = new IdxRequestPayload()
             {

@@ -1,7 +1,9 @@
-﻿using Okta.Idx.Sdk.Configuration;
+﻿// <copyright file="IdxConfigurationValidator.cs" company="Okta, Inc">
+// Copyright (c) 2020 - present Okta, Inc. All rights reserved.
+// Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
+// </copyright>
+
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Okta.Idx.Sdk.Configuration
 {
@@ -40,7 +42,7 @@ namespace Okta.Idx.Sdk.Configuration
             {
                 throw new ArgumentNullException(
                     nameof(configuration.RedirectUri),
-                    "Your Okta Application redirect URI is missing.You can find it in the Okta Developer Console in the details for the Application you created.") ;
+                    "Your Okta Application redirect URI is missing.You can find it in the Okta Developer Console in the details for the Application you created.");
             }
         }
     }
