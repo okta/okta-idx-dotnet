@@ -77,7 +77,7 @@ namespace Okta.Idx.Sdk
                 proxyConfiguration: null,
                 logger: _logger);
 
-            var oktaBaseConfiguration = OktaConfigurationConverter.Convert(configuration);
+            var oktaBaseConfiguration = OktaConfigurationConverter.Convert(Configuration);
             var resourceTypeResolverFactory = new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource)));
             var requestExecutor = new DefaultRequestExecutor(oktaBaseConfiguration, httpClient, _logger);
             var resourceFactory = new ResourceFactory(this, _logger, resourceTypeResolverFactory);

@@ -13,15 +13,14 @@ namespace Okta.Idx.Sdk.IntegrationTests
         [Fact]
         public async Task CallIntrospectEndpoint()
         {
-            var stateHandle = "{stateHandlePlaceholder}";
-            var client = TestIdxClient.Create(new IdxConfiguration() { Issuer = "https://idx-foo.com/oauth2/default/v1", ClientId = "foo" });
+            var client = TestIdxClient.Create();
 
-            var res = await ((IdxClient)client).InteractAsync();
+            var interactResponse = await ((IdxClient)client).InteractAsync();
 
 
-            var response = await client.IntrospectAsync(stateHandle);
+            var response = await client.IntrospectAsync(interactResponse.InteractionHandle);
 
-            response.StateHandle.Should().Be(stateHandle);
+            response.StateHandle.Should().NotBeNullOrEmpty();
             response.Version.Should().NotBeNullOrEmpty();
             response.ExpiresAt.Should().NotBeNull();
             response.Intent.Should().Be("LOGIN");
@@ -33,22 +32,58 @@ namespace Okta.Idx.Sdk.IntegrationTests
             response.Remediation.RemediationOptions.Should().NotBeNullOrEmpty();
             response.Remediation.RemediationOptions.FirstOrDefault().Rel.Should().Contain("create-form");
             response.Remediation.RemediationOptions.FirstOrDefault().Name.Should().Be("identify");
-            response.Remediation.RemediationOptions.FirstOrDefault().Href.Should().Be("https://idx-foo.com.oktapreview.com/idp/idx/identify");
+            response.Remediation.RemediationOptions.FirstOrDefault().Href.Should().NotBeNullOrEmpty();
             response.Remediation.RemediationOptions.FirstOrDefault().Method.Should().Be("POST");
 
             response.Remediation.RemediationOptions.FirstOrDefault().Form.Should().NotBeNullOrEmpty();
 
             var formItem = response.Remediation.RemediationOptions.FirstOrDefault().Form.FirstOrDefault(x => x.Name == "stateHandle");
             formItem.Should().NotBeNull();
-
-
-            var resourceData = new IdxRequestPayload();
-            resourceData.SetProperty("identifier", "{emailPlaceHolder}");
-            resourceData.StateHandle = stateHandle;
-            resourceData.SetProperty("rememberMe", false);
-
-            var response2 =  await response.Remediation.RemediationOptions.FirstOrDefault().ProceedAsync(resourceData);
-
         }
+
+        [Fact]
+        public async Task ExchangeTokens()
+        {
+            var client = TestIdxClient.Create();
+
+
+            var interactResponse = await client.InteractAsync();
+
+            var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", Environment.GetEnvironmentVariable("OKTA_IDX_USERNAME"));
+            
+            // Send username
+            var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+            // Send password
+
+            identifyRequest = new IdxRequestPayload()
+            {
+                StateHandle = identifyResponse.StateHandle,
+            };
+
+            identifyRequest.SetProperty("credentials", new
+            {
+                passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
+            });
+
+
+            var challengeResponse = await identifyResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                        .ProceedAsync(identifyRequest);
+
+
+
+            var token = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+
+            token.AccessToken.Should().NotBeNullOrEmpty();
+        }
+
+
     }
 }
