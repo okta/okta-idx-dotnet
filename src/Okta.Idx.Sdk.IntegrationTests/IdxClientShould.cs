@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Okta.Idx.Sdk.Configuration;
+using Okta.Sdk.Abstractions;
 using Okta.Sdk.Abstractions.Configuration;
 using System;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
     public class IdxClientShould
     {
         [Fact]
-        public async Task CallIntrospectEndpoint()
+        public async Task CallSuccessfullyIntrospectWithRetrievedInteractEndpoint()
         {
             var client = TestIdxClient.Create();
 
@@ -42,10 +43,48 @@ namespace Okta.Idx.Sdk.IntegrationTests
         }
 
         [Fact]
-        public async Task ExchangeTokens()
+        public async Task ThrowWhenRetrievingTokensAfterCancel()
         {
             var client = TestIdxClient.Create();
 
+            var interactResponse = await client.InteractAsync();
+
+            var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", Environment.GetEnvironmentVariable("OKTA_IDX_USERNAME"));
+
+            // Send username
+            var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+            identifyRequest = new IdxRequestPayload()
+            {
+                StateHandle = identifyResponse.StateHandle,
+            };
+
+            identifyRequest.SetProperty("credentials", new
+            {
+                passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
+            });
+
+
+            var challengeResponse = await identifyResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                        .ProceedAsync(identifyRequest);
+
+            var cancelResponse =  await identifyResponse.CancelAsync();
+
+            await Assert.ThrowsAsync<OktaApiException>(() => challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync());
+        }
+
+
+        [Fact]
+        public async Task ExchangeTokens()
+        {
+            var client = TestIdxClient.Create();
 
             var interactResponse = await client.InteractAsync();
 
@@ -83,7 +122,6 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             token.AccessToken.Should().NotBeNullOrEmpty();
         }
-
 
     }
 }
