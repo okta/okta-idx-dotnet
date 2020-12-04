@@ -49,7 +49,7 @@ namespace Okta.Idx.Sdk
         Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Returns if authentication succeed
+        /// Returns if login was successful
         /// </summary>
         bool IsLoginSuccess { get; }
     }
