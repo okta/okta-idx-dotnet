@@ -24,8 +24,6 @@ namespace Okta.Idx.Sdk
 
         public IRemediation Remediation => GetResourceProperty<Remediation>("remediation");
 
-        public string Raw => GetStringProperty("raw");
-
         public bool IsLoginSuccess => this.GetData().ContainsKey("successWithInteractionCode");
 
         public IIdxSuccessResponse SuccessWithInteractionCode => GetResourceProperty<IdxSuccessResponse>("successWithInteractionCode");

@@ -52,12 +52,9 @@ namespace Okta.Idx.Sdk
             var headers = new Dictionary<string, string>();
             headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
 
-            // TODO: Use href when https://oktainc.atlassian.net/browse/OKTA-349894 is fixed
-
-            var uri = $"{UrlHelper.EnsureTrailingSlash(client.Configuration.Issuer)}v1/token";
             var request = new HttpRequest
             {
-                Uri = uri,
+                Uri = Href,
                 Payload = payload,
                 Headers = headers,
             };
