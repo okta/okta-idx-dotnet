@@ -23,7 +23,7 @@ namespace Okta.Idx.Sdk.Configuration
         /// <summary>
         /// Gets or sets a list of string based scopes.
         /// </summary>
-        public IList<string> Scopes { get; set; } = OktaDefaults.Scopes;
+        public List<string> Scopes { get; set; } = OktaDefaults.Scopes;
 
         /// <summary>
         /// Gets or sets the issuer.

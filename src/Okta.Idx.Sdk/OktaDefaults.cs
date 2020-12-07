@@ -3,10 +3,12 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using System.Collections.Generic;
+
 namespace Okta.Idx.Sdk
 {
     public static class OktaDefaults
     {
-        public static readonly string[] Scopes = new string[] { "openid", "profile" };
+        public static readonly List<string> Scopes = new List<string> { "openid", "profile" };
     }
 }
