@@ -55,7 +55,7 @@ var client = new IdxClient(new IdxConfiguration()
                 ClientId = "{YOUR_CLIENT_ID}",
                 ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
                 RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
-                Scopes = OktaDefaults.Scopes, //Default: openid profile.
+                Scopes = OktaDefaults.Scopes,
             });
 ```
 ### Get Interaction Handle
@@ -73,6 +73,107 @@ var introspectResponse = await client.IntrospectAsync(interactResponse.Interacti
 var stateHandle = introspectResponse.StateHandle;
 ```
 
+### Get new tokens (access + id + refresh tokens) using interact code flow
+
+In this example the sign-on policy has no authenticators required.
+
+> Note: Steps to identify the user might change based on the Org configuration.
+
+```csharp
+// Create a new client passing the desired scopes
+var client = new IdxClient(new IdxConfiguration()
+            {
+                Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
+                ClientId = "{YOUR_CLIENT_ID}",
+                ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
+                RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
+                Scopes = "openid profile offline_access",
+            });
+
+// Call Introspect - interactionHandle is optional; if it's not provided, a new interactionHandle will be obtained.
+var introspectResponse = await client.IntrospectAsync();
+
+// Identify with username 
+var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", " foo@example.com");
+
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+// Challenge with password
+identifyRequest = new IdxRequestPayload()
+            {
+                StateHandle = identifyResponse.StateHandle,
+            };
+
+            identifyRequest.SetProperty("credentials", new
+            {
+                passcode = "foo",
+            });
+
+
+var challengeResponse = await identifyResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                            .ProceedAsync(identifyRequest);   
+
+// Exchange tokens
+var tokenResponse = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+
+```
+
+### Cancel the OIE transaction and start a new one after that
+
+In this example the Org is configured to require email as a second authenticator. After answering password challenge, a cancel request is send right before answering the email challenge.
+
+```csharp
+// Create a new client passing the desired scopes
+var client = new IdxClient(new IdxConfiguration()
+            {
+                Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
+                ClientId = "{YOUR_CLIENT_ID}",
+                ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
+                RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
+                Scopes = "openid profile offline_access",
+            });
+
+// Call Introspect - interactionHandle is optional; if it's not provided, a new interactionHandle will be obtained.
+var introspectResponse = await client.IntrospectAsync();
+
+// Identify with username 
+var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", " foo@example.com");
+
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+// Challenge with password
+identifyRequest = new IdxRequestPayload()
+            {
+                StateHandle = identifyResponse.StateHandle,
+            };
+
+            identifyRequest.SetProperty("credentials", new
+            {
+                passcode = "foo",
+            });
+
+
+var challengeResponse = await identifyResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                            .ProceedAsync(identifyRequest);   
+
+// Before answering email challenge, cancel the transaction
+await challengeResponse.CancelAsync();
+
+// Get a new interaction code
+interactResponse = await client.InteractAsync();
+
+// From now on, you can use interactResponse.InteractionHandle to continue with a new flow.
+```                                            
 
 ### Check Remediation Options
 
@@ -81,44 +182,6 @@ var stateHandle = introspectResponse.StateHandle;
 var remediationOptions = identifyResponse.Remediation.RemediationOptions;
 remediationOption = remediationOptions.FirstOrDefault();
 var formValues = remediationOption.Form;
-```
-
-
-
-### Identify without Credentials
-
-
-```csharp
-var introspectResponse = await testClient.IntrospectAsync("foo");
-
-var identifyRequest = new IdxRequestPayload();
-            identifyRequest.StateHandle = introspectResponse.StateHandle;
-            identifyRequest.SetProperty("identifier", "darth.vader@imperial-senate.gov");
-
-var identifyResponse = await introspectResponse.Remediation.RemediationOptions
-                                                            .FirstOrDefault(x => x.Name == "identify")
-                                                            .ProceedAsync(identifyRequest);
-```
-
-### Send Credentials
-
-```csharp
-
-var identifyRequest = new IdxRequestPayload()
-{
-    StateHandle = identifyResponse.StateHandle,
-};
-
-identifyRequest.SetProperty("credentials", new
-{
-    passcode = "Abcd1234",
-});
-
-
-var challengeResponse = await identifyResponse.Remediation.RemediationOptions
-                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
-                                            .ProceedAsync(identifyRequest);
-
 ```
 
 ### Check Remediation Options and Select Authenticator
@@ -185,6 +248,19 @@ if (idxResponse.IsLoginSuccessful) {
 
 ```csharp
 var rawResponse = idxResponse.GetRaw();
+```
+
+### Get a form value
+
+Use `GetProperty<T>("value")` method to get an ION form value.
+
+```csharp
+// Value is string
+var stringValue = response.GetProperty<string>("value");
+
+// Value is a FormValue.
+var formValues = authenticatorOptionsEmail.GetProperty<FormValue>("value");
+
 ```
 
 ## Configuration Reference
