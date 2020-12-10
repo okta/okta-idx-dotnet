@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk", "Okta.Idx.Sdk\Okta.Idx.Sdk.csproj", "{D1D9206A-DE77-489B-9DB4-435AFA4DB28B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk.UnitTests", "Okta.Idx.Sdk.UnitTests\Okta.Idx.Sdk.UnitTests.csproj", "{55D29521-F820-4281-8F75-A4A7D20AA81C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk.IntegrationTests", "Okta.Idx.Sdk.IntegrationTests\Okta.Idx.Sdk.IntegrationTests.csproj", "{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2E0FC778-884B-4549-B9FC-6B7DF83D8657}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1D9206A-DE77-489B-9DB4-435AFA4DB28B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1D9206A-DE77-489B-9DB4-435AFA4DB28B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1D9206A-DE77-489B-9DB4-435AFA4DB28B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1D9206A-DE77-489B-9DB4-435AFA4DB28B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55D29521-F820-4281-8F75-A4A7D20AA81C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55D29521-F820-4281-8F75-A4A7D20AA81C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55D29521-F820-4281-8F75-A4A7D20AA81C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55D29521-F820-4281-8F75-A4A7D20AA81C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D18F5F3F-1D51-4CF4-857D-ACD314D50BAF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DF6F2C19-8D14-4D7B-9A8F-C3F2B2E5AABC}
+	EndGlobalSection
+EndGlobal
