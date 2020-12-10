@@ -5,6 +5,10 @@
 
 # Okta .NET IDX SDK
 
+This repository contains the Okta IDX SDK for .NET. This SDK can be used in your server-side code to interact with the Okta Identity Engine.
+
+> :warning: Beta alert! This library is in beta. See [release status](#release-status) for more information.
+
 * [Release status](#release-status)
 * [Need help?](#need-help)
 * [Getting started](#getting-started)
@@ -13,15 +17,13 @@
 * [Building the SDK](#building-the-sdk)
 * [Contributing](#contributing)
 
-This repository contains the Okta IDX SDK for .NET. This SDK can be used in your server-side code to interact with the Okta Identity Engine.
-
 ## Release status
 
 This library uses semantic versioning and follows Okta's [Library Version Policy][okta-library-versioning].
 
 | Version | Status                             |
 | ------- | ---------------------------------- |
-| 0.1.0-beta01    | :construction: Work In Progress     |
+| 0.1.0    | :warning: Beta |
 
 The latest release can always be found on the [releases page][github-releases].
 
