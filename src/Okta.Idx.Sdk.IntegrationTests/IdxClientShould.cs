@@ -124,6 +124,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
         }
 
         // This test requires to have email configured as second authenticator.
+        // Test plan: #4
         [Fact]
         public async Task CancelFlowBeforeSendingEmailCode()
         {
@@ -203,5 +204,106 @@ namespace Okta.Idx.Sdk.IntegrationTests
             interactResponse.InteractionHandle.Should().NotBeNullOrEmpty();
         }
 
+        // This test requires a policy with security question as a required second factor.
+        // Test plan: #2
+        [Fact]
+        public async Task EnrollSecurityQuestion()
+        {
+            // Create an app with email required and set secrets via env var
+            var client = TestIdxClient.Create();
+
+            var interactResponse = await client.InteractAsync();
+
+            var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+
+            // TODO: Create user and assign user to application.
+
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", "test-enroll-idx@test.com");
+            identifyRequest.SetProperty("credentials", new
+            {
+                passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
+            });
+
+            // Send username and password
+            var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+
+            var selectAuthenticatorRemediationOption = identifyResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+
+            var securityQuestionId = selectAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Security Question")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+
+            // Send password
+            var selectAuthenticatorEnrollRequest = new IdxRequestPayload()
+            {
+                StateHandle = identifyResponse.StateHandle,
+            };
+
+            selectAuthenticatorEnrollRequest.SetProperty("authenticator", new
+            {
+                id = securityQuestionId,
+            });
+
+
+            var selectAuthenticatorEnrollResponse = await identifyResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "select-authenticator-enroll")
+                                            .ProceedAsync(selectAuthenticatorEnrollRequest);
+
+
+
+
+            var enrollAuthenticatorRemediationOption = selectAuthenticatorEnrollResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "enroll-authenticator");
+
+            var seccurityQuestionValue = enrollAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "credentials")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Choose a security question")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "questionKey")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.GetProperty<string>("value") == "disliked_food")
+                                                        .GetProperty<string>("value");
+
+
+            var enrollRequest = new IdxRequestPayload();
+            enrollRequest.StateHandle = selectAuthenticatorEnrollResponse.StateHandle;
+            enrollRequest.SetProperty("credentials", new {
+                answer = "pasta",
+                questionKey = seccurityQuestionValue,
+            });
+
+            var enrollResponse = await enrollAuthenticatorRemediationOption.ProceedAsync(enrollRequest);
+
+
+            var skipRequest = new IdxRequestPayload();
+            skipRequest.StateHandle = enrollResponse.StateHandle;
+
+            // skip optional factor
+            var skipResponse = await enrollResponse.Remediation.RemediationOptions
+                                        .FirstOrDefault(x => x.Name == "skip")
+                                        .ProceedAsync(skipRequest);
+
+
+            var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+
+            tokenResponse.AccessToken.Should().NotBeNullOrEmpty();
+        }
     }
 }
