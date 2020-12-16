@@ -11,6 +11,7 @@ This repository contains the Okta IDX SDK for .NET. This SDK can be used in your
 
 > :warning: Beta alert! This library is in beta. See [release status](#release-status) for more information.
 
+
 * [Release status](#release-status)
 * [Need help?](#need-help)
 * [Getting started](#getting-started)
