@@ -305,5 +305,59 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             tokenResponse.AccessToken.Should().NotBeNullOrEmpty();
         }
+
+        // Test plan: #5
+        [Fact]
+        public async Task LoginSuccessfullyWithProgressiveProfilingFeature()
+        {
+            var client = TestIdxClient.Create();
+
+            var interactResponse = await client.InteractAsync();
+
+            var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", "devex@okta.com");
+
+            // Send username
+            var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+            identifyRequest = new IdxRequestPayload()
+            {
+                StateHandle = identifyResponse.StateHandle,
+            };
+
+            identifyRequest.SetProperty("credentials", new
+            {
+                passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
+            });
+
+
+            var challengeResponse = await identifyResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                        .ProceedAsync(identifyRequest);
+
+
+
+            var enrollProfileRequest = new IdxRequestPayload()
+            {
+                StateHandle = challengeResponse.StateHandle,
+            };
+
+            // TODO: Enable profiling attributes
+            enrollProfileRequest.SetProperty("userProfile", new
+            {
+                test = "foo",
+            });
+
+            var enrollProfileResponse = await challengeResponse.Remediation.RemediationOptions
+                                                       .FirstOrDefault(x => x.Name == "enroll-profile")
+                                                       .ProceedAsync(enrollProfileRequest);
+
+            enrollProfileResponse.IsLoginSuccess.Should().BeTrue();
+        }
     }
 }
