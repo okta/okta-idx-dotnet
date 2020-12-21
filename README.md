@@ -148,7 +148,7 @@ var introspectResponse = await client.IntrospectAsync();
 // Identify with username 
 var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;
-            identifyRequest.SetProperty("identifier", " foo@example.com");
+            identifyRequest.SetProperty("identifier", "foo@example.com");
 
 var identifyResponse = await introspectResponse.Remediation.RemediationOptions
                                                         .FirstOrDefault(x => x.Name == "identify")
@@ -178,6 +178,113 @@ interactResponse = await client.InteractAsync();
 
 // From now on, you can use interactResponse.InteractionHandle to continue with a new flow.
 ```                                            
+
+### Remediation/MFA scenarios with sign-on policy
+
+#### Login using password + enroll security question authenticator
+
+In this example the Org is configured to require a second authenticator. After answering password challenge, a security question is selected and enrolled. Finally, the process finished when the tokens are retrieved.
+
+```csharp
+// Create a new client passing the desired scopes
+var client = new IdxClient(new IdxConfiguration()
+            {
+                Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
+                ClientId = "{YOUR_CLIENT_ID}",
+                ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
+                RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
+                Scopes = "openid profile offline_access",
+            });
+
+var interactResponse = await client.InteractAsync();
+
+var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "foo@example.com");
+identifyRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
+});
+
+// Send username and password
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+
+var selectAuthenticatorRemediationOption = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+
+var securityQuestionId = selectAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Security Question")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+
+// Send password
+var selectAuthenticatorEnrollRequest = new IdxRequestPayload()
+{
+    StateHandle = identifyResponse.StateHandle,
+};
+
+selectAuthenticatorEnrollRequest.SetProperty("authenticator", new
+{
+    id = securityQuestionId,
+});
+
+
+var selectAuthenticatorEnrollResponse = await identifyResponse.Remediation.RemediationOptions
+                                .FirstOrDefault(x => x.Name == "select-authenticator-enroll")
+                                .ProceedAsync(selectAuthenticatorEnrollRequest);
+
+
+
+
+var enrollAuthenticatorRemediationOption = selectAuthenticatorEnrollResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "enroll-authenticator");
+
+var securityQuestionValue = enrollAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "credentials")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Choose a security question")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "questionKey")
+                                            .Options
+                                            .FirstOrDefault(x => x.GetProperty<string>("value") == "disliked_food")
+                                            .GetProperty<string>("value");
+
+
+var enrollRequest = new IdxRequestPayload();
+enrollRequest.StateHandle = selectAuthenticatorEnrollResponse.StateHandle;
+enrollRequest.SetProperty("credentials", new {
+    answer = "chicken",
+    questionKey = securityQuestionValue,
+});
+
+var enrollResponse = await enrollAuthenticatorRemediationOption.ProceedAsync(enrollRequest);
+
+// Optional when you have configured multiple authenticators but only one required.
+var skipRequest = new IdxRequestPayload();
+skipRequest.StateHandle = enrollResponse.StateHandle;
+
+// skip optional factor
+var skipResponse = await enrollResponse.Remediation.RemediationOptions
+                            .FirstOrDefault(x => x.Name == "skip")
+                            .ProceedAsync(skipRequest);
+
+
+var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+```
 
 ### Check Remediation Options
 
