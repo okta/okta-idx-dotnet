@@ -354,15 +354,15 @@ namespace Okta.Idx.Sdk.IntegrationTests
             var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
 
             var challengePasswordRequest = new IdxRequestPayload();
-            sendPasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
-            sendPasswordRequest.SetProperty("credentials", new
+            challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+            challengePasswordRequest.SetProperty("credentials", new
             {
                 passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
             });
 
             var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
                                                         .FirstOrDefault(x => x.Name == "challenge-authenticator")
-                                                        .ProceedAsync(sendPasswordRequest);
+                                                        .ProceedAsync(challengePasswordRequest);
 
             var selectAuthenticatorRemediationOption2 = identifyResponse.Remediation.RemediationOptions
                                                                 .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
