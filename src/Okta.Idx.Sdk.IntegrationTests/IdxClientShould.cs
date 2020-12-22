@@ -419,7 +419,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;
-            identifyRequest.SetProperty("identifier", "devex@okta.com");
+            identifyRequest.SetProperty("identifier", "test-progressive-profiling@okta.com");
 
             // Send username
             var identifyResponse = await introspectResponse.Remediation.RemediationOptions
