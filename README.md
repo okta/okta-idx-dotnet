@@ -183,7 +183,8 @@ interactResponse = await client.InteractAsync();
 
 #### Login using password + enroll security question authenticator
 
-In this example the Org is configured to require a second authenticator. After answering password challenge, a security question is selected and enrolled. Finally, the process finished when the tokens are retrieved.
+
+In this example the Org is configured to require a security question as a second authenticator. After answering the password challenge, you have to select _security question_ and then select a question and enter an answer to finish the process.
 
 ```csharp
 // Create a new client passing the desired scopes
@@ -285,6 +286,108 @@ var skipResponse = await enrollResponse.Remediation.RemediationOptions
 
 var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
 ```
+
+#### Login using password + email authenticator
+
+In this example the Org is configured to require an email as a second authenticator. After answering the password challenge, you have to select email and enter the code to finish the process.
+
+```csharp
+// Create a new client passing the desired scopes
+var client = new IdxClient();
+
+var interactResponse = await client.InteractAsync();
+
+var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "test-login-email@test.com");
+
+// Send username
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+var selectAuthenticatorRemediationOption1 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+// Select password authenticator first
+var passwordId = selectAuthenticatorRemediationOption1.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Password")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+var selectPasswordRequest = new IdxRequestPayload();
+selectPasswordRequest.StateHandle = identifyResponse.StateHandle;
+selectPasswordRequest.SetProperty("authenticator", new
+{
+    id = passwordId
+});
+
+
+var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
+
+// Challenge password
+var challengePasswordRequest = new IdxRequestPayload();
+challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengePasswordRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
+});
+
+var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                            .ProceedAsync(challengePasswordRequest);
+
+// Select email authenticator
+var selectAuthenticatorRemediationOption2 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+var emailId = selectAuthenticatorRemediationOption2.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Email")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+
+var selectEmailAuthenticatorRequest = new IdxRequestPayload();
+selectEmailAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+selectEmailAuthenticatorRequest.SetProperty("authenticator", new
+{
+    id = emailId,
+});
+
+
+var selectEmailAuthenticatorResponse = await selectAuthenticatorRemediationOption2.ProceedAsync(selectEmailAuthenticatorRequest);
+
+// Challenge email
+var challengeEmailRequest = new IdxRequestPayload();
+challengeEmailRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengeEmailRequest.SetProperty("credentials", new
+{
+    passcode = "00000",
+});
+
+
+var challengeEmailResponse = await selectEmailAuthenticatorResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                    .ProceedAsync(challengeEmailRequest);
+
+if (challengeEmailResponse.IsLoginSuccess)
+{
+    var tokenResponse = await challengeEmailResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+}
+```
+
 
 ### Check Remediation Options
 
