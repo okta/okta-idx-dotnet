@@ -254,12 +254,10 @@ enrollRequest.SetProperty("credentials", new {
 
 var enrollResponse = await enrollAuthenticatorRemediationOption.ProceedAsync(enrollRequest);
 
-// Optional when you have configured multiple authenticators but only one required. 
-//If login is success after enrolling the security question, you can exchange tokens right away by doing `enrollResponse.SuccessWithInteractionCode.ExchangeCodeAsyc()`
+// Skip other optional factors if applicable; otherwise exchange tokens `enrollResponse.SuccessWithInteractionCode.ExchangeCodeAsync()`
 var skipRequest = new IdxRequestPayload();
 skipRequest.StateHandle = enrollResponse.StateHandle;
 
-// skip optional authenticators
 var skipResponse = await enrollResponse.Remediation.RemediationOptions
                             .FirstOrDefault(x => x.Name == "skip")
                             .ProceedAsync(skipRequest);
@@ -376,7 +374,7 @@ if (challengeEmailResponse.IsLoginSuccess)
 }
 ```
 
-#### Login using password + phone authenticator (SMS/Voice)
+#### Login using password + enroll phone authenticator (SMS/Voice)
 
 ```csharp
 var client = TestIdxClient.Create();
@@ -424,7 +422,318 @@ var challengePasswordRequest = new IdxRequestPayload();
 challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
 challengePasswordRequest.SetProperty("credentials", new
 {
-    passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
+    passcode = "foo",
+});
+
+var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                            .ProceedAsync(challengePasswordRequest);
+
+// Select `select-authenticator-enroll` remediation option
+var selectAuthenticatorRemediationOption2 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+// Get the phone authenticator ID
+var phoneId = selectAuthenticatorRemediationOption2.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Phone")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+// Proceed with phone (SMS or Voice)
+var selectPhoneAuthenticatorRequest = new IdxRequestPayload();
+selectPhoneAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+selectPhoneAuthenticatorRequest.SetProperty("authenticator", new
+{
+    phoneNumber = "xxxxxx",
+    id = phoneId,
+    methodType = "sms" // You can set either `sms` or `voice`
+});
+
+
+var selectPhoneAuthenticatorResponse = await selectAuthenticatorRemediationOption2.ProceedAsync(selectPhoneAuthenticatorRequest);
+
+// Send the code received via SMS or Voice
+var challengePhoneRequest = new IdxRequestPayload();
+challengePhoneRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengePhoneRequest.SetProperty("credentials", new
+{
+    passcode = "xxxxxx", // Set the code received via SMS or Voice
+});
+
+
+var challengePhoneResponse = await selectPhoneAuthenticatorResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "enroll-authenticator")
+                                                    .ProceedAsync(challengePhoneRequest);
+
+// Exchange tokens
+var tokenResponse = await challengePhoneResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+
+```
+
+
+#### Login using password + email authenticator + enroll phone + enroll security question
+
+In this example, the Org is configured to require email, phone and security question in addition to password. After answering the password challenge, users have to select _email_ and enter the code, enroll a phone and enter the code and finally enroll a security question to complete the process.
+
+> Note: Steps to identify the user might change based on your Org configuration.
+
+```csharp
+var client = TestIdxClient.Create();
+
+var introspectResponse = await client.IntrospectAsync();
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "test-mfa@okta.com");
+
+// Send username
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+// Select `select-authenticator-authenticate` remediation option and select password
+var selectAuthenticatorRemediationOption1 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+// Get password ID
+var passwordId = selectAuthenticatorRemediationOption1.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Password")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+var selectPasswordRequest = new IdxRequestPayload();
+selectPasswordRequest.StateHandle = identifyResponse.StateHandle;
+selectPasswordRequest.SetProperty("authenticator", new
+{
+    id = passwordId
+});
+
+
+var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
+
+// Send password
+var challengePasswordRequest = new IdxRequestPayload();
+challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengePasswordRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
+});
+
+var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                            .ProceedAsync(challengePasswordRequest);
+
+
+// EMAIL
+
+// Select `select-authenticator-authenticate` remediation option
+var selectEmailAuthenticatorRemediationOption = challengePasswordRemediationOption.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+// Get email authenticator ID
+var emailId = selectEmailAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Email")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+
+var selectEmailAuthenticatorRequest = new IdxRequestPayload();
+selectEmailAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+selectEmailAuthenticatorRequest.SetProperty("authenticator", new
+{
+    id = emailId,
+});
+
+// Proceed with email
+var selectEmailAuthenticatorResponse = await selectEmailAuthenticatorRemediationOption.ProceedAsync(selectEmailAuthenticatorRequest);
+
+var challengeEmailRequest = new IdxRequestPayload();
+challengeEmailRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengeEmailRequest.SetProperty("credentials", new
+{
+    passcode = "xxxxxx",
+});
+
+
+var challengeEmailResponse = await selectEmailAuthenticatorResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                    .ProceedAsync(challengeEmailRequest);
+// PHONE
+
+// Select `select-authenticator-enroll` remediation option
+var selectPhoneAuthenticatorRemediationOption = challengeEmailResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+// Get phone authenticator ID
+var phoneId = selectPhoneAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Phone")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+// Proceed with phone
+var selectPhoneAuthenticatorRequest = new IdxRequestPayload();
+selectPhoneAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+selectPhoneAuthenticatorRequest.SetProperty("authenticator", new
+{
+    id = phoneId,
+    methodType = "sms", // You can set either `sms` or `voice`
+    phoneNumber = "xxxxxx",
+});
+
+
+var selectPhoneAuthenticatorResponse = await selectPhoneAuthenticatorRemediationOption.ProceedAsync(selectPhoneAuthenticatorRequest);
+
+var challengePhoneRequest = new IdxRequestPayload();
+challengePhoneRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengePhoneRequest.SetProperty("credentials", new
+{
+    passcode = code,
+});
+
+
+var challengePhoneResponse = await selectPhoneAuthenticatorResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "enroll-authenticator")
+                                                    .ProceedAsync(challengePhoneRequest);
+
+
+
+
+// SECURITY QUESTION
+var selectSQAuthenticatorRemediationOption = challengePhoneResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+// Get security question authenticator ID
+var securityQuestionId = selectSQAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Security Question")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+
+// Proceed with Security Question
+var selectAuthenticatorEnrollRequest = new IdxRequestPayload();
+selectAuthenticatorEnrollRequest.StateHandle = challengePhoneResponse.StateHandle;
+selectAuthenticatorEnrollRequest.SetProperty("authenticator", new
+{
+    id = securityQuestionId,
+});
+
+
+var selectAuthenticatorEnrollResponse = await selectSQAuthenticatorRemediationOption.ProceedAsync(selectAuthenticatorEnrollRequest);
+
+// Select `enroll-authenticator` remediation option
+var enrollAuthenticatorRemediationOption = selectAuthenticatorEnrollResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "enroll-authenticator");
+
+// Get the desired security question
+var securityQuestionValue = enrollAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "credentials")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Choose a security question")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "questionKey")
+                                            .Options
+                                            .FirstOrDefault(x => x.GetProperty<string>("value") == "disliked_food")
+                                            .GetProperty<string>("value");
+
+
+var enrollRequest = new IdxRequestPayload();
+enrollRequest.StateHandle = selectAuthenticatorEnrollResponse.StateHandle;
+enrollRequest.SetProperty("credentials", new
+{
+    answer = "chicken",
+    questionKey = securityQuestionValue,
+});
+
+var enrollResponse = await enrollAuthenticatorRemediationOption.ProceedAsync(enrollRequest);
+
+// skip other optional factors if applicable; otherwise exchange tokens `enrollResponse.SuccessWithInteractionCode.ExchangeCodeAsync()`
+var skipRequest = new IdxRequestPayload();
+skipRequest.StateHandle = enrollResponse.StateHandle;
+
+
+var skipResponse = await enrollResponse.Remediation.RemediationOptions
+                            .FirstOrDefault(x => x.Name == "skip")
+                            .ProceedAsync(skipRequest);
+
+
+var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+
+```
+
+#### Login using password + challenge phone authenticator (SMS/Voice)
+
+```csharp
+var client = TestIdxClient.Create();
+
+var introspectResponse = await client.IntrospectAsync();
+
+// Identify with username
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "test-login-phone@test.com");
+
+// Send username
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+// Select `select-authenticator-authenticate` remediation option
+var selectAuthenticatorRemediationOption1 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+// Select password ID first
+var passwordId = selectAuthenticatorRemediationOption1.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Password")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+// Proceed with password
+var selectPasswordRequest = new IdxRequestPayload();
+selectPasswordRequest.StateHandle = identifyResponse.StateHandle;
+selectPasswordRequest.SetProperty("authenticator", new
+{
+    id = passwordId
+});
+
+
+var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
+
+// Send credentials
+var challengePasswordRequest = new IdxRequestPayload();
+challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengePasswordRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
 });
 
 var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
@@ -475,7 +784,7 @@ var challengePhoneRequest = new IdxRequestPayload();
 challengePhoneRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
 challengePhoneRequest.SetProperty("credentials", new
 {
-    passcode = "000000", // Set the code received via SMS or Voice
+    passcode = "xxxxxx", // Set the code received via SMS or Voice
 });
 
 
@@ -487,6 +796,7 @@ var challengePhoneResponse = await selectPhoneAuthenticatorResponse.Remediation.
 var tokenResponse = await challengePhoneResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
 
 ```
+
 
 ### Check Remediation Options
 
@@ -514,24 +824,6 @@ selectSecondAuthenticatorRequest.SetProperty("authenticator", new
 var response = await selectSecondAuthenticatorRemediationOption.ProceedAsync(selectSecondAuthenticatorRequest);
 ```
 
-### Answer Authenticator Challenge
-
-```csharp
-var challengeSecondAuthenticatorRemediationOption = response.Remediation.RemediationOptions.FirstOrDefault(x => x.Name == "challenge-authenticator");
-
-
-var code = "<CODE_RECEIVED_BY_EMAIL>"
-
-var sendEmailCodeRequest = new IdentityEngineRequest();
-sendEmailCodeRequest.StateHandle = stateHandle;
-sendEmailCodeRequest.SetProperty("credentials", new
-{
-    passcode = code,
-});
-
-var response = await challengeSecondAuthenticatorRemediationOption.ProceedAsync(sendEmailCodeRequest);
-```
-
 ### Cancel Flow
 
 ```csharp
@@ -551,6 +843,8 @@ if (idxResponse.IsLoginSuccessful) {
 ```
 
 ### Print Raw Response
+
+Use the `GetRaw` method to get the full JSON response.
 
 ```csharp
 var rawResponse = idxResponse.GetRaw();

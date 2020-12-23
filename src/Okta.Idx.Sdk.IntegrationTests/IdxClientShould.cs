@@ -406,11 +406,222 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             tokenResponse.AccessToken.Should().NotBeNullOrEmpty();
         }
+        // This test requires a policy with phone, security question and email required as additional authenticators.
+        // Test plan: #3
+        [Fact]
+        public async Task EnrollEmailPhoneSecurityQuestion()
+        {
+            // Create an app with email required and set secrets via env var
+            var client = TestIdxClient.Create();
+
+            var interactResponse = await client.InteractAsync();
+
+            var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+
+            // TODO: Create user and assign user to application.
+
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", "test-mfa@test.com");
+
+            // Send username
+            var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+            var selectAuthenticatorRemediationOption1 = identifyResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+            // Select password first
+            var passwordId = selectAuthenticatorRemediationOption1.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Password")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+            var selectPasswordRequest = new IdxRequestPayload();
+            selectPasswordRequest.StateHandle = identifyResponse.StateHandle;
+            selectPasswordRequest.SetProperty("authenticator", new
+            {
+                id = passwordId
+            });
+
+
+            var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
+
+            var challengePasswordRequest = new IdxRequestPayload();
+            challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+            challengePasswordRequest.SetProperty("credentials", new
+            {
+                passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
+            });
+
+            var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                        .ProceedAsync(challengePasswordRequest);
+
+
+            // EMAIL
+
+
+            var selectEmailAuthenticatorRemediationOption = challengePasswordRemediationOption.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+            var emailId = selectEmailAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Email")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+
+            // Send password
+            var selectEmailAuthenticatorRequest = new IdxRequestPayload();
+            selectEmailAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+            selectEmailAuthenticatorRequest.SetProperty("authenticator", new
+            {
+                id = emailId,
+            });
+
+
+            var selectEmailAuthenticatorResponse = await selectEmailAuthenticatorRemediationOption.ProceedAsync(selectEmailAuthenticatorRequest);
+            var challengeEmailRequest = new IdxRequestPayload();
+            challengeEmailRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+            challengeEmailRequest.SetProperty("credentials", new
+            {
+                passcode = "xxxxx",
+            });
+
+
+            var challengeEmailResponse = await selectEmailAuthenticatorResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                                .ProceedAsync(challengeEmailRequest);
+            // PHONE
+
+
+            var selectPhoneAuthenticatorRemediationOption = challengeEmailResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+            var phoneId = selectPhoneAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Phone")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+            var selectPhoneAuthenticatorRequest = new IdxRequestPayload();
+            selectPhoneAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+            selectPhoneAuthenticatorRequest.SetProperty("authenticator", new
+            {
+                id = phoneId,
+                methodType = "sms",
+                phoneNumber = "+00000000000",
+            });
+
+
+            var selectPhoneAuthenticatorResponse = await selectPhoneAuthenticatorRemediationOption.ProceedAsync(selectPhoneAuthenticatorRequest);
+            var challengePhoneRequest = new IdxRequestPayload();
+            challengePhoneRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+            challengePhoneRequest.SetProperty("credentials", new
+            {
+                passcode = "xxxxxx",
+            });
+
+
+            var challengePhoneResponse = await selectPhoneAuthenticatorResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "enroll-authenticator")
+                                                                .ProceedAsync(challengePhoneRequest);
+
+
+
+
+            // SECURITY QUESTION
+            var selectSQAuthenticatorRemediationOption = challengePhoneResponse.Remediation.RemediationOptions
+                                                               .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+
+            var securityQuestionId = selectSQAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Security Question")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+
+            // Send password
+            var selectAuthenticatorEnrollRequest = new IdxRequestPayload()
+            {
+                StateHandle = identifyResponse.StateHandle,
+            };
+
+            selectAuthenticatorEnrollRequest.SetProperty("authenticator", new
+            {
+                id = securityQuestionId,
+            });
+
+
+            var selectAuthenticatorEnrollResponse = await selectSQAuthenticatorRemediationOption.ProceedAsync(selectAuthenticatorEnrollRequest);
+
+
+
+
+            var enrollAuthenticatorRemediationOption = selectAuthenticatorEnrollResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "enroll-authenticator");
+
+            var seccurityQuestionValue = enrollAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "credentials")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Choose a security question")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "questionKey")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.GetProperty<string>("value") == "disliked_food")
+                                                        .GetProperty<string>("value");
+
+
+            var enrollRequest = new IdxRequestPayload();
+            enrollRequest.StateHandle = selectAuthenticatorEnrollResponse.StateHandle;
+            enrollRequest.SetProperty("credentials", new
+            {
+                answer = "chicken",
+                questionKey = seccurityQuestionValue,
+            });
+
+            var enrollResponse = await enrollAuthenticatorRemediationOption.ProceedAsync(enrollRequest);
+
+
+            var skipRequest = new IdxRequestPayload();
+            skipRequest.StateHandle = enrollResponse.StateHandle;
+
+            // skip optional factor
+            var skipResponse = await enrollResponse.Remediation.RemediationOptions
+                                        .FirstOrDefault(x => x.Name == "skip")
+                                        .ProceedAsync(skipRequest);
+
+
+            var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+
+        }
 
         // This test requires a policy with phone as a required second authenticator.
         // Test plan: #2
         [Fact]
-        public async Task EnrollPhone()
+        public async Task ChallengePhone()
         {
             // Create an app with email required and set secrets via env var
             var client = TestIdxClient.Create();
