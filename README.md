@@ -48,7 +48,7 @@ You will need:
 
 These examples will help you understand how to use this library.
 
-Once you initialize a `Client`, you can call methods to make requests to the Okta API.
+Once you initialize a `Client`, you can call methods to make requests to the Okta API. Check out the [Configuration reference](#configuration-reference) section for more details.
 
 ### Create the Client
 
@@ -59,9 +59,10 @@ var client = new IdxClient(new IdxConfiguration()
                 ClientId = "{YOUR_CLIENT_ID}",
                 ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
                 RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
-                Scopes = OktaDefaults.Scopes,
+                Scopes = "openid profile offiline_access",
             });
 ```
+
 ### Get Interaction Handle
 
 ```csharp
@@ -77,21 +78,21 @@ var introspectResponse = await client.IntrospectAsync(interactResponse.Interacti
 var stateHandle = introspectResponse.StateHandle;
 ```
 
-### Get new tokens (access + id + refresh tokens) using interact code flow
+### Get New Tokens (access_token/id_token/refresh_token)
 
 In this example the sign-on policy has no authenticators required.
 
-> Note: Steps to identify the user might change based on the Org configuration.
+> Note: Steps to identify the user might change based on your Org configuration.
 
 ```csharp
 // Create a new client passing the desired scopes
 var client = new IdxClient(new IdxConfiguration()
             {
-                Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
+                Issuer = "{YOUR_ISSUER}",                 // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
                 ClientId = "{YOUR_CLIENT_ID}",
-                ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
-                RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
-                Scopes = "openid profile offline_access",
+                ClientSecret = "{YOUR_CLIENT_SECRET}",    // Required for confidential clients. 
+                RedirectUri = "{YOUR_REDIRECT_URI}",      // Must match the redirect uri in client app settings/console
+                Scopes = "openid profile offline_access", // Optional. The default value is "openid profile".
             });
 
 // Call Introspect - interactionHandle is optional; if it's not provided, a new interactionHandle will be obtained.
@@ -99,23 +100,20 @@ var introspectResponse = await client.IntrospectAsync();
 
 // Identify with username 
 var identifyRequest = new IdxRequestPayload();
-            identifyRequest.StateHandle = introspectResponse.StateHandle;
-            identifyRequest.SetProperty("identifier", " foo@example.com");
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", " foo@example.com");
 
 var identifyResponse = await introspectResponse.Remediation.RemediationOptions
                                                         .FirstOrDefault(x => x.Name == "identify")
                                                         .ProceedAsync(identifyRequest);
 
 // Challenge with password
-identifyRequest = new IdxRequestPayload()
-            {
-                StateHandle = identifyResponse.StateHandle,
-            };
-
-            identifyRequest.SetProperty("credentials", new
-            {
-                passcode = "foo",
-            });
+identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = identifyResponse.StateHandle;            
+identifyRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
+});
 
 
 var challengeResponse = await identifyResponse.Remediation.RemediationOptions
@@ -129,48 +127,39 @@ var tokenResponse = await challengeResponse.SuccessWithInteractionCode.ExchangeC
 
 ### Cancel the OIE transaction and start a new one after that
 
-In this example the Org is configured to require email as a second authenticator. After answering password challenge, a cancel request is send right before answering the email challenge.
+In this example, the Org is configured to require an email as a second authenticator. After answering the password challenge, a cancel request is sent right before answering the email challenge.
+
+> Note: Steps to identify the user might change based on your Org configuration.
 
 ```csharp
-// Create a new client passing the desired scopes
-var client = new IdxClient(new IdxConfiguration()
-            {
-                Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
-                ClientId = "{YOUR_CLIENT_ID}",
-                ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
-                RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
-                Scopes = "openid profile offline_access",
-            });
+var client = new IdxClient();
 
 // Call Introspect - interactionHandle is optional; if it's not provided, a new interactionHandle will be obtained.
 var introspectResponse = await client.IntrospectAsync();
 
 // Identify with username 
 var identifyRequest = new IdxRequestPayload();
-            identifyRequest.StateHandle = introspectResponse.StateHandle;
-            identifyRequest.SetProperty("identifier", " foo@example.com");
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "foo@example.com");
 
 var identifyResponse = await introspectResponse.Remediation.RemediationOptions
                                                         .FirstOrDefault(x => x.Name == "identify")
                                                         .ProceedAsync(identifyRequest);
 
 // Challenge with password
-identifyRequest = new IdxRequestPayload()
-            {
-                StateHandle = identifyResponse.StateHandle,
-            };
-
-            identifyRequest.SetProperty("credentials", new
-            {
-                passcode = "foo",
-            });
+identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = identifyResponse.StateHandle;            
+identifyRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
+});
 
 
 var challengeResponse = await identifyResponse.Remediation.RemediationOptions
                                             .FirstOrDefault(x => x.Name == "challenge-authenticator")
                                             .ProceedAsync(identifyRequest);   
 
-// Before answering email challenge, cancel the transaction
+// Before answering the email challenge, cancel the transaction
 await challengeResponse.CancelAsync();
 
 // Get a new interaction code
@@ -178,6 +167,326 @@ interactResponse = await client.InteractAsync();
 
 // From now on, you can use interactResponse.InteractionHandle to continue with a new flow.
 ```                                            
+
+### Remediation/MFA scenarios with sign-on policy
+
+#### Login using password + enroll security question authenticator
+
+
+In this example, the Org is configured to require a security question as a second authenticator. After answering the password challenge, users have to select _security question_ and then select a question and enter an answer to finish the process.
+
+> Note: Steps to identify the user might change based on your Org configuration.
+
+```csharp
+var client = new IdxClient();
+
+var introspectResponse = await client.IntrospectAsync();
+
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "foo@example.com");
+identifyRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
+});
+
+// Send username and password
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+
+// Select `select-authenticator-enroll` remediation option
+var selectAuthenticatorRemediationOption = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+// Get the authenticator ID
+var securityQuestionId = selectAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Security Question")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+
+// Proceed with security question
+var selectAuthenticatorEnrollRequest = new IdxRequestPayload();
+selectAuthenticatorEnrollRequest.StateHandle = identifyResponse.StateHandle;
+selectAuthenticatorEnrollRequest.SetProperty("authenticator", new
+{
+    id = securityQuestionId,
+});
+
+
+var selectAuthenticatorEnrollResponse = await identifyResponse.Remediation.RemediationOptions
+                                .FirstOrDefault(x => x.Name == "select-authenticator-enroll")
+                                .ProceedAsync(selectAuthenticatorEnrollRequest);
+
+
+
+// Select `enroll-authenticator` remediation option
+var enrollAuthenticatorRemediationOption = selectAuthenticatorEnrollResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "enroll-authenticator");
+
+// Select a question
+var securityQuestionValue = enrollAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "credentials")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Choose a security question")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "questionKey")
+                                            .Options
+                                            .FirstOrDefault(x => x.GetProperty<string>("value") == "disliked_food")
+                                            .GetProperty<string>("value");
+
+// Proceed with the answer
+var enrollRequest = new IdxRequestPayload();
+enrollRequest.StateHandle = selectAuthenticatorEnrollResponse.StateHandle;
+enrollRequest.SetProperty("credentials", new {
+    answer = "chicken",
+    questionKey = securityQuestionValue,
+});
+
+var enrollResponse = await enrollAuthenticatorRemediationOption.ProceedAsync(enrollRequest);
+
+// Optional when you have configured multiple authenticators but only one required. 
+//If login is success after enrolling the security question, you can exchange tokens right away by doing `enrollResponse.SuccessWithInteractionCode.ExchangeCodeAsyc()`
+var skipRequest = new IdxRequestPayload();
+skipRequest.StateHandle = enrollResponse.StateHandle;
+
+// skip optional authenticators
+var skipResponse = await enrollResponse.Remediation.RemediationOptions
+                            .FirstOrDefault(x => x.Name == "skip")
+                            .ProceedAsync(skipRequest);
+
+
+var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+```
+
+#### Login using password + email authenticator
+
+In this example, the Org is configured to require an email as a second authenticator. After answering the password challenge, users have to select _email_ and enter the code to finish the process.
+
+> Note: Steps to identify the user might change based on your Org configuration.
+
+> Note: If users click a magic link instead of providing a code, they will be redirected to the login page with a valid session if applicable.
+
+```csharp
+// Create a new client passing the desired scopes
+var client = new IdxClient();
+
+var introspectResponse = await client.IntrospectAsync();
+
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "test-login-email@test.com");
+
+// Send username
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+// Select `select-authenticator-authenticate` remediation option
+var selectAuthenticatorRemediationOption1 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+// Get password authenticator ID 
+var passwordId = selectAuthenticatorRemediationOption1.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Password")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+// Proceed with password
+var selectPasswordRequest = new IdxRequestPayload();
+selectPasswordRequest.StateHandle = identifyResponse.StateHandle;
+selectPasswordRequest.SetProperty("authenticator", new
+{
+    id = passwordId
+});
+
+
+var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
+
+// Challenge password
+var challengePasswordRequest = new IdxRequestPayload();
+challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengePasswordRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
+});
+
+// Select `challenge-authenticator` remediation and proceed
+var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                            .ProceedAsync(challengePasswordRequest);
+
+// Select email authenticator
+var selectAuthenticatorRemediationOption2 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+// Get the email authenticator ID
+var emailId = selectAuthenticatorRemediationOption2.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Email")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+
+// Proceed with email
+var selectEmailAuthenticatorRequest = new IdxRequestPayload();
+selectEmailAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+selectEmailAuthenticatorRequest.SetProperty("authenticator", new
+{
+    id = emailId,
+});
+
+
+var selectEmailAuthenticatorResponse = await selectAuthenticatorRemediationOption2.ProceedAsync(selectEmailAuthenticatorRequest);
+
+// Challenge email
+var challengeEmailRequest = new IdxRequestPayload();
+challengeEmailRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengeEmailRequest.SetProperty("credentials", new
+{
+    passcode = "00000", // Set the code you received in your email
+});
+
+
+var challengeEmailResponse = await selectEmailAuthenticatorResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                    .ProceedAsync(challengeEmailRequest);
+
+if (challengeEmailResponse.IsLoginSuccess)
+{
+    var tokenResponse = await challengeEmailResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+}
+```
+
+#### Login using password + phone authenticator (SMS/Voice)
+
+```csharp
+var client = TestIdxClient.Create();
+
+var introspectResponse = await client.IntrospectAsync();
+
+// Identify with username
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "test-login-phone@test.com");
+
+// Send username
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+// Select `select-authenticator-authenticate` remediation option
+var selectAuthenticatorRemediationOption1 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+// Select password ID first
+var passwordId = selectAuthenticatorRemediationOption1.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Password")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+// Proceed with password
+var selectPasswordRequest = new IdxRequestPayload();
+selectPasswordRequest.StateHandle = identifyResponse.StateHandle;
+selectPasswordRequest.SetProperty("authenticator", new
+{
+    id = passwordId
+});
+
+
+var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
+
+// Send credentials
+var challengePasswordRequest = new IdxRequestPayload();
+challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengePasswordRequest.SetProperty("credentials", new
+{
+    passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
+});
+
+var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                            .ProceedAsync(challengePasswordRequest);
+
+// Select `select-authenticator-authenticate` remediation option
+var selectAuthenticatorRemediationOption2 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+// Get the phone authenticator ID
+var phoneId = selectAuthenticatorRemediationOption2.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Phone")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+// Get the phone enrollment ID
+var enrollmentId = selectAuthenticatorRemediationOption2.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Phone")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "enrollmentId")
+                                            .GetProperty<string>("value");
+
+// Proceed with phone (SMS or Voice)
+var selectPhoneAuthenticatorRequest = new IdxRequestPayload();
+selectPhoneAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+selectPhoneAuthenticatorRequest.SetProperty("authenticator", new
+{
+    enrollmentId = enrollmentId,
+    id = phoneId,
+    methodType = "sms" // You can set either `sms` or `voice`
+});
+
+
+var selectPhoneAuthenticatorResponse = await selectAuthenticatorRemediationOption2.ProceedAsync(selectPhoneAuthenticatorRequest);
+
+// Send the code received via SMS or Voice
+var challengePhoneRequest = new IdxRequestPayload();
+challengePhoneRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengePhoneRequest.SetProperty("credentials", new
+{
+    passcode = "000000", // Set the code received via SMS or Voice
+});
+
+
+var challengePhoneResponse = await selectPhoneAuthenticatorResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                    .ProceedAsync(challengePhoneRequest);
+
+// Exchange tokens
+var tokenResponse = await challengePhoneResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+
+```
 
 ### Check Remediation Options
 
@@ -194,11 +503,8 @@ var formValues = remediationOption.Form;
 var selectSecondAuthenticatorRemediationOption = response.Remediation.RemediationOptions
                                                     .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
 
-var selectSecondAuthenticatorRequest = new IdentityEngineRequest()
-{
-    StateHandle = stateHandle,
-};
-
+var selectSecondAuthenticatorRequest = new IdentityEngineRequest();
+selectSecondAuthenticatorRequest.StateHandle = stateHandle,
 selectSecondAuthenticatorRequest.SetProperty("authenticator", new
 {
     id = "aut2ihzk1gHl7ynhd1d6",
@@ -216,11 +522,8 @@ var challengeSecondAuthenticatorRemediationOption = response.Remediation.Remedia
 
 var code = "<CODE_RECEIVED_BY_EMAIL>"
 
-var sendEmailCodeRequest = new IdentityEngineRequest()
-{
-    StateHandle = stateHandle,
-};
-
+var sendEmailCodeRequest = new IdentityEngineRequest();
+sendEmailCodeRequest.StateHandle = stateHandle;
 sendEmailCodeRequest.SetProperty("credentials", new
 {
     passcode = code,
@@ -236,8 +539,7 @@ var response = await challengeSecondAuthenticatorRemediationOption.ProceedAsync(
 var idxResponse = await client.CancelAsync();
 ```
 
-### Get Token with Interaction Code
-
+### Get Tokens with Interaction Code
 
 ```csharp
 if (idxResponse.IsLoginSuccessful) {
@@ -319,3 +621,4 @@ We are happy to accept contributions and PRs! Please see the [contribution guide
 [github-issues]: https://github.com/okta/okta-idx-dotnet/issues
 [github-releases]: https://github.com/okta/okta-idx-dotnet/releases
 [Rate Limiting at Okta]: https://developer.okta.com/docs/api/getting_started/rate-limits
+[okta-library-versioning]: https://developer.okta.com/code/library-versions

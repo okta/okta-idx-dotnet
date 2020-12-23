@@ -294,3 +294,4 @@ tools/**
 
 docs/_site
 docs/temp
+/src/Okta.Idx.E2e.Tests
