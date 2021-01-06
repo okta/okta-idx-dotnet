@@ -748,11 +748,8 @@ namespace Okta.Idx.Sdk.IntegrationTests
                                                         .FirstOrDefault(x => x.Name == "identify")
                                                         .ProceedAsync(identifyRequest);
 
-            identifyRequest = new IdxRequestPayload()
-            {
-                StateHandle = identifyResponse.StateHandle,
-            };
-
+            identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = identifyResponse.StateHandle;
             identifyRequest.SetProperty("credentials", new
             {
                 passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
@@ -764,16 +761,13 @@ namespace Okta.Idx.Sdk.IntegrationTests
                                                         .ProceedAsync(identifyRequest);
 
 
-
-            var enrollProfileRequest = new IdxRequestPayload()
-            {
-                StateHandle = challengeResponse.StateHandle,
-            };
-
             // TODO: Enable profiling attributes
+            var enrollProfileRequest = new IdxRequestPayload();
+            enrollProfileRequest.StateHandle = challengeResponse.StateHandle;
             enrollProfileRequest.SetProperty("userProfile", new
             {
-                test = "foo",
+                prop1 = "foo",
+                prop2 = "bar",
             });
 
             var enrollProfileResponse = await challengeResponse.Remediation.RemediationOptions

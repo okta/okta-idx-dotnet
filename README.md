@@ -59,7 +59,7 @@ var client = new IdxClient(new IdxConfiguration()
                 ClientId = "{YOUR_CLIENT_ID}",
                 ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
                 RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
-                Scopes = "openid profile offiline_access",
+                Scopes = "openid profile offline_access",
             });
 ```
 
@@ -172,7 +172,6 @@ interactResponse = await client.InteractAsync();
 
 #### Login using password + enroll security question authenticator
 
-
 In this example, the Org is configured to require a security question as a second authenticator. After answering the password challenge, users have to select _security question_ and then select a question and enter an answer to finish the process.
 
 > Note: Steps to identify the user might change based on your Org configuration.
@@ -275,7 +274,6 @@ In this example, the Org is configured to require an email as a second authentic
 > Note: If users click a magic link instead of providing a code, they will be redirected to the login page with a valid session if applicable.
 
 ```csharp
-// Create a new client passing the desired scopes
 var client = new IdxClient();
 
 var introspectResponse = await client.IntrospectAsync();
@@ -376,8 +374,13 @@ if (challengeEmailResponse.IsLoginSuccess)
 
 #### Login using password + enroll phone authenticator (SMS/Voice)
 
+In this example, the Org is configured with phone as a second authenticator. After answering the password challenge, users have to provide a phone number and then enter a code to finish the process.
+
+> Note: Steps to identify the user might change based on your Org configuration.
+
+
 ```csharp
-var client = TestIdxClient.Create();
+var client = new IdxClient();
 
 var introspectResponse = await client.IntrospectAsync();
 
@@ -483,7 +486,7 @@ In this example, the Org is configured to require email, phone and security ques
 > Note: Steps to identify the user might change based on your Org configuration.
 
 ```csharp
-var client = TestIdxClient.Create();
+var client = new IdxClient();
 
 var introspectResponse = await client.IntrospectAsync();
 var identifyRequest = new IdxRequestPayload();
@@ -688,7 +691,7 @@ var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAs
 #### Login using password + challenge phone authenticator (SMS/Voice)
 
 ```csharp
-var client = TestIdxClient.Create();
+var client = new IdxClient();
 
 var introspectResponse = await client.IntrospectAsync();
 
@@ -797,6 +800,52 @@ var tokenResponse = await challengePhoneResponse.SuccessWithInteractionCode.Exch
 
 ```
 
+#### User Enrollment - Registration and progressive profiling
+
+In this example, the Org is configured to require additional attributes when users are registering. After answering the password challenge, users have to provide the required attributes to finish the process.
+
+> Note: Steps to identify the user might change based on your Org configuration.
+
+```csharp
+var client = new IdxClient();
+var introspectResponse = await client.IntrospectAsync();
+
+// Identify with username
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "test-progressive-profiling@okta.com");
+
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+// Send credentials
+identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = identifyResponse.StateHandle;
+identifyRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
+});
+
+
+var challengeResponse = await identifyResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                            .ProceedAsync(identifyRequest);
+
+
+// Send required attributes
+var enrollProfileRequest = new IdxRequestPayload();
+enrollProfileRequest.StateHandle = challengeResponse.StateHandle;
+enrollProfileRequest.SetProperty("userProfile", new
+{
+    prop1 = "foo",
+    prop2 = "bar",
+});
+
+var enrollProfileResponse = await challengeResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "enroll-profile")
+                                            .ProceedAsync(enrollProfileRequest);
+```
 
 ### Check Remediation Options
 
