@@ -372,6 +372,101 @@ if (challengeEmailResponse.IsLoginSuccess)
 }
 ```
 
+#### Login using password + web authenticator
+
+In this example, the Org is configured with fingerprint as a second authenticator. After answering the password challenge, users have to provide their fingerprint to finish the process.
+
+> Note: Steps to identify the user might change based on your Org configuration.
+
+```csharp
+var client = new IdxClient();
+
+var introspectResponse = await client.IntrospectAsync();
+
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "test-login-fingerprint@test.com");
+
+// Send username
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+
+var selectAuthenticatorRemediationOption1 = identifyResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+// Select password
+var passwordId = selectAuthenticatorRemediationOption1.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Password")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+var selectPasswordRequest = new IdxRequestPayload();
+selectPasswordRequest.StateHandle = identifyResponse.StateHandle;
+selectPasswordRequest.SetProperty("authenticator", new
+{
+    id = passwordId
+});
+
+var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
+
+var challengePasswordRequest = new IdxRequestPayload();
+challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+challengePasswordRequest.SetProperty("credentials", new
+{
+    passcode = "foo",
+});
+
+var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                            .ProceedAsync(challengePasswordRequest);
+
+var selectAuthenticatorRemediationOption = challengePasswordRemediationOption.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+var fingerprintId = selectAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Windows Hello Hardware Authenticator")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+var selectFingerprintProceedRequest = new IdxRequestPayload();
+selectFingerprintProceedRequest.StateHandle = identifyResponse.StateHandle;
+selectFingerprintProceedRequest.SetProperty("authenticator", new
+{
+    id = fingerprintId,
+});
+
+var selectFingerprintResponse = await selectAuthenticatorRemediationOption.ProceedAsync(selectFingerprintProceedRequest);
+
+var challengeFingerprintRequest = new IdxRequestPayload();
+challengeFingerprintRequest.StateHandle = selectFingerprintResponse.StateHandle;
+challengeFingerprintRequest.SetProperty("credentials", new
+{
+    authenticatorData = "5vIi/yA...",
+    clientData = "eyJjaGFsbGVuZ2UiO...",
+    signatureData = "jaZSjGS6+jiVH...",
+});
+
+
+var challengeFingerprintResponse = await selectFingerprintResponse.Remediation.RemediationOptions
+                                .FirstOrDefault(X => X.Name == "challenge-authenticator")
+                                .ProceedAsync(challengeFingerprintRequest);
+
+// Exchange tokens
+var tokenResponse = await challengeFingerprintResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+```
+
 #### Login using password + enroll phone authenticator (SMS/Voice)
 
 In this example, the Org is configured with phone as a second authenticator. After answering the password challenge, users have to provide a phone number and then enter a code to finish the process.

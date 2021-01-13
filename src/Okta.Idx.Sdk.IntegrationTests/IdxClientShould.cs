@@ -1,7 +1,5 @@
 using FluentAssertions;
-using Okta.Idx.Sdk.Configuration;
 using Okta.Sdk.Abstractions;
-using Okta.Sdk.Abstractions.Configuration;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,7 +15,6 @@ namespace Okta.Idx.Sdk.IntegrationTests
             var client = TestIdxClient.Create();
 
             var interactResponse = await ((IdxClient)client).InteractAsync();
-
 
             var response = await client.IntrospectAsync(interactResponse.InteractionHandle);
 
@@ -730,6 +727,203 @@ namespace Okta.Idx.Sdk.IntegrationTests
         }
 
         // Test plan: #5
+        [Fact]
+        public async Task ChallengeFingerprint()
+        {
+            var client = TestIdxClient.Create();
+
+            var interactResponse = await client.InteractAsync();
+
+            var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", "test-login-fingerprint@test.com");
+
+            // Send username
+            var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+
+            var selectAuthenticatorRemediationOption1 = identifyResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+            // Select password
+            var passwordId = selectAuthenticatorRemediationOption1.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Password")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+            var selectPasswordRequest = new IdxRequestPayload();
+            selectPasswordRequest.StateHandle = identifyResponse.StateHandle;
+            selectPasswordRequest.SetProperty("authenticator", new
+            {
+                id = passwordId
+            });
+
+
+            var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
+
+            var challengePasswordRequest = new IdxRequestPayload();
+            challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+            challengePasswordRequest.SetProperty("credentials", new
+            {
+                passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
+            });
+
+            var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                        .ProceedAsync(challengePasswordRequest);
+
+            var selectAuthenticatorRemediationOption = challengePasswordRemediationOption.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+            var fingerprintId = selectAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Windows Hello Hardware Authenticator")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+
+
+
+            var selectFingerprintProceedRequest = new IdxRequestPayload();
+            selectFingerprintProceedRequest.StateHandle = identifyResponse.StateHandle;
+            selectFingerprintProceedRequest.SetProperty("authenticator", new
+            {
+                id = fingerprintId,
+            });
+
+
+
+            var selectFingerprintResponse = await selectAuthenticatorRemediationOption.ProceedAsync(selectFingerprintProceedRequest);
+
+
+            var challengeFingerprintRequest = new IdxRequestPayload();
+            challengeFingerprintRequest.StateHandle = selectFingerprintResponse.StateHandle;
+            challengeFingerprintRequest.SetProperty("credentials", new
+            {
+                authenticatorData = "5vIi/yA...",
+                clientData = "eyJjaGFsbGVuZ2UiO...",
+                signatureData = "jaZSjGS6+jiVH...",
+            });
+
+
+            var challengeFingerprintResponse = await selectFingerprintResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(X => X.Name == "challenge-authenticator")
+                                            .ProceedAsync(challengeFingerprintRequest);
+
+            challengeFingerprintResponse.IsLoginSuccess.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task EnrollFingerprint()
+        {
+            var client = TestIdxClient.Create();
+
+            var interactResponse = await client.InteractAsync();
+
+            var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", "test-login-fingerprint@test.com");
+
+            // Send username
+            var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+
+            var selectAuthenticatorRemediationOption1 = identifyResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+            // Select password
+            var passwordId = selectAuthenticatorRemediationOption1.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Password")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+            var selectPasswordRequest = new IdxRequestPayload();
+            selectPasswordRequest.StateHandle = identifyResponse.StateHandle;
+            selectPasswordRequest.SetProperty("authenticator", new
+            {
+                id = passwordId
+            });
+
+
+            var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption1.ProceedAsync(selectPasswordRequest);
+
+            var challengePasswordRequest = new IdxRequestPayload();
+            challengePasswordRequest.StateHandle = selectPasswordAuthenticatorResponse.StateHandle;
+            challengePasswordRequest.SetProperty("credentials", new
+            {
+                passcode = Environment.GetEnvironmentVariable("OKTA_IDX_PASSWORD"),
+            });
+
+            var challengePasswordRemediationOption = await selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                        .ProceedAsync(challengePasswordRequest);
+
+            var selectAuthenticatorRemediationOption = challengePasswordRemediationOption.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+            var fingerprintId = selectAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Security Key or Biometric")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+
+
+
+            var selectFingerprintProceedRequest = new IdxRequestPayload();
+            selectFingerprintProceedRequest.StateHandle = identifyResponse.StateHandle;
+            selectFingerprintProceedRequest.SetProperty("authenticator", new
+            {
+                id = fingerprintId,
+            });
+
+
+
+            var selectFingerprintResponse = await selectAuthenticatorRemediationOption.ProceedAsync(selectFingerprintProceedRequest);
+
+
+            var challengeFingerprintRequest = new IdxRequestPayload();
+            challengeFingerprintRequest.StateHandle = selectFingerprintResponse.StateHandle;
+            challengeFingerprintRequest.SetProperty("credentials", new
+            {
+                authenticatorData = "5vIi/yA...",
+                clientData = "eyJjaGFsbGVuZ2UiO...",
+            });
+
+
+            var challengeFingerprintResponse = await selectFingerprintResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(X => X.Name == "enroll-authenticator")
+                                            .ProceedAsync(challengeFingerprintRequest);
+
+            challengeFingerprintResponse.IsLoginSuccess.Should().BeTrue();
+        }
+
         [Fact]
         public async Task LoginSuccessfullyWithProgressiveProfilingFeature()
         {
