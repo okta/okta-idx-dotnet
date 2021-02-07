@@ -39,7 +39,7 @@ namespace Okta.Idx.Sdk
         /// <returns>The <see cref="IOktaClient">OktaClient</see> that created this resource.</returns>
         protected new IIdxClient GetClient()
         {
-            return (IIdxClient)_client ?? throw new InvalidOperationException("Only resources retrieved or saved through a Client object cna call server-side methods.");
+            return (IIdxClient)_client ?? throw new InvalidOperationException("Only resources retrieved or saved through a Client object can call server-side methods.");
         }
     }
 }

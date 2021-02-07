@@ -20,6 +20,9 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// The IDX client.
+    /// </summary>
     public class IdxClient : IIdxClient
     {
         /// <summary>
@@ -34,8 +37,6 @@ namespace Okta.Idx.Sdk
 
         private ILogger _logger;
 
-        private IIdxClientContext _idxClientContext;
-
         static IdxClient()
         {
             System.AppContext.SetSwitch("Switch.System.Net.DontEnableSystemDefaultTlsVersions", false);
@@ -46,13 +47,12 @@ namespace Okta.Idx.Sdk
         /// </summary>
         public IdxClient()
         {
-            GenerateStateCodeVerifierAndChallenge();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IdxClient"/> class using the specified <see cref="HttpClient"/>.
         /// </summary>
-        /// <param name="apiClientConfiguration">
+        /// <param name="configuration">
         /// The client configuration. If <c>null</c>, the library will attempt to load
         /// configuration from an <c>okta.yaml</c> file or environment variables.
         /// </param>
@@ -65,8 +65,6 @@ namespace Okta.Idx.Sdk
         {
             Configuration = GetConfigurationOrDefault(configuration);
             IdxConfigurationValidator.Validate(Configuration);
-            GenerateStateCodeVerifierAndChallenge();
-
             _logger = logger ?? NullLogger.Instance;
 
             var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
@@ -123,17 +121,8 @@ namespace Okta.Idx.Sdk
         /// <param name="configuration">The client configuration.</param>
         /// <param name="requestContext">The request context, if any.</param>
         /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
-        protected IdxClient(IDataStore dataStore, IdxConfiguration configuration, RequestContext requestContext, IIdxClientContext idxClientContext = null)
+        protected IdxClient(IDataStore dataStore, IdxConfiguration configuration, RequestContext requestContext)
         {
-            if (idxClientContext != null)
-            {
-                _idxClientContext = idxClientContext;
-            }
-            else
-            {
-                GenerateStateCodeVerifierAndChallenge();
-            }
-
             _dataStore = dataStore ?? throw new ArgumentNullException(nameof(dataStore));
             Configuration = configuration;
             _requestContext = requestContext;
@@ -143,23 +132,6 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the Okta configuration.
         /// </summary>
         public IdxConfiguration Configuration { get; protected set; }
-
-        /// <summary>
-        /// The internal OAuth state used to track requests from this client
-        /// </summary>
-        private string State { get; set; }
-
-        /// <summary>
-        /// The PKCE code that is used to verify the integrity of the token exchange
-        /// </summary>
-        private string CodeVerifier { get; set; }
-
-        /// <summary>
-        /// A SHA256 hash of the <see cref="CodeVerifier"/> used for PKCE
-        /// </summary>
-        private string CodeChallenge { get; set; }
-
-        public IIdxClientContext Context => _idxClientContext;
 
         private string GenerateSecureRandomString(int byteCount)
         {
@@ -173,32 +145,38 @@ namespace Okta.Idx.Sdk
         }
 
         /// <summary>
-        /// Generates a cryptographically random <see cref="State"/> and <see cref="CodeVerifier"/>, and computes the <see cref="CodeChallenge"/> for use in PKCE
+        /// Generates the <see cref="CodeChallenge"/> for use in PKCE
         /// </summary>
-        private void GenerateStateCodeVerifierAndChallenge()
+        private string GenerateCodeChallenge(string codeVerifier, out string codeChallengeMethod)
         {
-            State = GenerateSecureRandomString(16);
-            CodeVerifier = GenerateSecureRandomString(86);
+            codeChallengeMethod = "S256";
+
             using (SHA256 sha256Hash = SHA256.Create())
             {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(CodeVerifier));
-                CodeChallenge = UrlFormatter.EncodeToBase64Url(bytes);
-            }
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier));
 
-            _idxClientContext = new IdxClientContext(CodeVerifier, CodeChallenge, "S256");
+                return UrlFormatter.EncodeToBase64Url(bytes);
+            }
         }
 
-        public async Task<IInteractionHandleResponse> InteractAsync(CancellationToken cancellationToken = default)
+        /// <inheritdoc/>
+        public async Task<IIdxContext> InteractAsync(CancellationToken cancellationToken = default)
         {
+            // PKCE props
+            var state = GenerateSecureRandomString(16);
+            var codeVerifier = GenerateSecureRandomString(86);
+            var codeChallengeMethod = string.Empty;
+            var codeChallenge = GenerateCodeChallenge(codeVerifier, out codeChallengeMethod);
+
             var payload = new Dictionary<string, string>();
             payload.Add("scope", string.Join(" ", Configuration.Scopes));
             payload.Add("client_id", Configuration.ClientId);
 
             // Add PKCE params and state
-            payload.Add("code_challenge_method", "S256");
-            payload.Add("code_challenge", CodeChallenge);
+            payload.Add("code_challenge_method", codeChallengeMethod);
+            payload.Add("code_challenge", codeChallenge);
             payload.Add("redirect_uri", Configuration.RedirectUri);
-            payload.Add("state", State);
+            payload.Add("state", state);
 
             var headers = new Dictionary<string, string>();
             headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
@@ -210,10 +188,13 @@ namespace Okta.Idx.Sdk
                 Headers = headers,
             };
 
-            return await PostAsync<InteractionHandleResponse>(
+            var response = await PostAsync<InteractionHandleResponse>(
                 request, cancellationToken).ConfigureAwait(false);
+
+            return new IdxContext(codeVerifier, codeChallenge, codeChallengeMethod, response.InteractionHandle);
         }
 
+        /// <inheritdoc/>
         public async Task<IIdxResponse> IntrospectAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (string.IsNullOrEmpty(interactionHandle))
@@ -244,8 +225,9 @@ namespace Okta.Idx.Sdk
                 request, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public IOktaClient CreateScoped(RequestContext requestContext)
-            => new IdxClient(_dataStore, Configuration, requestContext, _idxClientContext);
+            => new IdxClient(_dataStore, Configuration, requestContext);
 
         /// <summary>
         /// Creates a new <see cref="CollectionClient{T}"/> given an initial HTTP request.

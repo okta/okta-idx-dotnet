@@ -33,7 +33,7 @@ namespace Okta.Idx.Sdk
             return interactionCodeFormValue.GetProperty<string>("value");
         }
 
-        public async Task<ITokenResponse> ExchangeCodeAsync(CancellationToken cancellationToken = default)
+        public async Task<ITokenResponse> ExchangeCodeAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var client = GetClient();
             var payload = new Dictionary<string, string>();
@@ -41,7 +41,7 @@ namespace Okta.Idx.Sdk
             payload.Add("grant_type", "interaction_code");
 
             // Add PKCE params
-            payload.Add("code_verifier", client.Context.CodeVerifier);
+            payload.Add("code_verifier", idxContext.CodeVerifier);
             payload.Add("client_id", client.Configuration.ClientId);
 
             if (client.Configuration.IsConfidentialClient)

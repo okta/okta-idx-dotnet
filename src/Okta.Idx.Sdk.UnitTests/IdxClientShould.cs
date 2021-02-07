@@ -12,6 +12,147 @@ namespace Okta.Idx.Sdk.UnitTests
     public class IdxClientShould
     {
         [Fact]
+        public async Task GeneratePkcePropsWhenCallingInteract()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var idxContext = await testClient.InteractAsync();
+
+            idxContext.InteractionHandle.Should().Be("foo");
+            idxContext.CodeChallenge.Should().NotBeNullOrEmpty();
+            idxContext.CodeChallengeMethod.Should().NotBeNullOrEmpty();
+            idxContext.CodeVerifier.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task SendPkceCodeChallengeWhenExchangingTokens()
+        {
+            #region rawSuccessResponse
+            var rawSuccessResponse = @"{
+                                       ""stateHandle"":""02gXmcy1YH8qk6GcefMB447eZuL6EOxTiaSj-N6-80"",
+                                       ""version"":""1.0.0"",
+                                       ""expiresAt"":""2020-12-10T17:13:12.000Z"",
+                                       ""intent"":""LOGIN"",
+                                       ""successWithInteractionCode"":{
+                                          ""rel"":[
+                                             ""create-form""
+                                          ],
+                                          ""name"":""issue"",
+                                          ""href"":""https://test.com/oauth2/v1/token"",
+                                          ""method"":""POST"",
+                                          ""value"":[
+                                             {
+                                                ""name"":""grant_type"",
+                                                ""required"":true,
+                                                ""value"":""interaction_code""
+                                             },
+                                             {
+                                                ""name"":""interaction_code"",
+                                                ""required"":true,
+                                                ""value"":""TmcFc9MCxmVXGeYTW0pSE7NhvDxdMP8MUlazrmhkIGk""
+                                             },
+                                             {
+                                                ""name"":""client_id"",
+                                                ""required"":true,
+                                                ""value"":""0oazsmpxZpVEg4chS2o4""
+                                             },
+                                             {
+                                                ""name"":""client_secret"",
+                                                ""required"":true
+                                             },
+                                             {
+                                                ""name"":""code_verifier"",
+                                                ""required"":true
+                                             }
+                                          ],
+                                          ""accepts"":""application/x-www-form-urlencoded""
+                                       }
+                                    }";
+            #endregion
+
+            var rawResponse = @"{""token_type"":""Bearer"",""expires_in"":3600,""access_token"":""foo"",""scope"":""openid profile"",""id_token"":""bar""}";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            // Create a mock for an success response
+            var resourceFactory = new ResourceFactory(testClient, NullLogger.Instance, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
+            var data = new DefaultSerializer().Deserialize(rawSuccessResponse);
+            var successResponse = resourceFactory.CreateNew<IdxResponse>(data);
+
+            var mockIdxContext = new IdxContext("codeVer1f13r", "codeChanll3ng3", "S256", "foo");
+
+            var tokens = await successResponse.SuccessWithInteractionCode.ExchangeCodeAsync(mockIdxContext);
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"code_verifier\":\"{mockIdxContext.CodeVerifier}\"");
+        }
+
+        [Fact]
+        public async Task ProcessExchangingTokensResponse()
+        {
+            #region rawSuccessResponse
+            var rawSuccessResponse = @"{
+                                       ""stateHandle"":""02gXmcy1YH8qk6GcefMB447eZuL6EOxTiaSj-N6-80"",
+                                       ""version"":""1.0.0"",
+                                       ""expiresAt"":""2020-12-10T17:13:12.000Z"",
+                                       ""intent"":""LOGIN"",
+                                       ""successWithInteractionCode"":{
+                                          ""rel"":[
+                                             ""create-form""
+                                          ],
+                                          ""name"":""issue"",
+                                          ""href"":""https://test.com/oauth2/v1/token"",
+                                          ""method"":""POST"",
+                                          ""value"":[
+                                             {
+                                                ""name"":""grant_type"",
+                                                ""required"":true,
+                                                ""value"":""interaction_code""
+                                             },
+                                             {
+                                                ""name"":""interaction_code"",
+                                                ""required"":true,
+                                                ""value"":""TmcFc9MCxmVXGeYTW0pSE7NhvDxdMP8MUlazrmhkIGk""
+                                             },
+                                             {
+                                                ""name"":""client_id"",
+                                                ""required"":true,
+                                                ""value"":""0oazsmpxZpVEg4chS2o4""
+                                             },
+                                             {
+                                                ""name"":""client_secret"",
+                                                ""required"":true
+                                             },
+                                             {
+                                                ""name"":""code_verifier"",
+                                                ""required"":true
+                                             }
+                                          ],
+                                          ""accepts"":""application/x-www-form-urlencoded""
+                                       }
+                                    }";
+            #endregion
+
+            var rawResponse = @"{""token_type"":""Bearer"",""expires_in"":3600,""access_token"":""foo"",""scope"":""openid profile"",""id_token"":""bar""}";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            // Create a mock for an success response
+            var resourceFactory = new ResourceFactory(testClient, NullLogger.Instance, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
+            var data = new DefaultSerializer().Deserialize(rawSuccessResponse);
+            var successResponse = resourceFactory.CreateNew<IdxResponse>(data);
+
+            var mockIdxContext = new IdxContext("codeVer1f13r", "codeChanll3ng3", "S256", "foo");
+
+            var tokens = await successResponse.SuccessWithInteractionCode.ExchangeCodeAsync(mockIdxContext);
+
+            tokens.TokenType.Should().Be("Bearer");
+            tokens.IdToken.Should().Be("bar");
+            tokens.AccessToken.Should().Be("foo");
+            tokens.ExpiresIn.Should().Be(3600);
+        }
+
+        [Fact]
         // STEP 1
         public async Task ProcessIntrospectResponse()
         {

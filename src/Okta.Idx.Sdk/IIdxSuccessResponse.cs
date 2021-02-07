@@ -40,7 +40,9 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Exchange an interaction code for tokens.
         /// </summary>
-        /// <returns></returns>
-        Task<ITokenResponse> ExchangeCodeAsync(CancellationToken cancellationToken = default);
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The tokens' reponse.</returns>
+        Task<ITokenResponse> ExchangeCodeAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }

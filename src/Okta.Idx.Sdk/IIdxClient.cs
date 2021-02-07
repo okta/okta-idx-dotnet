@@ -25,16 +25,11 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The Interaction Response.</returns>
-        Task<IInteractionHandleResponse> InteractAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task<IIdxContext> InteractAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets the client configuration.
         /// </summary>
         IdxConfiguration Configuration { get; }
-
-        /// <summary>
-        /// Gets the Idx client context.
-        /// </summary>
-        IIdxClientContext Context { get; }
     }
 }
