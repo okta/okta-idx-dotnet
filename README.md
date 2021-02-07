@@ -63,11 +63,12 @@ var client = new IdxClient(new IdxConfiguration()
             });
 ```
 
-### Get Interaction Handle
+### Get Interaction Handle and Code Verifier
 
 ```csharp
-var interactResponse = await client.InteractAsync();
-var interactHandle = interactResponse.InteractionHandle;
+var idxContext = await client.InteractAsync();
+var interactHandle = idxContext.InteractionHandle;
+var codeVerifier = idxContext.CodeVerifier;
 ```
 
 ### Get State Handle
