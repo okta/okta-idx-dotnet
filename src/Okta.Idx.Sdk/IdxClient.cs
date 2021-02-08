@@ -194,7 +194,6 @@ namespace Okta.Idx.Sdk
             return new IdxContext(codeVerifier, codeChallenge, codeChallengeMethod, response.InteractionHandle);
         }
 
-        // TODO: Idx Context? 
         /// <inheritdoc/>
         public async Task<IIdxResponse> IntrospectAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken))
         {
