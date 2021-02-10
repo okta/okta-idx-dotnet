@@ -16,7 +16,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await ((IdxClient)client).InteractAsync();
 
-            var response = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var response = await client.IntrospectAsync(idxContext);
 
             response.StateHandle.Should().NotBeNullOrEmpty();
             response.Version.Should().NotBeNullOrEmpty();
@@ -46,7 +46,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;
@@ -85,7 +85,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;
@@ -130,7 +130,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;
@@ -214,7 +214,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             // TODO: Create user and assign user to application.
 
@@ -316,7 +316,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             // TODO: Create user and assign user to application.
 
@@ -416,7 +416,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             // TODO: Create user and assign user to application.
 
@@ -628,7 +628,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             // TODO: Create user and assign user to application.
 
@@ -737,7 +737,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;
@@ -836,7 +836,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;
@@ -934,7 +934,7 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             var idxContext = await client.InteractAsync();
 
-            var introspectResponse = await client.IntrospectAsync(idxContext.InteractionHandle);
+            var introspectResponse = await client.IntrospectAsync(idxContext);
 
             var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;

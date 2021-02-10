@@ -74,8 +74,7 @@ var codeVerifier = idxContext.CodeVerifier;
 ### Get State Handle
 
 ```csharp
-// optional with interactionHandle or empty; if empty, a new interactionHandle will be obtained
-var introspectResponse = await client.IntrospectAsync(interactResponse.InteractionHandle);
+var introspectResponse = await client.IntrospectAsync(idxContext);
 var stateHandle = introspectResponse.StateHandle;
 ```
 
@@ -96,8 +95,11 @@ var client = new IdxClient(new IdxConfiguration()
                 Scopes = "openid profile offline_access", // Optional. The default value is "openid profile".
             });
 
-// Call Introspect - interactionHandle is optional; if it's not provided, a new interactionHandle will be obtained.
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
 
 // Identify with username 
 var identifyRequest = new IdxRequestPayload();
@@ -122,7 +124,7 @@ var challengeResponse = await identifyResponse.Remediation.RemediationOptions
                                             .ProceedAsync(identifyRequest);   
 
 // Exchange tokens
-var tokenResponse = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+var tokenResponse = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
 
 ```
 
@@ -135,8 +137,11 @@ In this example, the Org is configured to require an email as a second authentic
 ```csharp
 var client = new IdxClient();
 
-// Call Introspect - interactionHandle is optional; if it's not provided, a new interactionHandle will be obtained.
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
 
 // Identify with username 
 var identifyRequest = new IdxRequestPayload();
@@ -163,10 +168,10 @@ var challengeResponse = await identifyResponse.Remediation.RemediationOptions
 // Before answering the email challenge, cancel the transaction
 await challengeResponse.CancelAsync();
 
-// Get a new interaction code
-interactResponse = await client.InteractAsync();
+// Get a new IDX context
+idxContext = await client.InteractAsync();
 
-// From now on, you can use interactResponse.InteractionHandle to continue with a new flow.
+// From now on, you can use the new IDX context to continue with a new flow.
 ```                                            
 
 ### Remediation/MFA scenarios with sign-on policy
@@ -180,7 +185,11 @@ In this example, the Org is configured to require a security question as a secon
 ```csharp
 var client = new IdxClient();
 
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
 
 var identifyRequest = new IdxRequestPayload();
 identifyRequest.StateHandle = introspectResponse.StateHandle;
@@ -263,7 +272,7 @@ var skipResponse = await enrollResponse.Remediation.RemediationOptions
                             .ProceedAsync(skipRequest);
 
 
-var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
 ```
 
 #### Login using password + email authenticator
@@ -277,7 +286,11 @@ In this example, the Org is configured to require an email as a second authentic
 ```csharp
 var client = new IdxClient();
 
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
 
 var identifyRequest = new IdxRequestPayload();
 identifyRequest.StateHandle = introspectResponse.StateHandle;
@@ -369,7 +382,7 @@ var challengeEmailResponse = await selectEmailAuthenticatorResponse.Remediation.
 
 if (challengeEmailResponse.IsLoginSuccess)
 {
-    var tokenResponse = await challengeEmailResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+    var tokenResponse = await challengeEmailResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
 }
 ```
 
@@ -382,7 +395,11 @@ In this example, the Org is configured with fingerprint as a second authenticato
 ```csharp
 var client = new IdxClient();
 
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
 
 var identifyRequest = new IdxRequestPayload();
 identifyRequest.StateHandle = introspectResponse.StateHandle;
@@ -465,7 +482,7 @@ var challengeFingerprintResponse = await selectFingerprintResponse.Remediation.R
                                 .ProceedAsync(challengeFingerprintRequest);
 
 // Exchange tokens
-var tokenResponse = await challengeFingerprintResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+var tokenResponse = await challengeFingerprintResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
 ```
 
 #### Login using password + enroll phone authenticator (SMS/Voice)
@@ -478,7 +495,11 @@ In this example, the Org is configured with phone as a second authenticator. Aft
 ```csharp
 var client = new IdxClient();
 
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
 
 // Identify with username
 var identifyRequest = new IdxRequestPayload();
@@ -570,7 +591,7 @@ var challengePhoneResponse = await selectPhoneAuthenticatorResponse.Remediation.
                                                     .ProceedAsync(challengePhoneRequest);
 
 // Exchange tokens
-var tokenResponse = await challengePhoneResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+var tokenResponse = await challengePhoneResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
 
 ```
 
@@ -584,7 +605,11 @@ In this example, the Org is configured with web authenticator as a second authen
 ```csharp
 var client = new IdxClient();
 
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
 
 var identifyRequest = new IdxRequestPayload();
 identifyRequest.StateHandle = introspectResponse.StateHandle;
@@ -672,7 +697,7 @@ var challengeFingerprintResponse = await selectFingerprintResponse.Remediation.R
                                 .ProceedAsync(challengeFingerprintRequest);
 
 // Exchange tokens
-var tokenResponse = await challengeFingerprintResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+var tokenResponse = await challengeFingerprintResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
 ```
 
 #### Login using password + email authenticator + enroll phone + enroll security question
@@ -684,7 +709,12 @@ In this example, the Org is configured to require email, phone and security ques
 ```csharp
 var client = new IdxClient();
 
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
+
 var identifyRequest = new IdxRequestPayload();
 identifyRequest.StateHandle = introspectResponse.StateHandle;
 identifyRequest.SetProperty("identifier", "test-mfa@okta.com");
@@ -880,7 +910,7 @@ var skipResponse = await enrollResponse.Remediation.RemediationOptions
                             .ProceedAsync(skipRequest);
 
 
-var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
 
 ```
 
@@ -889,7 +919,11 @@ var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAs
 ```csharp
 var client = new IdxClient();
 
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
 
 // Identify with username
 var identifyRequest = new IdxRequestPayload();
@@ -992,7 +1026,7 @@ var challengePhoneResponse = await selectPhoneAuthenticatorResponse.Remediation.
                                                     .ProceedAsync(challengePhoneRequest);
 
 // Exchange tokens
-var tokenResponse = await challengePhoneResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+var tokenResponse = await challengePhoneResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
 
 ```
 
@@ -1004,7 +1038,11 @@ In this example, the Org is configured to require additional attributes when use
 
 ```csharp
 var client = new IdxClient();
-var introspectResponse = await client.IntrospectAsync();
+// Call Interact to obtain an IDX context
+var idxContext = await client.InteractAsync();
+
+// Continue with Introspect
+var introspectResponse = await client.IntrospectAsync(idxContext);
 
 // Identify with username
 var identifyRequest = new IdxRequestPayload();
@@ -1080,8 +1118,7 @@ var idxResponse = await client.CancelAsync();
 
 ```csharp
 if (idxResponse.IsLoginSuccessful) {
-    // exchange interaction code for token
-    var tokenResponse = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync();
+    var tokenResponse = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
     var accessToken = tokenResponse.AccessToken;
     var idToken = tokenResponse.IdToken;
 }

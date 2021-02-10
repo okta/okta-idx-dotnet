@@ -16,9 +16,9 @@ namespace Okta.Idx.Sdk
         /// Calls the Idx introspect endpoint to get remediation steps. if Interaction Handle is
         /// null, the SDK MUST make an API call to the interact endpoint to get the initial inteactionHandle.
         /// </summary>
-        /// <param name="interactionHandle">The interaction handle that was returned by the `interact()` call</param>
+        /// <param name="idxContext">The IDX context that was returned by the `interact()` call</param>
         /// <returns>The IdxResponse.</returns>
-        Task<IIdxResponse> IntrospectAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Calls the Idx interact endpoint to get an interaction handle.

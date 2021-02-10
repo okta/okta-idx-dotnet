@@ -195,17 +195,10 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<IIdxResponse> IntrospectAsync(string interactionHandle = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (string.IsNullOrEmpty(interactionHandle))
-            {
-                var idxContext = await InteractAsync(cancellationToken);
-
-                interactionHandle = idxContext.InteractionHandle;
-            }
-
             var payload = new IdxRequestPayload();
-            payload.SetProperty("interactionHandle", interactionHandle);
+            payload.SetProperty("interactionHandle", idxContext.InteractionHandle);
 
             var oktaDomain = UrlHelper.GetOktaRootUrl(this.Configuration.Issuer);
 
