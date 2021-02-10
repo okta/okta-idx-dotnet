@@ -13,18 +13,17 @@ namespace Okta.Idx.Sdk
     public interface IIdxClient : IOktaClient
     {
         /// <summary>
-        /// Calls the Idx introspect endpoint to get remediation steps. if Interaction Handle is
-        /// null, the SDK MUST make an API call to the interact endpoint to get the initial inteactionHandle.
+        /// Calls the Idx introspect endpoint to get remediation steps.
         /// </summary>
         /// <param name="idxContext">The IDX context that was returned by the `interact()` call</param>
         /// <returns>The IdxResponse.</returns>
         Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Calls the Idx interact endpoint to get an interaction handle.
+        /// Calls the Idx interact endpoint to get an IDX context.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <returns>The Interaction Response.</returns>
+        /// <returns>The IDX context.</returns>
         Task<IIdxContext> InteractAsync(CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
