@@ -1151,7 +1151,7 @@ In most cases, you won't need to build the SDK from source. If you want to build
 
 ## Contributing
  
-We are happy to accept contributions and PRs! Please see the [contribution guide](CONTRIBUTING.md) to understand how to structure a contribution.
+We are happy to accept contributions and PR's! Please see the [contribution guide](CONTRIBUTING.md) to understand how to structure a contribution.
 
 [devforum]: https://devforum.okta.com/
 [dotnetdocs]: https://developer.okta.com/okta-idx-dotnet/latest/
