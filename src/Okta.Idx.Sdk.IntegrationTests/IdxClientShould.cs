@@ -973,5 +973,106 @@ namespace Okta.Idx.Sdk.IntegrationTests
 
             enrollProfileResponse.IsLoginSuccess.Should().BeTrue();
         }
+
+        [Fact]
+        public async Task RecoverPassword()
+        {
+            var client = TestIdxClient.Create();
+
+            var idxContext = await client.InteractAsync();
+
+            var introspectResponse = await client.IntrospectAsync(idxContext);
+
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", "test-recover-password@test.com");
+
+            // Send username
+            var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                                        .FirstOrDefault(x => x.Name == "identify")
+                                                        .ProceedAsync(identifyRequest);
+
+            // Proceed with recovery
+            var recoveryRequest = new IdxRequestPayload();
+            recoveryRequest.StateHandle = identifyResponse.StateHandle;
+
+            var recoveryResponse = await identifyResponse.CurrentAuthenticatorEnrollment.Value.Recover.ProceedAsync(recoveryRequest);
+
+            // Select email
+            var selectEmailAuthenticatorRemediationOption = recoveryResponse.Remediation.RemediationOptions
+                                                                            .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+            var emailId = selectEmailAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "authenticator")
+                                                        .Options
+                                                        .FirstOrDefault(x => x.Label == "Email")
+                                                        .GetProperty<FormValue>("value")
+                                                        .Form
+                                                        .GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "id")
+                                                        .GetProperty<string>("value");
+
+            // Send code
+            var selectEmailAuthenticatorRequest = new IdxRequestPayload();
+            selectEmailAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+            selectEmailAuthenticatorRequest.SetProperty("authenticator", new
+            {
+                id = emailId,
+            });
+
+
+            var selectEmailAuthenticatorResponse = await selectEmailAuthenticatorRemediationOption.ProceedAsync(selectEmailAuthenticatorRequest);
+
+            var challengeEmailRequest = new IdxRequestPayload();
+            challengeEmailRequest.StateHandle = selectEmailAuthenticatorResponse.StateHandle;
+            challengeEmailRequest.SetProperty("credentials", new
+            {
+                passcode = "xxxxxx",
+            });
+
+
+            var challengeEmailResponse = await selectEmailAuthenticatorResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                                .ProceedAsync(challengeEmailRequest);
+
+            // Send your security question value
+            var challengeSecurityQuestionRemediationOption = challengeEmailResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "challenge-authenticator");
+
+            var securityQuestionValue = challengeSecurityQuestionRemediationOption.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "credentials")
+                                                        .Form.GetArrayProperty<FormValue>("value")
+                                                        .FirstOrDefault(x => x.Name == "questionKey")
+                                                        .GetProperty<string>("value");
+
+
+            var challengeSecurityQuestionRequest = new IdxRequestPayload();
+            challengeSecurityQuestionRequest.StateHandle = challengeEmailResponse.StateHandle;
+            challengeSecurityQuestionRequest.SetProperty("credentials", new
+            {
+                answer = "chicken",
+                questionKey = securityQuestionValue,
+            });
+
+            var challengeSecurityQuestionResponse = await challengeSecurityQuestionRemediationOption.ProceedAsync(challengeSecurityQuestionRequest);
+
+
+            // Reset password
+            var resetAuthenticatorRequest = new IdxRequestPayload();
+            resetAuthenticatorRequest.StateHandle = challengeSecurityQuestionResponse.StateHandle;
+            resetAuthenticatorRequest.SetProperty("credentials", new
+            {
+                passcode = "myNewP4ssw0rd",
+            });
+
+            var resetAuthenticatorResponse = await challengeSecurityQuestionResponse.Remediation.RemediationOptions
+                                                            .FirstOrDefault(x => x.Name == "reset-authenticator")
+                                                            .ProceedAsync(resetAuthenticatorRequest);
+            // Exchange tokens
+            if (resetAuthenticatorResponse.IsLoginSuccess)
+            {
+                var tokenResponse = await resetAuthenticatorResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+            }
+        }
     }
 }
