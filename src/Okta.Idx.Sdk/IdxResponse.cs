@@ -12,22 +12,36 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// The IDX response.
+    /// </summary>
     public class IdxResponse : Resource, IIdxResponse
     {
+        /// <inheritdoc/>
         public string StateHandle => GetStringProperty("stateHandle");
 
+        /// <inheritdoc/>
         public string Version => GetStringProperty("version");
 
+        /// <inheritdoc/>
         public DateTimeOffset? ExpiresAt => GetDateTimeProperty("expiresAt");
 
+        /// <inheritdoc/>
         public string Intent => GetStringProperty("intent");
 
+        /// <inheritdoc/>
         public IRemediation Remediation => GetResourceProperty<Remediation>("remediation");
 
+        /// <inheritdoc/>
         public bool IsLoginSuccess => this.GetData().ContainsKey("successWithInteractionCode");
 
+        /// <inheritdoc/>
         public IIdxSuccessResponse SuccessWithInteractionCode => GetResourceProperty<IdxSuccessResponse>("successWithInteractionCode");
 
+        /// <inheritdoc/>
+        public IAuthenticatorEnrollment CurrentAuthenticatorEnrollment => GetResourceProperty<AuthenticatorEnrollment>("currentAuthenticatorEnrollment");
+
+        /// <inheritdoc/>
         public async Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken = default)
         {
             var cancelResponse = this.GetResourceProperty<CancelResponse>("cancel");

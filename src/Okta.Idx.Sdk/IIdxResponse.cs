@@ -10,6 +10,9 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// An interface to represent the IDX response.
+    /// </summary>
     public interface IIdxResponse : IResource
     {
         /// <summary>
@@ -49,7 +52,12 @@ namespace Okta.Idx.Sdk
         Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Returns if login was successful
+        /// Gets the current authenticator enrollment
+        /// </summary>
+        IAuthenticatorEnrollment CurrentAuthenticatorEnrollment { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether login was successful
         /// </summary>
         bool IsLoginSuccess { get; }
     }
