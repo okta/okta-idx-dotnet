@@ -1,6 +1,8 @@
-// Default MSBuild configuration arguments
+#addin nuget:?package=Cake.Figlet&version=1.3.1
 
+var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
+
 
 Task("Clean")
 .Does(() =>
@@ -78,9 +80,21 @@ Task("IntegrationTest")
     }
 });
 
+Task("Info")
+.Does(() => 
+{
+    Information(Figlet("Okta.Idx.Sdk"));
+
+    var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
+
+    Information("Building using {0} version of Cake", cakeVersion);
+});
+
+
 // Define top-level tasks
 
 Task("Default")
+    .IsDependentOn("Info")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
@@ -94,6 +108,4 @@ Task("DefaultIT")
     .IsDependentOn("IntegrationTest")
     .IsDependentOn("Pack");
 
-// Default task
-var target = Argument("target", "Default");
 RunTarget(target);

@@ -12,6 +12,10 @@ namespace Okta.Idx.Sdk.UnitTests
         private readonly string _returnThis;
         private readonly int _statusCode;
 
+        public string ReceivedHref { get; set; }
+
+        public string ReceivedBody { get; set; }
+
         public string OktaDomain => throw new NotImplementedException();
 
         public MockedStringRequestExecutor(string returnThis, int statusCode = 200)
@@ -21,18 +25,25 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         public Task<HttpResponse<string>> GetAsync(string href, IEnumerable<KeyValuePair<string, string>> headers, CancellationToken cancellationToken)
-            => Task.FromResult(new HttpResponse<string>
+        {
+            ReceivedHref = href;
+            return Task.FromResult(new HttpResponse<string>
             {
                 StatusCode = _statusCode,
                 Payload = _returnThis,
             });
+        }
 
         public Task<HttpResponse<string>> PostAsync(string href, IEnumerable<KeyValuePair<string, string>> headers, string body, CancellationToken cancellationToken)
-            => Task.FromResult(new HttpResponse<string>
+        {
+            ReceivedHref = href;
+            ReceivedBody = body;
+            return Task.FromResult(new HttpResponse<string>
             {
                 StatusCode = _statusCode,
                 Payload = _returnThis,
             });
+        }
 
         public Task<HttpResponse<string>> PutAsync(string href, IEnumerable<KeyValuePair<string, string>> headers, string body, CancellationToken cancellationToken)
         {
