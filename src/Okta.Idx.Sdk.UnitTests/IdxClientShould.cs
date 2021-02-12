@@ -88,6 +88,183 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
+        public void ProcessRecoverResponse()
+        {
+            #region rawResponse
+            var rawResponse = @"
+                                {
+                                   ""stateHandle"":""02sRsXE-KaQW3sigxQl-0WYEI1clG96hHHL1Vg90VB"",
+                                   ""version"":""1.0.0"",
+                                   ""expiresAt"":""2021-02-11T22:26:19.000Z"",
+                                   ""intent"":""LOGIN"",
+                                   ""remediation"":{
+                                      ""type"":""array"",
+                                      ""value"":[
+                                         {
+                                            ""rel"":[
+                                               ""create-form""
+                                            ],
+                                            ""name"":""challenge-authenticator"",
+                                            ""relatesTo"":[
+                                               ""$.currentAuthenticatorEnrollment""
+                                            ],
+                                            ""href"":""https://foo.okta.com/idp/idx/challenge/answer"",
+                                            ""method"":""POST"",
+                                            ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                            ""value"":[
+                                               {
+                                                  ""name"":""credentials"",
+                                                  ""type"":""object"",
+                                                  ""form"":{
+                                                     ""value"":[
+                                                        {
+                                                           ""name"":""passcode"",
+                                                           ""label"":""Password"",
+                                                           ""secret"":true
+                                                        }
+                                                     ]
+                                                  },
+                                                  ""required"":true
+                                               },
+                                               {
+                                                  ""name"":""stateHandle"",
+                                                  ""required"":true,
+                                                  ""value"":""02sRsXE"",
+                                                  ""visible"":false,
+                                                  ""mutable"":false
+                                               }
+                                            ],
+                                            ""accepts"":""application/json; okta-version=1.0.0""
+                                         }
+                                      ]
+                                   },
+                                   ""currentAuthenticatorEnrollment"":{
+                                      ""type"":""object"",
+                                      ""value"":{
+                                         ""recover"":{
+                                            ""rel"":[
+                                               ""create-form""
+                                            ],
+                                            ""name"":""recover"",
+                                            ""href"":""https://foo.okta.com/idp/idx/recover"",
+                                            ""method"":""POST"",
+                                            ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                            ""value"":[
+                                               {
+                                                  ""name"":""stateHandle"",
+                                                  ""required"":true,
+                                                  ""value"":""02sRsXE-"",
+                                                  ""visible"":false,
+                                                  ""mutable"":false
+                                               }
+                                            ],
+                                            ""accepts"":""application/json; okta-version=1.0.0""
+                                         },
+                                         ""type"":""password"",
+                                         ""key"":""okta_password"",
+                                         ""id"":""lae8uz"",
+                                         ""displayName"":""Password"",
+                                         ""methods"":[
+                                            {
+                                               ""type"":""password""
+                                            }
+                                         ]
+                                      }
+                                   },
+                                   ""authenticators"":{
+                                      ""type"":""array"",
+                                      ""value"":[
+                                         {
+                                            ""type"":""password"",
+                                            ""key"":""okta_password"",
+                                            ""id"":""aut3jya5"",
+                                            ""displayName"":""Password"",
+                                            ""methods"":[
+                                               {
+                                                  ""type"":""password""
+                                               }
+                                            ]
+                                         }
+                                      ]
+                                   },
+                                   ""authenticatorEnrollments"":{
+                                      ""type"":""array"",
+                                      ""value"":[
+                                         {
+                                            ""type"":""password"",
+                                            ""key"":""okta_password"",
+                                            ""id"":""lae8u"",
+                                            ""displayName"":""Password"",
+                                            ""methods"":[
+                                               {
+                                                  ""type"":""password""
+                                               }
+                                            ]
+                                         }
+                                      ]
+                                   },
+                                   ""user"":{
+                                      ""type"":""object"",
+                                      ""value"":{
+                                         ""id"":""00u3jxoh2""
+                                      }
+                                   },
+                                   ""cancel"":{
+                                      ""rel"":[
+                                         ""create-form""
+                                      ],
+                                      ""name"":""cancel"",
+                                      ""href"":""https://foo.okta.com/idp/idx/cancel"",
+                                      ""method"":""POST"",
+                                      ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                      ""value"":[
+                                         {
+                                            ""name"":""stateHandle"",
+                                            ""required"":true,
+                                            ""value"":""02sRsXE-"",
+                                            ""visible"":false,
+                                            ""mutable"":false
+                                         }
+                                      ],
+                                      ""accepts"":""application/json; okta-version=1.0.0""
+                                   },
+                                   ""app"":{
+                                      ""type"":""object"",
+                                      ""value"":{
+                                         ""name"":""oidc_client"",
+                                         ""label"":""IDX Backend SDK's"",
+                                         ""id"":""0oa3j""
+                                      }
+                                   }
+                                }";
+            #endregion
+
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            // Create a mock for a response with recover
+            var resourceFactory = new ResourceFactory(testClient, NullLogger.Instance, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
+            var data = new DefaultSerializer().Deserialize(rawResponse);
+            var recoverResponse = resourceFactory.CreateNew<IdxResponse>(data);
+
+            recoverResponse.CurrentAuthenticatorEnrollment.Type.Should().Be("object");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Name.Should().Be("recover");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Rel.Should().Contain("create-form");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Href.Should().Be("https://foo.okta.com/idp/idx/recover");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Method.Should().Be("POST");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Accepts.Should().Be("application/json; okta-version=1.0.0");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Form.FirstOrDefault().Name.Should().Be("stateHandle");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Form.FirstOrDefault().Required.Should().BeTrue();
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Form.FirstOrDefault().GetProperty<string>("value").Should().NotBeNullOrEmpty();
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Form.FirstOrDefault().Visible.Should().BeFalse();
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Recover.Form.FirstOrDefault().Mutable.Should().BeFalse();
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.DisplayName.Should().Be("Password");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Key.Should().Be("okta_password");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Id.Should().NotBeNullOrEmpty();
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Methods.FirstOrDefault().Type.Should().Be("password");
+        }
+
+        [Fact]
         public async Task ProcessExchangingTokensResponse()
         {
             #region rawSuccessResponse

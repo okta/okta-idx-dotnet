@@ -8,16 +8,34 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// An interface to represent the authenticator enrollment value.
+    /// </summary>
     public interface IAuthenticatorEnrollmentValue : IResource
     {
+        /// <summary>
+        /// Gets the display name.
+        /// </summary>
         string DisplayName { get; }
 
+        /// <summary>
+        /// Gets the Id.
+        /// </summary>
         string Id { get; }
 
+        /// <summary>
+        /// Gets the key.
+        /// </summary>
         string Key { get; }
 
+        /// <summary>
+        /// Gets the methods.
+        /// </summary>
         IList<IAuthenticatorEnrollmentMethod> Methods { get; }
 
+        /// <summary>
+        /// Gets the recover object.
+        /// </summary>
         IRecover Recover { get; }
     }
 }

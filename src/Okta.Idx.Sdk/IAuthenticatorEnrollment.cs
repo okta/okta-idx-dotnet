@@ -7,10 +7,19 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// An interface to represent the authenticator enrollment.
+    /// </summary>
     public interface IAuthenticatorEnrollment : IResource
     {
+        /// <summary>
+        /// Gets the type.
+        /// </summary>
         string Type { get; }
 
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
         IAuthenticatorEnrollmentValue Value { get; }
     }
 }
