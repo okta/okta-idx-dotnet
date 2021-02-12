@@ -11,22 +11,31 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
+    /// <inheritdoc/>
     public class RemediationOption : Resource, IRemediationOption
     {
+        /// <inheritdoc/>
         public IList<string> Rel => GetArrayProperty<string>("rel");
 
+        /// <inheritdoc/>
         public string Name => GetStringProperty("name");
 
+        /// <inheritdoc/>
         public string Method => GetStringProperty("method");
 
+        /// <inheritdoc/>
         public string Href => GetStringProperty("href");
 
+        /// <inheritdoc/>
         public string Accepts => GetStringProperty("accepts");
 
+        /// <inheritdoc/>
         public string RelatesTo => GetStringProperty("relatesTo");
 
+        /// <inheritdoc/>
         public IList<IFormValue> Form => GetArrayProperty<IFormValue>("value");
 
+        /// <inheritdoc/>
         public async Task<IIdxResponse> ProceedAsync(IdxRequestPayload dataFromUi, CancellationToken cancellationToken = default)
         {
             // TODO: Get accept from Produces.

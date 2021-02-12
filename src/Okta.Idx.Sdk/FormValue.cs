@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
 {
+    /// <inheritdoc/>
     public class FormValue : Resource, IFormValue
     {
         /// <inheritdoc/>
@@ -33,8 +34,10 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public bool? Secret => GetBooleanProperty("secret");
 
+        /// <inheritdoc/>
         public IFormValue Form => GetResourceProperty<FormValue>("form");
 
+        /// <inheritdoc/>
         public IList<IFormValue> Options => GetArrayProperty<IFormValue>("options");
     }
 }

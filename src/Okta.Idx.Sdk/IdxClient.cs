@@ -88,6 +88,11 @@ namespace Okta.Idx.Sdk
                 userAgentBuilder);
         }
 
+        /// <summary>
+        /// Builds and gets the IDX configuration.
+        /// </summary>
+        /// <param name="configuration">The IDX configuration.</param>
+        /// <returns>The built configuration</returns>
         protected static IdxConfiguration GetConfigurationOrDefault(IdxConfiguration configuration)
         {
             string configurationFileRoot = Directory.GetCurrentDirectory();

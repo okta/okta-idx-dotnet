@@ -10,12 +10,16 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// A client to interact with the IDX API.
+    /// </summary>
     public interface IIdxClient : IOktaClient
     {
         /// <summary>
         /// Calls the Idx introspect endpoint to get remediation steps.
         /// </summary>
         /// <param name="idxContext">The IDX context that was returned by the `interact()` call</param>
+        /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The IdxResponse.</returns>
         Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken));
 

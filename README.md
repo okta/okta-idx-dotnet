@@ -266,7 +266,7 @@ var resetAuthenticatorRequest = new IdxRequestPayload();
 resetAuthenticatorRequest.StateHandle = challengeSecurityQuestionResponse.StateHandle;
 resetAuthenticatorRequest.SetProperty("credentials", new
 {
-    passcode = "1234Abcd",
+    passcode = "yyyyyy",
 });
 
 
