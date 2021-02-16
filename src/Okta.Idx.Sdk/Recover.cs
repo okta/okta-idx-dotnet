@@ -1,4 +1,4 @@
-﻿// <copyright file="RemediationOption.cs" company="Okta, Inc">
+﻿// <copyright file="Recover.cs" company="Okta, Inc">
 // Copyright (c) 2020 - present Okta, Inc. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
@@ -11,8 +11,10 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
-    /// <inheritdoc/>
-    public class RemediationOption : Resource, IRemediationOption
+    /// <summary>
+    /// A class to represent the <code>entity</code>.
+    /// </summary>
+    public class Recover : Resource, IRecover
     {
         /// <inheritdoc/>
         public IList<string> Rel => GetArrayProperty<string>("rel");
@@ -30,13 +32,10 @@ namespace Okta.Idx.Sdk
         public string Accepts => GetStringProperty("accepts");
 
         /// <inheritdoc/>
-        public string RelatesTo => GetStringProperty("relatesTo");
-
-        /// <inheritdoc/>
         public IList<IFormValue> Form => GetArrayProperty<IFormValue>("value");
 
         /// <inheritdoc/>
-        public async Task<IIdxResponse> ProceedAsync(IdxRequestPayload dataFromUi, CancellationToken cancellationToken = default)
+        public async Task<IIdxResponse> ProceedAsync(IdxRequestPayload recoveryPayload, CancellationToken cancellationToken = default)
         {
             // TODO: Get accept from Produces.
             var headers = new Dictionary<string, string>();
@@ -45,7 +44,7 @@ namespace Okta.Idx.Sdk
             var request = new HttpRequest
             {
                 Uri = Href,
-                Payload = dataFromUi,
+                Payload = recoveryPayload,
                 Headers = headers,
             };
 

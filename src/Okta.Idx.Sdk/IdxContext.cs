@@ -5,16 +5,30 @@
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// The IDX Context.
+    /// </summary>
     public class IdxContext : IIdxContext
     {
         private readonly string _codeVerifier;
         private readonly string _codeChallenge;
         private readonly string _codeChallengeMethod;
         private readonly string _interactionHandle;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IdxContext"/> class.
+        /// </summary>
         public IdxContext()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IdxContext"/> class.
+        /// </summary
+        /// <param name="codeVerifier">The PKCE code verifier.</param>
+        /// <param name="codeChallenge">The PKCE code challenge.</param>
+        /// <param name="codeChallengeMethod">The PKCE code challenge method.</param>
+        /// <param name="interactionHandle">The interaction handle.</param>
         public IdxContext(string codeVerifier, string codeChallenge, string codeChallengeMethod, string interactionHandle)
         {
             _codeVerifier = codeVerifier;
@@ -23,12 +37,24 @@ namespace Okta.Idx.Sdk
             _interactionHandle = interactionHandle;
         }
 
+        /// <summary>
+        /// Gets the PKCE code verifier
+        /// </summary>
         public string CodeVerifier => _codeVerifier;
 
+        /// <summary>
+        /// Gets the PKCE code challenge
+        /// </summary>
         public string CodeChallenge => _codeChallenge;
 
+        /// <summary>
+        /// Gets the PKCE code challenge method
+        /// </summary>
         public string CodeChallengeMethod => _codeChallengeMethod;
 
+        /// <summary>
+        /// Gets the interaction handle
+        /// </summary>
         public string InteractionHandle => _interactionHandle;
     }
 }

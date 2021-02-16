@@ -5,8 +5,10 @@
 
 namespace Okta.Idx.Sdk
 {
+    /// <inheritdoc/>
     public class InteractionHandleResponse : Resource, IInteractionHandleResponse
     {
+        /// <inheritdoc/>
         public string InteractionHandle => GetStringProperty("interaction_handle");
     }
 }

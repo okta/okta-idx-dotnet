@@ -174,6 +174,112 @@ idxContext = await client.InteractAsync();
 // From now on, you can use the new IDX context to continue with a new flow.
 ```                                            
 
+### Reset password 
+
+In this example, the Org is configured to require only password when logging into. After providing the username, select your current authenticator enrollment and proceed with the recovery process.
+
+> Note: Steps to identify the user might change based on your Org configuration.
+
+```csharp
+var client = new IdxClient();
+
+var idxContext = await client.InteractAsync();
+
+var introspectResponse = await client.IntrospectAsync(idxContext);
+
+var identifyRequest = new IdxRequestPayload();
+identifyRequest.StateHandle = introspectResponse.StateHandle;
+identifyRequest.SetProperty("identifier", "test-recover-password@test.com");
+
+// Send username
+var identifyResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+// Proceed with recovery
+var recoveryRequest = new IdxRequestPayload();
+recoveryRequest.StateHandle = identifyResponse.StateHandle;
+
+var recoveryResponse = await identifyResponse.CurrentAuthenticatorEnrollment.Value.Recover.ProceedAsync(recoveryRequest);
+
+// Select email
+var selectEmailAuthenticatorRemediationOption = recoveryResponse.Remediation.RemediationOptions
+                                                                .FirstOrDefault(x => x.Name == "select-authenticator-authenticate");
+
+var emailId = selectEmailAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Email")
+                                            .GetProperty<FormValue>("value")
+                                            .Form
+                                            .GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+// Send code
+var selectEmailAuthenticatorRequest = new IdxRequestPayload();
+selectEmailAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+selectEmailAuthenticatorRequest.SetProperty("authenticator", new
+{
+    id = emailId,
+});
+
+
+var selectEmailAuthenticatorResponse = await selectEmailAuthenticatorRemediationOption.ProceedAsync(selectEmailAuthenticatorRequest);
+
+var challengeEmailRequest = new IdxRequestPayload();
+challengeEmailRequest.StateHandle = selectEmailAuthenticatorResponse.StateHandle;
+challengeEmailRequest.SetProperty("credentials", new
+{
+    passcode = "xxxxxx",
+});
+
+
+var challengeEmailResponse = await selectEmailAuthenticatorResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                                    .ProceedAsync(challengeEmailRequest);
+
+// Send your security question value
+var challengeSecurityQuestionRemediationOption = challengeEmailResponse.Remediation.RemediationOptions
+                                                    .FirstOrDefault(x => x.Name == "challenge-authenticator");
+
+var securityQuestionValue = challengeSecurityQuestionRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "credentials")
+                                            .Form.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "questionKey")
+                                            .GetProperty<string>("value");
+
+
+var challengeSecurityQuestionRequest = new IdxRequestPayload();
+challengeSecurityQuestionRequest.StateHandle = challengeEmailResponse.StateHandle;
+challengeSecurityQuestionRequest.SetProperty("credentials", new
+{
+    answer = "chicken",
+    questionKey = securityQuestionValue,
+});
+
+var challengeSecurityQuestionResponse = await challengeSecurityQuestionRemediationOption.ProceedAsync(challengeSecurityQuestionRequest);
+
+
+// Reset password
+var resetAuthenticatorRequest = new IdxRequestPayload();
+resetAuthenticatorRequest.StateHandle = challengeSecurityQuestionResponse.StateHandle;
+resetAuthenticatorRequest.SetProperty("credentials", new
+{
+    passcode = "yyyyyy",
+});
+
+
+var resetAuthenticatorResponse = await challengeSecurityQuestionResponse.Remediation.RemediationOptions
+                                                .FirstOrDefault(x => x.Name == "reset-authenticator")
+                                                .ProceedAsync(resetAuthenticatorRequest);
+// Exchange tokens
+if (resetAuthenticatorResponse.IsLoginSuccess)
+{
+    var tokenResponse = await resetAuthenticatorResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+}
+```
+
 ### Remediation/MFA scenarios with sign-on policy
 
 #### Login using password + enroll security question authenticator
