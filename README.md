@@ -1187,7 +1187,9 @@ var enrollProfileResponse = await challengeResponse.Remediation.RemediationOptio
                                             .ProceedAsync(enrollProfileRequest);
 ```
 
-#### Self service signup 
+#### Self-service signup flow
+
+Following factors are enrolled during the signup: password, security question (disliked food) and e-mail. All the others factors are optional and skipped.
 
 ```csharp
 var client = TestIdxClient.Create();
