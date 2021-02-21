@@ -1343,11 +1343,6 @@ var skipRequest = new IdxRequestPayload
 var skipResponse = await setEmailRequestResponse.Remediation.RemediationOptions
                             .FirstOrDefault(x => x.Name == "skip")
                             .ProceedAsync(skipRequest);
-
-var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
-
-tokenResponse.AccessToken.Should().NotBeNullOrEmpty();
-
 ```
 
 ### Check Remediation Options
