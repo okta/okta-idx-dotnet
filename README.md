@@ -1187,6 +1187,169 @@ var enrollProfileResponse = await challengeResponse.Remediation.RemediationOptio
                                             .ProceedAsync(enrollProfileRequest);
 ```
 
+#### Self service signup 
+
+```csharp
+var client = TestIdxClient.Create();
+var idxContext = await client.InteractAsync();
+var introspectResponse = await client.IntrospectAsync(idxContext);
+
+var enrollRequest = new IdxRequestPayload
+{
+    StateHandle = introspectResponse.StateHandle
+};
+
+// choose enroll option
+var enrollProfileResponse = await introspectResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "select-enroll-profile")
+                                            .ProceedAsync(enrollRequest);
+var enrollNewProfileRequest = new IdxRequestPayload();
+enrollNewProfileRequest.SetProperty("userProfile", new
+{
+    lastName = "LastName",
+    firstName = "FirstName",
+    email = "mailbox@domain.com"
+});
+
+enrollNewProfileRequest.StateHandle = enrollProfileResponse.StateHandle;
+
+var enrollNewProfileResponse = await enrollProfileResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "enroll-profile")
+                                            .ProceedAsync(enrollNewProfileRequest);
+
+// enroll a password factor
+var selectAuthenticatorRemediationOption = enrollNewProfileResponse.Remediation.RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+var passwordAuthenticatorId = selectAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Password")
+                                            .GetProperty<FormValue>("value")
+                                            .Form.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+var selectPasswordAuthenticatorRequest = new IdxRequestPayload
+{
+    StateHandle = enrollNewProfileResponse.StateHandle
+};
+selectPasswordAuthenticatorRequest.SetProperty("authenticator", new
+{
+    id = passwordAuthenticatorId,
+});
+
+var selectPasswordAuthenticatorResponse = await selectAuthenticatorRemediationOption.ProceedAsync(selectPasswordAuthenticatorRequest);
+
+var setPasswordOption = selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                    .FirstOrDefault(x => x.Name == "enroll-authenticator");
+var setPasswordRequest =  new IdxRequestPayload
+{
+    StateHandle = enrollNewProfileResponse.StateHandle
+};
+
+setPasswordRequest.SetProperty("credentials", new
+{
+    passcode= "N3wP@55w0rd!"
+});
+
+var setPasswordResponcse = await setPasswordOption.ProceedAsync(setPasswordRequest);
+
+// enroll a security question factor
+selectAuthenticatorRemediationOption = enrollNewProfileResponse.Remediation.RemediationOptions
+                                .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+var questionAuthenticatorId = selectAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Security Question")
+                                            .GetProperty<FormValue>("value")
+                                            .Form.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+var selectSecurityQuestionAuthenticatorRequest = new IdxRequestPayload
+{
+    StateHandle = enrollNewProfileResponse.StateHandle
+};
+selectSecurityQuestionAuthenticatorRequest.SetProperty("authenticator", new
+{
+    id = questionAuthenticatorId,
+});
+
+var selectSecurityQuestionAuthenticatorResponse = await selectAuthenticatorRemediationOption.ProceedAsync(selectSecurityQuestionAuthenticatorRequest);
+
+var setSecurityQuestionAuthenticatorOption = selectSecurityQuestionAuthenticatorResponse.Remediation.RemediationOptions
+                                    .FirstOrDefault(x => x.Name == "enroll-authenticator");
+var setSecurityQuestionRequest = new IdxRequestPayload
+{
+    StateHandle = selectSecurityQuestionAuthenticatorResponse.StateHandle
+};
+setSecurityQuestionRequest.SetProperty("credentials", new
+{
+    questionKey = "disliked_food",
+    answer = "oatmeal"
+});
+
+var setSecurityQuestionRequestResponse = await setSecurityQuestionAuthenticatorOption.ProceedAsync(setSecurityQuestionRequest);
+
+
+// enroll an e-mail factor
+
+selectAuthenticatorRemediationOption = enrollNewProfileResponse.Remediation.RemediationOptions
+                                .FirstOrDefault(x => x.Name == "select-authenticator-enroll");
+
+var emailAuthenticatorId = selectAuthenticatorRemediationOption.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "authenticator")
+                                            .Options
+                                            .FirstOrDefault(x => x.Label == "Email")
+                                            .GetProperty<FormValue>("value")
+                                            .Form.GetArrayProperty<FormValue>("value")
+                                            .FirstOrDefault(x => x.Name == "id")
+                                            .GetProperty<string>("value");
+
+var selectEmailAuthenticatorRequest = new IdxRequestPayload
+{
+    StateHandle = enrollNewProfileResponse.StateHandle
+};
+selectEmailAuthenticatorRequest.SetProperty("authenticator", new
+{
+    id = emailAuthenticatorId,
+});
+
+var selectEmailAuthenticatorResponse = await selectAuthenticatorRemediationOption.ProceedAsync(selectEmailAuthenticatorRequest);
+
+var setEmailAuthenticatorOption = selectPasswordAuthenticatorResponse.Remediation.RemediationOptions
+                                    .FirstOrDefault(x => x.Name == "enroll-authenticator");
+var setEmailRequest = new IdxRequestPayload
+{
+    StateHandle = selectEmailAuthenticatorResponse.StateHandle
+};
+
+setEmailRequest.SetProperty("credentials", new
+{
+    passcode = "123456" // passcode from one-time verification email
+});
+
+var setEmailRequestResponse = await setSecurityQuestionAuthenticatorOption.ProceedAsync(setEmailRequest);
+
+// skip other optional factors
+
+var skipRequest = new IdxRequestPayload
+{
+    StateHandle = setEmailRequestResponse.StateHandle
+};
+
+var skipResponse = await setEmailRequestResponse.Remediation.RemediationOptions
+                            .FirstOrDefault(x => x.Name == "skip")
+                            .ProceedAsync(skipRequest);
+
+var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+
+tokenResponse.AccessToken.Should().NotBeNullOrEmpty();
+
+```
+
 ### Check Remediation Options
 
 ```csharp
