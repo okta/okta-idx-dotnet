@@ -170,8 +170,7 @@ namespace Okta.Idx.Sdk
             // PKCE props
             var state = GenerateSecureRandomString(16);
             var codeVerifier = GenerateSecureRandomString(86);
-            var codeChallengeMethod = string.Empty;
-            var codeChallenge = GenerateCodeChallenge(codeVerifier, out codeChallengeMethod);
+            var codeChallenge = GenerateCodeChallenge(codeVerifier, out var codeChallengeMethod);
 
             var payload = new Dictionary<string, string>();
             payload.Add("scope", string.Join(" ", Configuration.Scopes));
@@ -209,8 +208,10 @@ namespace Okta.Idx.Sdk
 
             var uri = $"{UrlHelper.EnsureTrailingSlash(oktaDomain)}idp/idx/introspect";
 
-            var headers = new Dictionary<string, string>();
-            headers.Add("Accept", "application/ion+json; okta-version=1.0.0");
+            var headers = new Dictionary<string, string>
+            {
+                { "Accept", "application/ion+json; okta-version=1.0.0" },
+            };
 
             var request = new HttpRequest
             {
