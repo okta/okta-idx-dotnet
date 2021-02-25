@@ -1189,7 +1189,9 @@ var enrollProfileResponse = await challengeResponse.Remediation.RemediationOptio
 
 #### Self-service signup flow
 
-Following factors are enrolled during the signup: password, security question (disliked food) and e-mail. All the others factors are optional and skipped.
+In this example, the Org is configured to require email and security question in addition to password. After answering the password challenge, users have to enroll a security question and finally select email and enter the code to finish the process. All the others factors are optional and skipped.
+
+> Note: Steps to identify the user might change based on your Org configuration.
 
 ```csharp
 var client = TestIdxClient.Create();
