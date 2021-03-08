@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json;
 using Okta.Sdk.Abstractions;
 using System;
 using System.Linq;
@@ -24,6 +23,19 @@ namespace Okta.Idx.Sdk.UnitTests
             idxContext.CodeChallenge.Should().NotBeNullOrEmpty();
             idxContext.CodeChallengeMethod.Should().NotBeNullOrEmpty();
             idxContext.CodeVerifier.Should().NotBeNullOrEmpty();
+            idxContext.State.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task UseProvidedStateWhenCallingInteract()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var idxContext = await testClient.InteractAsync("bar");
+
+            idxContext.State.Should().Be("bar");
         }
 
         [Fact]
@@ -81,7 +93,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var data = new DefaultSerializer().Deserialize(rawSuccessResponse);
             var successResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
-            var mockIdxContext = new IdxContext("codeVer1f13r", "codeChanll3ng3", "S256", "foo");
+            var mockIdxContext = new IdxContext("codeVer1f13r", "codeChanll3ng3", "S256", "foo", "bar");
 
             var tokens = await successResponse.SuccessWithInteractionCode.ExchangeCodeAsync(mockIdxContext);
             mockRequestExecutor.ReceivedBody.Should().Contain($"\"code_verifier\":\"{mockIdxContext.CodeVerifier}\"");
@@ -319,7 +331,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var data = new DefaultSerializer().Deserialize(rawSuccessResponse);
             var successResponse = resourceFactory.CreateNew<IdxResponse>(data);
 
-            var mockIdxContext = new IdxContext("codeVer1f13r", "codeChanll3ng3", "S256", "foo");
+            var mockIdxContext = new IdxContext("codeVer1f13r", "codeChanll3ng3", "S256", "foo", "bar");
 
             var tokens = await successResponse.SuccessWithInteractionCode.ExchangeCodeAsync(mockIdxContext);
 
@@ -406,7 +418,7 @@ namespace Okta.Idx.Sdk.UnitTests
 
             var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
             var testClient = new TesteableIdxClient(mockRequestExecutor);
-            var mockIdxContext = new IdxContext("foo", "bar", "baz", "qux");
+            var mockIdxContext = new IdxContext("foo", "bar", "baz", "qux", "quux");
 
 
             var response = await testClient.IntrospectAsync(mockIdxContext);

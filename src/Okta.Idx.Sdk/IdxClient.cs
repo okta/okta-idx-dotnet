@@ -165,10 +165,10 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<IIdxContext> InteractAsync(CancellationToken cancellationToken = default)
+        public async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
         {
             // PKCE props
-            var state = GenerateSecureRandomString(16);
+            state = state ?? GenerateSecureRandomString(16);
             var codeVerifier = GenerateSecureRandomString(86);
             var codeChallenge = GenerateCodeChallenge(codeVerifier, out var codeChallengeMethod);
 
@@ -195,7 +195,7 @@ namespace Okta.Idx.Sdk
             var response = await PostAsync<InteractionHandleResponse>(
                 request, cancellationToken).ConfigureAwait(false);
 
-            return new IdxContext(codeVerifier, codeChallenge, codeChallengeMethod, response.InteractionHandle);
+            return new IdxContext(codeVerifier, codeChallenge, codeChallengeMethod, response.InteractionHandle, state);
         }
 
         /// <inheritdoc/>
