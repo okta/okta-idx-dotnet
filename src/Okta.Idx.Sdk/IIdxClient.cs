@@ -26,9 +26,10 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Calls the Idx interact endpoint to get an IDX context.
         /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="state">Optional value to use as the state argument when initiating the authentication flow. This is used to provide contextual information to survive redirects.</param>
+        /// <param name="cancellationToken">The cancellation token. Optional.</param>
         /// <returns>The IDX context.</returns>
-        Task<IIdxContext> InteractAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the client configuration.

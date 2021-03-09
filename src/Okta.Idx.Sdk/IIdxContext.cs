@@ -5,14 +5,34 @@
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// An interface to represent the IDX context.
+    /// </summary>
     public interface IIdxContext
     {
+        /// <summary>
+        /// Gets the PKCE code verifier used during the interact call.
+        /// </summary>
         string CodeVerifier { get; }
 
+        /// <summary>
+        /// Gets the PKCE code challenge used during the interact call.
+        /// </summary>
         string CodeChallenge { get; }
 
+        /// <summary>
+        /// Gets the PKCE code challenge method used during the interact call.
+        /// </summary>
         string CodeChallengeMethod { get; }
 
+        /// <summary>
+        /// Gets the interaction handle obtained during the interact call.
+        /// </summary>
         string InteractionHandle { get; }
+
+        /// <summary>
+        /// Gets the state used during the interact call.
+        /// </summary>
+        string State { get; }
     }
 }

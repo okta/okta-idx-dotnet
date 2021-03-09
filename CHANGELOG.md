@@ -1,21 +1,17 @@
 # Changelog
 
-## v0.1.0-beta01
+## v0.1.0-beta03
 
 ### Features
 
-- Initial version with basic functionality:
-* `InteractAsync()`
-* `IntrospectAsync()`
-* `CancelAsync()`
-* `RemediationOption.ProceedAsync()`
-* `IdxResponse.SuccessWithInteractionCode.ExchangeCode()`
+* Update `InteractAsync()` method to support passing an existing state
+* Expose the `state` in the `IdxContext`
 
 ## v0.1.0-beta02
 
 ### Features
 
-* Add support for password recovery.
+* Add support for password recovery
 * Update the client to allow for continuing a flow from any point
 * Move the creation of the PKCE codeVerifier into `InteractAsync()` instead of the client constructor
 
@@ -28,4 +24,15 @@
 ### Additions
 
 New models: `AuthenticatorEnrollment`, `AuthenticatorEnrollmentValue`, `Recover` and `AuthenticatorEnrollmentMethod`.
+
+## v0.1.0-beta01
+
+### Features
+
+- Initial version with basic functionality:
+* `InteractAsync()`
+* `IntrospectAsync()`
+* `CancelAsync()`
+* `RemediationOption.ProceedAsync()`
+* `IdxResponse.SuccessWithInteractionCode.ExchangeCode()`
 
