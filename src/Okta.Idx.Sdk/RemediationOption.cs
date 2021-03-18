@@ -21,6 +21,9 @@ namespace Okta.Idx.Sdk
         public string Name => GetStringProperty("name");
 
         /// <inheritdoc/>
+        public string Type => GetStringProperty("type");
+
+        /// <inheritdoc/>
         public string Method => GetStringProperty("method");
 
         /// <inheritdoc/>
