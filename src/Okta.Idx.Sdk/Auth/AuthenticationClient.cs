@@ -19,13 +19,13 @@ namespace Okta.Idx.Sdk.Auth
             _idxClient = idxClient;
         }
 
-        public async Task<ITokenResponse> AuthenticateAsync(AuthenticationOptions options)
+        public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions options)
         {
             var idxContext = await _idxClient.InteractAsync();
             var introspectResponse = await _idxClient.IntrospectAsync(idxContext);
 
             // Check if identify flow include credentials
-            var isIdentifyInOneStep = IdentifyRequireCredentials("identify", introspectResponse);
+            var isIdentifyInOneStep = IsRemediationRequireCredentials("identify", introspectResponse);
 
             // Common request payload
             var identifyRequest = new IdxRequestPayload();
@@ -51,16 +51,34 @@ namespace Okta.Idx.Sdk.Auth
                 // We expect success
                 if (!identifyResponse.IsLoginSuccess)
                 {
-                    // TODO: Improve error
-                    throw new NotSupportedException("Uknown flow - Review your policies");
+                    // Verify if password expired
+                    if (IsRemediationRequireCredentials("reenroll-authenticator", identifyResponse))
+                    {
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.PasswordExpired,
+                            IdxContext = idxContext,
+                        };
+                    }
+                    else
+                    {
+                        // TODO: Improve error
+                        throw new NotSupportedException("Uknown flow - Review your policies");
+                    }
                 }
 
-                return await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+                var tokenResponse = await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
             }
             else
             {
                 // We expect remediation has credentials now
-                if (!IdentifyRequireCredentials("challenge-authenticator", identifyResponse))
+                if (!IsRemediationRequireCredentials("challenge-authenticator", identifyResponse))
                 {
                     // TODO: Improve error
                     throw new NotSupportedException("Uknown flow - Review your policies");
@@ -79,51 +97,84 @@ namespace Okta.Idx.Sdk.Auth
                                               .FirstOrDefault(x => x.Name == "challenge-authenticator")
                                               .ProceedAsync(challengeRequest);
 
-                // We expect success
                 if (!challengeResponse.IsLoginSuccess)
                 {
-                    // TODO: Improve error
-                    throw new NotSupportedException("Uknown flow - Review your policies");
+                    // Verify if password expired
+                    if (IsRemediationRequireCredentials("reenroll-authenticator", challengeResponse))
+                    {
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.PasswordExpired,
+                            IdxContext = idxContext,
+                        };
+                    }
+                    else
+                    {
+                        // TODO: Improve error
+                        throw new NotSupportedException("Uknown flow - Review your policies");
+                    }
                 }
 
-                return await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+                var tokenResponse = await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
             }
         }
 
+        public async Task<AuthenticationResponse> ChangePasswordAsync(ChangePasswordOptions changePasswordOptions, IIdxContext idxContext)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await _idxClient.IntrospectAsync(idxContext);
 
-        private static bool IdentifyRequireCredentials(string remediationOptionName, IIdxResponse idxResponse)
+            // Verify if password expired
+            if (!IsRemediationRequireCredentials("reenroll-authenticator", introspectResponse))
+            {
+                // TODO: Improve error
+                throw new NotSupportedException("Uknown flow - Review your policies");
+            }
+
+            var resetAuthenticatorRequest = new IdxRequestPayload();
+            resetAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
+            resetAuthenticatorRequest.SetProperty("credentials", new
+            {
+                passcode = changePasswordOptions.NewPassword,
+            });
+
+            // Reset Password is expected
+            var resetPasswordResponse = await introspectResponse
+                                              .Remediation
+                                              .RemediationOptions
+                                              .FirstOrDefault(x => x.Name == "reenroll-authenticator")
+                                              .ProceedAsync(resetAuthenticatorRequest);
+
+            if (resetPasswordResponse.IsLoginSuccess)
+            {
+                var tokenResponse = await resetPasswordResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+            else
+            {
+                // TODO: Improve error
+                throw new NotSupportedException("Uknown flow - Review your policies");
+            }
+        }
+
+        private static bool IsRemediationRequireCredentials(string remediationOptionName, IIdxResponse idxResponse)
         {
             var jToken = JToken.Parse(idxResponse.GetRaw());
 
             var credentialsObj = jToken.SelectToken($"$.remediation.value[?(@.name == '{remediationOptionName}')].value[?(@.name == 'credentials')]");
 
-
             return credentialsObj != null;
-        }
-
-        private static bool HasProperty(JToken token, string propertyName)
-        {
-            if (token.Type == JTokenType.Object)
-            {
-                foreach (var prop in token.Children<JProperty>())
-                {
-                    if (prop.Name == propertyName)
-                    {
-                        return true;
-                    }
-
-                    var child = prop.Value;
-
-                    if (child != null && child.HasValues)
-                    {
-                        child = HasProperty(child, propertyName);
-                    }
-                }
-
-                return false;
-            }
-
-            return false;
         }
 
         public class AuthenticationOptions
@@ -131,6 +182,28 @@ namespace Okta.Idx.Sdk.Auth
             public string Username { get; set; }
 
             public string Password { get; set; }
+        }
+
+        public class ChangePasswordOptions
+        {
+            public string NewPassword { get; set; }
+            public string StateHandle { get; set; }
+        }
+
+        public class AuthenticationResponse
+        {
+            // TODO: Create a TokenInfo class
+            public ITokenResponse TokenInfo { get; set; }
+
+            public AuthenticationStatus AuthenticationStatus  { get; set; }
+
+            public IIdxContext IdxContext { get; set; }
+        }
+
+        public enum AuthenticationStatus
+        {
+            Success,
+            PasswordExpired,
         }
     }
 }
