@@ -26,6 +26,11 @@ namespace Okta.Idx.Sdk
         string Name { get; }
 
         /// <summary>
+        /// Gets the type for the remediation option
+        /// </summary>
+        string Type { get; }
+
+        /// <summary>
         /// Gets the HTTP Method to use for this remediation option.
         /// </summary>
         string Method { get; }
