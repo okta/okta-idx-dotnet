@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 using FlexibleConfiguration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json.Linq;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Sdk.Abstractions;
 
@@ -165,7 +167,7 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
+        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
         {
             // PKCE props
             state = state ?? GenerateSecureRandomString(16);
@@ -199,7 +201,7 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken))
+        internal async Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken))
         {
             var payload = new IdxRequestPayload();
             payload.SetProperty("interactionHandle", idxContext.InteractionHandle);
@@ -227,6 +229,164 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public IOktaClient CreateScoped(RequestContext requestContext)
             => new IdxClient(_dataStore, Configuration, requestContext);
+
+        public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions options)
+        {
+            var idxContext = await InteractAsync();
+            var introspectResponse = await IntrospectAsync(idxContext);
+
+            // Check if identify flow include credentials
+            var isIdentifyInOneStep = IsRemediationRequireCredentials("identify", introspectResponse);
+
+            // Common request payload
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", options.Username);
+
+            if (isIdentifyInOneStep)
+            {
+                identifyRequest.SetProperty("credentials", new
+                {
+                    passcode = options.Password,
+                });
+            }
+
+            var identifyResponse = await introspectResponse
+                                            .Remediation
+                                            .RemediationOptions
+                                            .FirstOrDefault(x => x.Name == "identify")
+                                            .ProceedAsync(identifyRequest);
+
+            if (isIdentifyInOneStep)
+            {
+                // We expect success
+                if (!identifyResponse.IsLoginSuccess)
+                {
+                    // Verify if password expired
+                    if (IsRemediationRequireCredentials("reenroll-authenticator", identifyResponse))
+                    {
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.PasswordExpired,
+                            IdxContext = idxContext,
+                        };
+                    }
+                    else
+                    {
+                        // TODO: Improve error
+                        throw new NotSupportedException("Unknown flow - Review your policies");
+                    }
+                }
+
+                var tokenResponse = await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+            else
+            {
+                // We expect remediation has credentials now
+                if (!IsRemediationRequireCredentials("challenge-authenticator", identifyResponse))
+                {
+                    // TODO: Improve error
+                    throw new NotSupportedException("Unknown flow - Review your policies");
+                }
+
+                var challengeRequest = new IdxRequestPayload();
+                challengeRequest.StateHandle = identifyResponse.StateHandle;
+                challengeRequest.SetProperty("credentials", new
+                {
+                    passcode = options.Password,
+                });
+
+                var challengeResponse = await identifyResponse
+                                              .Remediation
+                                              .RemediationOptions
+                                              .FirstOrDefault(x => x.Name == "challenge-authenticator")
+                                              .ProceedAsync(challengeRequest);
+
+                if (!challengeResponse.IsLoginSuccess)
+                {
+                    // Verify if password expired
+                    if (IsRemediationRequireCredentials("reenroll-authenticator", challengeResponse))
+                    {
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.PasswordExpired,
+                            IdxContext = idxContext,
+                        };
+                    }
+                    else
+                    {
+                        // TODO: Improve error
+                        throw new NotSupportedException("Unknown flow - Review your policies");
+                    }
+                }
+
+                var tokenResponse = await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+        }
+
+        public async Task<AuthenticationResponse> ChangePasswordAsync(ChangePasswordOptions changePasswordOptions, IIdxContext idxContext)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext);
+
+            // Verify if password expired
+            if (!IsRemediationRequireCredentials("reenroll-authenticator", introspectResponse))
+            {
+                // TODO: Improve error
+                throw new NotSupportedException("Unknown flow - Review your policies");
+            }
+
+            var resetAuthenticatorRequest = new IdxRequestPayload();
+            resetAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
+            resetAuthenticatorRequest.SetProperty("credentials", new
+            {
+                passcode = changePasswordOptions.NewPassword,
+            });
+
+            // Reset Password is expected
+            var resetPasswordResponse = await introspectResponse
+                                              .Remediation
+                                              .RemediationOptions
+                                              .FirstOrDefault(x => x.Name == "reenroll-authenticator")
+                                              .ProceedAsync(resetAuthenticatorRequest);
+
+            if (resetPasswordResponse.IsLoginSuccess)
+            {
+                var tokenResponse = await resetPasswordResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+            else
+            {
+                // TODO: Improve error
+                throw new NotSupportedException("Unknown flow - Review your policies");
+            }
+        }
+
+        private static bool IsRemediationRequireCredentials(string remediationOptionName, IIdxResponse idxResponse)
+        {
+            var jToken = JToken.Parse(idxResponse.GetRaw());
+
+            var credentialsObj = jToken.SelectToken($"$.remediation.value[?(@.name == '{remediationOptionName}')].value[?(@.name == 'credentials')]");
+
+            return credentialsObj != null;
+        }
 
         /// <summary>
         /// Creates a new <see cref="CollectionClient{T}"/> given an initial HTTP request.
