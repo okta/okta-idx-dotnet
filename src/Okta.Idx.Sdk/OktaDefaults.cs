@@ -7,8 +7,14 @@ using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// A class that contains all the Okta defaults.
+    /// </summary>
     public static class OktaDefaults
     {
+        /// <summary>
+        /// The default scopes to initiate an authentication flow.
+        /// </summary>
         public static readonly List<string> Scopes = new List<string> { "openid", "profile" };
     }
 }
