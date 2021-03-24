@@ -166,7 +166,12 @@ namespace Okta.Idx.Sdk
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Calls the Idx interact endpoint to get an IDX context.
+        /// </summary>
+        /// <param name="state">Optional value to use as the state argument when initiating the authentication flow. This is used to provide contextual information to survive redirects.</param>
+        /// <param name="cancellationToken">The cancellation token. Optional.</param>
+        /// <returns>The IDX context.</returns>
         internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
         {
             // PKCE props
@@ -200,7 +205,12 @@ namespace Okta.Idx.Sdk
             return new IdxContext(codeVerifier, codeChallenge, codeChallengeMethod, response.InteractionHandle, state);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Calls the Idx introspect endpoint to get remediation steps.
+        /// </summary>
+        /// <param name="idxContext">The IDX context that was returned by the `interact()` call</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The IdxResponse.</returns>
         internal async Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken))
         {
             var payload = new IdxRequestPayload();
@@ -230,32 +240,33 @@ namespace Okta.Idx.Sdk
         public IOktaClient CreateScoped(RequestContext requestContext)
             => new IdxClient(_dataStore, Configuration, requestContext);
 
-        public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions options)
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
-            var idxContext = await InteractAsync();
-            var introspectResponse = await IntrospectAsync(idxContext);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Check if identify flow include credentials
-            var isIdentifyInOneStep = IsRemediationRequireCredentials("identify", introspectResponse);
+            var isIdentifyInOneStep = IsRemediationRequireCredentials(RemediationType.Identify, introspectResponse);
 
             // Common request payload
             var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;
-            identifyRequest.SetProperty("identifier", options.Username);
+            identifyRequest.SetProperty("identifier", authenticationOptions.Username);
 
             if (isIdentifyInOneStep)
             {
                 identifyRequest.SetProperty("credentials", new
                 {
-                    passcode = options.Password,
+                    passcode = authenticationOptions.Password,
                 });
             }
 
             var identifyResponse = await introspectResponse
                                             .Remediation
                                             .RemediationOptions
-                                            .FirstOrDefault(x => x.Name == "identify")
-                                            .ProceedAsync(identifyRequest);
+                                            .FirstOrDefault(x => x.Name == RemediationType.Identify)
+                                            .ProceedAsync(identifyRequest, cancellationToken);
 
             if (isIdentifyInOneStep)
             {
@@ -263,7 +274,7 @@ namespace Okta.Idx.Sdk
                 if (!identifyResponse.IsLoginSuccess)
                 {
                     // Verify if password expired
-                    if (IsRemediationRequireCredentials("reenroll-authenticator", identifyResponse))
+                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, identifyResponse))
                     {
                         return new AuthenticationResponse
                         {
@@ -273,12 +284,11 @@ namespace Okta.Idx.Sdk
                     }
                     else
                     {
-                        // TODO: Improve error
-                        throw new NotSupportedException("Unknown flow - Review your policies");
+                        throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, identifyResponse);
                     }
                 }
 
-                var tokenResponse = await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+                var tokenResponse = await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
 
                 return new AuthenticationResponse
                 {
@@ -289,29 +299,28 @@ namespace Okta.Idx.Sdk
             else
             {
                 // We expect remediation has credentials now
-                if (!IsRemediationRequireCredentials("challenge-authenticator", identifyResponse))
+                if (!IsRemediationRequireCredentials(RemediationType.ChallengeAuthenticator, identifyResponse))
                 {
-                    // TODO: Improve error
-                    throw new NotSupportedException("Unknown flow - Review your policies");
+                    throw new UnexpectedRemediationException(RemediationType.ChallengeAuthenticator, identifyResponse);
                 }
 
                 var challengeRequest = new IdxRequestPayload();
                 challengeRequest.StateHandle = identifyResponse.StateHandle;
                 challengeRequest.SetProperty("credentials", new
                 {
-                    passcode = options.Password,
+                    passcode = authenticationOptions.Password,
                 });
 
                 var challengeResponse = await identifyResponse
                                               .Remediation
                                               .RemediationOptions
-                                              .FirstOrDefault(x => x.Name == "challenge-authenticator")
-                                              .ProceedAsync(challengeRequest);
+                                              .FirstOrDefault(x => x.Name == RemediationType.ChallengeAuthenticator)
+                                              .ProceedAsync(challengeRequest, cancellationToken);
 
                 if (!challengeResponse.IsLoginSuccess)
                 {
                     // Verify if password expired
-                    if (IsRemediationRequireCredentials("reenroll-authenticator", challengeResponse))
+                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, challengeResponse))
                     {
                         return new AuthenticationResponse
                         {
@@ -321,12 +330,11 @@ namespace Okta.Idx.Sdk
                     }
                     else
                     {
-                        // TODO: Improve error
-                        throw new NotSupportedException("Unknown flow - Review your policies");
+                        throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, challengeResponse);
                     }
                 }
 
-                var tokenResponse = await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+                var tokenResponse = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
 
                 return new AuthenticationResponse
                 {
@@ -336,16 +344,16 @@ namespace Okta.Idx.Sdk
             }
         }
 
-        public async Task<AuthenticationResponse> ChangePasswordAsync(ChangePasswordOptions changePasswordOptions, IIdxContext idxContext)
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> ChangePasswordAsync(ChangePasswordOptions changePasswordOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext);
 
             // Verify if password expired
-            if (!IsRemediationRequireCredentials("reenroll-authenticator", introspectResponse))
+            if (!IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, introspectResponse))
             {
-                // TODO: Improve error
-                throw new NotSupportedException("Unknown flow - Review your policies");
+                throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, introspectResponse);
             }
 
             var resetAuthenticatorRequest = new IdxRequestPayload();
@@ -359,12 +367,12 @@ namespace Okta.Idx.Sdk
             var resetPasswordResponse = await introspectResponse
                                               .Remediation
                                               .RemediationOptions
-                                              .FirstOrDefault(x => x.Name == "reenroll-authenticator")
-                                              .ProceedAsync(resetAuthenticatorRequest);
+                                              .FirstOrDefault(x => x.Name == RemediationType.ReenrollAuthenticator)
+                                              .ProceedAsync(resetAuthenticatorRequest, cancellationToken);
 
             if (resetPasswordResponse.IsLoginSuccess)
             {
-                var tokenResponse = await resetPasswordResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+                var tokenResponse = await resetPasswordResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
 
                 return new AuthenticationResponse
                 {
@@ -374,8 +382,7 @@ namespace Okta.Idx.Sdk
             }
             else
             {
-                // TODO: Improve error
-                throw new NotSupportedException("Unknown flow - Review your policies");
+                throw new UnexpectedRemediationException(RemediationType.SuccessWithInteractionCode, resetPasswordResponse);
             }
         }
 
