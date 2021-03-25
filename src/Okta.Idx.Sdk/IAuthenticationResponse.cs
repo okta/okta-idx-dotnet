@@ -1,28 +1,30 @@
-﻿// <copyright file="AuthenticationResponse.cs" company="Okta, Inc">
+﻿// <copyright file="IAuthenticationResponse.cs" company="Okta, Inc">
 // Copyright (c) 2020 - present Okta, Inc. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using Okta.Sdk.Abstractions;
+
 namespace Okta.Idx.Sdk
 {
     /// <summary>
-    /// This class represents the authentication response.
+    /// This interface represents the authentication response.
     /// </summary>
-    public class AuthenticationResponse : Resource, IAuthenticationResponse
+    public interface IAuthenticationResponse : IResource
     {
         /// <summary>
         /// Gets or sets the Token Info.
         /// </summary>
-        public ITokenResponse TokenInfo { get; set; }
+        ITokenResponse TokenInfo { get; set; }
 
         /// <summary>
         /// Gets or sets the authentication status.
         /// </summary>
-        public AuthenticationStatus AuthenticationStatus { get; set; }
+        AuthenticationStatus AuthenticationStatus { get; set; }
 
         /// <summary>
         /// Gets or sets the IDX context.
         /// </summary>
-        public IIdxContext IdxContext { get; set; }
+        IIdxContext IdxContext { get; set; }
     }
 }
