@@ -48,6 +48,7 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// The method to call when you want to cancel the Okta Identity Engine flow. This will return an IdxResponse
         /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>An IdxResponse.</returns>
         Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken = default);
 

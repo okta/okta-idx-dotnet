@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -15,6 +16,7 @@ using System.Threading.Tasks;
 using FlexibleConfiguration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json.Linq;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Sdk.Abstractions;
 
@@ -164,8 +166,13 @@ namespace Okta.Idx.Sdk
             }
         }
 
-        /// <inheritdoc/>
-        public async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Calls the Idx interact endpoint to get an IDX context.
+        /// </summary>
+        /// <param name="state">Optional value to use as the state argument when initiating the authentication flow. This is used to provide contextual information to survive redirects.</param>
+        /// <param name="cancellationToken">The cancellation token. Optional.</param>
+        /// <returns>The IDX context.</returns>
+        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
         {
             // PKCE props
             state = state ?? GenerateSecureRandomString(16);
@@ -198,8 +205,13 @@ namespace Okta.Idx.Sdk
             return new IdxContext(codeVerifier, codeChallenge, codeChallengeMethod, response.InteractionHandle, state);
         }
 
-        /// <inheritdoc/>
-        public async Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        /// Calls the Idx introspect endpoint to get remediation steps.
+        /// </summary>
+        /// <param name="idxContext">The IDX context that was returned by the `interact()` call</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>The IdxResponse.</returns>
+        internal async Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken))
         {
             var payload = new IdxRequestPayload();
             payload.SetProperty("interactionHandle", idxContext.InteractionHandle);
@@ -227,6 +239,161 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public IOktaClient CreateScoped(RequestContext requestContext)
             => new IdxClient(_dataStore, Configuration, requestContext);
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
+        {
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            // Check if identify flow include credentials
+            var isIdentifyInOneStep = IsRemediationRequireCredentials(RemediationType.Identify, introspectResponse);
+
+            // Common request payload
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", authenticationOptions.Username);
+
+            if (isIdentifyInOneStep)
+            {
+                identifyRequest.SetProperty("credentials", new
+                {
+                    passcode = authenticationOptions.Password,
+                });
+            }
+
+            var identifyResponse = await introspectResponse
+                                            .Remediation
+                                            .RemediationOptions
+                                            .FirstOrDefault(x => x.Name == RemediationType.Identify)
+                                            .ProceedAsync(identifyRequest, cancellationToken);
+
+            if (isIdentifyInOneStep)
+            {
+                // We expect success
+                if (!identifyResponse.IsLoginSuccess)
+                {
+                    // Verify if password expired
+                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, identifyResponse))
+                    {
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.PasswordExpired,
+                            IdxContext = idxContext,
+                        };
+                    }
+                    else
+                    {
+                        throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, identifyResponse);
+                    }
+                }
+
+                var tokenResponse = await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+            else
+            {
+                // We expect remediation has credentials now
+                if (!IsRemediationRequireCredentials(RemediationType.ChallengeAuthenticator, identifyResponse))
+                {
+                    throw new UnexpectedRemediationException(RemediationType.ChallengeAuthenticator, identifyResponse);
+                }
+
+                var challengeRequest = new IdxRequestPayload();
+                challengeRequest.StateHandle = identifyResponse.StateHandle;
+                challengeRequest.SetProperty("credentials", new
+                {
+                    passcode = authenticationOptions.Password,
+                });
+
+                var challengeResponse = await identifyResponse
+                                              .Remediation
+                                              .RemediationOptions
+                                              .FirstOrDefault(x => x.Name == RemediationType.ChallengeAuthenticator)
+                                              .ProceedAsync(challengeRequest, cancellationToken);
+
+                if (!challengeResponse.IsLoginSuccess)
+                {
+                    // Verify if password expired
+                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, challengeResponse))
+                    {
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.PasswordExpired,
+                            IdxContext = idxContext,
+                        };
+                    }
+                    else
+                    {
+                        throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, challengeResponse);
+                    }
+                }
+
+                var tokenResponse = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> ChangePasswordAsync(ChangePasswordOptions changePasswordOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext);
+
+            // Verify if password expired
+            if (!IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, introspectResponse))
+            {
+                throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, introspectResponse);
+            }
+
+            var resetAuthenticatorRequest = new IdxRequestPayload();
+            resetAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
+            resetAuthenticatorRequest.SetProperty("credentials", new
+            {
+                passcode = changePasswordOptions.NewPassword,
+            });
+
+            // Reset Password is expected
+            var resetPasswordResponse = await introspectResponse
+                                              .Remediation
+                                              .RemediationOptions
+                                              .FirstOrDefault(x => x.Name == RemediationType.ReenrollAuthenticator)
+                                              .ProceedAsync(resetAuthenticatorRequest, cancellationToken);
+
+            if (resetPasswordResponse.IsLoginSuccess)
+            {
+                var tokenResponse = await resetPasswordResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+            else
+            {
+                throw new UnexpectedRemediationException(RemediationType.SuccessWithInteractionCode, resetPasswordResponse);
+            }
+        }
+
+        private static bool IsRemediationRequireCredentials(string remediationOptionName, IIdxResponse idxResponse)
+        {
+            var jToken = JToken.Parse(idxResponse.GetRaw());
+
+            var credentialsObj = jToken.SelectToken($"$.remediation.value[?(@.name == '{remediationOptionName}')].value[?(@.name == 'credentials')]");
+
+            return credentialsObj != null;
+        }
 
         /// <summary>
         /// Creates a new <see cref="CollectionClient{T}"/> given an initial HTTP request.

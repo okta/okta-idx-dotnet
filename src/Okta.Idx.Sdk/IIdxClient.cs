@@ -16,24 +16,25 @@ namespace Okta.Idx.Sdk
     public interface IIdxClient : IOktaClient
     {
         /// <summary>
-        /// Calls the Idx introspect endpoint to get remediation steps.
-        /// </summary>
-        /// <param name="idxContext">The IDX context that was returned by the `interact()` call</param>
-        /// <param name="cancellationToken">The cancellation token</param>
-        /// <returns>The IdxResponse.</returns>
-        Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        /// Calls the Idx interact endpoint to get an IDX context.
-        /// </summary>
-        /// <param name="state">Optional value to use as the state argument when initiating the authentication flow. This is used to provide contextual information to survive redirects.</param>
-        /// <param name="cancellationToken">The cancellation token. Optional.</param>
-        /// <returns>The IDX context.</returns>
-        Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default);
-
-        /// <summary>
         /// Gets the client configuration.
         /// </summary>
         IdxConfiguration Configuration { get; }
+
+        /// <summary>
+        /// Changes user's password.
+        /// </summary>
+        /// <param name="changePasswordOptions">The change password options</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> ChangePasswordAsync(ChangePasswordOptions changePasswordOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Authenticates a user with username/password credentials
+        /// </summary>
+        /// <param name="authenticationOptions">The authentication topions.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default);
     }
 }

@@ -7,6 +7,9 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// An interface to represent the token response.
+    /// </summary>
     public interface ITokenResponse : IResource
     {
         /// <summary>
