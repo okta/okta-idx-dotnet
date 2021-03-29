@@ -24,11 +24,29 @@ namespace Okta.Idx.Sdk
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnexpectedRemediationException"/> class.
+        /// </summary>
+        /// <param name="expectedRemediationNames">The expected remediation names.</param>
+        /// <param name="receivedResponse">The received response.</param>
+        public UnexpectedRemediationException(IList<string> expectedRemediationNames, IIdxResponse receivedResponse)
+            : base(GetDetailedErrorMessage(expectedRemediationNames, receivedResponse))
+        {
+        }
+
         private static string GetDetailedErrorMessage(string expectedRemediationName, IIdxResponse receivedResponse)
         {
             var remediationNamesList = receivedResponse?.Remediation?.RemediationOptions?.Select(x => x.Name).ToList() ?? new List<string>();
 
             return $@"Unexpected remediation step: Expected '{expectedRemediationName}' but received ['{string.Join(",", remediationNamesList)}'].
+                    Verify that your policies are configured as expected.";
+        }
+
+        private static string GetDetailedErrorMessage(IList<string> expectedRemediationNames, IIdxResponse receivedResponse)
+        {
+            var remediationNamesList = receivedResponse?.Remediation?.RemediationOptions?.Select(x => x.Name).ToList() ?? new List<string>();
+
+            return $@"Unexpected remediation step: Expected '['{string.Join(" or ", expectedRemediationNames)}']' but received ['{string.Join(",", remediationNamesList)}'].
                     Verify that your policies are configured as expected.";
         }
     }

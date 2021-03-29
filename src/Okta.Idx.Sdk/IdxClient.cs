@@ -349,11 +349,34 @@ namespace Okta.Idx.Sdk
         {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext);
+            var currentRemediationType = RemediationType.Unknown;
 
-            // Verify if password expired
-            if (!IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, introspectResponse))
+            // Check if flow is password expiration or forgot password, otherwise throw
+            if (introspectResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.ReenrollAuthenticator))
             {
-                throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, introspectResponse);
+                currentRemediationType = RemediationType.ReenrollAuthenticator;
+            }
+            else if (introspectResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.ResetAuthenticator))
+            {
+                currentRemediationType = RemediationType.ResetAuthenticator;
+            }
+            else
+            {
+                if (currentRemediationType == RemediationType.ReenrollAuthenticator &&
+                    !IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, introspectResponse))
+                {
+                    throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, introspectResponse);
+                }
+                else
+                {
+                    throw new UnexpectedRemediationException(
+                        new List<string>
+                        {
+                            RemediationType.ReenrollAuthenticator,
+                            RemediationType.ResetAuthenticator,
+                        },
+                        introspectResponse);
+                }
             }
 
             var resetAuthenticatorRequest = new IdxRequestPayload();
@@ -363,11 +386,11 @@ namespace Okta.Idx.Sdk
                 passcode = changePasswordOptions.NewPassword,
             });
 
-            // Reset Password is expected
+            // Reset password
             var resetPasswordResponse = await introspectResponse
                                               .Remediation
                                               .RemediationOptions
-                                              .FirstOrDefault(x => x.Name == RemediationType.ReenrollAuthenticator)
+                                              .FirstOrDefault(x => x.Name == currentRemediationType)
                                               .ProceedAsync(resetAuthenticatorRequest, cancellationToken);
 
             if (resetPasswordResponse.IsLoginSuccess)
@@ -384,6 +407,98 @@ namespace Okta.Idx.Sdk
             {
                 throw new UnexpectedRemediationException(RemediationType.SuccessWithInteractionCode, resetPasswordResponse);
             }
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default) 
+        {
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            // Common request payload
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", recoverPasswordOptions.Username);
+
+            // Send username
+            var identifyResponse = await introspectResponse
+                                        .Remediation
+                                        .RemediationOptions
+                                        .FirstOrDefault(x => x.Name == RemediationType.Identify)
+                                        .ProceedAsync(identifyRequest, cancellationToken);
+
+            // Proceed with recovery
+            var recoveryRequest = new IdxRequestPayload();
+            recoveryRequest.StateHandle = identifyResponse.StateHandle;
+
+            var recoveryResponse = await identifyResponse
+                                        .CurrentAuthenticatorEnrollment
+                                        .Value
+                                        .Recover
+                                        .ProceedAsync(recoveryRequest, cancellationToken);
+
+            // Send code
+            var selectAuthenticatorRequest = new IdxRequestPayload();
+            selectAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+            selectAuthenticatorRequest.SetProperty("authenticator", new
+            {
+                id = recoverPasswordOptions.AuthenticatorType.ToIdxKeyString(),
+            });
+
+            var selectRecoveryAuthenticatorRemediationOption = await recoveryResponse
+                                                            .Remediation
+                                                            .RemediationOptions
+                                                            .FirstOrDefault(x => x.Name == RemediationType.SelectAuthenticatorAuthenticate)
+                                                            .ProceedAsync(selectAuthenticatorRequest, cancellationToken);
+
+            if (!selectRecoveryAuthenticatorRemediationOption
+                .Remediation.RemediationOptions
+                .Any(x => x.Name == RemediationType.ChallengeAuthenticator))
+            {
+                throw new UnexpectedRemediationException(RemediationType.ChallengeAuthenticator, selectRecoveryAuthenticatorRemediationOption);
+            }
+
+            return new AuthenticationResponse
+            {
+                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
+                IdxContext = idxContext,
+            };
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext);
+
+            // Verify if password expired
+            if (!IsRemediationRequireCredentials(RemediationType.ChallengeAuthenticator, introspectResponse))
+            {
+                throw new UnexpectedRemediationException(RemediationType.ChallengeAuthenticator, introspectResponse);
+            }
+
+            var challengeAuthenticatorRequest = new IdxRequestPayload();
+            challengeAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
+            challengeAuthenticatorRequest.SetProperty("credentials", new
+            {
+                passcode = verifyAuthenticatorOptions.Code,
+            });
+
+            var challengeAuthenticatorResponse = await introspectResponse
+                                                .Remediation.RemediationOptions
+                                                .FirstOrDefault(x => x.Name == RemediationType.ChallengeAuthenticator)
+                                                .ProceedAsync(challengeAuthenticatorRequest, cancellationToken);
+
+            if (!challengeAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.ResetAuthenticator))
+            {
+                throw new UnexpectedRemediationException(RemediationType.ResetAuthenticator, challengeAuthenticatorResponse);
+            }
+
+            return new AuthenticationResponse
+            {
+                AuthenticationStatus = AuthenticationStatus.AwaitingPasswordReset,
+                IdxContext = idxContext,
+            };
         }
 
         private static bool IsRemediationRequireCredentials(string remediationOptionName, IIdxResponse idxResponse)

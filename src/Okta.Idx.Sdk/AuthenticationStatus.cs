@@ -23,5 +23,15 @@ namespace Okta.Idx.Sdk
         /// Password expired
         /// </summary>
         PasswordExpired,
+
+        /// <summary>
+        /// Waiting for authenticator verification
+        /// </summary>
+        AwaitingAuthenticatorVerification,
+
+        /// <summary>
+        /// Waiting for password reset
+        /// </summary>
+        AwaitingPasswordReset,
     }
 }

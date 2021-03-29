@@ -26,8 +26,23 @@ namespace Okta.Idx.Sdk
         public static readonly string ChallengeAuthenticator = "challenge-authenticator";
 
         /// <summary>
+        /// select-authenticator-authenticate
+        /// </summary>
+        public static readonly string SelectAuthenticatorAuthenticate = "select-authenticator-authenticate";
+
+        /// <summary>
+        /// reset-authenticator
+        /// </summary>
+        public static readonly string ResetAuthenticator = "reset-authenticator";
+
+        /// <summary>
         /// This is not a remediation itself, but it's used internally to identify that a response is successful.
         /// </summary>
         public static readonly string SuccessWithInteractionCode = "successWithInteractionCode";
+
+        /// <summary>
+        /// This is not a remediation itself, but it's used internally to identify unknown remediations.
+        /// </summary>
+        public static readonly string Unknown = "unknown";
     }
 }
