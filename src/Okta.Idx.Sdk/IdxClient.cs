@@ -437,12 +437,23 @@ namespace Okta.Idx.Sdk
                                         .Recover
                                         .ProceedAsync(recoveryRequest, cancellationToken);
 
+            var recoveryAuthenticator = recoveryResponse
+               .Authenticators
+               .Value
+               .Where(x => x.Key == recoverPasswordOptions.AuthenticatorType.ToIdxKeyString())
+               .FirstOrDefault();
+
+            if (recoveryAuthenticator == null)
+            {
+                throw new OktaException($"Authenticator not found. Verify that you have {Enum.GetName(typeof(AuthenticatorType), recoverPasswordOptions.AuthenticatorType)} enabled for your app.");
+            }
+
             // Send code
             var selectAuthenticatorRequest = new IdxRequestPayload();
             selectAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
             selectAuthenticatorRequest.SetProperty("authenticator", new
             {
-                id = recoverPasswordOptions.AuthenticatorType.ToIdxKeyString(),
+                id = recoveryAuthenticator.Id,
             });
 
             var selectRecoveryAuthenticatorRemediationOption = await recoveryResponse
