@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using Okta.Idx.Sdk.Configuration;
+using Okta.Idx.Sdk.Extensions;
 using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
@@ -510,6 +511,34 @@ namespace Okta.Idx.Sdk
                 AuthenticationStatus = AuthenticationStatus.AwaitingPasswordReset,
                 IdxContext = idxContext,
             };
+        }
+
+        private static string Base64Encode(string plainText)
+        {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            return System.Convert.ToBase64String(plainTextBytes);
+        }
+
+        ///<inheritdoc/>
+        public async Task RevokeTokensAsync(TokenType tokenType, string token, CancellationToken cancellationToken = default)
+        {
+            var payload = new Dictionary<string, string>();
+            payload.Add("client_id", Configuration.ClientId);
+            payload.Add("client_secret", Configuration.ClientSecret);
+            payload.Add("token_type_hint", tokenType.ToTokenHintString());
+            payload.Add("token", token);
+
+            var headers = new Dictionary<string, string>();
+            headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
+
+            var request = new HttpRequest
+            {
+                Uri = $"{UrlHelper.EnsureTrailingSlash(Configuration.Issuer)}v1/revoke",
+                Payload = payload,
+                Headers = headers,
+            };
+
+            await PostAsync<Resource>(request, cancellationToken).ConfigureAwait(false);
         }
 
         private static bool IsRemediationRequireCredentials(string remediationOptionName, IIdxResponse idxResponse)

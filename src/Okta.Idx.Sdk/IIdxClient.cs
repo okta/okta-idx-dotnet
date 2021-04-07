@@ -53,5 +53,14 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Revokes tokens.
+        /// </summary>
+        /// <param name="tokenType">The token type.</param>
+        /// <param name="token">The token.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Task.</returns>
+        Task RevokeTokensAsync(TokenType tokenType, string token, CancellationToken cancellationToken = default);
     }
 }

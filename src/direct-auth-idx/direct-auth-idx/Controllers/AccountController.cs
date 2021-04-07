@@ -93,18 +93,10 @@ namespace direct_auth_idx.Controllers
         public async Task<ActionResult> LogOff()
         {
             var client = new IdxClient(null);
-            var idToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "id_token");
-        //https://dotnet.oktapreview.com/oauth2/default/v1/logout?post_logout_redirect_uri=https%3A%2F%2Flocalhost%3A44314
-            var logoutUrl = $"{client.Configuration.Issuer}/v1/logout?post_logout_redirect_uri=https%3A%2F%2Flocalhost%3A44379&id_token_hint={idToken.Value}";
+            var accessToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "access_token");
+            await client.RevokeTokensAsync(TokenType.AccessToken, accessToken.Value);
             _authenticationManager.SignOut();
-            return Redirect(logoutUrl);
-            //try
-            //{
-            //    await client.GetAsync<BaseResource>(logoutUrl);
-            //}
-            //catch { }
-            //_authenticationManager.SignOut();
-            //return RedirectToAction("Login", "Account");
+            return RedirectToAction("Login", "Account");
         }
 
     }
