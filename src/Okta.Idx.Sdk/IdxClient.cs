@@ -513,13 +513,7 @@ namespace Okta.Idx.Sdk
             };
         }
 
-        private static string Base64Encode(string plainText)
-        {
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
-            return System.Convert.ToBase64String(plainTextBytes);
-        }
-
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public async Task RevokeTokensAsync(TokenType tokenType, string token, CancellationToken cancellationToken = default)
         {
             var payload = new Dictionary<string, string>();
