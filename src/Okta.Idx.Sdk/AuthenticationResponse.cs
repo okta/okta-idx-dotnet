@@ -3,6 +3,8 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using System.Collections.Generic;
+
 namespace Okta.Idx.Sdk
 {
     /// <summary>
@@ -24,5 +26,10 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the IDX context.
         /// </summary>
         public IIdxContext IdxContext { get; set; }
+
+        /// <summary>
+        /// Gets or sets the authenticators.
+        /// </summary>
+        public IList<IAuthenticator> Authenticators { get; set; }
     }
 }

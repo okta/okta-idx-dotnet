@@ -1,0 +1,22 @@
+﻿@model direct_auth_idx.Models.SelectAuthenticatorViewModel
+
+@{
+    ViewBag.Title = "Set up Authenticators";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>@ViewBag.Title</h2>
+
+    <hr />
+    <ul>
+        @foreach (var authenticator in Model.Authenticators)
+        {
+        <div class="form-group">
+            @Ajax.ActionLink(authenticator.Name, "SelectAuthenticatorAsync", "Manage", new { authenticatorId = authenticator.Id }, new AjaxOptions { HttpMethod = "POST" })
+        </div>
+        }
+    </ul>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/ajax")
+}

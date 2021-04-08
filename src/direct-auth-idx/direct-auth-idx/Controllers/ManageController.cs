@@ -140,13 +140,74 @@ namespace direct_auth_idx.Controllers
 
                     return RedirectToAction("ChangePassword", "Manage");
                 }
+                else if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
+                {
+                    Session["idxContext"] = authnResponse.IdxContext;
+                    TempData["authenticators"] = authnResponse.Authenticators;
+                    return RedirectToAction("selectAuthenticator", "Manage");
+                }
+                else if (authnResponse.AuthenticationStatus == AuthenticationStatus.Success)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
 
-                return View("ChangePassword", model);
+                return View("VerifyAuthenticator", model);
             }
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
-                return View("ChangePassword", model);
+                return View("VerifyAuthenticator", model);
+            }
+        }
+
+        public ActionResult SelectAuthenticator()
+        {
+            var authenticators = (IList<IAuthenticator>)TempData["authenticators"];
+
+            var viewModel = new SelectAuthenticatorViewModel();
+            viewModel.Authenticators = authenticators
+                                        .Select(x =>
+                                                    new AuthenticatorViewModel
+                                                    {
+                                                        Id = x.Id,
+                                                        Name = x.DisplayName
+                                                    })
+                                        .ToList();
+
+            //viewModel.Authenticators = new List<AuthenticatorViewModel> { new AuthenticatorViewModel { Id = "emailId", Name = "Email" }, new AuthenticatorViewModel { Id = "passId", Name = "Password" } };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        //[ValidateAntiForgeryToken] TODO: Validate antiforgery
+        public async Task<ActionResult> SelectAuthenticatorAsync(string authenticatorId)
+        {
+            try
+            {
+                // WIP
+                var idxAuthClient = new IdxClient(null);
+
+                var enrollAuthenticatorOptions = new EnrollAuthenticatorOptions
+                {
+                    AuthenticatorId = authenticatorId,
+                };
+
+               var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+
+               if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    Session["IdxContext"] = enrollResponse.IdxContext;
+                    return RedirectToAction("VerifyAuthenticator", "Manage");
+                }
+
+                return View("SelectAuthenticator");
+            }
+            catch (OktaException exception)
+            {
+                // Handle errors
+                return RedirectToAction("VerifyAuthenticator");
             }
         }
     }
