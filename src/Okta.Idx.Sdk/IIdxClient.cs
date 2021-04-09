@@ -63,5 +63,22 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Task.</returns>
         Task RevokeTokensAsync(TokenType tokenType, string token, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Register a new user.
+        /// </summary>
+        /// <param name="userProfile">The user profile. Contains all the dynamic properties required for registration.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Trigger the authenticator enrollment flow.
+        /// </summary>
+        /// <param name="enrollAuthenticatorOptions">The options for enrollment.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }

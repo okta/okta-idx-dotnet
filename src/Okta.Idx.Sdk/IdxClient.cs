@@ -591,8 +591,12 @@ namespace Okta.Idx.Sdk
         {
             var payload = new Dictionary<string, string>();
             payload.Add("client_id", Configuration.ClientId);
-            // TODO: Verify if it's a confidential client before adding this
-            payload.Add("client_secret", Configuration.ClientSecret);
+
+            if (Configuration.IsConfidentialClient)
+            {
+                payload.Add("client_secret", Configuration.ClientSecret);
+            }
+
             payload.Add("token_type_hint", tokenType.ToTokenHintString());
             payload.Add("token", token);
 
@@ -609,6 +613,7 @@ namespace Okta.Idx.Sdk
             await PostAsync<Resource>(request, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default)
         {
             var idxContext = await InteractAsync(cancellationToken: cancellationToken);
@@ -651,6 +656,7 @@ namespace Okta.Idx.Sdk
             };
         }
 
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context

@@ -181,9 +181,14 @@ namespace direct_auth_idx.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        //[ValidateAntiForgeryToken] TODO: Validate antiforgery
-        public async Task<ActionResult> SelectAuthenticatorAsync(string authenticatorId)
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SelectAuthenticatorAsync(SelectAuthenticatorViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View("SelectAuthenticator", model);
+            }
+
             try
             {
                 // WIP
@@ -191,7 +196,7 @@ namespace direct_auth_idx.Controllers
 
                 var enrollAuthenticatorOptions = new EnrollAuthenticatorOptions
                 {
-                    AuthenticatorId = authenticatorId,
+                    AuthenticatorId = model.AuthenticatorId,
                 };
 
                var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
@@ -202,12 +207,12 @@ namespace direct_auth_idx.Controllers
                     return RedirectToAction("VerifyAuthenticator", "Manage");
                 }
 
-                return View("SelectAuthenticator");
+                return View("SelectAuthenticator", model);
             }
             catch (OktaException exception)
             {
-                // Handle errors
-                return RedirectToAction("VerifyAuthenticator");
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return RedirectToAction("SelectAuthenticator", model);
             }
         }
     }
