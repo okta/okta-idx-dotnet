@@ -26,9 +26,6 @@
                                 @authenticator.Name
                             </label>
                         </div>
-                        @*<div class="form-group">
-                        <input type="submit" name="authenticatorId" value=@authenticator.Id class="btn btn-default" />
-                    </div>*@
                     }
                 </ul>
                 @Html.ValidationMessageFor(m => m.AuthenticatorId, "", new { @class = "text-danger" })
@@ -43,5 +40,4 @@
 </div>
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-    @Scripts.Render("~/bundles/ajax")
 }
