@@ -225,7 +225,6 @@ namespace direct_auth_idx.Controllers
 
                     if (model.IsPasswordSelected)
                     {
-                        ViewDate.PageTitle = "Enter your password.";
                         return RedirectToAction("ChangePassword", "Manage");
                     }
 
