@@ -93,18 +93,56 @@ namespace direct_auth_idx.Controllers
         public async Task<ActionResult> LogOff()
         {
             var client = new IdxClient(null);
-            var idToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "id_token");
-        //https://dotnet.oktapreview.com/oauth2/default/v1/logout?post_logout_redirect_uri=https%3A%2F%2Flocalhost%3A44314
-            var logoutUrl = $"{client.Configuration.Issuer}/v1/logout?post_logout_redirect_uri=https%3A%2F%2Flocalhost%3A44379&id_token_hint={idToken.Value}";
+            var accessToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "access_token");
+            await client.RevokeTokensAsync(TokenType.AccessToken, accessToken.Value);
             _authenticationManager.SignOut();
-            return Redirect(logoutUrl);
-            //try
-            //{
-            //    await client.GetAsync<BaseResource>(logoutUrl);
-            //}
-            //catch { }
-            //_authenticationManager.SignOut();
-            //return RedirectToAction("Login", "Account");
+            return RedirectToAction("Login", "Account");
+        }
+
+        // GET: Account
+        [AllowAnonymous]
+        public ActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RegisterAsync(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Register");
+            }
+
+            try
+            {
+                // WIP
+                var idxAuthClient = new IdxClient(null);
+
+                var userProfile = new UserProfile();
+                userProfile.SetProperty("firstName", model.FirstName);
+                userProfile.SetProperty("lastName", model.LastName);
+                userProfile.SetProperty("email", model.Email);
+
+                var registerResponse = await idxAuthClient.RegisterAsync(userProfile);
+
+                if (registerResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
+                {
+                    Session["idxContext"] = registerResponse.IdxContext;
+                    TempData["authenticators"] = registerResponse.Authenticators;
+                    return RedirectToAction("selectAuthenticator", "Manage");
+                }
+
+                ModelState.AddModelError(string.Empty, $"Oops! Something went wrong.");
+                return View("Register", model);
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, $"Oops! Something went wrong: {exception.Message}");
+                return View("Register", model);
+            }
         }
 
     }

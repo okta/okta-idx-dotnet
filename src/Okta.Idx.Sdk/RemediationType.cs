@@ -36,6 +36,31 @@ namespace Okta.Idx.Sdk
         public static readonly string ResetAuthenticator = "reset-authenticator";
 
         /// <summary>
+        /// select-enroll-profile
+        /// </summary>
+        public static readonly string SelectEnrollProfile = "select-enroll-profile";
+
+        /// <summary>
+        /// enroll-profile
+        /// </summary>
+        public static readonly string EnrollProfile = "enroll-profile";
+
+        /// <summary>
+        /// select-authenticator-enroll
+        /// </summary>
+        public static readonly string SelectAuthenticatorEnroll = "select-authenticator-enroll";
+
+        /// <summary>
+        /// enroll-authenticator
+        /// </summary>
+        public static readonly string EnrollAuthenticator = "enroll-authenticator";
+
+        /// <summary>
+        /// skip
+        /// </summary>
+        public static readonly string Skip = "skip";
+
+        /// <summary>
         /// This is not a remediation itself, but it's used internally to identify that a response is successful.
         /// </summary>
         public static readonly string SuccessWithInteractionCode = "successWithInteractionCode";

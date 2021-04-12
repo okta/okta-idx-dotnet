@@ -33,5 +33,10 @@ namespace Okta.Idx.Sdk
         /// Waiting for password reset
         /// </summary>
         AwaitingPasswordReset,
+
+        /// <summary>
+        /// Waiting for authenticator enrollment
+        /// </summary>
+        AwaitingAuthenticatorEnrollment,
     }
 }

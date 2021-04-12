@@ -9,7 +9,8 @@ namespace direct_auth_idx.Models
     public class VerifyAuthenticatorViewModel
     {
         [Required]
-        [Display(Name = "Code")]
+        [Display(Name = "Passcode")]
         public string Code { get; set; }
+
     }
 }
