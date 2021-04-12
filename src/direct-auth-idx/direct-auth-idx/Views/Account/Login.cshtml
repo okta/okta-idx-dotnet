@@ -63,6 +63,21 @@
         </section>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-8">
+        <section id="register">
+            @using (Html.BeginForm("Register", "Account", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Register" class="btn btn-default" />
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

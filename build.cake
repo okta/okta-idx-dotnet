@@ -3,7 +3,6 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
-
 Task("Clean")
 .Does(() =>
 {
@@ -28,7 +27,7 @@ Task("Build")
 .IsDependentOn("Restore")
 .Does(() =>
 {
-    var projects = GetFiles("./src/**/*.csproj");
+    var projects = GetFiles("./src/**/Okta.Idx.Sdk.csproj");
     Console.WriteLine("Building {0} projects", projects.Count());
 
     foreach (var project in projects)

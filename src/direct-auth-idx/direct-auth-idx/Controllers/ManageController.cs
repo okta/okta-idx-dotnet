@@ -28,6 +28,15 @@ namespace direct_auth_idx.Controllers
                 return View("ChangePassword", model);
             }
 
+            // Password was selected during registration.
+            if ((bool?)Session["isPasswordSelected"] ?? false)
+            {
+                return await VerifyAuthenticatorAsync(new VerifyAuthenticatorViewModel
+                {
+                    Code = model.NewPassword,
+                });
+            }
+
             var changePasswordOptions = new ChangePasswordOptions()
             {
                 NewPassword = model.NewPassword,
@@ -44,6 +53,13 @@ namespace direct_auth_idx.Controllers
                 {
                     return RedirectToAction("Login", "Account");
                 }
+                else if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
+                {
+                    Session["idxContext"] = authnResponse.IdxContext;
+                    TempData["authenticators"] = authnResponse.Authenticators;
+                    return RedirectToAction("selectAuthenticator", "Manage");
+                }
+
 
                 return View("ChangePassword", model);
             }
@@ -140,13 +156,88 @@ namespace direct_auth_idx.Controllers
 
                     return RedirectToAction("ChangePassword", "Manage");
                 }
+                else if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
+                {
+                    Session["idxContext"] = authnResponse.IdxContext;
+                    TempData["authenticators"] = authnResponse.Authenticators;
+                    return RedirectToAction("selectAuthenticator", "Manage");
+                }
+                else if (authnResponse.AuthenticationStatus == AuthenticationStatus.Success)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
 
-                return View("ChangePassword", model);
+                return View("VerifyAuthenticator", model);
             }
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
-                return View("ChangePassword", model);
+                return View("VerifyAuthenticator", model);
+            }
+        }
+
+        public ActionResult SelectAuthenticator()
+        {
+            var authenticators = (IList<IAuthenticator>)TempData["authenticators"];
+
+            var viewModel = new SelectAuthenticatorViewModel();
+            viewModel.Authenticators = authenticators
+                                        .Select(x =>
+                                                    new AuthenticatorViewModel
+                                                    {
+                                                        Id = x.Id,
+                                                        Name = x.DisplayName
+                                                    })
+                                        .ToList();
+
+            //viewModel.Authenticators = new List<AuthenticatorViewModel> { new AuthenticatorViewModel { Id = "emailId", Name = "Email" }, new AuthenticatorViewModel { Id = "passId", Name = "Password" } };
+            viewModel.PasswordId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.Id;
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SelectAuthenticatorAsync(SelectAuthenticatorViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("SelectAuthenticator", model);
+            }
+
+            try
+            {
+                // WIP
+                var idxAuthClient = new IdxClient(null);
+
+                var enrollAuthenticatorOptions = new EnrollAuthenticatorOptions
+                {
+                    AuthenticatorId = model.AuthenticatorId,
+                };
+
+               var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+
+               if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    // TODO: clean session.
+                    Session["IdxContext"] = enrollResponse.IdxContext;
+                    Session["isPasswordSelected"] = model.IsPasswordSelected;
+
+                    if (model.IsPasswordSelected)
+                    {
+                        ViewDate.PageTitle = "Enter your password.";
+                        return RedirectToAction("ChangePassword", "Manage");
+                    }
+
+                    return RedirectToAction("VerifyAuthenticator", "Manage");
+                }
+
+                return View("SelectAuthenticator", model);
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return RedirectToAction("SelectAuthenticator", model);
             }
         }
     }

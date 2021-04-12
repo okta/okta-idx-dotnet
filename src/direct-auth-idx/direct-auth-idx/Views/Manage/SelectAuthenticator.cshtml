@@ -1,0 +1,44 @@
+﻿@model direct_auth_idx.Models.SelectAuthenticatorViewModel
+
+@{
+    ViewBag.Title = "Set up Authenticators";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>@ViewBag.Title</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <section id="selectAuthenticatorForm">
+            @using (Html.BeginForm("SelectAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <h4>Set up required </h4>
+                <h5>Set up authenticators for Okta to ensure that only you have access to your account.</h5>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(m => m.PasswordId)
+                <ul>
+                    @foreach (var authenticator in Model.Authenticators)
+                    {
+                        <div>
+                            <label>
+                                @Html.RadioButtonFor(m => m.AuthenticatorId, authenticator.Id)
+                                @authenticator.Name
+                            </label>
+                        </div>
+                    }
+                </ul>
+                @Html.ValidationMessageFor(m => m.AuthenticatorId, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Submit" class="btn btn-default" />
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

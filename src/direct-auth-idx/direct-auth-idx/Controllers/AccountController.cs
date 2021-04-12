@@ -99,5 +99,51 @@ namespace direct_auth_idx.Controllers
             return RedirectToAction("Login", "Account");
         }
 
+        // GET: Account
+        [AllowAnonymous]
+        public ActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RegisterAsync(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Register");
+            }
+
+            try
+            {
+                // WIP
+                var idxAuthClient = new IdxClient(null);
+
+                var userProfile = new UserProfile();
+                userProfile.SetProperty("firstName", model.FirstName);
+                userProfile.SetProperty("lastName", model.LastName);
+                userProfile.SetProperty("email", model.Email);
+
+                var registerResponse = await idxAuthClient.RegisterAsync(userProfile);
+
+                if (registerResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
+                {
+                    Session["idxContext"] = registerResponse.IdxContext;
+                    TempData["authenticators"] = registerResponse.Authenticators;
+                    return RedirectToAction("selectAuthenticator", "Manage");
+                }
+
+                ModelState.AddModelError(string.Empty, $"Oops! Something went wrong.");
+                return View("Register", model);
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, $"Oops! Something went wrong: {exception.Message}");
+                return View("Register", model);
+            }
+        }
+
     }
 }
