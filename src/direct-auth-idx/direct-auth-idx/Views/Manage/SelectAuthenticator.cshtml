@@ -17,6 +17,7 @@
                 <h5>Set up authenticators for Okta to ensure that only you have access to your account.</h5>
                 <hr />
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(m => m.PasswordId)
                 <ul>
                     @foreach (var authenticator in Model.Authenticators)
                     {

@@ -28,6 +28,15 @@ namespace direct_auth_idx.Controllers
                 return View("ChangePassword", model);
             }
 
+            // Password was selected during registration.
+            if ((bool?)Session["isPasswordSelected"] ?? false)
+            {
+                return await VerifyAuthenticatorAsync(new VerifyAuthenticatorViewModel
+                {
+                    Code = model.NewPassword,
+                });
+            }
+
             var changePasswordOptions = new ChangePasswordOptions()
             {
                 NewPassword = model.NewPassword,
@@ -44,6 +53,13 @@ namespace direct_auth_idx.Controllers
                 {
                     return RedirectToAction("Login", "Account");
                 }
+                else if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
+                {
+                    Session["idxContext"] = authnResponse.IdxContext;
+                    TempData["authenticators"] = authnResponse.Authenticators;
+                    return RedirectToAction("selectAuthenticator", "Manage");
+                }
+
 
                 return View("ChangePassword", model);
             }
@@ -175,7 +191,7 @@ namespace direct_auth_idx.Controllers
                                         .ToList();
 
             //viewModel.Authenticators = new List<AuthenticatorViewModel> { new AuthenticatorViewModel { Id = "emailId", Name = "Email" }, new AuthenticatorViewModel { Id = "passId", Name = "Password" } };
-
+            viewModel.PasswordId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.Id;
             return View(viewModel);
         }
 
@@ -203,7 +219,16 @@ namespace direct_auth_idx.Controllers
 
                if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
                 {
+                    // TODO: clean session.
                     Session["IdxContext"] = enrollResponse.IdxContext;
+                    Session["isPasswordSelected"] = model.IsPasswordSelected;
+
+                    if (model.IsPasswordSelected)
+                    {
+                        ViewDate.PageTitle = "Enter your password.";
+                        return RedirectToAction("ChangePassword", "Manage");
+                    }
+
                     return RedirectToAction("VerifyAuthenticator", "Manage");
                 }
 

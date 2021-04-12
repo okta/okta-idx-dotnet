@@ -12,6 +12,16 @@ namespace direct_auth_idx.Models
         [Display(Name = "Authenticator ID")]
         public string AuthenticatorId { get; set; }
 
+        public string PasswordId { get; set; }
+
         public IList<AuthenticatorViewModel> Authenticators { get; set; }
+
+        public bool IsPasswordSelected
+        {
+            get
+            {
+                return PasswordId == AuthenticatorId;
+            }
+        }
     }
 }
