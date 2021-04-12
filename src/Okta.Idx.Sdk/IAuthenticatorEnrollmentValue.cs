@@ -31,7 +31,7 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets the methods.
         /// </summary>
-        IList<IAuthenticatorEnrollmentMethod> Methods { get; }
+        IList<IAuthenticatorMethod> Methods { get; }
 
         /// <summary>
         /// Gets the recover object.

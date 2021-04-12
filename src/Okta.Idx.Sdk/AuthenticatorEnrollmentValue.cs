@@ -15,7 +15,7 @@ namespace Okta.Idx.Sdk
 
         public string Key => GetStringProperty("key");
 
-        public IList<IAuthenticatorEnrollmentMethod> Methods => GetArrayProperty<IAuthenticatorEnrollmentMethod>("methods");
+        public IList<IAuthenticatorMethod> Methods => GetArrayProperty<IAuthenticatorMethod>("methods");
 
         public IRecover Recover => GetResourceProperty<Recover>("recover");
     }

@@ -7,7 +7,7 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
-    public interface IAuthenticatorEnrollmentMethod : IResource
+    public interface IAuthenticatorMethod : IResource
     {
         string Type { get; }
     }
