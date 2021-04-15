@@ -532,31 +532,41 @@ namespace Okta.Idx.Sdk
             var isResetAuthenticator = challengeAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.ResetAuthenticator);
             var isAuthenticatorEnroll = challengeAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.SelectAuthenticatorEnroll);
             // TODO: Assume default authenticators?
-            var canSkip = challengeAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.Skip);
+            //var canSkip = challengeAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.Skip);
 
-            if (canSkip)
+            //if (canSkip)
+            //{
+            //    var skipRequest = new IdxRequestPayload
+            //    {
+            //        StateHandle = challengeAuthenticatorResponse.StateHandle,
+            //    };
+
+            //    var skipResponse = await challengeAuthenticatorResponse
+            //                            .Remediation
+            //                            .RemediationOptions
+            //                            .FirstOrDefault(x => x.Name == RemediationType.Skip)
+            //                            .ProceedAsync(skipRequest, cancellationToken);
+
+            //    if (skipResponse.IsLoginSuccess)
+            //    {
+            //        var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+            //        return new AuthenticationResponse
+            //        {
+            //            AuthenticationStatus = AuthenticationStatus.Success,
+            //            TokenInfo = tokenResponse,
+            //        };
+            //    }
+            //}
+            if (challengeAuthenticatorResponse.IsLoginSuccess)
             {
-                var skipRequest = new IdxRequestPayload
+                var tokenResponse = await challengeAuthenticatorResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                return new AuthenticationResponse
                 {
-                    StateHandle = challengeAuthenticatorResponse.StateHandle,
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
                 };
-
-                var skipResponse = await challengeAuthenticatorResponse
-                                        .Remediation
-                                        .RemediationOptions
-                                        .FirstOrDefault(x => x.Name == RemediationType.Skip)
-                                        .ProceedAsync(skipRequest, cancellationToken);
-
-                if (skipResponse.IsLoginSuccess)
-                {
-                    var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
-
-                    return new AuthenticationResponse
-                    {
-                        AuthenticationStatus = AuthenticationStatus.Success,
-                        TokenInfo = tokenResponse,
-                    };
-                }
             }
 
             if (isResetAuthenticator)
@@ -624,6 +634,7 @@ namespace Okta.Idx.Sdk
                 StateHandle = introspectResponse.StateHandle,
             };
 
+            // TODO: Add sanity check for SelectEnrollProfile since it's not always present
             // choose enroll option
             var enrollProfileResponse = await introspectResponse
                                             .Remediation

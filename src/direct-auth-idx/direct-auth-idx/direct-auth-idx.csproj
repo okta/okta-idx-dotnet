@@ -276,6 +276,7 @@
     </Compile>
     <Compile Include="Models\AuthenticationService.cs" />
     <Compile Include="Models\AuthenticatorViewModel.cs" />
+    <Compile Include="Models\BaseViewModel.cs" />
     <Compile Include="Models\ChangePasswordViewModel.cs" />
     <Compile Include="Models\ForgotPasswordViewModel.cs" />
     <Compile Include="Models\LoginViewModel.cs" />

@@ -31,10 +31,7 @@ namespace direct_auth_idx.Controllers
             // Password was selected during registration.
             if ((bool?)Session["isPasswordSelected"] ?? false)
             {
-                return await VerifyAuthenticatorAsync(new VerifyAuthenticatorViewModel
-                {
-                    Code = model.NewPassword,
-                });
+                return await VerifyAuthenticatorAsync(model.NewPassword, "ChangePassword", model);
             }
 
             var changePasswordOptions = new ChangePasswordOptions()
@@ -127,22 +124,19 @@ namespace direct_auth_idx.Controllers
             return View();
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> VerifyAuthenticatorAsync(VerifyAuthenticatorViewModel model)
+
+        private async Task<ActionResult> VerifyAuthenticatorAsync(string code, string view, BaseViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View("VerifyAuthenticator", model);
+                return View(view, model);
             }
 
-            // WIP
             var idxAuthClient = new IdxClient(null);
 
             var verifyAuthenticatorOptions = new VerifyAuthenticatorOptions
             {
-               Code = model.Code,
+                Code = code,
             };
 
             try
@@ -167,13 +161,21 @@ namespace direct_auth_idx.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                return View("VerifyAuthenticator", model);
+                return View(view, model);
             }
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
-                return View("VerifyAuthenticator", model);
+                return View(view, model);
             }
+        }
+
+            [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> VerifyAuthenticatorAsync(VerifyAuthenticatorViewModel model)
+        {
+            return await VerifyAuthenticatorAsync(model.Code, "VerifyAuthenticator", model);
         }
 
         public ActionResult SelectAuthenticator()
@@ -181,16 +183,15 @@ namespace direct_auth_idx.Controllers
             var authenticators = (IList<IAuthenticator>)TempData["authenticators"];
 
             var viewModel = new SelectAuthenticatorViewModel();
-            viewModel.Authenticators = authenticators
+            viewModel.Authenticators = authenticators?
                                         .Select(x =>
                                                     new AuthenticatorViewModel
                                                     {
                                                         Id = x.Id,
                                                         Name = x.DisplayName
                                                     })
-                                        .ToList();
+                                        .ToList() ?? new List<AuthenticatorViewModel>();
 
-            //viewModel.Authenticators = new List<AuthenticatorViewModel> { new AuthenticatorViewModel { Id = "emailId", Name = "Email" }, new AuthenticatorViewModel { Id = "passId", Name = "Password" } };
             viewModel.PasswordId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.Id;
             return View(viewModel);
         }
