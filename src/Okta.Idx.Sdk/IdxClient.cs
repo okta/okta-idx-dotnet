@@ -634,12 +634,18 @@ namespace Okta.Idx.Sdk
                 StateHandle = introspectResponse.StateHandle,
             };
 
-            // TODO: Add sanity check for SelectEnrollProfile since it's not always present
             // choose enroll option
-            var enrollProfileResponse = await introspectResponse
+            var selectEnrollProfileRemediationOption = introspectResponse
                                             .Remediation
                                             .RemediationOptions
-                                            .FirstOrDefault(x => x.Name == RemediationType.SelectEnrollProfile)
+                                            .FirstOrDefault(x => x.Name == RemediationType.SelectEnrollProfile);
+
+            if (selectEnrollProfileRemediationOption == null)
+            {
+                throw new UnexpectedRemediationException(RemediationType.SelectEnrollProfile, introspectResponse);
+            }
+
+            var enrollProfileResponse = await selectEnrollProfileRemediationOption
                                             .ProceedAsync(enrollRequest, cancellationToken);
 
             var enrollNewProfileRequest = new IdxRequestPayload();
