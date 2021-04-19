@@ -676,8 +676,34 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
+            var selectAuthenticatorRequest = new IdxRequestPayload();
+            selectAuthenticatorRequest.SetProperty("authenticator", new
+            {
+                id = enrollAuthenticatorOptions.AuthenticatorId,
+            });
+
+            return await EnrollAuthenticatorAsync(selectAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollPhoneAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var selectAuthenticatorRequest = new IdxRequestPayload();
+            selectAuthenticatorRequest.SetProperty("authenticator", new
+            {
+                id = enrollAuthenticatorOptions.AuthenticatorId,
+                methodType = enrollAuthenticatorOptions.MethodType.ToString().ToLower(),
+                phoneNumber = enrollAuthenticatorOptions.PhoneNumber,
+            });
+
+            return await EnrollAuthenticatorAsync(selectAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        private async Task<AuthenticationResponse> EnrollAuthenticatorAsync(IdxRequestPayload selectAuthenticatorRequest, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            selectAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
 
             var selectAuthenticatorEnrollRemediationOption = introspectResponse
                                                              .Remediation
@@ -690,28 +716,37 @@ namespace Okta.Idx.Sdk
                 throw new UnexpectedRemediationException(RemediationType.SelectAuthenticatorEnroll, introspectResponse);
             }
 
-            var selectAuthenticatorRequest = new IdxRequestPayload();
-            selectAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
-            selectAuthenticatorRequest.SetProperty("authenticator", new
-            {
-                id = enrollAuthenticatorOptions.AuthenticatorId,
-            });
-
             var selectAuthenticatorResponse = await selectAuthenticatorEnrollRemediationOption.ProceedAsync(selectAuthenticatorRequest, cancellationToken);
+            var currentRemediationType = RemediationType.Unknown;
+            var status = AuthenticationStatus.AwaitingAuthenticatorVerification;
 
-
-            if (!selectAuthenticatorResponse
-                .Remediation
-                .RemediationOptions
-                .Any(x => x.Name == RemediationType.EnrollAuthenticator))
+            // Check if flow is challenge authenticator or enroll authenticator, otherwise throw
+            if (selectAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.AuthenticatorEnrollmentData))
             {
-                throw new UnexpectedRemediationException(RemediationType.SelectAuthenticatorEnroll, selectAuthenticatorResponse);
+                currentRemediationType = RemediationType.AuthenticatorEnrollmentData;
+                status = AuthenticationStatus.AwaitingAuthenticatorEnrollmentData;
+            }
+            else if (selectAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.EnrollAuthenticator))
+            {
+                currentRemediationType = RemediationType.EnrollAuthenticator;
+            }
+
+            if (currentRemediationType != RemediationType.EnrollAuthenticator &&
+                    currentRemediationType != RemediationType.AuthenticatorEnrollmentData)
+            {
+                throw new UnexpectedRemediationException(
+                    new List<string>
+                    {
+                            RemediationType.AuthenticatorEnrollmentData,
+                            RemediationType.EnrollAuthenticator,
+                    },
+                    selectAuthenticatorResponse);
             }
 
             return new AuthenticationResponse
             {
                 IdxContext = idxContext,
-                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
+                AuthenticationStatus = status,
             };
         }
 

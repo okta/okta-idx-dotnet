@@ -14,6 +14,8 @@ namespace direct_auth_idx.Models
 
         public string PasswordId { get; set; }
 
+        public string PhoneId { get; set; }
+
         public IList<AuthenticatorViewModel> Authenticators { get; set; }
 
         public bool IsPasswordSelected
@@ -21,6 +23,14 @@ namespace direct_auth_idx.Models
             get
             {
                 return PasswordId == AuthenticatorId;
+            }
+        }
+
+        public bool IsPhoneSelected
+        {
+            get
+            {
+                return PhoneId == AuthenticatorId;
             }
         }
     }
