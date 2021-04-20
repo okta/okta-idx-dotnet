@@ -265,25 +265,25 @@ namespace direct_auth_idx.Controllers
 
                var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
 
-               if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
-                {
-                    // TODO: clean session.
-                    Session["IdxContext"] = enrollResponse.IdxContext;
-                    Session["isPasswordSelected"] = model.IsPasswordSelected;
-                    Session["isPhoneSelected"] = model.IsPhoneSelected;
-                    Session["phoneId"] = model.PhoneId;
+                Session["IdxContext"] = enrollResponse.IdxContext;
+                Session["isPasswordSelected"] = model.IsPasswordSelected;
+                Session["isPhoneSelected"] = model.IsPhoneSelected;
+                Session["phoneId"] = model.PhoneId;
 
+                if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    
                     if (model.IsPasswordSelected)
                     {
                         return RedirectToAction("ChangePassword", "Manage");
                     }
-                    else if (model.IsPhoneSelected)
-                    {
-                        return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
-                    }
 
                     return RedirectToAction("VerifyAuthenticator", "Manage");
                 }
+               else if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollmentData)
+                {
+                    return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
+                } 
 
                 return View("SelectAuthenticator", model);
             }
