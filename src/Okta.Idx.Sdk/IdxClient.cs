@@ -440,7 +440,7 @@ namespace Okta.Idx.Sdk
                                         .Recover
                                         .ProceedAsync(recoveryRequest, cancellationToken);
 
-            var recoveryrecoveryAuthenticators = recoveryResponse
+            var recoveryAuthenticators = recoveryResponse
                 .Authenticators
                 .Value;
 
