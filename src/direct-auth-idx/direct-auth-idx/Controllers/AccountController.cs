@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using direct_auth_idx.Models;
-using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 using Okta.Sdk.Abstractions;
@@ -54,31 +52,21 @@ namespace direct_auth_idx.Controllers
             {
                 var authnResponse = await idxAuthClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
 
-                if (authnResponse != null && authnResponse.AuthenticationStatus == AuthenticationStatus.Success)
+                switch (authnResponse?.AuthenticationStatus)
                 {
-                    var identity = new ClaimsIdentity(
-                        new[] { new Claim(ClaimTypes.Name, model.UserName),
-                                new Claim("access_token", authnResponse.TokenInfo.AccessToken),
-                                new Claim("id_token", authnResponse.TokenInfo.IdToken),
-                                new Claim("refresh_token", authnResponse.TokenInfo.RefreshToken ?? string.Empty),
-                                },
-                        DefaultAuthenticationTypes.ApplicationCookie);
+                    case AuthenticationStatus.Success:
+                            ClaimsIdentity identity = Helpers.IdentityFromAuthResponse(model.UserName, authnResponse);
+                            _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, identity);
+                            return RedirectToAction("Index", "Home");
 
-                    _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, identity);
+                    case AuthenticationStatus.PasswordExpired:
+                        // Redirect to ChangePassword
+                        Session["idxContext"] = authnResponse.IdxContext;
+                        return RedirectToAction("ChangePassword", "Manage");
 
-                    return RedirectToAction("Index", "Home");
-                }
-                else if (authnResponse != null && authnResponse.AuthenticationStatus == AuthenticationStatus.PasswordExpired)
-                {
-                    // Redirect to ChangePassword
-                    Session["idxContext"] = authnResponse.IdxContext;
-
-                    return RedirectToAction("ChangePassword", "Manage");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, $"Invalid login attempt:");
-                    return View("Login", model);
+                    default:
+                        ModelState.AddModelError(string.Empty, $"Invalid login attempt:");
+                        return View("Login", model);
                 }
             }
             catch (OktaException exception)
@@ -86,6 +74,7 @@ namespace direct_auth_idx.Controllers
                 ModelState.AddModelError(string.Empty, $"Invalid login attempt: {exception.Message}");
                 return View("Login", model);
             }
+
         }
 
         [HttpPost]
@@ -142,6 +131,109 @@ namespace direct_auth_idx.Controllers
             {
                 ModelState.AddModelError(string.Empty, $"Oops! Something went wrong: {exception.Message}");
                 return View("Register", model);
+            }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public ActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ForgotPasswordAsync(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("ForgotPassword", model);
+            }
+
+            var idxAuthClient = new IdxClient(null);
+
+            var recoverPasswordOptions = new RecoverPasswordOptions
+            {
+                Username = model.UserName,
+            };
+
+            try
+            {
+                var authnResponse = await idxAuthClient.RecoverPasswordAsync(recoverPasswordOptions);
+
+                if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
+                {
+                    Session["idxContext"] = authnResponse.IdxContext;
+                    Session["PasswordRecoverUserName"] = model.UserName;
+                    TempData["authenticators"] = authnResponse.Authenticators;
+                    return RedirectToAction("SelectRecoveryAuthenticator", "Account");
+                }
+
+                if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    Session["idxContext"] = authnResponse.IdxContext;
+                    return RedirectToAction("VerifyAuthenticator", "Manage");
+                }
+
+                return View("ForgotPassword", model);
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return View("ForgotPassword", model);
+            }
+        }
+
+        public ActionResult SelectRecoveryAuthenticator()
+        {
+            var authenticators = (IList<IAuthenticator>)TempData["authenticators"];
+            var viewModel = new SelectRecoveryAuthenticatorViewModel
+            {
+                Authenticators = authenticators?
+                                 .Select(x =>
+                                            new AuthenticatorViewModel
+                                            {
+                                                Id = x.Id,
+                                                Name = x.DisplayName
+                                            })
+                                .ToList() ?? new List<AuthenticatorViewModel>()
+            };
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SelectRecoveryAuthenticatorAsync(SelectRecoveryAuthenticatorViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("ForgotPassword", new ForgotPasswordViewModel());
+            }
+
+            try
+            {
+                var idxAuthClient = new IdxClient(null);
+                var applyAuthenticatorResponse = await idxAuthClient.EnrollRecoveryAuthenticatorAsync(
+                                                                                    new EnrollAuthenticatorOptions { AuthenticatorId = model.AuthenticatorId },
+                                                                                    (IIdxContext)Session["IdxContext"]);
+
+                Session["IdxContext"] = applyAuthenticatorResponse.IdxContext;
+                Session["isPasswordSelected"] = false;
+
+                if (applyAuthenticatorResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    return RedirectToAction("VerifyAuthenticator", "Manage");
+                }
+
+                return View("SelectAuthenticator", model);
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return RedirectToAction("ForgotPassword", model);
             }
         }
 
