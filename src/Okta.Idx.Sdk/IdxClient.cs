@@ -478,7 +478,7 @@ namespace Okta.Idx.Sdk
 
             if (recoveryAuthenticator == null)
             {
-                throw new OktaException($"Authenticator not found.");
+                throw new OktaException($"Authenticator not found. Verify that you have the selected authenticator enabled for your application.");
             }
 
             var selectAuthenticatorRequest = new IdxRequestPayload
