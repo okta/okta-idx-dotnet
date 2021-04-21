@@ -448,7 +448,7 @@ namespace Okta.Idx.Sdk
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                Authenticators = recoveryrecoveryAuthenticators,
+                Authenticators = recoveryAuthenticators,
             };
 
         }
