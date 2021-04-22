@@ -274,7 +274,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Helpers.cs" />
+    <Compile Include="AuthenticationHelper.cs" />
     <Compile Include="Models\AuthenticationService.cs" />
     <Compile Include="Models\AuthenticatorViewModel.cs" />
     <Compile Include="Models\BaseViewModel.cs" />

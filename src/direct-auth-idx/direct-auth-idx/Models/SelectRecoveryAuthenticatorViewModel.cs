@@ -8,6 +8,7 @@ namespace direct_auth_idx.Models
         [Required]
         [Display(Name = "Authenticator ID")]
         public string AuthenticatorId { get; set; }
+
         public IList<AuthenticatorViewModel> Authenticators { get; set; }
 
     }

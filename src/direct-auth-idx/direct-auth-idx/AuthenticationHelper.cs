@@ -4,9 +4,9 @@ using System.Security.Claims;
 
 namespace direct_auth_idx
 {
-    public static class Helpers
+    public static class AuthenticationHelper
     {
-        public static ClaimsIdentity IdentityFromAuthResponse(string userName, AuthenticationResponse authnResponse) =>
+        public static ClaimsIdentity GetIdentityFromAuthResponse(string userName, AuthenticationResponse authnResponse) =>
                       new ClaimsIdentity(
                             new[]
                                 {

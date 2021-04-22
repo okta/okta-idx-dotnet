@@ -41,12 +41,13 @@ namespace direct_auth_idx.Controllers
             // WIP
             var idxAuthClient = new IdxClient(null);
 
-
             var authnOptions = new Okta.Idx.Sdk.AuthenticationOptions()
             {
                 Username = model.UserName,
                 Password = model.Password,
             };
+
+            Session["UserName"] = model.UserName;
 
             try
             {
@@ -55,7 +56,7 @@ namespace direct_auth_idx.Controllers
                 switch (authnResponse?.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
-                            ClaimsIdentity identity = Helpers.IdentityFromAuthResponse(model.UserName, authnResponse);
+                            ClaimsIdentity identity = AuthenticationHelper.GetIdentityFromAuthResponse(model.UserName, authnResponse);
                             _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, identity);
                             return RedirectToAction("Index", "Home");
 
@@ -166,7 +167,7 @@ namespace direct_auth_idx.Controllers
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
                 {
                     Session["idxContext"] = authnResponse.IdxContext;
-                    Session["PasswordRecoverUserName"] = model.UserName;
+                    Session["UserName"] = model.UserName;
                     TempData["authenticators"] = authnResponse.Authenticators;
                     return RedirectToAction("SelectRecoveryAuthenticator", "Account");
                 }

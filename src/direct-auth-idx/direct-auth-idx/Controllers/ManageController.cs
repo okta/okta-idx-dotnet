@@ -56,15 +56,15 @@ namespace direct_auth_idx.Controllers
                 switch (authnResponse.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
-                        var userName = (string)Session["PasswordRecoverUserName"];
+                        var userName = (string)Session["UserName"];
                         if (string.IsNullOrEmpty(userName))
                         {
                             return RedirectToAction("Login", "Account");
                         }
                         else
                         {
-                            Session["PasswordRecoverUserName"] = null;
-                            var identity = Helpers.IdentityFromAuthResponse(userName, authnResponse);
+                            Session["UserName"] = null;
+                            var identity = AuthenticationHelper.GetIdentityFromAuthResponse(userName, authnResponse);
                             _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                             return RedirectToAction("Index", "Home");
                         }
@@ -127,7 +127,10 @@ namespace direct_auth_idx.Controllers
                         return RedirectToAction("selectAuthenticator", "Manage");
 
                     case AuthenticationStatus.Success:
-                        return RedirectToAction("Login", "Account");
+                        var userName = (string)Session["UserName"] ?? string.Empty;
+                        var identity = AuthenticationHelper.GetIdentityFromAuthResponse(userName, authnResponse);
+                        _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                        return RedirectToAction("Index", "Home");
                 }
 
                 return View(view, model);
