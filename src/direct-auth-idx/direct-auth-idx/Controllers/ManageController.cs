@@ -1,4 +1,5 @@
 ﻿using direct_auth_idx.Models;
+using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 using Okta.Sdk.Abstractions;
 using System;
@@ -12,6 +13,13 @@ namespace direct_auth_idx.Controllers
 {
     public class ManageController : Controller
     {
+        private readonly IAuthenticationManager _authenticationManager;
+
+        public ManageController(IAuthenticationManager authenticationManager)
+        {
+            _authenticationManager = authenticationManager;
+        }
+
         // GET: /Manage/ChangePassword
         public ActionResult ChangePassword()
         {
@@ -158,7 +166,10 @@ namespace direct_auth_idx.Controllers
                 }
                 else if (authnResponse.AuthenticationStatus == AuthenticationStatus.Success)
                 {
-                    return RedirectToAction("Login", "Account");
+                    var identity = AuthenticationService.BuildClaimsIdentity(authnResponse.TokenInfo);
+                    _authenticationManager.SignIn(identity);
+
+                    return RedirectToAction("Index", "Home");
                 }
 
                 return View(view, model);

@@ -358,9 +358,47 @@ namespace Okta.Idx.Sdk
             else
             {
                 // We expect remediation has credentials now
-                if (!IsRemediationRequireCredentials(RemediationType.ChallengeAuthenticator, identifyResponse))
+                if (!IsRemediationRequireCredentials(RemediationType.ChallengeAuthenticator, identifyResponse)
+                    && !IsRemediationsContainsRemediation(RemediationType.SelectAuthenticatorAuthenticate, identifyResponse))
                 {
-                    throw new UnexpectedRemediationException(RemediationType.ChallengeAuthenticator, identifyResponse);
+                    throw new UnexpectedRemediationException(
+                        new List<string>
+                        {
+                            RemediationType.ChallengeAuthenticator,
+                            RemediationType.SelectAuthenticatorAuthenticate,
+                        }, identifyResponse);
+                }
+
+                var sendPasswordResponse = identifyResponse;
+
+                if (IsRemediationsContainsRemediation(RemediationType.SelectAuthenticatorAuthenticate, identifyResponse))
+                {
+                    var passwordAuthenticator = identifyResponse
+                                                 .Authenticators
+                                                 .Value
+                                                 .FirstOrDefault(x => x.Key == AuthenticatorType.Password.ToIdxKeyString());
+
+                    if (passwordAuthenticator == null)
+                    {
+                        throw new OktaException("Password is not available for authentication. Please review your policies.");
+                    }
+
+                    var selectAuthenticatorRequest = new IdxRequestPayload();
+                    selectAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+                    selectAuthenticatorRequest.SetProperty(
+                        "authenticator",
+                        new
+                        {
+                            id = passwordAuthenticator.Id,
+                        });
+
+                    var selectAuthenticatorResponse = await identifyResponse
+                                                  .Remediation
+                                                  .RemediationOptions
+                                                  .FirstOrDefault(x => x.Name == RemediationType.SelectAuthenticatorAuthenticate)
+                                                  .ProceedAsync(selectAuthenticatorRequest, cancellationToken);
+
+                    sendPasswordResponse = selectAuthenticatorResponse;
                 }
 
                 var challengeRequest = new IdxRequestPayload();
@@ -370,7 +408,7 @@ namespace Okta.Idx.Sdk
                     passcode = authenticationOptions.Password,
                 });
 
-                var challengeResponse = await identifyResponse
+                var challengeResponse = await sendPasswordResponse
                                               .Remediation
                                               .RemediationOptions
                                               .FirstOrDefault(x => x.Name == RemediationType.ChallengeAuthenticator)

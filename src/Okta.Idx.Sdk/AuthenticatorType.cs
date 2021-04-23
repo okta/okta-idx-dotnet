@@ -19,5 +19,10 @@ namespace Okta.Idx.Sdk
         /// SMS
         /// </summary>
         Sms,
+
+        /// <summary>
+        /// Password
+        /// </summary>
+        Password,
     }
 }
