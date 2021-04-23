@@ -1,18 +1,18 @@
-﻿using direct_auth_idx.Models;
-using Microsoft.Owin.Security;
+﻿using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 using Okta.Sdk.Abstractions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
+using direct_auth_idx.Models;
+using Microsoft.Owin.Security;
 
 namespace direct_auth_idx.Controllers
 {
     public class ManageController : Controller
     {
+
         private readonly IAuthenticationManager _authenticationManager;
 
         public ManageController(IAuthenticationManager authenticationManager)
@@ -54,17 +54,27 @@ namespace direct_auth_idx.Controllers
             {
                 var authnResponse = await idxAuthClient.ChangePasswordAsync(changePasswordOptions, (IIdxContext)Session["idxContext"]).ConfigureAwait(false);
 
-                if (authnResponse.AuthenticationStatus == AuthenticationStatus.Success)
+                switch (authnResponse.AuthenticationStatus)
                 {
-                    return RedirectToAction("Login", "Account");
+                    case AuthenticationStatus.Success:
+                        var userName = (string)Session["UserName"];
+                        if (string.IsNullOrEmpty(userName))
+                        {
+                            return RedirectToAction("Login", "Account");
+                        }
+                        else
+                        {
+                            Session["UserName"] = null;
+                            var identity = AuthenticationHelper.GetIdentityFromAuthResponse(userName, authnResponse);
+                            _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                            return RedirectToAction("Index", "Home");
+                        }
+            
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["idxContext"] = authnResponse.IdxContext;
+                        TempData["authenticators"] = authnResponse.Authenticators;
+                        return RedirectToAction("selectAuthenticator", "Manage");
                 }
-                else if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
-                {
-                    Session["idxContext"] = authnResponse.IdxContext;
-                    TempData["authenticators"] = authnResponse.Authenticators;
-                    return RedirectToAction("selectAuthenticator", "Manage");
-                }
-
 
                 return View("ChangePassword", model);
             }
@@ -77,52 +87,6 @@ namespace direct_auth_idx.Controllers
             {
                 ModelState.AddModelError("Oops! Something went wrong.", exception.Message);
                 return View("ChangePassword", model);
-            }
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public ActionResult ForgotPassword()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ForgotPasswordAsync(ForgotPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View("ForgotPassword", model);
-            }
-
-            // WIP
-            var idxAuthClient = new IdxClient(null);
-
-            var recoverPasswordOptions = new RecoverPasswordOptions
-            {
-                AuthenticatorType = model.AuthenticatorType,
-                Username = model.UserName,
-            };
-
-            try
-            {
-                var authnResponse = await idxAuthClient.RecoverPasswordAsync(recoverPasswordOptions);
-                 
-                if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
-                {
-                    Session["idxContext"] = authnResponse.IdxContext;
-                    return RedirectToAction("VerifyAuthenticator", "Manage");
-                }
-
-                return View("ForgotPassword", model);
-            }
-            catch (OktaException exception)
-            {
-                ModelState.AddModelError(string.Empty, exception.Message);
-                return View("ForgotPassword", model);
             }
         }
 
@@ -151,27 +115,25 @@ namespace direct_auth_idx.Controllers
             {
                 var authnResponse = await idxAuthClient.VerifyAuthenticatorAsync(verifyAuthenticatorOptions, (IIdxContext)Session["idxContext"]);
 
-                if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingPasswordReset)
+                switch (authnResponse.AuthenticationStatus)
                 {
-                    // TODO: Force authentication and redirect to home page
-                    Session["idxContext"] = authnResponse.IdxContext;
+                    case AuthenticationStatus.AwaitingPasswordReset:
+                        // TODO: Force authentication and redirect to home page
+                        Session["idxContext"] = authnResponse.IdxContext;
+                        return RedirectToAction("ChangePassword", "Manage");
 
-                    return RedirectToAction("ChangePassword", "Manage");
-                }
-                else if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
-                {
-                    Session["idxContext"] = authnResponse.IdxContext;
-                    TempData["authenticators"] = authnResponse.Authenticators;
-                    return RedirectToAction("selectAuthenticator", "Manage");
-                }
-                else if (authnResponse.AuthenticationStatus == AuthenticationStatus.Success)
-                {
-                    var identity = AuthenticationService.BuildClaimsIdentity(authnResponse.TokenInfo);
-                    _authenticationManager.SignIn(identity);
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["idxContext"] = authnResponse.IdxContext;
+                        TempData["authenticators"] = authnResponse.Authenticators;
+                        return RedirectToAction("selectAuthenticator", "Manage");
 
-                    return RedirectToAction("Index", "Home");
+                    case AuthenticationStatus.Success:
+                        var userName = (string)Session["UserName"] ?? string.Empty;
+                        var identity = AuthenticationHelper.GetIdentityFromAuthResponse(userName, authnResponse);
+                        _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                        return RedirectToAction("Index", "Home");
                 }
-
+                
                 return View(view, model);
             }
             catch (OktaException exception)
@@ -274,7 +236,7 @@ namespace direct_auth_idx.Controllers
                     AuthenticatorId = model.AuthenticatorId,
                 };
 
-               var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+                var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
 
                 Session["IdxContext"] = enrollResponse.IdxContext;
                 Session["isPasswordSelected"] = model.IsPasswordSelected;
@@ -304,5 +266,6 @@ namespace direct_auth_idx.Controllers
                 return RedirectToAction("SelectAuthenticator", model);
             }
         }
+
     }
 }

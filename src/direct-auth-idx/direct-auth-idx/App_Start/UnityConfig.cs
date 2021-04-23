@@ -22,8 +22,6 @@ namespace direct_auth_idx
             container.RegisterType<IAuthenticationManager>(new InjectionFactory(o => HttpContext.Current.GetOwinContext().Authentication));
 
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));
-
-            DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }
     }
 }

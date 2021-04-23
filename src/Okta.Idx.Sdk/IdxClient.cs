@@ -513,7 +513,7 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default) 
+        public async Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default)
         {
             var idxContext = await InteractAsync(cancellationToken: cancellationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
@@ -530,9 +530,11 @@ namespace Okta.Idx.Sdk
                                         .FirstOrDefault(x => x.Name == RemediationType.Identify)
                                         .ProceedAsync(identifyRequest, cancellationToken);
 
-            // Proceed with recovery
-            var recoveryRequest = new IdxRequestPayload();
-            recoveryRequest.StateHandle = identifyResponse.StateHandle;
+            // Get available authenticators
+            var recoveryRequest = new IdxRequestPayload
+            {
+                StateHandle = identifyResponse.StateHandle,
+            };
 
             var recoveryResponse = await identifyResponse
                                         .CurrentAuthenticatorEnrollment
@@ -540,30 +542,62 @@ namespace Okta.Idx.Sdk
                                         .Recover
                                         .ProceedAsync(recoveryRequest, cancellationToken);
 
+            var recoveryAuthenticators = recoveryResponse
+                .Authenticators
+                .Value;
+
+            return new AuthenticationResponse
+            {
+                IdxContext = idxContext,
+                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                Authenticators = recoveryAuthenticators,
+            };
+
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> EnrollRecoveryAuthenticatorAsync(EnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            var recoveryRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            var recoveryResponse = await introspectResponse
+                                        .CurrentAuthenticatorEnrollment
+                                        .Value
+                                        .Recover
+                                        .ProceedAsync(recoveryRequest, cancellationToken);
+
             var recoveryAuthenticator = recoveryResponse
-               .Authenticators
-               .Value
-               .Where(x => x.Key == recoverPasswordOptions.AuthenticatorType.ToIdxKeyString())
-               .FirstOrDefault();
+                                           .Authenticators
+                                           .Value
+                                           .Where(x => x.Id == enrollAuthenticatorOptions.AuthenticatorId)
+                                           .FirstOrDefault();
 
             if (recoveryAuthenticator == null)
             {
-                throw new OktaException($"Authenticator not found. Verify that you have {Enum.GetName(typeof(AuthenticatorType), recoverPasswordOptions.AuthenticatorType)} enabled for your app.");
+                throw new OktaException($"Authenticator not found. Verify that you have the selected authenticator enabled for your application.");
             }
 
-            // Send code
-            var selectAuthenticatorRequest = new IdxRequestPayload();
-            selectAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+            var selectAuthenticatorRequest = new IdxRequestPayload
+            {
+                StateHandle = recoveryResponse.StateHandle,
+            };
+
             selectAuthenticatorRequest.SetProperty("authenticator", new
             {
                 id = recoveryAuthenticator.Id,
             });
 
             var selectRecoveryAuthenticatorRemediationOption = await recoveryResponse
-                                                            .Remediation
-                                                            .RemediationOptions
-                                                            .FirstOrDefault(x => x.Name == RemediationType.SelectAuthenticatorAuthenticate)
-                                                            .ProceedAsync(selectAuthenticatorRequest, cancellationToken);
+                                                                        .Remediation
+                                                                        .RemediationOptions
+                                                                        .FirstOrDefault(x => x.Name == RemediationType.SelectAuthenticatorAuthenticate)
+                                                                        .ProceedAsync(selectAuthenticatorRequest, cancellationToken);
 
             if (!selectRecoveryAuthenticatorRemediationOption
                 .Remediation.RemediationOptions

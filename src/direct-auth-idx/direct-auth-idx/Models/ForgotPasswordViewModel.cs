@@ -13,9 +13,5 @@ namespace direct_auth_idx.Models
         [Required]
         [Display(Name = "Username")]
         public string UserName { get; set; }
-
-        [Required]
-        [Display(Name = "Authenticator Type")]
-        public AuthenticatorType AuthenticatorType { get; set; }
-     }
+    }
 }

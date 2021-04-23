@@ -82,6 +82,15 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Starts the password recovery process with the recovery authenticator.
+        /// </summary>
+        /// <param name="enrollAuthenticatorOptions">The options to choose authenticator</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> EnrollRecoveryAuthenticatorAsync(EnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Trigger the phone authenticator enrollment flow.
         /// </summary>
         /// <param name="enrollAuthenticatorOptions">The options for phone enrollment.</param>
