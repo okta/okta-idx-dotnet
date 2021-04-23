@@ -16,7 +16,7 @@ namespace Okta.Idx.Sdk
         public string Username { get; set; }
 
         /// <summary>
-        /// Gets or sets the password.
+        /// Gets or sets the password. Optional.
         /// </summary>
         public string Password { get; set; }
     }

@@ -43,5 +43,10 @@ namespace Okta.Idx.Sdk
         /// Waiting for authenticator enrollment data
         /// </summary>
         AwaitingAuthenticatorEnrollmentData,
+
+        /// <summary>
+        /// Waiting for an authenticator to continue with the authentication process.
+        /// </summary>
+        AwaitingAuthenticatorSelection,
     }
 }
