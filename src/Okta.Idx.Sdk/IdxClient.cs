@@ -380,8 +380,11 @@ namespace Okta.Idx.Sdk
                 }
             }
 
-            var resetAuthenticatorRequest = new IdxRequestPayload();
-            resetAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
+            var resetAuthenticatorRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
             resetAuthenticatorRequest.SetProperty("credentials", new
             {
                 passcode = changePasswordOptions.NewPassword,
@@ -447,14 +450,13 @@ namespace Okta.Idx.Sdk
             return new AuthenticationResponse
             {
                 IdxContext = idxContext,
-                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorSelection,
                 Authenticators = recoveryAuthenticators,
             };
-
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> EnrollRecoveryAuthenticatorAsync(EnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        public async Task<AuthenticationResponse> SelectRecoveryAuthenticatorAsync(SelectAuthenticatorOptions selectAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
@@ -473,7 +475,7 @@ namespace Okta.Idx.Sdk
             var recoveryAuthenticator = recoveryResponse
                                            .Authenticators
                                            .Value
-                                           .Where(x => x.Id == enrollAuthenticatorOptions.AuthenticatorId)
+                                           .Where(x => x.Id == selectAuthenticatorOptions.AuthenticatorId)
                                            .FirstOrDefault();
 
             if (recoveryAuthenticator == null)

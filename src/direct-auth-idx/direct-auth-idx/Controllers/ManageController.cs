@@ -74,12 +74,12 @@ namespace direct_auth_idx.Controllers
                         TempData["authenticators"] = authnResponse.Authenticators;
                         return RedirectToAction("selectAuthenticator", "Manage");
                 }
-
                 return View("ChangePassword", model);
             }
             catch (OktaApiException exception)
             {
-                ModelState.AddModelError("Oops! Something went wrong.", exception.ErrorSummary);
+                ModelState.AddModelError("Oops! Something went wrong.", exception.ErrorSummary 
+                                         ?? "Cannot change password. Check if the new password meets the requirements.");
                 return View("ChangePassword", model);
             }
             catch (OktaException exception)
