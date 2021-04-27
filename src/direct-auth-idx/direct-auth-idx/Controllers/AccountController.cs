@@ -165,7 +165,7 @@ namespace direct_auth_idx.Controllers
             {
                 var authnResponse = await idxAuthClient.RecoverPasswordAsync(recoverPasswordOptions);
 
-                if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
+                if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorSelection)
                 {
                     Session["idxContext"] = authnResponse.IdxContext;
                     Session["UserName"] = model.UserName;
@@ -218,8 +218,8 @@ namespace direct_auth_idx.Controllers
             try
             {
                 var idxAuthClient = new IdxClient(null);
-                var applyAuthenticatorResponse = await idxAuthClient.EnrollRecoveryAuthenticatorAsync(
-                                                                                    new EnrollAuthenticatorOptions { AuthenticatorId = model.AuthenticatorId },
+                var applyAuthenticatorResponse = await idxAuthClient.SelectRecoveryAuthenticatorAsync(
+                                                                                    new SelectAuthenticatorOptions { AuthenticatorId = model.AuthenticatorId },
                                                                                     (IIdxContext)Session["IdxContext"]);
 
                 Session["IdxContext"] = applyAuthenticatorResponse.IdxContext;
