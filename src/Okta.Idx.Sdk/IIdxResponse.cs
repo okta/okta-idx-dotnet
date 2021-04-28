@@ -64,6 +64,11 @@ namespace Okta.Idx.Sdk
         IAuthenticators Authenticators { get;  }
 
         /// <summary>
+        /// Gets the user's authenticator enrollments
+        /// </summary>
+        IAuthenticatorEnrollments AuthenticatorEnrollments { get; }
+
+        /// <summary>
         /// Gets a value indicating whether login was successful
         /// </summary>
         bool IsLoginSuccess { get; }
