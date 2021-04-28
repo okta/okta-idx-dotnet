@@ -110,6 +110,7 @@ namespace direct_auth_idx.Controllers
             {
                 // WIP
                 var idxAuthClient = new IdxClient(null);
+                Session["UserName"] = model.Email;
 
                 var userProfile = new UserProfile();
                 userProfile.SetProperty("firstName", model.FirstName);

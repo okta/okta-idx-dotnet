@@ -1,4 +1,5 @@
-﻿using Okta.Idx.Sdk;
+﻿using Microsoft.Owin.Security;
+using Okta.Idx.Sdk;
 using Okta.Sdk.Abstractions;
 using System.Collections.Generic;
 using System.Linq;
@@ -132,7 +133,7 @@ namespace direct_auth_idx.Controllers
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         return RedirectToAction("Index", "Home");
                 }
-
+                
                 return View(view, model);
             }
             catch (OktaException exception)
@@ -150,6 +151,51 @@ namespace direct_auth_idx.Controllers
             return await VerifyAuthenticatorAsync(model.Code, "VerifyAuthenticator", model);
         }
 
+        public async Task<ActionResult> EnrollPhoneAuthenticatorAsync(EnrollPhoneViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("EnrollPhoneAuthenticator", model);
+            }
+
+            try
+            {
+                // WIP
+                var idxAuthClient = new IdxClient(null);
+
+                var enrollPhoneAuthenticatorOptions = new EnrollPhoneAuthenticatorOptions
+                {
+                    AuthenticatorId = Session["phoneId"].ToString(),
+                    PhoneNumber = model.PhoneNumber,
+                    
+                };
+
+                var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+
+                if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    // TODO: clean session.
+                    Session["IdxContext"] = enrollResponse.IdxContext;
+                    
+                    return RedirectToAction("VerifyAuthenticator", "Manage");
+                }
+
+                return View("EnrollPhoneAuthenticator", model);
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return RedirectToAction("EnrollPhoneAuthenticator", model);
+            }
+        }
+
+        public ActionResult EnrollPhoneAuthenticator()
+        {
+            return View();
+        }
+
+
+
         public ActionResult SelectAuthenticator()
         {
             var authenticators = (IList<IAuthenticator>)TempData["authenticators"];
@@ -165,6 +211,8 @@ namespace direct_auth_idx.Controllers
                                         .ToList() ?? new List<AuthenticatorViewModel>();
 
             viewModel.PasswordId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.Id;
+            viewModel.PhoneId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.Id;
+
             return View(viewModel);
         }
 
@@ -190,12 +238,14 @@ namespace direct_auth_idx.Controllers
 
                 var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
 
+                Session["IdxContext"] = enrollResponse.IdxContext;
+                Session["isPasswordSelected"] = model.IsPasswordSelected;
+                Session["isPhoneSelected"] = model.IsPhoneSelected;
+                Session["phoneId"] = model.PhoneId;
+
                 if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
                 {
-                    // TODO: clean session.
-                    Session["IdxContext"] = enrollResponse.IdxContext;
-                    Session["isPasswordSelected"] = model.IsPasswordSelected;
-
+                    
                     if (model.IsPasswordSelected)
                     {
                         return RedirectToAction("ChangePassword", "Manage");
@@ -203,6 +253,10 @@ namespace direct_auth_idx.Controllers
 
                     return RedirectToAction("VerifyAuthenticator", "Manage");
                 }
+               else if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollmentData)
+                {
+                    return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
+                } 
 
                 return View("SelectAuthenticator", model);
             }

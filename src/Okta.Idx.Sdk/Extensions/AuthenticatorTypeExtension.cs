@@ -17,6 +17,9 @@ namespace Okta.Idx.Sdk
                 case AuthenticatorType.Sms:
                     return "okta_sms";
                     break;
+                case AuthenticatorType.Password:
+                    return "okta_password";
+                    break;
                 default:
                     return string.Empty;
             }

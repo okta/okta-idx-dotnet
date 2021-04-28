@@ -244,11 +244,63 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
+            var isPasswordFlow = !string.IsNullOrEmpty(authenticationOptions.Password);
+
+            if (isPasswordFlow)
+            {
+                return await AuthenticateWithPasswordAsync(authenticationOptions, cancellationToken);
+            }
+
+            // assume users will log in with the authenticator they want
+
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            // Common request payload
+            var identifyRequest = new IdxRequestPayload();
+            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            identifyRequest.SetProperty("identifier", authenticationOptions.Username);
+
+            // TODO: Verify this flow doesn't require credentials right away
+            var identifyResponse = await introspectResponse
+                                            .Remediation
+                                            .RemediationOptions
+                                            .FirstOrDefault(x => x.Name == RemediationType.Identify)
+                                            .ProceedAsync(identifyRequest, cancellationToken);
+
+            if (IsRemediationsContainsRemediation(RemediationType.SelectAuthenticatorAuthenticate, identifyResponse))
+            {
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorSelection,
+                    Authenticators = identifyResponse.Authenticators.Value,
+                };
+            }
+            else if (IsRemediationsContainsRemediation(RemediationType.ChallengeAuthenticator, identifyResponse))
+            {
+                throw new NotSupportedException("Challenge 2FA");
+            }
+            // TODO: Enroll might be a possible new branch here
+            else
+            {
+                throw new UnexpectedRemediationException(
+                        new List<string>
+                        {
+                            RemediationType.SelectAuthenticatorAuthenticate,
+                            RemediationType.ChallengeAuthenticator,
+                        },
+                        introspectResponse);
+            }
+        }
+
+        private async Task<AuthenticationResponse> AuthenticateWithPasswordAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
+        {
             var idxContext = await InteractAsync(cancellationToken: cancellationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Check if identify flow include credentials
             var isIdentifyInOneStep = IsRemediationRequireCredentials(RemediationType.Identify, introspectResponse);
+            var isPasswordFlow = string.IsNullOrEmpty(authenticationOptions.Password);
 
             // Common request payload
             var identifyRequest = new IdxRequestPayload();
@@ -283,6 +335,12 @@ namespace Okta.Idx.Sdk
                             IdxContext = idxContext,
                         };
                     }
+                    // TODO: It needs test when enabling 2FA
+                    else if (IsRemediationsContainsRemediation(RemediationType.ChallengeAuthenticator, identifyResponse))
+                    {
+                        //TODO
+                        throw new NotSupportedException("Challenge 2FA");
+                    }
                     else
                     {
                         throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, identifyResponse);
@@ -300,9 +358,47 @@ namespace Okta.Idx.Sdk
             else
             {
                 // We expect remediation has credentials now
-                if (!IsRemediationRequireCredentials(RemediationType.ChallengeAuthenticator, identifyResponse))
+                if (!IsRemediationRequireCredentials(RemediationType.ChallengeAuthenticator, identifyResponse)
+                    && !IsRemediationsContainsRemediation(RemediationType.SelectAuthenticatorAuthenticate, identifyResponse))
                 {
-                    throw new UnexpectedRemediationException(RemediationType.ChallengeAuthenticator, identifyResponse);
+                    throw new UnexpectedRemediationException(
+                        new List<string>
+                        {
+                            RemediationType.ChallengeAuthenticator,
+                            RemediationType.SelectAuthenticatorAuthenticate,
+                        }, identifyResponse);
+                }
+
+                var sendPasswordResponse = identifyResponse;
+
+                if (IsRemediationsContainsRemediation(RemediationType.SelectAuthenticatorAuthenticate, identifyResponse))
+                {
+                    var passwordAuthenticator = identifyResponse
+                                                 .Authenticators
+                                                 .Value
+                                                 .FirstOrDefault(x => x.Key == AuthenticatorType.Password.ToIdxKeyString());
+
+                    if (passwordAuthenticator == null)
+                    {
+                        throw new OktaException("Password is not available for authentication. Please review your policies.");
+                    }
+
+                    var selectAuthenticatorRequest = new IdxRequestPayload();
+                    selectAuthenticatorRequest.StateHandle = identifyResponse.StateHandle;
+                    selectAuthenticatorRequest.SetProperty(
+                        "authenticator",
+                        new
+                        {
+                            id = passwordAuthenticator.Id,
+                        });
+
+                    var selectAuthenticatorResponse = await identifyResponse
+                                                  .Remediation
+                                                  .RemediationOptions
+                                                  .FirstOrDefault(x => x.Name == RemediationType.SelectAuthenticatorAuthenticate)
+                                                  .ProceedAsync(selectAuthenticatorRequest, cancellationToken);
+
+                    sendPasswordResponse = selectAuthenticatorResponse;
                 }
 
                 var challengeRequest = new IdxRequestPayload();
@@ -312,7 +408,7 @@ namespace Okta.Idx.Sdk
                     passcode = authenticationOptions.Password,
                 });
 
-                var challengeResponse = await identifyResponse
+                var challengeResponse = await sendPasswordResponse
                                               .Remediation
                                               .RemediationOptions
                                               .FirstOrDefault(x => x.Name == RemediationType.ChallengeAuthenticator)
@@ -328,6 +424,12 @@ namespace Okta.Idx.Sdk
                             AuthenticationStatus = AuthenticationStatus.PasswordExpired,
                             IdxContext = idxContext,
                         };
+                    }
+                    // TODO: It needs test when enabling 2FA
+                    else if (IsRemediationsContainsRemediation(RemediationType.ChallengeAuthenticator, identifyResponse))
+                    {
+                        //TODO
+                        throw new NotSupportedException("Challenge 2FA");
                     }
                     else
                     {
@@ -712,8 +814,34 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
+            var selectAuthenticatorRequest = new IdxRequestPayload();
+            selectAuthenticatorRequest.SetProperty("authenticator", new
+            {
+                id = enrollAuthenticatorOptions.AuthenticatorId,
+            });
+
+            return await EnrollAuthenticatorAsync(selectAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollPhoneAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var selectAuthenticatorRequest = new IdxRequestPayload();
+            selectAuthenticatorRequest.SetProperty("authenticator", new
+            {
+                id = enrollAuthenticatorOptions.AuthenticatorId,
+                methodType = enrollAuthenticatorOptions.MethodType.ToString().ToLower(),
+                phoneNumber = enrollAuthenticatorOptions.PhoneNumber,
+            });
+
+            return await EnrollAuthenticatorAsync(selectAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        private async Task<AuthenticationResponse> EnrollAuthenticatorAsync(IdxRequestPayload selectAuthenticatorRequest, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            selectAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
 
             var selectAuthenticatorEnrollRemediationOption = introspectResponse
                                                              .Remediation
@@ -726,27 +854,37 @@ namespace Okta.Idx.Sdk
                 throw new UnexpectedRemediationException(RemediationType.SelectAuthenticatorEnroll, introspectResponse);
             }
 
-            var selectAuthenticatorRequest = new IdxRequestPayload();
-            selectAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
-            selectAuthenticatorRequest.SetProperty("authenticator", new
-            {
-                id = enrollAuthenticatorOptions.AuthenticatorId,
-            });
-
             var selectAuthenticatorResponse = await selectAuthenticatorEnrollRemediationOption.ProceedAsync(selectAuthenticatorRequest, cancellationToken);
+            var currentRemediationType = RemediationType.Unknown;
+            var status = AuthenticationStatus.AwaitingAuthenticatorVerification;
 
-            if (!selectAuthenticatorResponse
-                .Remediation
-                .RemediationOptions
-                .Any(x => x.Name == RemediationType.EnrollAuthenticator))
+            // Check if flow is challenge authenticator or enroll authenticator, otherwise throw
+            if (selectAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.AuthenticatorEnrollmentData))
             {
-                throw new UnexpectedRemediationException(RemediationType.SelectAuthenticatorEnroll, selectAuthenticatorResponse);
+                currentRemediationType = RemediationType.AuthenticatorEnrollmentData;
+                status = AuthenticationStatus.AwaitingAuthenticatorEnrollmentData;
+            }
+            else if (selectAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.EnrollAuthenticator))
+            {
+                currentRemediationType = RemediationType.EnrollAuthenticator;
+            }
+
+            if (currentRemediationType != RemediationType.EnrollAuthenticator &&
+                    currentRemediationType != RemediationType.AuthenticatorEnrollmentData)
+            {
+                throw new UnexpectedRemediationException(
+                    new List<string>
+                    {
+                            RemediationType.AuthenticatorEnrollmentData,
+                            RemediationType.EnrollAuthenticator,
+                    },
+                    selectAuthenticatorResponse);
             }
 
             return new AuthenticationResponse
             {
                 IdxContext = idxContext,
-                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
+                AuthenticationStatus = status,
             };
         }
 
@@ -755,6 +893,15 @@ namespace Okta.Idx.Sdk
             var jToken = JToken.Parse(idxResponse.GetRaw());
 
             var credentialsObj = jToken.SelectToken($"$.remediation.value[?(@.name == '{remediationOptionName}')].value[?(@.name == 'credentials')]");
+
+            return credentialsObj != null;
+        }
+
+        private static bool IsRemediationsContainsRemediation(string remediationOptionName, IIdxResponse idxResponse)
+        {
+            var jToken = JToken.Parse(idxResponse.GetRaw());
+
+            var credentialsObj = jToken.SelectToken($"$.remediation.value[?(@.name == '{remediationOptionName}')]");
 
             return credentialsObj != null;
         }
