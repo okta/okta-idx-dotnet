@@ -455,11 +455,11 @@ namespace Okta.Idx.Sdk
             var currentRemediationType = RemediationType.Unknown;
 
             // Check if flow is password expiration or forgot password, otherwise throw
-            if (introspectResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.ReenrollAuthenticator))
+            if (introspectResponse.ContainsRemediationOption(RemediationType.ReenrollAuthenticator))
             {
                 currentRemediationType = RemediationType.ReenrollAuthenticator;
             }
-            else if (introspectResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.ResetAuthenticator))
+            else if (introspectResponse.ContainsRemediationOption(RemediationType.ResetAuthenticator))
             {
                 currentRemediationType = RemediationType.ResetAuthenticator;
             }
@@ -494,10 +494,7 @@ namespace Okta.Idx.Sdk
 
             // Reset password
             var resetPasswordResponse = await introspectResponse
-                                              .Remediation
-                                              .RemediationOptions
-                                              .FirstOrDefault(x => x.Name == currentRemediationType)
-                                              .ProceedAsync(resetAuthenticatorRequest, cancellationToken);
+                                              .ProceedWithRemediationOptionAsync(currentRemediationType, resetAuthenticatorRequest, cancellationToken);
 
             if (resetPasswordResponse.IsLoginSuccess)
             {
@@ -522,16 +519,14 @@ namespace Okta.Idx.Sdk
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Common request payload
-            var identifyRequest = new IdxRequestPayload();
-            identifyRequest.StateHandle = introspectResponse.StateHandle;
+            var identifyRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
             identifyRequest.SetProperty("identifier", recoverPasswordOptions.Username);
 
             // Send username
-            var identifyResponse = await introspectResponse
-                                        .Remediation
-                                        .RemediationOptions
-                                        .FirstOrDefault(x => x.Name == RemediationType.Identify)
-                                        .ProceedAsync(identifyRequest, cancellationToken);
+            var identifyResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.Identify, identifyRequest, cancellationToken);
 
             // Get available authenticators
             var recoveryRequest = new IdxRequestPayload
@@ -596,14 +591,9 @@ namespace Okta.Idx.Sdk
             });
 
             var selectRecoveryAuthenticatorRemediationOption = await recoveryResponse
-                                                                        .Remediation
-                                                                        .RemediationOptions
-                                                                        .FirstOrDefault(x => x.Name == RemediationType.SelectAuthenticatorAuthenticate)
-                                                                        .ProceedAsync(selectAuthenticatorRequest, cancellationToken);
+                    .ProceedWithRemediationOptionAsync(RemediationType.SelectAuthenticatorAuthenticate, selectAuthenticatorRequest, cancellationToken);
 
-            if (!selectRecoveryAuthenticatorRemediationOption
-                .Remediation.RemediationOptions
-                .Any(x => x.Name == RemediationType.ChallengeAuthenticator))
+            if (!selectRecoveryAuthenticatorRemediationOption.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
             {
                 throw new UnexpectedRemediationException(RemediationType.ChallengeAuthenticator, selectRecoveryAuthenticatorRemediationOption);
             }
@@ -623,11 +613,11 @@ namespace Okta.Idx.Sdk
             var currentRemediationType = RemediationType.Unknown;
 
             // Check if flow is challenge authenticator or enroll authenticator, otherwise throw
-            if (introspectResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.ChallengeAuthenticator))
+            if (introspectResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
             {
                 currentRemediationType = RemediationType.ChallengeAuthenticator;
             }
-            else if (introspectResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.EnrollAuthenticator))
+            else if (introspectResponse.ContainsRemediationOption(RemediationType.EnrollAuthenticator))
             {
                 currentRemediationType = RemediationType.EnrollAuthenticator;
             }
@@ -655,20 +645,20 @@ namespace Okta.Idx.Sdk
                 }
             }
 
-            var challengeAuthenticatorRequest = new IdxRequestPayload();
-            challengeAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
+            var challengeAuthenticatorRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
             challengeAuthenticatorRequest.SetProperty("credentials", new
             {
                 passcode = verifyAuthenticatorOptions.Code,
             });
 
             var challengeAuthenticatorResponse = await introspectResponse
-                                                .Remediation.RemediationOptions
-                                                .FirstOrDefault(x => x.Name == currentRemediationType)
-                                                .ProceedAsync(challengeAuthenticatorRequest, cancellationToken);
+                .ProceedWithRemediationOptionAsync(currentRemediationType, challengeAuthenticatorRequest, cancellationToken);
 
-            var isResetAuthenticator = challengeAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.ResetAuthenticator);
-            var isAuthenticatorEnroll = challengeAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.SelectAuthenticatorEnroll);
+            var isResetAuthenticator = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.ResetAuthenticator);
+            var isAuthenticatorEnroll = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll);
             // TODO: Assume default authenticators?
             //var canSkip = challengeAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.Skip);
 
@@ -737,8 +727,10 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task RevokeTokensAsync(TokenType tokenType, string token, CancellationToken cancellationToken = default)
         {
-            var payload = new Dictionary<string, string>();
-            payload.Add("client_id", Configuration.ClientId);
+            var payload = new Dictionary<string, string>
+            {
+                { "client_id", Configuration.ClientId },
+            };
 
             if (Configuration.IsConfidentialClient)
             {
@@ -748,8 +740,10 @@ namespace Okta.Idx.Sdk
             payload.Add("token_type_hint", tokenType.ToTokenHintString());
             payload.Add("token", token);
 
-            var headers = new Dictionary<string, string>();
-            headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
+            var headers = new Dictionary<string, string>
+            {
+                { "Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded },
+            };
 
             var request = new HttpRequest
             {
@@ -773,32 +767,17 @@ namespace Okta.Idx.Sdk
             };
 
             // choose enroll option
-            var selectEnrollProfileRemediationOption = introspectResponse
-                                            .Remediation
-                                            .RemediationOptions
-                                            .FirstOrDefault(x => x.Name == RemediationType.SelectEnrollProfile);
+            var enrollProfileResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.SelectEnrollProfile, enrollRequest, cancellationToken);
 
-            if (selectEnrollProfileRemediationOption == null)
+            var enrollNewProfileRequest = new IdxRequestPayload
             {
-                throw new UnexpectedRemediationException(RemediationType.SelectEnrollProfile, introspectResponse);
-            }
-
-            var enrollProfileResponse = await selectEnrollProfileRemediationOption
-                                            .ProceedAsync(enrollRequest, cancellationToken);
-
-            var enrollNewProfileRequest = new IdxRequestPayload();
-            enrollNewProfileRequest.StateHandle = enrollProfileResponse.StateHandle;
+                StateHandle = enrollProfileResponse.StateHandle,
+            };
             enrollNewProfileRequest.SetProperty("userProfile", userProfile);
 
-            var enrollNewProfileResponse = await enrollProfileResponse
-                                                .Remediation.RemediationOptions
-                                                .FirstOrDefault(x => x.Name == RemediationType.EnrollProfile)
-                                                .ProceedAsync(enrollNewProfileRequest, cancellationToken);
+            var enrollNewProfileResponse = await enrollProfileResponse.ProceedWithRemediationOptionAsync(RemediationType.EnrollProfile, enrollNewProfileRequest, cancellationToken);
 
-            if (!enrollNewProfileResponse
-                .Remediation
-                .RemediationOptions
-                .Any(x => x.Name == RemediationType.SelectAuthenticatorEnroll))
+            if (!enrollNewProfileResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
             {
                 throw new UnexpectedRemediationException(RemediationType.SelectAuthenticatorEnroll, enrollNewProfileResponse);
             }
@@ -1011,5 +990,6 @@ namespace Okta.Idx.Sdk
                     return await GetAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
             }
         }
+
     }
 }
