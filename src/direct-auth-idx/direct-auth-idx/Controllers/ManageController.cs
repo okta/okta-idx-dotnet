@@ -72,7 +72,7 @@ namespace direct_auth_idx.Controllers
             
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["idxContext"] = authnResponse.IdxContext;
-                        TempData["authenticators"] = authnResponse.Authenticators;
+                        TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         return RedirectToAction("selectAuthenticator", "Manage");
                 }
                 return View("ChangePassword", model);
@@ -124,7 +124,7 @@ namespace direct_auth_idx.Controllers
 
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["idxContext"] = authnResponse.IdxContext;
-                        TempData["authenticators"] = authnResponse.Authenticators;
+                        TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         return RedirectToAction("selectAuthenticator", "Manage");
 
                     case AuthenticationStatus.Success:
@@ -198,20 +198,10 @@ namespace direct_auth_idx.Controllers
 
         public ActionResult SelectAuthenticator()
         {
-            var authenticators = (IList<IAuthenticator>)TempData["authenticators"];
-
             var viewModel = new SelectAuthenticatorViewModel();
-            viewModel.Authenticators = authenticators?
-                                        .Select(x =>
-                                                    new AuthenticatorViewModel
-                                                    {
-                                                        Id = x.Id,
-                                                        Name = x.DisplayName
-                                                    })
-                                        .ToList() ?? new List<AuthenticatorViewModel>();
-
-            viewModel.PasswordId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.Id;
-            viewModel.PhoneId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.Id;
+            viewModel.Authenticators = (IList<AuthenticatorViewModel>)TempData["authenticators"];
+            viewModel.PasswordId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId;
+            viewModel.PhoneId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId;
 
             return View(viewModel);
         }
@@ -230,35 +220,63 @@ namespace direct_auth_idx.Controllers
             {
                 // WIP
                 var idxAuthClient = new IdxClient(null);
-
-                var enrollAuthenticatorOptions = new EnrollAuthenticatorOptions
-                {
-                    AuthenticatorId = model.AuthenticatorId,
-                };
-
-                var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
-
-                Session["IdxContext"] = enrollResponse.IdxContext;
-                Session["isPasswordSelected"] = model.IsPasswordSelected;
+                var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;
                 Session["isPhoneSelected"] = model.IsPhoneSelected;
                 Session["phoneId"] = model.PhoneId;
+                var authenticators = (IList<AuthenticatorViewModel>)TempData["authenticators"];
 
-                if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                if (isChallengeFlow)
                 {
+                    SelectAuthenticatorOptions selectChallengeAuthenticatorOptions = new SelectAuthenticatorOptions();
+                    selectChallengeAuthenticatorOptions.AuthenticatorId = model.AuthenticatorId;
                     
-                    if (model.IsPasswordSelected)
+                    if (model.IsPhoneSelected)
                     {
-                        return RedirectToAction("ChangePassword", "Manage");
+                        selectChallengeAuthenticatorOptions = new SelectPhoneAuthenticatorOptions();
+                        ((SelectPhoneAuthenticatorOptions)selectChallengeAuthenticatorOptions).EnrollmentId = authenticators
+                                                                    .FirstOrDefault(x => x.AuthenticatorId == model.AuthenticatorId)?
+                                                                    .EnrollmentId;
                     }
 
-                    return RedirectToAction("VerifyAuthenticator", "Manage");
-                }
-               else if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollmentData)
-                {
-                    return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
-                } 
+                    var selectAuthenticatorResponse = await idxAuthClient.SelectChallengeAuthenticatorAsync(selectChallengeAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
 
-                return View("SelectAuthenticator", model);
+                    //switch (selectAuthenticatorResponse?.AuthenticationStatus)
+                    //{
+                    //    case AuthenticationStatus.AwaitingChallengeAuthenticatorData:
+
+                    //}
+                    // TODO
+                    return View("SelectAuthenticator", model);
+                }
+                else
+                {
+                    var enrollAuthenticatorOptions = new EnrollAuthenticatorOptions
+                    {
+                        AuthenticatorId = model.AuthenticatorId,
+                    };
+
+                    var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+
+                    Session["IdxContext"] = enrollResponse.IdxContext;
+                    Session["isPasswordSelected"] = model.IsPasswordSelected;
+
+                    switch (enrollResponse?.AuthenticationStatus)
+                    {
+                        case AuthenticationStatus.AwaitingAuthenticatorVerification:
+                            if (model.IsPasswordSelected)
+                            {
+                                return RedirectToAction("ChangePassword", "Manage");
+                            }
+
+                            return RedirectToAction("VerifyAuthenticator", "Manage");
+
+                        case AuthenticationStatus.AwaitingAuthenticatorEnrollmentData:
+                            return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
+
+                        default:
+                            return View("SelectAuthenticator", model);
+                    }
+                }
             }
             catch (OktaException exception)
             {

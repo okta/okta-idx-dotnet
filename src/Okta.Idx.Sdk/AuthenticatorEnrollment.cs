@@ -25,5 +25,23 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public IRecover Recover => GetResourceProperty<Recover>("recover");
+
+        /// <inheritdoc/>
+        public string Profile
+        {
+            get
+            {
+                if (Key == AuthenticatorType.Phone.ToIdxKeyString())
+                {
+                    return GetStringProperty("phoneNumber");
+                }
+                else if (Key == AuthenticatorType.Email.ToIdxKeyString())
+                {
+                    return GetStringProperty("email");
+                }
+
+                return string.Empty;
+            }
+        }
     }
 }

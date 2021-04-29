@@ -286,10 +286,10 @@ namespace Okta.Idx.Sdk
                         Authenticators = identifyResponse.Authenticators.Value,
                     };
                 }
-            else if (identifyResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
-            {
-                throw new NotSupportedException("Challenge 2FA");
-            }
+            //else if (identifyResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
+            //{
+            //    throw new NotSupportedException("Challenge 2FA");
+            //}
             // TODO: Enroll might be a possible new branch here
             else
             {
@@ -297,7 +297,7 @@ namespace Okta.Idx.Sdk
                         new List<string>
                         {
                             RemediationType.SelectAuthenticatorAuthenticate,
-                            RemediationType.ChallengeAuthenticator,
+                            //RemediationType.ChallengeAuthenticator,
                             RemediationType.SelectAuthenticatorEnroll,
                         },
                         introspectResponse);
@@ -356,12 +356,15 @@ namespace Okta.Idx.Sdk
                             Authenticators = identifyResponse.Authenticators.Value,
                         };
                     }
-
-                    // TODO: It needs test when enabling 2FA
-                    else if (identifyResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
+                    else if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
                     {
-                        //TODO
-                        throw new NotSupportedException("Challenge 2FA");
+                        return new AuthenticationResponse
+                        {
+                            IdxContext = idxContext,
+                            AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
+                            AuthenticatorEnrollments = identifyResponse.AuthenticatorEnrollments.Value,
+                            Authenticators = identifyResponse.Authenticators.Value,
+                        };
                     }
                     else
                     {
@@ -369,7 +372,7 @@ namespace Okta.Idx.Sdk
                             new List<string>
                             {
                                 RemediationType.ReenrollAuthenticator,
-                                RemediationType.ChallengeAuthenticator,
+                                RemediationType.SelectAuthenticatorAuthenticate,
                                 RemediationType.SelectAuthenticatorEnroll,
                             }, identifyResponse);
                     }
@@ -472,6 +475,7 @@ namespace Okta.Idx.Sdk
                             IdxContext = idxContext,
                             AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
                             AuthenticatorEnrollments = identifyResponse.AuthenticatorEnrollments.Value,
+                            Authenticators = identifyResponse.Authenticators.Value,
                         };
                     }
                     else
@@ -480,7 +484,6 @@ namespace Okta.Idx.Sdk
                             new List<string>
                             {
                                 RemediationType.ReenrollAuthenticator,
-                                RemediationType.ChallengeAuthenticator,
                                 RemediationType.SelectAuthenticatorEnroll,
                                 RemediationType.SelectAuthenticatorAuthenticate,
                             }, identifyResponse);
@@ -615,7 +618,7 @@ namespace Okta.Idx.Sdk
                 return new AuthenticationResponse
                 {
                     IdxContext = idxContext,
-                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorData,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorData,
                 };
             }
             else //(authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))

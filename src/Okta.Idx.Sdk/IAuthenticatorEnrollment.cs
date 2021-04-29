@@ -19,7 +19,7 @@ namespace Okta.Idx.Sdk
         string DisplayName { get; }
 
         /// <summary>
-        /// Gets the Id.
+        /// Gets the enrollment ID.
         /// </summary>
         string Id { get; }
 
@@ -32,5 +32,10 @@ namespace Okta.Idx.Sdk
         /// Gets the methods.
         /// </summary>
         IList<IAuthenticatorMethod> Methods { get; }
+
+        /// <summary>
+        /// Gets the profile.
+        /// </summary>
+        string Profile { get; }
     }
 }

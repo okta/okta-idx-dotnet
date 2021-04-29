@@ -12,6 +12,8 @@ namespace direct_auth_idx.Models
         [Display(Name = "Authenticator ID")]
         public string AuthenticatorId { get; set; }
 
+        public string EnrollmentId { get; set; }
+
         public string PasswordId { get; set; }
 
         public string PhoneId { get; set; }

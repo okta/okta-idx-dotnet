@@ -52,7 +52,7 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Waiting for authenticator's data to continue with the authentication process.
         /// </summary>
-        AwaitingAuthenticatorData,
+        AwaitingChallengeAuthenticatorData,
 
         /// <summary>
         /// Waiting for an authenticator to continue with the authentication process.

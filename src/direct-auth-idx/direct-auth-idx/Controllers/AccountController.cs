@@ -65,6 +65,14 @@ namespace direct_auth_idx.Controllers
                         Session["idxContext"] = authnResponse.IdxContext;
                         return RedirectToAction("ChangePassword", "Manage");
 
+                    case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
+                        Session["idxContext"] = authnResponse.IdxContext;
+                        TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(
+                                                                        authnResponse.AuthenticatorEnrollments,
+                                                                        authnResponse.Authenticators);
+                        Session["isChallengeFlow"] = true;
+                        return RedirectToAction("selectAuthenticator", "Manage");
+
                     default:
                         ModelState.AddModelError(string.Empty, $"Invalid login attempt:");
                         return View("Login", model);
@@ -197,7 +205,7 @@ namespace direct_auth_idx.Controllers
                                  .Select(x =>
                                             new AuthenticatorViewModel
                                             {
-                                                Id = x.Id,
+                                                AuthenticatorId = x.Id,
                                                 Name = x.DisplayName
                                             })
                                 .ToList() ?? new List<AuthenticatorViewModel>()

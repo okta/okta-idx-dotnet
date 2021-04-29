@@ -9,6 +9,8 @@ namespace direct_auth_idx.Models
     {
         public string Name { get; set; }
 
-        public string Id { get; set; }
+        public string AuthenticatorId { get; set; }
+
+        public string EnrollmentId { get; set; }
     }
 }
