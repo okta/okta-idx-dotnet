@@ -12,6 +12,6 @@ namespace Okta.Idx.Sdk
     {
         string Type { get; }
 
-        IList<IMessage> Message { get; }
+        IList<IMessageItem> MessageItem { get; }
     }
 }

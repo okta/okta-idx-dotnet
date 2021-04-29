@@ -21,6 +21,6 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets the params
         /// </summary>
-        IList<string> Params{ get; }
+        IList<string> Params { get; }
     }
 }

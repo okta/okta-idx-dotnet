@@ -36,7 +36,7 @@ namespace Okta.Idx.Sdk
         public string RelatesTo => GetStringProperty("relatesTo");
 
         /// <inheritdoc/>
-        public IList<IFormValue> Form => GetArrayProperty<IFormValue>("value");
+        public IList<IRemediationOptionItem> Items => GetArrayProperty<IRemediationOptionItem>("value");
 
         /// <inheritdoc/>
         public async Task<IIdxResponse> ProceedAsync(IdxRequestPayload dataFromUi, CancellationToken cancellationToken = default)

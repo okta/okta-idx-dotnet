@@ -54,7 +54,7 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets all form values. This is generated from `$this->value`. Each item in `$this->value` MUST be mapped to a `FormValue` object.
         /// </summary>
-        IList<IFormValue> Form { get; }
+        IList<IRemediationOptionItem> Items { get; }
 
         /// <summary>
         /// Allows you to continue the remediation with this option.

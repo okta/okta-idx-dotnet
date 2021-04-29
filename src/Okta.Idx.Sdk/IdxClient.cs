@@ -91,14 +91,44 @@ namespace Okta.Idx.Sdk
                 userAgentBuilder);
         }
 
-        /// <inheritdoc/>
-        public string FindValidationErrorsMessages(OktaIonApiException exception)
+        /// <summary>
+        /// Extracts the error description from the <see cref="OktaIonApiException"/> object
+        /// </summary>
+        /// <param name="exception">Exception object</param>
+        /// <returns>Error message</returns>
+        public string FindValidationErrorMessages(OktaIonApiException exception)
         {
-
+            var sb = new StringBuilder();
             var response = new IdxResponse();
             response.Initialize(null, null, exception.Error.GetData(), null);
+            var remediations = response.Remediation?.RemediationOptions;
+            if (remediations == null)
+            {
+                return null;
+            }
 
-            return null;
+            foreach (var remediation in remediations)
+            {
+                foreach (var remediationItem in remediation.Items)
+                {
+                    var formContent = remediationItem.Form;
+                    foreach (var field in formContent.Fields)
+                    {
+                        if (field.Messages != null)
+                        {
+                            foreach (var messageItem in field.Messages.MessageItem)
+                            {
+                                if (messageItem?.Class == "ERROR")
+                                {
+                                    sb.Append($"{field.Name}:{messageItem.Message}\n");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

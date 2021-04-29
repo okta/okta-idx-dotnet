@@ -1,4 +1,4 @@
-﻿// <copyright file="IMessage.cs" company="Okta, Inc">
+﻿// <copyright file="IMessageItem.cs" company="Okta, Inc">
 // Copyright (c) 2020 - present Okta, Inc. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
@@ -10,7 +10,7 @@ namespace Okta.Idx.Sdk
     /// <summary>
     /// An interface to represent a single message in message list.
     /// </summary>
-    public interface IMessage : IResource
+    public interface IMessageItem : IResource
     {
         /// <summary>
         /// Gets message text
