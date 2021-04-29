@@ -98,5 +98,23 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollPhoneAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Select an authenticator to continue with the challenge process.
+        /// </summary>
+        /// <param name="selectAuthenticatorOptions">The options for authenticator selection.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(SelectAuthenticatorOptions selectAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Challenge a phone authenticator.
+        /// </summary>
+        /// <param name="challengeAuthenticatorOptions">The options for authenticator challenge.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> ChallengeAuthenticatorAsync(ChallengePhoneAuthenticatorOptions challengeAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }

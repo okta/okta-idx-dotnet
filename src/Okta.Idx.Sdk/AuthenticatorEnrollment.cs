@@ -3,17 +3,27 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using System.Collections.Generic;
+using Okta.Idx.Sdk.Internal;
+
 namespace Okta.Idx.Sdk
 {
-    /// <summary>
-    /// A class to represent the authenticator enrollment.
-    /// </summary>
-    public class AuthenticatorEnrollment : Resource, IAuthenticatorEnrollment
+    /// <inheritdoc/>
+    public class AuthenticatorEnrollment : Resource, IAuthenticatorEnrollment, IRecoverable
     {
         /// <inheritdoc/>
-        public string Type => GetStringProperty("type");
+        public string DisplayName => GetStringProperty("displayName");
 
         /// <inheritdoc/>
-        public IAuthenticatorEnrollmentValue Value => GetResourceProperty<AuthenticatorEnrollmentValue>("value");
+        public string Id => GetStringProperty("id");
+
+        /// <inheritdoc/>
+        public string Key => GetStringProperty("key");
+
+        /// <inheritdoc/>
+        public IList<IAuthenticatorMethod> Methods => GetArrayProperty<IAuthenticatorMethod>("methods");
+
+        /// <inheritdoc/>
+        public IRecover Recover => GetResourceProperty<Recover>("recover");
     }
 }
