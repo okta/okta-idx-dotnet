@@ -69,7 +69,7 @@ namespace direct_auth_idx.Controllers
                             _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                             return RedirectToAction("Index", "Home");
                         }
-            
+
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["idxContext"] = authnResponse.IdxContext;
                         TempData["authenticators"] = authnResponse.Authenticators;
@@ -79,8 +79,13 @@ namespace direct_auth_idx.Controllers
             }
             catch (OktaApiException exception)
             {
-                ModelState.AddModelError("Oops! Something went wrong.", exception.ErrorSummary 
+                ModelState.AddModelError("Oops! Something went wrong.", exception.ErrorSummary
                                          ?? "Cannot change password. Check if the new password meets the requirements.");
+                return View("ChangePassword", model);
+            }
+            catch (OktaIonApiException exception)
+            {
+                ModelState.AddModelError("Validation error", idxAuthClient.FindValidationErrorMessages(exception));
                 return View("ChangePassword", model);
             }
             catch (OktaException exception)

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "direct-auth-idx", "direct-a
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk", "..\Okta.Idx.Sdk\Okta.Idx.Sdk.csproj", "{996AE278-03A8-45E9-A47F-ABAB48BF9F2D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Sdk.Abstractions", "..\..\..\okta-sdk-abstractions-dotnet\src\Okta.Sdk.Abstractions\Okta.Sdk.Abstractions.csproj", "{84FFAA76-91C1-4029-8FFE-31BC0A78C81A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{996AE278-03A8-45E9-A47F-ABAB48BF9F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{996AE278-03A8-45E9-A47F-ABAB48BF9F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{996AE278-03A8-45E9-A47F-ABAB48BF9F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84FFAA76-91C1-4029-8FFE-31BC0A78C81A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84FFAA76-91C1-4029-8FFE-31BC0A78C81A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84FFAA76-91C1-4029-8FFE-31BC0A78C81A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84FFAA76-91C1-4029-8FFE-31BC0A78C81A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

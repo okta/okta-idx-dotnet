@@ -39,5 +39,8 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public IList<IFormValue> Options => GetArrayProperty<IFormValue>("options");
+
+        /// <inheritdoc/>
+        public IList<IMessages> Messages => GetArrayProperty<IMessages>("messages");
     }
 }

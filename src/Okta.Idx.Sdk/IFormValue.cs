@@ -60,5 +60,10 @@ namespace Okta.Idx.Sdk
         /// Gets a list of options that is described as an array of formValue. Will be null if $this->type == "object" but `options` key does not exist
         /// </summary>
         IList<IFormValue> Options { get; }
+
+        /// <summary>
+        /// Gets a list of related messages.
+        /// </summary>
+        IList<IMessages> Messages { get; }
     }
 }

@@ -98,5 +98,12 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollPhoneAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Extracts the error description from the <see cref="OktaIonApiException"/> object
+        /// </summary>
+        /// <param name="exception">Exception object</param>
+        /// <returns>Error message</returns>
+        string FindValidationErrorMessages(OktaIonApiException exception);
     }
 }

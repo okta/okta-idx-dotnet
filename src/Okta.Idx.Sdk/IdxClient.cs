@@ -91,6 +91,16 @@ namespace Okta.Idx.Sdk
                 userAgentBuilder);
         }
 
+        /// <inheritdoc/>
+        public string FindValidationErrorsMessages(OktaIonApiException exception)
+        {
+
+            var response = new IdxResponse();
+            response.Initialize(null, null, exception.Error.GetData(), null);
+
+            return null;
+        }
+
         /// <summary>
         /// Builds and gets the IDX configuration.
         /// </summary>
