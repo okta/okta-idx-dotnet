@@ -19,6 +19,10 @@
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\okta-sdk-abstractions-dotnet\src\Okta.Sdk.Abstractions\Okta.Sdk.Abstractions.csproj" />
+  </ItemGroup>
+
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\OktaSdk.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>

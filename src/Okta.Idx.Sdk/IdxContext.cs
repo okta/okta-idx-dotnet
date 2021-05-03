@@ -10,11 +10,11 @@ namespace Okta.Idx.Sdk
     /// </summary>
     public class IdxContext : IIdxContext
     {
-        private readonly string _codeVerifier;
-        private readonly string _codeChallenge;
-        private readonly string _codeChallengeMethod;
-        private readonly string _interactionHandle;
-        private readonly string _state;
+        private string _codeVerifier;
+        private string _codeChallenge;
+        private string _codeChallengeMethod;
+        private string _interactionHandle;
+        private string _state;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IdxContext"/> class.
@@ -43,26 +43,26 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets the PKCE code verifier
         /// </summary>
-        public string CodeVerifier => _codeVerifier;
+        public string CodeVerifier { get => _codeVerifier; set => _codeVerifier = value; }
 
         /// <summary>
         /// Gets the PKCE code challenge
         /// </summary>
-        public string CodeChallenge => _codeChallenge;
+        public string CodeChallenge { get => _codeChallenge; set => _codeChallenge = value; }
 
         /// <summary>
         /// Gets the PKCE code challenge method
         /// </summary>
-        public string CodeChallengeMethod => _codeChallengeMethod;
+        public string CodeChallengeMethod { get => _codeChallengeMethod; set => _codeChallengeMethod = value; }
 
         /// <summary>
         /// Gets the interaction handle
         /// </summary>
-        public string InteractionHandle => _interactionHandle;
+        public string InteractionHandle { get => _interactionHandle; set => _interactionHandle = value; }
 
         /// <summary>
         /// Gets the state
         /// </summary>
-        public string State => _state;
+        public string State { get => _state; set => _state = value; }
     }
 }
