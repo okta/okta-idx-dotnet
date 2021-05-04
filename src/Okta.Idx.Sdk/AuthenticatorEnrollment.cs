@@ -31,13 +31,14 @@ namespace Okta.Idx.Sdk
         {
             get
             {
+                Resource profile = GetResourceProperty<Resource>("profile");
                 if (Key == AuthenticatorType.Phone.ToIdxKeyString())
                 {
-                    return GetStringProperty("phoneNumber");
+                    return profile.GetProperty<string>("phoneNumber");
                 }
                 else if (Key == AuthenticatorType.Email.ToIdxKeyString())
                 {
-                    return GetStringProperty("email");
+                    return profile.GetProperty<string>("email");
                 }
 
                 return string.Empty;

@@ -194,7 +194,48 @@ namespace direct_auth_idx.Controllers
             return View();
         }
 
+        public ActionResult SelectPhoneChallengeMethod()
+        {
+           return View((SelectAuthenticatorMethodViewModel)TempData["selectMethodModel"]);
+        }
 
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SelectPhoneChallengeMethodAsync(SelectAuthenticatorMethodViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("SelectPhoneChallengeMethod", model);
+            }
+
+            try
+            {
+                var challengeOptions = new ChallengePhoneAuthenticatorOptions
+                {
+                    AuthenticatorId = model.AuthenticatorId,
+                    EnrollmentId = model.EnrollmentId,
+                    MethodType = AuthenticatorMethodType.Sms,
+                };
+
+                var idxAuthClient = new IdxClient(null);
+
+                var challengeResponse = await idxAuthClient.ChallengeAuthenticatorAsync(challengeOptions, (IIdxContext)Session["IdxContext"]);
+
+                switch (challengeResponse?.AuthenticationStatus)
+                {
+                    case AuthenticationStatus.AwaitingAuthenticatorVerification:
+                        return RedirectToAction("VerifyAuthenticator", "Manage");
+                    default:
+                        return View("SelectPhoneChallengeMethod", model);
+                }
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return RedirectToAction("SelectPhoneChallengeMethod", model);
+            }
+        }
 
         public ActionResult SelectAuthenticator()
         {
@@ -203,6 +244,7 @@ namespace direct_auth_idx.Controllers
             viewModel.PasswordId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId;
             viewModel.PhoneId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId;
 
+            TempData["authenticators"] = viewModel.Authenticators;
             return View(viewModel);
         }
 
@@ -227,24 +269,55 @@ namespace direct_auth_idx.Controllers
 
                 if (isChallengeFlow)
                 {
-                    SelectAuthenticatorOptions selectChallengeAuthenticatorOptions = new SelectAuthenticatorOptions();
-                    selectChallengeAuthenticatorOptions.AuthenticatorId = model.AuthenticatorId;
-                    
+                    AuthenticationResponse selectAuthenticatorResponse = null;
+
                     if (model.IsPhoneSelected)
                     {
-                        selectChallengeAuthenticatorOptions = new SelectPhoneAuthenticatorOptions();
-                        ((SelectPhoneAuthenticatorOptions)selectChallengeAuthenticatorOptions).EnrollmentId = authenticators
+                        var selectPhoneOptions = new SelectPhoneAuthenticatorOptions();
+                        ((SelectPhoneAuthenticatorOptions)selectPhoneOptions).EnrollmentId = authenticators
                                                                     .FirstOrDefault(x => x.AuthenticatorId == model.AuthenticatorId)?
                                                                     .EnrollmentId;
+                        selectPhoneOptions.AuthenticatorId = model.AuthenticatorId;
+
+                        selectAuthenticatorResponse = await idxAuthClient.SelectChallengeAuthenticatorAsync(selectPhoneOptions, (IIdxContext)Session["IdxContext"]);
                     }
+                    else
+                    {
+                        var selectAuthenticatorOptions = new SelectAuthenticatorOptions
+                        {
+                            AuthenticatorId = model.AuthenticatorId,
+                        };
 
-                    var selectAuthenticatorResponse = await idxAuthClient.SelectChallengeAuthenticatorAsync(selectChallengeAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+                        selectAuthenticatorResponse = await idxAuthClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+                    }
+                    
+                    Session["IdxContext"] = selectAuthenticatorResponse.IdxContext;
 
-                    //switch (selectAuthenticatorResponse?.AuthenticationStatus)
-                    //{
-                    //    case AuthenticationStatus.AwaitingChallengeAuthenticatorData:
+                    switch (selectAuthenticatorResponse?.AuthenticationStatus)
+                    {
+                        // TODO: Review
+                        //case AuthenticationStatus.AwaitingAuthenticatorEnrollmentData:
+                        //    return RedirectToAction("SelectPhoneChallengeMethod", 
+                        //        new SelectAuthenticatorMethodViewModel
+                        //        {
+                        //            Profile = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Profile,
+                        //            EnrollmentId = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Id,
+                        //            AuthenticatorId = model.AuthenticatorId,
+                        //        });
+                        case AuthenticationStatus.AwaitingChallengeAuthenticatorData:
+                            TempData["selectMethodModel"] = new SelectAuthenticatorMethodViewModel
+                            {
+                                Profile = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Profile,
+                                EnrollmentId = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Id,
+                                AuthenticatorId = model.AuthenticatorId,
+                            };
 
-                    //}
+                            return RedirectToAction("SelectPhoneChallengeMethod", "Manage");
+                        case AuthenticationStatus.AwaitingAuthenticatorVerification:
+                            return RedirectToAction("VerifyAuthenticator", "Manage");
+                        default:
+                            return View("SelectAuthenticator", model);
+                    }
                     // TODO
                     return View("SelectAuthenticator", model);
                 }
