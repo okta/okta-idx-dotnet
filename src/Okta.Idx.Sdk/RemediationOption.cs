@@ -38,6 +38,8 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public IList<IFormValue> Form => GetArrayProperty<IFormValue>("value");
 
+        public IIdp Idp => GetProperty<IIdp>("idp");
+
         /// <inheritdoc/>
         public async Task<IIdxResponse> ProceedAsync(IdxRequestPayload dataFromUi, CancellationToken cancellationToken = default)
         {

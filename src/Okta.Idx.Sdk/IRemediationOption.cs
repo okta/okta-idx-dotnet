@@ -41,6 +41,11 @@ namespace Okta.Idx.Sdk
         string Href { get; }
 
         /// <summary>
+        /// Gets the Idp
+        /// </summary>
+        IIdp Idp { get; }
+
+        /// <summary>
         /// Gets the Accepts Header for this remediation option.
         /// </summary>
         string Accepts { get; }
@@ -55,6 +60,8 @@ namespace Okta.Idx.Sdk
         /// Gets all form values. This is generated from `$this->value`. Each item in `$this->value` MUST be mapped to a `FormValue` object.
         /// </summary>
         IList<IFormValue> Form { get; }
+
+
 
         /// <summary>
         /// Allows you to continue the remediation with this option.
