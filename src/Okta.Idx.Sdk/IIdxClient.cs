@@ -15,8 +15,6 @@ namespace Okta.Idx.Sdk
     /// </summary>
     public interface IIdxClient : IOktaClient
     {
-        Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default);
-
         /// <summary>
         /// Gets the client configuration.
         /// </summary>

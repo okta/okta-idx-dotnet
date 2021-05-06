@@ -173,7 +173,7 @@ namespace Okta.Idx.Sdk
         /// <param name="state">Optional value to use as the state argument when initiating the authentication flow. This is used to provide contextual information to survive redirects.</param>
         /// <param name="cancellationToken">The cancellation token. Optional.</param>
         /// <returns>The IDX context.</returns>
-        public async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
+        protected async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
         {
             // PKCE props
             state = state ?? GenerateSecureRandomString(16);

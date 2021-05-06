@@ -9,7 +9,7 @@ using Okta.Idx.Sdk.Configuration;
 namespace Okta.Idx.Sdk
 {
     /// <summary>
-    /// A descriptor for the current state of an Idx interaction.
+    /// A descriptor for the current state of an Idx social login interaction.
     /// </summary>
     public class SocialLoginSettings
     {
