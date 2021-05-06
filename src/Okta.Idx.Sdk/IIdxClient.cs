@@ -32,7 +32,7 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Authenticates a user with username/password credentials
         /// </summary>
-        /// <param name="authenticationOptions">The authentication topions.</param>
+        /// <param name="authenticationOptions">The authentication options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default);

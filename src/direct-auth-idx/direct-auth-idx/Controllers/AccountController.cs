@@ -130,7 +130,7 @@ namespace direct_auth_idx.Controllers
                 if (registerResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
                 {
                     Session["idxContext"] = registerResponse.IdxContext;
-                    TempData["authenticators"] = registerResponse.Authenticators;
+                    TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(registerResponse.Authenticators);
                     return RedirectToAction("selectAuthenticator", "Manage");
                 }
 
@@ -177,7 +177,7 @@ namespace direct_auth_idx.Controllers
                 {
                     Session["idxContext"] = authnResponse.IdxContext;
                     Session["UserName"] = model.UserName;
-                    TempData["authenticators"] = authnResponse.Authenticators;
+                    TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                     return RedirectToAction("SelectRecoveryAuthenticator", "Account");
                 }
 
@@ -198,17 +198,9 @@ namespace direct_auth_idx.Controllers
 
         public ActionResult SelectRecoveryAuthenticator()
         {
-            var authenticators = (IList<IAuthenticator>)TempData["authenticators"];
             var viewModel = new SelectRecoveryAuthenticatorViewModel
             {
-                Authenticators = authenticators?
-                                 .Select(x =>
-                                            new AuthenticatorViewModel
-                                            {
-                                                AuthenticatorId = x.Id,
-                                                Name = x.DisplayName
-                                            })
-                                .ToList() ?? new List<AuthenticatorViewModel>()
+                Authenticators = (List<AuthenticatorViewModel>)TempData["authenticators"],
             };
             return View(viewModel);
         }
