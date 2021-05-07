@@ -61,8 +61,6 @@ namespace Okta.Idx.Sdk
         /// </summary>
         IList<IFormValue> Form { get; }
 
-
-
         /// <summary>
         /// Allows you to continue the remediation with this option.
         /// </summary>
