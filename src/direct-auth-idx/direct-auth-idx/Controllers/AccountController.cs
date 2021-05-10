@@ -67,9 +67,7 @@ namespace direct_auth_idx.Controllers
 
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
                         Session["idxContext"] = authnResponse.IdxContext;
-                        TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(
-                                                                        authnResponse.AuthenticatorEnrollments,
-                                                                        authnResponse.Authenticators);
+                        TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
                         return RedirectToAction("selectAuthenticator", "Manage");
 

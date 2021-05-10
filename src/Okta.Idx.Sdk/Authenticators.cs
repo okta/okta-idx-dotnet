@@ -16,6 +16,6 @@ namespace Okta.Idx.Sdk
         public string Type => GetStringProperty("type");
 
         /// <inheritdoc/>
-        public IList<IAuthenticator> Value => GetArrayProperty<IAuthenticator>("value");
+        public IList<IAuthenticatorValue> Value => GetArrayProperty<IAuthenticatorValue>("value");
     }
 }

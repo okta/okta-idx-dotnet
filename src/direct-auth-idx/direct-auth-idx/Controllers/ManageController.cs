@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using direct_auth_idx.Models;
-using Microsoft.Owin.Security;
 
 namespace direct_auth_idx.Controllers
 {
@@ -308,7 +307,7 @@ namespace direct_auth_idx.Controllers
                             TempData["selectMethodModel"] = new SelectAuthenticatorMethodViewModel
                             {
                                 Profile = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Profile,
-                                EnrollmentId = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Id,
+                                EnrollmentId = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.EnrollmentId,
                                 AuthenticatorId = model.AuthenticatorId,
                             };
 

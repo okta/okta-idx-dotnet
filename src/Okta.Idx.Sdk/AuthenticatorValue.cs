@@ -1,15 +1,15 @@
-﻿// <copyright file="AuthenticatorEnrollment.cs" company="Okta, Inc">
+﻿// <copyright file="AuthenticatorValue.cs" company="Okta, Inc">
 // Copyright (c) 2020 - present Okta, Inc. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
 using System.Collections.Generic;
-using Okta.Idx.Sdk.Internal;
 
 namespace Okta.Idx.Sdk
 {
-    /// <inheritdoc/>
-    public class AuthenticatorEnrollment : Resource, IAuthenticatorEnrollment, IRecoverable
+    /// <summary>
+    /// This class represents an Authenticator.
+    public class AuthenticatorValue : Resource, IAuthenticatorValue
     {
         /// <inheritdoc/>
         public string DisplayName => GetStringProperty("displayName");
@@ -22,11 +22,5 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public IList<IAuthenticatorMethod> Methods => GetArrayProperty<IAuthenticatorMethod>("methods");
-
-        /// <inheritdoc/>
-        public IRecover Recover => GetResourceProperty<Recover>("recover");
-
-        /// <inheritdoc/>
-        public Resource Profile => GetResourceProperty<Resource>("profile");
     }
 }

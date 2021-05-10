@@ -23,6 +23,6 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets the value property which contains a list of authenticators.
         /// </summary>
-        IList<IAuthenticator> Value { get; }
+        IList<IAuthenticatorValue> Value { get; }
     }
 }

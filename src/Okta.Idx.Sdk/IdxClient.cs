@@ -274,8 +274,8 @@ namespace Okta.Idx.Sdk
                 return new AuthenticationResponse
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
-                    Authenticators = identifyResponse.Authenticators.Value,
-                    AuthenticatorEnrollments = identifyResponse.AuthenticatorEnrollments.Value,
+                    Authenticators = ConvertToAuthenticators(identifyResponse.Authenticators.Value, identifyResponse.AuthenticatorEnrollments.Value),
+                    //AuthenticatorEnrollments = identifyResponse.AuthenticatorEnrollments.Value,
                 };
             }
             else if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
@@ -284,7 +284,7 @@ namespace Okta.Idx.Sdk
                     {
                         IdxContext = idxContext,
                         AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                        Authenticators = identifyResponse.Authenticators.Value,
+                        Authenticators = ConvertToAuthenticators(identifyResponse.Authenticators.Value),
                     };
                 }
             //else if (identifyResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
@@ -354,7 +354,7 @@ namespace Okta.Idx.Sdk
                         {
                             IdxContext = idxContext,
                             AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                            Authenticators = identifyResponse.Authenticators.Value,
+                            Authenticators = ConvertToAuthenticators(identifyResponse.Authenticators.Value),
                         };
                     }
                     else if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
@@ -363,8 +363,8 @@ namespace Okta.Idx.Sdk
                         {
                             IdxContext = idxContext,
                             AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
-                            AuthenticatorEnrollments = identifyResponse.AuthenticatorEnrollments.Value,
-                            Authenticators = identifyResponse.Authenticators.Value,
+                            //AuthenticatorEnrollments = identifyResponse.AuthenticatorEnrollments.Value,
+                            Authenticators = ConvertToAuthenticators(identifyResponse.Authenticators.Value, identifyResponse.AuthenticatorEnrollments.Value),
                         };
                     }
                     else
@@ -466,7 +466,7 @@ namespace Okta.Idx.Sdk
                         {
                             IdxContext = idxContext,
                             AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                            Authenticators = challengeResponse.Authenticators.Value,
+                            Authenticators = ConvertToAuthenticators(challengeResponse.Authenticators.Value),
                         };
                     }
                     else if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
@@ -475,8 +475,8 @@ namespace Okta.Idx.Sdk
                         {
                             IdxContext = idxContext,
                             AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
-                            AuthenticatorEnrollments = challengeResponse.AuthenticatorEnrollments.Value,
-                            Authenticators = challengeResponse.Authenticators.Value,
+                            //AuthenticatorEnrollments = challengeResponse.AuthenticatorEnrollments.Value,
+                            Authenticators = ConvertToAuthenticators(challengeResponse.Authenticators.Value, challengeResponse.AuthenticatorEnrollments.Value),
                         };
                     }
                     else
@@ -579,6 +579,51 @@ namespace Okta.Idx.Sdk
             return await SelectChallengeAuthenticatorAsync(request, idxContext, cancellationToken);
         }
 
+        private IList<IAuthenticator> ConvertToAuthenticators(IList<IAuthenticatorValue> authenticators, IList<IAuthenticatorEnrollment> authenticatorEnrollments = null)
+        {
+            var authenticatorOptions = new List<IAuthenticator>();
+
+            foreach (var authenticator in authenticators)
+            {
+                var enrollment = authenticatorEnrollments?.FirstOrDefault(x => x.Key == authenticator.Key);
+                authenticatorOptions.Add(new Authenticator
+                {
+                    Id = authenticator.Id,
+                    Name = authenticator.DisplayName,
+                    MethodTypes = authenticator.Methods?.Select(x => x.Type).ToList(),
+                    EnrollmentId = enrollment?.Id,
+                    Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
+                });
+            }
+
+            return authenticatorOptions;
+        }
+
+        private IAuthenticator ConvertToAuthenticator(IList<IAuthenticatorValue> authenticators, IAuthenticatorEnrollment authenticatorEnrollment)
+        => new Authenticator
+            {
+                Id = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment.Key)?.Id,
+                Name = authenticatorEnrollment.DisplayName,
+                MethodTypes = authenticatorEnrollment.Methods?.Select(x => x.Type).ToList(),
+                EnrollmentId = authenticatorEnrollment.Id,
+                Profile = GetAuthenticatorProfile(authenticatorEnrollment),
+            };
+        
+
+        private string GetAuthenticatorProfile(IAuthenticatorEnrollment authenticatorEnrollment)
+        {
+            if (authenticatorEnrollment.Key == AuthenticatorType.Phone.ToIdxKeyString())
+            {
+                return authenticatorEnrollment.Profile.GetProperty<string>("phoneNumber");
+            }
+            else if (authenticatorEnrollment.Key == AuthenticatorType.Email.ToIdxKeyString())
+            {
+                return authenticatorEnrollment.Profile.GetProperty<string>("email");
+            }
+
+            return string.Empty;
+        }
+
         /// <inheritdoc/>
         public async Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(SelectAuthenticatorOptions selectAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
@@ -620,7 +665,7 @@ namespace Okta.Idx.Sdk
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorData,
-                    CurrentAuthenticatorEnrollment = authenticatorSelectionResponse.CurrentAuthenticatorEnrollment.Value,
+                    CurrentAuthenticatorEnrollment = ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, authenticatorSelectionResponse.CurrentAuthenticatorEnrollment.Value),
                 };
             }
             else //(authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
@@ -629,7 +674,7 @@ namespace Okta.Idx.Sdk
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
-                    CurrentAuthenticatorEnrollment = authenticatorSelectionResponse.CurrentAuthenticatorEnrollment.Value,
+                    CurrentAuthenticatorEnrollment = ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, authenticatorSelectionResponse.CurrentAuthenticatorEnrollment.Value),
                 };
             }
         }
@@ -727,7 +772,7 @@ namespace Okta.Idx.Sdk
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorSelection,
-                Authenticators = recoveryAuthenticators,
+                Authenticators = ConvertToAuthenticators(recoveryAuthenticators),
             };
         }
 
@@ -891,7 +936,7 @@ namespace Okta.Idx.Sdk
                 return new AuthenticationResponse
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                    Authenticators = challengeAuthenticatorResponse.Authenticators.Value,
+                    Authenticators = ConvertToAuthenticators(challengeAuthenticatorResponse.Authenticators.Value),
                     IdxContext = idxContext,
                 };
             }
@@ -967,7 +1012,7 @@ namespace Okta.Idx.Sdk
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                Authenticators = enrollNewProfileResponse.Authenticators.Value,
+                Authenticators = ConvertToAuthenticators(enrollNewProfileResponse.Authenticators.Value),
             };
         }
 
