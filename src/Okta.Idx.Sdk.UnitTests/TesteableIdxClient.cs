@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Sdk.Abstractions;
@@ -26,6 +28,16 @@ namespace Okta.Idx.Sdk.UnitTests
                 DefaultFakeConfiguration,
                 new RequestContext())
         {
+        }
+
+        public new async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
+        {
+            return await base.InteractAsync(state, cancellationToken);
+        }
+
+        public new async Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await base.IntrospectAsync(idxContext, cancellationToken);
         }
     }
 }
