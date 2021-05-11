@@ -5,6 +5,9 @@
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// Options to challenge phone.
+    /// </summary>
     public class ChallengePhoneAuthenticatorOptions : ChallengeAuthenticatorOptions
     {
         /// <summary>

@@ -43,11 +43,9 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public IAuthenticators Authenticators => GetResourceProperty<Authenticators>("authenticators");
-        
+
         /// <inheritdoc/>
         public IAuthenticatorEnrollments AuthenticatorEnrollments => GetResourceProperty<AuthenticatorEnrollments>("authenticatorEnrollments");
-
-
 
         /// <inheritdoc/>
         public async Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken = default)
