@@ -5,8 +5,14 @@
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// Options to select phone.
+    /// </summary>
     public class SelectPhoneAuthenticatorOptions : SelectAuthenticatorOptions
     {
+        /// <summary>
+        /// Gets or sets the enrollment ID.
+        /// </summary>
         public string EnrollmentId { get; set; }
     }
 }

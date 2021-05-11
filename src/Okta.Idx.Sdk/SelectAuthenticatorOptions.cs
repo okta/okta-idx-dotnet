@@ -5,8 +5,14 @@
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// Options to select an authenticator.
+    /// </summary>
     public class SelectAuthenticatorOptions
     {
+        /// <summary>
+        /// Gets or sets the authenticator ID.
+        /// </summary>
         public string AuthenticatorId { get; set; }
     }
 }
