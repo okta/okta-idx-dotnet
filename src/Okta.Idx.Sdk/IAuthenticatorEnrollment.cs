@@ -37,5 +37,10 @@ namespace Okta.Idx.Sdk
         /// Gets the profile.
         /// </summary>
         Resource Profile { get; }
+
+        /// <summary>
+        /// Gets the recover object.
+        /// </summary>
+        IRecover Recover { get; }
     }
 }

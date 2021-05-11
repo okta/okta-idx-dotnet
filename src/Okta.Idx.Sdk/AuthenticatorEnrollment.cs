@@ -4,12 +4,11 @@
 // </copyright>
 
 using System.Collections.Generic;
-using Okta.Idx.Sdk.Internal;
 
 namespace Okta.Idx.Sdk
 {
     /// <inheritdoc/>
-    public class AuthenticatorEnrollment : Resource, IAuthenticatorEnrollment, IRecoverable
+    public class AuthenticatorEnrollment : Resource, IAuthenticatorEnrollment
     {
         /// <inheritdoc/>
         public string DisplayName => GetStringProperty("displayName");

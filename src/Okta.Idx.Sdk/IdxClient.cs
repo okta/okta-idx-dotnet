@@ -19,7 +19,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Idx.Sdk.Extensions;
-using Okta.Idx.Sdk.Internal;
 using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
@@ -756,7 +755,7 @@ namespace Okta.Idx.Sdk
                 StateHandle = identifyResponse.StateHandle,
             };
 
-            var currentEnrollment = (IRecoverable)identifyResponse
+            var currentEnrollment = identifyResponse
                                         .CurrentAuthenticatorEnrollment
                                         .Value;
 
@@ -787,7 +786,7 @@ namespace Okta.Idx.Sdk
                 StateHandle = introspectResponse.StateHandle,
             };
 
-            var currentEnrollment = (IRecoverable)introspectResponse
+            var currentEnrollment = introspectResponse
                                         .CurrentAuthenticatorEnrollment
                                         .Value;
 
@@ -796,10 +795,9 @@ namespace Okta.Idx.Sdk
                                         .ProceedAsync(recoveryRequest, cancellationToken);
 
             var recoveryAuthenticator = recoveryResponse
-                                           .Authenticators
-                                           .Value
-                                           .Where(x => x.Id == selectAuthenticatorOptions.AuthenticatorId)
-                                           .FirstOrDefault();
+                .Authenticators
+                .Value
+                .FirstOrDefault(x => x.Id == selectAuthenticatorOptions.AuthenticatorId);
 
             if (recoveryAuthenticator == null)
             {
