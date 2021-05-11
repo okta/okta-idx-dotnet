@@ -166,7 +166,7 @@ namespace direct_auth_idx.Controllers
                 {
                     AuthenticatorId = Session["phoneId"].ToString(),
                     PhoneNumber = model.PhoneNumber,
-                    
+                    MethodType = AuthenticatorMethodType.Sms,
                 };
 
                 var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
