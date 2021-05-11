@@ -9,7 +9,7 @@ using Okta.Sdk.Abstractions;
 namespace Okta.Idx.Sdk
 {
     /// <summary>
-    /// An interface to reprenset an authenticator.
+    /// An interface to represent an authenticator.
     /// </summary>
     public interface IAuthenticatorValue : IResource
     {
