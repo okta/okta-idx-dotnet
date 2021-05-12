@@ -241,6 +241,7 @@ namespace Okta.Idx.Sdk
                 request, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default)
         {
             IIdxContext idxContext = await this.InteractAsync();
@@ -251,6 +252,7 @@ namespace Okta.Idx.Sdk
             };
         }
 
+        /// <inheritdoc/>
         public async Task<OktaTokens> RedeemInteractionCodeAsync(IIdxContext idxContext, string interactionCode, Action<Exception> exceptionHandler = null, CancellationToken cancellationToken = default)
         {
             exceptionHandler = exceptionHandler ?? LogError;
@@ -291,6 +293,10 @@ namespace Okta.Idx.Sdk
             return null;
         }
 
+        /// <summary>
+        /// Logs the specified exception.
+        /// </summary>
+        /// <param name="ex">The exception.</param>
         protected virtual void LogError(Exception ex)
         {
             _logger.LogError(ex, ex.Message);
