@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using FlexibleConfiguration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Idx.Sdk.Extensions;
@@ -28,6 +29,8 @@ namespace Okta.Idx.Sdk
     /// </summary>
     public class IdxClient : IIdxClient
     {
+        private HttpClient httpClient;
+
         /// <summary>
         /// The <code>IDataStore</code> implementation to be used for making requests.
         /// </summary>
@@ -48,9 +51,9 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Initializes a new instance of the <see cref="IdxClient"/> class.
         /// </summary>
-        public IdxClient()
+/*        public IdxClient()
         {
-        }
+        }*/
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IdxClient"/> class using the specified <see cref="HttpClient"/>.
@@ -73,14 +76,14 @@ namespace Okta.Idx.Sdk
             var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
 
             // TODO: Allow proxy configuration
-            httpClient = httpClient ?? DefaultHttpClient.Create(
+            this.httpClient = httpClient ?? DefaultHttpClient.Create(
                 connectionTimeout: null,
                 proxyConfiguration: null,
                 logger: _logger);
 
             var oktaBaseConfiguration = OktaConfigurationConverter.Convert(Configuration);
             var resourceTypeResolverFactory = new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource)));
-            var requestExecutor = new DefaultRequestExecutor(oktaBaseConfiguration, httpClient, _logger);
+            var requestExecutor = new DefaultRequestExecutor(oktaBaseConfiguration, this.httpClient, _logger);
             var resourceFactory = new ResourceFactory(this, _logger, resourceTypeResolverFactory);
 
             _dataStore = new DefaultDataStore(
@@ -246,6 +249,114 @@ namespace Okta.Idx.Sdk
 
             return await PostAsync<IdxResponse>(
                 request, cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<SocialLoginResponse> StartSocialLoginAsync(string state = null, CancellationToken cancellationToken = default)
+        {
+            IIdxContext idxContext = await this.InteractAsync(state);
+            IIdxResponse introspectResponse = await this.IntrospectAsync(idxContext);
+
+            SocialLoginResponse socialLoginSettings = new SocialLoginResponse
+            {
+                Context = idxContext,
+                IdpOptions = introspectResponse.Remediation?.RemediationOptions?
+                    .Where(remediationOption => remediationOption.Name.Equals("redirect-idp"))
+                    .Select(remediationOption => new IdpOption
+                    {
+                        State = idxContext.State,
+                        InteractionHandle = idxContext.InteractionHandle,
+                        Id = remediationOption.Idp.Id,
+                        Name = remediationOption.Idp.Name,
+                        Href = remediationOption.Href,
+                    })
+                    .ToArray(),
+                Configuration = this.Configuration,
+            };
+            return socialLoginSettings;
+        }
+
+        public async Task<OktaTokens> RedeemInteractionCodeAsync(IdxContext idxContext, string interactionCode, Action<Exception> exceptionHandler = null, CancellationToken cancellationToken = default)
+        {
+            exceptionHandler = exceptionHandler ?? LogError;
+            try
+            {
+                Uri issuerUri = new Uri(Configuration.Issuer);
+                Uri tokenUri = new Uri(GetNormalizedUriString(issuerUri.ToString(), "v1/token"));
+                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenUri);
+
+                StringBuilder requestContent = new StringBuilder();
+                this.AddParameter(requestContent, "grant_type", "interaction_code", false);
+                this.AddParameter(requestContent, "client_id", Configuration.ClientId, true);
+                if (!string.IsNullOrEmpty(Configuration.ClientSecret))
+                {
+                    this.AddParameter(requestContent, "client_secret", Configuration.ClientSecret, true);
+                }
+
+                this.AddParameter(requestContent, "interaction_code", interactionCode, true);
+                this.AddParameter(requestContent, "code_verifier", idxContext.CodeVerifier, true);
+
+                requestMessage.Content = new StringContent(requestContent.ToString(), Encoding.UTF8, "application/x-www-form-urlencoded");
+                requestMessage.Headers.Add("Accept", "application/json");
+                HttpResponseMessage responseMessage = await this.httpClient.SendAsync(requestMessage);
+                string tokenResponseJson = await responseMessage.Content.ReadAsStringAsync();
+
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    exceptionHandler(new RedeemInteractionCodeException(tokenResponseJson));
+                }
+
+                return JsonConvert.DeserializeObject<OktaTokens>(tokenResponseJson);
+            }
+            catch (Exception exception)
+            {
+                exceptionHandler(new RedeemInteractionCodeException(exception));
+            }
+
+            return null;
+        }
+
+        protected virtual void LogError(Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+        }
+
+        private void AddParameter(StringBuilder stringBuilder, string key, string value, bool ampersandPrefix = false)
+        {
+            if (ampersandPrefix)
+            {
+                stringBuilder.Append("&");
+            }
+
+            stringBuilder.Append($"{key}={value}");
+        }
+
+        private static string GetNormalizedUriString(string issuer, string resourceUri)
+        {
+            string normalized = issuer;
+            if (IsRootOrgIssuer(issuer))
+            {
+                normalized = Path.Combine(normalized, "oauth2", resourceUri);
+            }
+            else
+            {
+                normalized = Path.Combine(normalized, resourceUri);
+            }
+
+            return normalized;
+        }
+
+        private static bool IsRootOrgIssuer(string issuerUri)
+        {
+            string path = new Uri(issuerUri).AbsolutePath;
+            string[] splitUri = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (splitUri.Length >= 2 &&
+            "oauth2".Equals(splitUri[0]) &&
+            !string.IsNullOrEmpty(splitUri[1]))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <inheritdoc/>

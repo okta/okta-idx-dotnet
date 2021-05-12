@@ -11,19 +11,11 @@ namespace Okta.Idx.Sdk
     /// <summary>
     /// A descriptor for the current state of an Idx social login interaction.
     /// </summary>
-    public class SocialLoginSettings
+    public class SocialLoginResponse
     {
-        public string Key
-        {
-            get => Context.State;
-        }
-
         public IIdxContext Context { get; set; }
 
         public IdpOption[] IdpOptions { get; set; }
-
-        [JsonIgnore]
-        public IdxClient Client { get; set; }
 
         public IdxConfiguration Configuration { get; set; }
     }
