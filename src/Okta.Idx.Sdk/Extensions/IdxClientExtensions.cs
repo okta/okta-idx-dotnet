@@ -19,17 +19,6 @@ namespace Okta.Idx.Sdk
                     .ProceedAsync(request, cancellationToken);
         }
 
-        internal static async Task<IIdxResponse> ProceedWithRemediationOptionAsync(this IRemediationOption remediationOption, IdxRequestPayload request, CancellationToken cancellationToken = default)
-        {
-            if (remediationOption == null)
-            {
-                throw new System.ArgumentNullException(nameof(remediationOption));
-            }
-
-            return await remediationOption
-                    .ProceedAsync(request, cancellationToken);
-        }
-
         internal static bool ContainsRemediationOption(this IIdxResponse response, string remediationType) =>
                     response.Remediation.RemediationOptions.Any(x => x.Name == remediationType);
 
