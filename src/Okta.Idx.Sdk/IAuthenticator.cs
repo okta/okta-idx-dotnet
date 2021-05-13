@@ -3,34 +3,38 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
-using Okta.Sdk.Abstractions;
 using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
 {
     /// <summary>
-    /// An interface to reprenset an authenticator.
+    /// An interface to represent an authenticator.
     /// </summary>
-    public interface IAuthenticator : IResource
+    public interface IAuthenticator
     {
         /// <summary>
-        /// Gets the display name.
+        /// Gets or sets the authenticator ID.
         /// </summary>
-        string DisplayName { get; }
+        string Id { get; set; }
 
         /// <summary>
-        /// Gets the Id.
+        /// Gets or sets the enrollment ID if available.
         /// </summary>
-        string Id { get; }
+        string EnrollmentId { get; set; }
 
         /// <summary>
-        /// Gets the key.
+        /// Gets or sets the authenticator name.
         /// </summary>
-        string Key { get; }
+        string Name { get; set; }
 
         /// <summary>
-        /// Gets the methods.
+        /// Gets or sets the profile.
         /// </summary>
-        IList<IAuthenticatorMethod> Methods { get; }
+        string Profile { get; set; }
+
+        /// <summary>
+        /// Gets or sets the authenticator method types if applicable.
+        /// </summary>
+        IList<AuthenticatorMethodType> MethodTypes { get; set; }
     }
 }

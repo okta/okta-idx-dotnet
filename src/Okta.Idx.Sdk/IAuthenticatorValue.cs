@@ -1,4 +1,4 @@
-﻿// <copyright file="IAuthenticatorEnrollmentValue.cs" company="Okta, Inc">
+﻿// <copyright file="IAuthenticatorValue.cs" company="Okta, Inc">
 // Copyright (c) 2020 - present Okta, Inc. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
@@ -9,9 +9,9 @@ using Okta.Sdk.Abstractions;
 namespace Okta.Idx.Sdk
 {
     /// <summary>
-    /// An interface to represent the authenticator enrollment value.
+    /// An interface to represent an authenticator.
     /// </summary>
-    public interface IAuthenticatorEnrollmentValue : IResource
+    public interface IAuthenticatorValue : IResource
     {
         /// <summary>
         /// Gets the display name.
@@ -32,10 +32,5 @@ namespace Okta.Idx.Sdk
         /// Gets the methods.
         /// </summary>
         IList<IAuthenticatorMethod> Methods { get; }
-
-        /// <summary>
-        /// Gets the recover object.
-        /// </summary>
-        IRecover Recover { get; }
     }
 }

@@ -9,6 +9,6 @@ namespace Okta.Idx.Sdk
 {
     public interface IAuthenticatorMethod : IResource
     {
-        string Type { get; }
+        AuthenticatorMethodType Type { get; }
     }
 }

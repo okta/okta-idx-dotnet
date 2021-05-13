@@ -5,12 +5,13 @@ using System.Web;
 
 namespace direct_auth_idx.Models
 {
-    public class AuthenticatorViewModel
+    public class SelectAuthenticatorMethodViewModel
     {
-        public string Name { get; set; }
+        public string Profile { get; set; }
+
+        public string EnrollmentId { get; set; }
 
         public string AuthenticatorId { get; set; }
 
-        public string EnrollmentId { get; set; }
     }
 }

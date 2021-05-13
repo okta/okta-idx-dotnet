@@ -16,9 +16,9 @@ namespace Okta.Idx.Sdk
         Email,
 
         /// <summary>
-        /// SMS
+        /// Phone
         /// </summary>
-        Sms,
+        Phone,
 
         /// <summary>
         /// Password

@@ -21,6 +21,6 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets the authenticators enrollments.
         /// </summary>
-        IList<IAuthenticatorEnrollmentValue> Value { get; }
+        IList<IAuthenticatorEnrollment> Value { get; }
     }
 }

@@ -31,5 +31,10 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the authenticators.
         /// </summary>
         public IList<IAuthenticator> Authenticators { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current authenticator enrollment.
+        /// </summary>
+        public IAuthenticator CurrentAuthenticatorEnrollment { get; set; }
     }
 }

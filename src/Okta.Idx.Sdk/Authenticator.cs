@@ -7,23 +7,22 @@ using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
 {
-    /// <summary>
-    /// This class represents an Authenticator.
-    public class Authenticator : Resource, IAuthenticator
+    /// <inheritdoc/>
+    public class Authenticator : IAuthenticator
     {
         /// <inheritdoc/>
-        public string DisplayName => GetStringProperty("displayName");
+        public string Id { get; set; }
 
         /// <inheritdoc/>
-        public string Id => GetStringProperty("id");
+        public string EnrollmentId { get; set; }
 
         /// <inheritdoc/>
-        public string Key => GetStringProperty("key");
+        public string Name { get; set; }
 
         /// <inheritdoc/>
-        public IList<IAuthenticatorMethod> Methods => GetArrayProperty<IAuthenticatorMethod>("methods");
+        public IList<AuthenticatorMethodType> MethodTypes { get; set; }
 
         /// <inheritdoc/>
-        public string Type => GetStringProperty("type");
+        public string Profile { get; set; }
     }
 }

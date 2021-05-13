@@ -7,6 +7,6 @@ namespace Okta.Idx.Sdk
 {
     public class AuthenticatorEnrollmentMethod : Resource, IAuthenticatorMethod
     {
-        public string Type => GetStringProperty("type");
+        public AuthenticatorMethodType Type => GetEnumProperty<AuthenticatorMethodType>("type");
     }
 }

@@ -4,7 +4,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Okta.Sdk.Abstractions;
@@ -56,7 +55,7 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets the current authenticator enrollment
         /// </summary>
-        IAuthenticatorEnrollment CurrentAuthenticatorEnrollment { get; }
+        IAuthenticatorEnrollmentData CurrentAuthenticatorEnrollment { get; }
 
         /// <summary>
         /// Gets the authenticators
