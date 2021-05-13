@@ -16,7 +16,7 @@ namespace Okta.Idx.Sdk
         public static readonly string Identify = "identify";
 
         /// <summary>
-        /// identify
+        /// identify-recovery
         /// </summary>
         public static readonly string IdentifyRecovery = "identify-recovery";
 
