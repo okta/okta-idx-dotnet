@@ -47,13 +47,6 @@ namespace Okta.Idx.Sdk
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IdxClient"/> class.
-        /// </summary>
-        public IdxClient()
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="IdxClient"/> class using the specified <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="configuration">
