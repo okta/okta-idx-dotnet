@@ -686,6 +686,28 @@ namespace Okta.Idx.Sdk
             var idxContext = await InteractAsync(cancellationToken: cancellationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
+            var identifyOption = introspectResponse.FindRemediationOption(RemediationType.Identify, throwIfNotFound: true);
+            var optionRequiresCredentials = identifyOption.Form.Any(f => f.Name == "credentials");
+
+            IIdxResponse recoveryResponse;
+
+            if (optionRequiresCredentials && introspectResponse.CurrentAuthenticator.Value != null)
+            {
+                // issue a recover request
+                var recoveryRequest2rename = new IdxRequestPayload
+                {
+                    StateHandle = introspectResponse.StateHandle,
+                };
+
+                var currentEnrollment2rename = introspectResponse
+                                .CurrentAuthenticator
+                                .Value;
+
+                introspectResponse = await currentEnrollment2rename
+                                            .Recover
+                                            .ProceedAsync(recoveryRequest2rename, cancellationToken);
+            }
+
             // Common request payload
             var identifyRequest = new IdxRequestPayload
             {
@@ -693,8 +715,11 @@ namespace Okta.Idx.Sdk
             };
             identifyRequest.SetProperty("identifier", recoverPasswordOptions.Username);
 
+            // Find identify option
+            var identifyRemediationOption = introspectResponse.FindRemediationOption(RemediationType.Identify) ??
+                introspectResponse.FindRemediationOption(RemediationType.IdentifyRecovery, throwIfNotFound: true);
             // Send username
-            var identifyResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.Identify, identifyRequest, cancellationToken);
+            var identifyResponse = await identifyRemediationOption.ProceedWithRemediationOptionAsync(identifyRequest, cancellationToken);
 
             // Get available authenticators
             var recoveryRequest = new IdxRequestPayload
@@ -703,10 +728,10 @@ namespace Okta.Idx.Sdk
             };
 
             var currentEnrollment = identifyResponse
-                                        .CurrentAuthenticatorEnrollment
-                                        .Value;
+                            .CurrentAuthenticatorEnrollment
+                            .Value;
 
-            var recoveryResponse = await currentEnrollment
+            recoveryResponse = await currentEnrollment
                                         .Recover
                                         .ProceedAsync(recoveryRequest, cancellationToken);
 
