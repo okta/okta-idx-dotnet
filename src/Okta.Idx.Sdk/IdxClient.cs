@@ -244,7 +244,7 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default)
         {
-            IIdxContext idxContext = await this.InteractAsync();
+            var idxContext = await this.InteractAsync();
             return new WidgetSignInResponse
             {
                 IdxContext = idxContext,
@@ -253,13 +253,12 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<OktaTokens> RedeemInteractionCodeAsync(IIdxContext idxContext, string interactionCode, Action<Exception> exceptionHandler = null, CancellationToken cancellationToken = default)
+        public async Task<TokenResponse> RedeemInteractionCodeAsync(IIdxContext idxContext, string interactionCode, CancellationToken cancellationToken = default)
         {
-            exceptionHandler = exceptionHandler ?? LogError;
             try
             {
                 Uri issuerUri = new Uri(Configuration.Issuer);
-                Uri tokenUri = new Uri(GetNormalizedUriString(issuerUri.ToString(), "v1/token"));
+                Uri tokenUri = new Uri(IdxUrlHelper.GetNormalizedUriString(issuerUri.ToString(), "v1/token"));
                 HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenUri);
 
                 StringBuilder requestContent = new StringBuilder();
@@ -280,17 +279,19 @@ namespace Okta.Idx.Sdk
 
                 if (!responseMessage.IsSuccessStatusCode)
                 {
-                    exceptionHandler(new RedeemInteractionCodeException(tokenResponseJson));
+                    throw new RedeemInteractionCodeException(tokenResponseJson);
                 }
 
-                return JsonConvert.DeserializeObject<OktaTokens>(tokenResponseJson);
+                Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(tokenResponseJson);
+                TokenResponse response = new TokenResponse();
+                response.Initialize(this, null, data, _logger);
+                return response;
             }
             catch (Exception exception)
             {
-                exceptionHandler(new RedeemInteractionCodeException(exception));
+                LogError(exception);
+                throw new RedeemInteractionCodeException(exception);
             }
-
-            return null;
         }
 
         /// <summary>
@@ -310,35 +311,6 @@ namespace Okta.Idx.Sdk
             }
 
             stringBuilder.Append($"{key}={value}");
-        }
-
-        private static string GetNormalizedUriString(string issuer, string resourceUri)
-        {
-            string normalized = issuer;
-            if (IsRootOrgIssuer(issuer))
-            {
-                normalized = Path.Combine(normalized, "oauth2", resourceUri);
-            }
-            else
-            {
-                normalized = Path.Combine(normalized, resourceUri);
-            }
-
-            return normalized;
-        }
-
-        private static bool IsRootOrgIssuer(string issuerUri)
-        {
-            string path = new Uri(issuerUri).AbsolutePath;
-            string[] splitUri = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            if (splitUri.Length >= 2 &&
-            "oauth2".Equals(splitUri[0]) &&
-            !string.IsNullOrEmpty(splitUri[1]))
-            {
-                return false;
-            }
-
-            return true;
         }
 
         /// <inheritdoc/>

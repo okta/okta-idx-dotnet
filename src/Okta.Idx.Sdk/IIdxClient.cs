@@ -35,10 +35,9 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="idxContext">The IDX context that was returned by the `interact()` call</param>
         /// <param name="interactionCode">The interaction code.</param>
-        /// <param name="exceptionHandler">An action delegate to handle exceptions if they occur.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>Tokens</returns>
-        Task<OktaTokens> RedeemInteractionCodeAsync(IIdxContext idxContext, string interactionCode, Action<Exception> exceptionHandler = null, CancellationToken cancellationToken = default);
+        Task<TokenResponse> RedeemInteractionCodeAsync(IIdxContext idxContext, string interactionCode, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Authenticates a user with username/password credentials
