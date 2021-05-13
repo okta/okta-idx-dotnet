@@ -136,6 +136,8 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> ChallengeAuthenticatorAsync(ChallengePhoneAuthenticatorOptions challengeAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+        
+        /// <summary>
         /// Start an interaction to be completed by the sign-in widget.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
