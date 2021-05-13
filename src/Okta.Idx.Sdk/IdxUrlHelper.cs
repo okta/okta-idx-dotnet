@@ -14,7 +14,7 @@ namespace Okta.Idx.Sdk
         /// Gets a normalized URI string for the specified issuer and resource.
         /// </summary>
         /// <param name="issuer">The issuer.</param>
-        /// <param name="resourceUri">The resource URI.</param>
+        /// <param name="resourceUri">The relative path of the resource.</param>
         /// <returns>Normalied URI string.</returns>
         public static string GetNormalizedUriString(string issuer, string resourceUri)
         {
@@ -27,6 +27,8 @@ namespace Okta.Idx.Sdk
             {
                 normalized = Path.Combine(normalized, resourceUri);
             }
+
+            normalized = normalized.Replace("\\", "/");
 
             return normalized;
         }
@@ -48,6 +50,23 @@ namespace Okta.Idx.Sdk
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Adds a key value parameter to the specified string builder in a query string format.
+        /// </summary>
+        /// <param name="stringBuilder">The string builder</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="ampersandPrefix">A value indicating whether to append an ampersand before the key value pair.</param>
+        public static void AddParameter(StringBuilder stringBuilder, string key, string value, bool ampersandPrefix = false)
+        {
+            if (ampersandPrefix)
+            {
+                stringBuilder.Append("&");
+            }
+
+            stringBuilder.Append($"{key}={value}");
         }
     }
 }

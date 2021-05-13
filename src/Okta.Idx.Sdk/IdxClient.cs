@@ -262,15 +262,15 @@ namespace Okta.Idx.Sdk
                 HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenUri);
 
                 StringBuilder requestContent = new StringBuilder();
-                this.AddParameter(requestContent, "grant_type", "interaction_code", false);
-                this.AddParameter(requestContent, "client_id", Configuration.ClientId, true);
+                IdxUrlHelper.AddParameter(requestContent, "grant_type", "interaction_code", false);
+                IdxUrlHelper.AddParameter(requestContent, "client_id", Configuration.ClientId, true);
                 if (!string.IsNullOrEmpty(Configuration.ClientSecret))
                 {
-                    this.AddParameter(requestContent, "client_secret", Configuration.ClientSecret, true);
+                    IdxUrlHelper.AddParameter(requestContent, "client_secret", Configuration.ClientSecret, true);
                 }
 
-                this.AddParameter(requestContent, "interaction_code", interactionCode, true);
-                this.AddParameter(requestContent, "code_verifier", idxContext.CodeVerifier, true);
+                IdxUrlHelper.AddParameter(requestContent, "interaction_code", interactionCode, true);
+                IdxUrlHelper.AddParameter(requestContent, "code_verifier", idxContext.CodeVerifier, true);
 
                 requestMessage.Content = new StringContent(requestContent.ToString(), Encoding.UTF8, "application/x-www-form-urlencoded");
                 requestMessage.Headers.Add("Accept", "application/json");
@@ -301,16 +301,6 @@ namespace Okta.Idx.Sdk
         protected virtual void LogError(Exception ex)
         {
             _logger.LogError(ex, ex.Message);
-        }
-
-        private void AddParameter(StringBuilder stringBuilder, string key, string value, bool ampersandPrefix = false)
-        {
-            if (ampersandPrefix)
-            {
-                stringBuilder.Append("&");
-            }
-
-            stringBuilder.Append($"{key}={value}");
         }
 
         /// <inheritdoc/>
