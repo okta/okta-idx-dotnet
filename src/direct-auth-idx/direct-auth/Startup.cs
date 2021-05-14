@@ -14,11 +14,15 @@ namespace direct_auth
     {
         public void Configuration(IAppBuilder app)
         {
-            // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=316888
+            ConfigureAuth(app);
+        }
+
+        public void ConfigureAuth(IAppBuilder app)
+        {
             app.UseCookieAuthentication(new CookieAuthenticationOptions
                                             {
                                                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                                                //LoginPath = new PathString("/Account/Login"),
+                                                LoginPath = new PathString("/Account/LoginWithPassword"),
                                             });
         }
     }

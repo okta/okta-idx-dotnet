@@ -24,7 +24,7 @@ namespace direct_auth
 
 
             container.RegisterFactory<IIdxClient>(o => new IdxClient(), new TransientLifetimeManager());
-            container.RegisterFactory<IAuthenticationManager>(o => HttpContext.Current.GetOwinContext().Authentication, new SingletonLifetimeManager());
+            container.RegisterFactory<IAuthenticationManager>(o => HttpContext.Current.GetOwinContext().Authentication, new TransientLifetimeManager());
 
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }

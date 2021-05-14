@@ -4,29 +4,31 @@
 
 <div class="jumbotron">
     <h1>Okta + ASP.NET: Direct-Auth</h1>
-    <p class="lead">This Web App shows you how to implement Direct-Auth scenarios with the `Okta.Idx.Sdk`.</p>
+    <p class="lead">This Web App shows you how to implement Direct-Auth scenarios with the Okta IDX SDK.</p>
     @*<p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>*@
 </div>
-
-<div class="row">
-    <div class="col-md-12">
-        <h2>Getting started</h2>
-        <h3>
-            Basic Authentication
-        </h3>
-        <p>Login with your username and password</p>
-        <div>
-            @Html.ActionLink("Log in", "LoginWithPassword", "Account", routeValues: null, htmlAttributes: new { @class = "btn btn-info" })
+@if (!Request.IsAuthenticated)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Getting started</h2>
+            <h3>
+                Basic Authentication
+            </h3>
+            <p>Login with your username and password</p>
+            <div>
+                @Html.ActionLink("Log in", "LoginWithPassword", "Account", routeValues: null, htmlAttributes: new { @class = "btn btn-info" })
+            </div>
         </div>
+        @*<div class="col-md-4">
+                <h2>Get more libraries</h2>
+                <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+                <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+            </div>
+            <div class="col-md-4">
+                <h2>Web Hosting</h2>
+                <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+                <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+            </div>*@
     </div>
-    @*<div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>*@
-</div>
+}

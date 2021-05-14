@@ -63,10 +63,12 @@ namespace direct_auth.Controllers
 
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.Success)
                 {
-                    Session["access_token"] = authnResponse.TokenInfo.AccessToken;
                     var claims = await GetClaimsFromUserInfoAsync(authnResponse.TokenInfo.AccessToken);
+                    claims = claims.Append(new Claim("access_token", authnResponse.TokenInfo.AccessToken));
+                    claims = claims.Append(new Claim("id_token", authnResponse.TokenInfo.IdToken));
                     ClaimsIdentity identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
-                    _authenticationManager.SignIn(identity);
+
+                    _authenticationManager.SignIn(new AuthenticationProperties {IsPersistent = false}, identity);
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -85,9 +87,8 @@ namespace direct_auth.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> LogOut()
         {
-            var client = new IdxClient(null);
-            //var accessToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "access_token");
-            await client.RevokeTokensAsync(TokenType.AccessToken, Session["access_token"]?.ToString());
+            var accessToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "access_token").ToString();
+            await this._idxClient.RevokeTokensAsync(TokenType.AccessToken, accessToken);
             _authenticationManager.SignOut();
             return RedirectToAction("Index", "Home");
         }
@@ -108,8 +109,10 @@ namespace direct_auth.Controllers
                                                                               Address = userInfoUri.ToString(),
                                                                               Token = accessToken,
                                                                           }).ConfigureAwait(false);
-
-            return userInfoResponse.Claims;
+            var nameClaim = new Claim(
+                ClaimTypes.Name,
+                userInfoResponse.Claims.FirstOrDefault(x => x.Type == "name")?.Value);
+            return userInfoResponse.Claims.Append(nameClaim);
         }
 
         /******************************************************************************************/
