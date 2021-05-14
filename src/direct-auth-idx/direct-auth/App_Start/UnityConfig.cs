@@ -5,7 +5,7 @@ using Unity;
 using Unity.Injection;
 using Unity.Mvc5;
 
-namespace direct_auth_idx
+namespace direct_auth
 {
     using Okta.Idx.Sdk;
 
@@ -22,8 +22,10 @@ namespace direct_auth_idx
 
             // e.g. container.RegisterType<ITestService, TestService>();
 
+
             container.RegisterFactory<IIdxClient>(o => new IdxClient(), new TransientLifetimeManager());
             container.RegisterFactory<IAuthenticationManager>(o => HttpContext.Current.GetOwinContext().Authentication, new TransientLifetimeManager());
+
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }
     }
