@@ -17,6 +17,7 @@ using FlexibleConfiguration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Idx.Sdk.Extensions;
 using Okta.Idx.Sdk.Helpers;
@@ -29,6 +30,8 @@ namespace Okta.Idx.Sdk
     /// </summary>
     public class IdxClient : IIdxClient
     {
+        private HttpClient httpClient;
+
         /// <summary>
         /// The <code>IDataStore</code> implementation to be used for making requests.
         /// </summary>
@@ -67,14 +70,14 @@ namespace Okta.Idx.Sdk
             var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
 
             // TODO: Allow proxy configuration
-            httpClient = httpClient ?? DefaultHttpClient.Create(
+            this.httpClient = httpClient ?? DefaultHttpClient.Create(
                 connectionTimeout: null,
                 proxyConfiguration: null,
                 logger: _logger);
 
             var oktaBaseConfiguration = OktaConfigurationConverter.Convert(Configuration);
             var resourceTypeResolverFactory = new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource)));
-            var requestExecutor = new DefaultRequestExecutor(oktaBaseConfiguration, httpClient, _logger);
+            var requestExecutor = new DefaultRequestExecutor(oktaBaseConfiguration, this.httpClient, _logger);
             var resourceFactory = new ResourceFactory(this, _logger, resourceTypeResolverFactory);
 
             _dataStore = new DefaultDataStore(
@@ -229,6 +232,68 @@ namespace Okta.Idx.Sdk
 
             return await PostAsync<IdxResponse>(
                 request, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc/>
+        public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default)
+        {
+            var idxContext = await this.InteractAsync();
+            return new WidgetSignInResponse
+            {
+                IdxContext = idxContext,
+                SignInWidgetConfiguration = new SignInWidgetConfiguration(this.Configuration, idxContext),
+            };
+        }
+
+        /// <inheritdoc/>
+        public async Task<TokenResponse> RedeemInteractionCodeAsync(IIdxContext idxContext, string interactionCode, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                Uri issuerUri = new Uri(Configuration.Issuer);
+                Uri tokenUri = new Uri(IdxUrlHelper.GetNormalizedUriString(issuerUri.ToString(), "v1/token"));
+                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenUri);
+
+                StringBuilder requestContent = new StringBuilder();
+                IdxUrlHelper.AddParameter(requestContent, "grant_type", "interaction_code", false);
+                IdxUrlHelper.AddParameter(requestContent, "client_id", Configuration.ClientId, true);
+                if (!string.IsNullOrEmpty(Configuration.ClientSecret))
+                {
+                    IdxUrlHelper.AddParameter(requestContent, "client_secret", Configuration.ClientSecret, true);
+                }
+
+                IdxUrlHelper.AddParameter(requestContent, "interaction_code", interactionCode, true);
+                IdxUrlHelper.AddParameter(requestContent, "code_verifier", idxContext.CodeVerifier, true);
+
+                requestMessage.Content = new StringContent(requestContent.ToString(), Encoding.UTF8, "application/x-www-form-urlencoded");
+                requestMessage.Headers.Add("Accept", "application/json");
+                HttpResponseMessage responseMessage = await this.httpClient.SendAsync(requestMessage);
+                string tokenResponseJson = await responseMessage.Content.ReadAsStringAsync();
+
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    throw new RedeemInteractionCodeException(tokenResponseJson);
+                }
+
+                Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(tokenResponseJson);
+                TokenResponse response = new TokenResponse();
+                response.Initialize(this, null, data, _logger);
+                return response;
+            }
+            catch (Exception exception)
+            {
+                LogError(exception);
+                throw new RedeemInteractionCodeException(exception);
+            }
+        }
+
+        /// <summary>
+        /// Logs the specified exception.
+        /// </summary>
+        /// <param name="ex">The exception.</param>
+        protected virtual void LogError(Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
         }
 
         /// <inheritdoc/>
