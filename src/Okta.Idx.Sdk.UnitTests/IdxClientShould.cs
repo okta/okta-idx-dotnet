@@ -273,7 +273,7 @@ namespace Okta.Idx.Sdk.UnitTests
             recoverResponse.CurrentAuthenticatorEnrollment.Value.DisplayName.Should().Be("Password");
             recoverResponse.CurrentAuthenticatorEnrollment.Value.Key.Should().Be("okta_password");
             recoverResponse.CurrentAuthenticatorEnrollment.Value.Id.Should().NotBeNullOrEmpty();
-            recoverResponse.CurrentAuthenticatorEnrollment.Value.Methods.FirstOrDefault().Type.Should().Be("password");
+            recoverResponse.CurrentAuthenticatorEnrollment.Value.Methods.FirstOrDefault().Type.Should().Be(AuthenticatorMethodType.Password);
         }
 
         [Fact]
