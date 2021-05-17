@@ -134,6 +134,37 @@ namespace Okta.Idx.Sdk
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="IdxClient"/> class.
+        /// </summary>
+        /// <param name="requestExecutor">The <see cref="IRequestExecutor">Request Executor</see> to use.</param>
+        /// <param name="configuration">The client configuration.</param>
+        /// <param name="requestContext">The request context, if any.</param>
+        /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
+        protected IdxClient(IRequestExecutor requestExecutor, IdxConfiguration configuration, RequestContext requestContext)
+        {
+            Configuration = configuration;
+
+            var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
+
+            // TODO: Allow proxy configuration
+            this.httpClient = httpClient ?? DefaultHttpClient.Create(
+                                  connectionTimeout: null,
+                                  proxyConfiguration: null,
+                                  logger: NullLogger.Instance);
+
+            var oktaBaseConfiguration = OktaConfigurationConverter.Convert(Configuration);
+            var resourceTypeResolverFactory = new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource)));
+            var resourceFactory = new ResourceFactory(this, NullLogger.Instance, resourceTypeResolverFactory);
+
+            _dataStore = new DefaultDataStore(
+                requestExecutor,
+                new DefaultSerializer(),
+                resourceFactory,
+                NullLogger.Instance,
+                userAgentBuilder);
+        }
+
+        /// <summary>
         /// Gets or sets the Okta configuration.
         /// </summary>
         public IdxConfiguration Configuration { get; protected set; }

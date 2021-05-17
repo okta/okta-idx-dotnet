@@ -1,0 +1,66 @@
+{
+   "version":"1.0.0",
+   "stateHandle":"021ASG5DWgfcbJZ5jRU_KzF-K-6EHgE_Cq9o48TEZ4",
+   "expiresAt":"2021-05-17T18:11:34.000Z",
+   "intent":"LOGIN",
+   "remediation":{
+      "type":"array",
+      "value":[
+         {
+            "rel":[
+               "create-form"
+            ],
+            "name":"identify",
+            "href":"https://foo.okta.com/idp/idx/identify",
+            "method":"POST",
+            "produces":"application/ion+json; okta-version=1.0.0",
+            "value":[
+               {
+                  "name":"identifier",
+                  "label":"Username"
+               },
+               {
+                  "name":"rememberMe",
+                  "type":"boolean",
+                  "label":"Remember this device"
+               },
+               {
+                  "name":"stateHandle",
+                  "required":true,
+                  "value":"021ASG5DWgfcbJZ5jRU_KzF-K-6EHgE_Cq9o48TEZ4",
+                  "visible":false,
+                  "mutable":false
+               }
+            ],
+            "accepts":"application/json; okta-version=1.0.0"
+         }
+      ]
+   },
+   "cancel":{
+      "rel":[
+         "create-form"
+      ],
+      "name":"cancel",
+      "href":"https://foo.okta.com/idp/idx/cancel",
+      "method":"POST",
+      "produces":"application/ion+json; okta-version=1.0.0",
+      "value":[
+         {
+            "name":"stateHandle",
+            "required":true,
+            "value":"021ASG5DWgfcbJZ5jRU_KzF-K-6EHgE_Cq9o48TEZ4",
+            "visible":false,
+            "mutable":false
+         }
+      ],
+      "accepts":"application/json; okta-version=1.0.0"
+   },
+   "app":{
+      "type":"object",
+      "value":{
+         "name":"oidc_client",
+         "label":"Laura - My Web App",
+         "id":"foo"
+      }
+   }
+}

@@ -16,16 +16,14 @@ namespace Okta.Idx.Sdk.UnitTests
             Issuer = "https://fake.example.com",
             ClientId = "foo",
         };
-
+        
         public TesteableIdxClient(IRequestExecutor requestExecutor)
             : base(
-                new DefaultDataStore(requestExecutor, new DefaultSerializer(), new ResourceFactory(null, null, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource)))),
-                    NullLogger.Instance,
-                    new UserAgentBuilder("test",
-                        typeof(TesteableIdxClient).GetTypeInfo().Assembly.GetName().Version)),
+                requestExecutor,
                 DefaultFakeConfiguration,
                 new RequestContext())
         {
         }
+
     }
 }
