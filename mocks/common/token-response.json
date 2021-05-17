@@ -1,0 +1,7 @@
+{
+   "token_type":"Bearer",
+   "expires_in":3600,
+   "access_token":"eyJraWQiOiJuV0xV",
+   "scope":"openid profile",
+   "id_token":"eyJraWQiOiJuV0xVc05v"
+}
