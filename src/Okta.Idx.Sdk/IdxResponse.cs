@@ -39,6 +39,9 @@ namespace Okta.Idx.Sdk
         public IIdxSuccessResponse SuccessWithInteractionCode => GetResourceProperty<IdxSuccessResponse>("successWithInteractionCode");
 
         /// <inheritdoc/>
+        public IAuthenticatorEnrollmentData CurrentAuthenticator => GetResourceProperty<AuthenticatorEnrollmentData>("currentAuthenticator");
+
+        /// <inheritdoc/>
         public IAuthenticatorEnrollmentData CurrentAuthenticatorEnrollment => GetResourceProperty<AuthenticatorEnrollmentData>("currentAuthenticatorEnrollment");
 
         /// <inheritdoc/>

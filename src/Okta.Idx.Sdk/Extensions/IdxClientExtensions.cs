@@ -13,15 +13,7 @@ namespace Okta.Idx.Sdk
     {
         internal static async Task<IIdxResponse> ProceedWithRemediationOptionAsync(this IIdxResponse response, string remediationType, IdxRequestPayload request, CancellationToken cancellationToken = default)
         {
-            var remediationOption = response
-                    .Remediation
-                    .RemediationOptions
-                    .FirstOrDefault(x => x.Name == remediationType);
-
-            if (remediationOption == null)
-            {
-                throw new UnexpectedRemediationException(remediationType, response);
-            }
+            var remediationOption = response.FindRemediationOption(remediationType, true);
 
             return await remediationOption
                     .ProceedAsync(request, cancellationToken);
@@ -30,5 +22,19 @@ namespace Okta.Idx.Sdk
         internal static bool ContainsRemediationOption(this IIdxResponse response, string remediationType) =>
                     response.Remediation.RemediationOptions.Any(x => x.Name == remediationType);
 
+        internal static IRemediationOption FindRemediationOption(this IIdxResponse response, string remediationType, bool throwIfNotFound = false)
+        {
+            var option = response
+                .Remediation
+                .RemediationOptions
+                .FirstOrDefault(x => x.Name == remediationType);
+
+            if (option == null && throwIfNotFound)
+            {
+                throw new UnexpectedRemediationException(remediationType, response);
+            }
+
+            return option;
+        }
     }
 }
