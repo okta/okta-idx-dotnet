@@ -15,6 +15,7 @@ namespace Okta.Idx.Sdk.UnitTests
         {
             Issuer = "https://fake.example.com",
             ClientId = "foo",
+            RedirectUri = "https://fake.example.com/redirectUri"
         };
         
         public TesteableIdxClient(IRequestExecutor requestExecutor)
