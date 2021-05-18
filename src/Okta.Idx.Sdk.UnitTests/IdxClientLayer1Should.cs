@@ -867,8 +867,6 @@ namespace Okta.Idx.Sdk.UnitTests
             methodTypeFormItem.Required.Should().BeFalse();
             methodTypeFormItem.GetProperty<string>("value").Should().Be("security_question");
             methodTypeFormItem.Mutable.Should().BeFalse();
-
-            // TODO: authenticators
         }
 
 
