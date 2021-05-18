@@ -8,7 +8,10 @@ using Xunit;
 
 namespace Okta.Idx.Sdk.UnitTests
 {
+    using Microsoft.Extensions.Logging;
+    using NSubstitute;
     using System.Collections.Generic;
+    using System.Net.Http;
 
     public class IdxClientShould
     {
@@ -898,5 +901,117 @@ namespace Okta.Idx.Sdk.UnitTests
             authResponse.TokenInfo.Should().BeNull();
         }
 
+        [Fact]
+        public async Task ThrowRedeemInteractionCodeExceptionIfNoInteractionCodeOnRedeem()
+        {
+            HttpClient fakeHttpClient = Substitute.For<HttpClient>();
+            ILogger fakeLogger = Substitute.For<ILogger>();
+            IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, fakeHttpClient, fakeLogger);
+
+            bool exceptionWasThrown = false;
+            try
+            {
+                IdxContext testIdxContext = new IdxContext();
+                await idxClient.RedeemInteractionCodeAsync(testIdxContext, null);
+            }
+            catch (RedeemInteractionCodeException redeemInteractionCodeException)
+            {
+                Assert.IsType<ArgumentNullException>(redeemInteractionCodeException.InnerException);
+                ArgumentNullException argumentNullException = (ArgumentNullException)redeemInteractionCodeException.InnerException;
+                Assert.Equal("interactionCode", argumentNullException.ParamName);
+                exceptionWasThrown = true;
+            }
+            Assert.True(exceptionWasThrown);
+        }
+
+        [Fact]
+        public async Task ThrowRedeemInteractionCodeExceptionIfNoCodeVerifierOnRedeem()
+        {
+            HttpClient fakeHttpClient = Substitute.For<HttpClient>();
+            ILogger fakeLogger = Substitute.For<ILogger>();
+            IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, fakeHttpClient, fakeLogger);
+
+            bool exceptionWasThrown = false;
+            try
+            {
+                IdxContext testIdxContext = new IdxContext();
+                await idxClient.RedeemInteractionCodeAsync(testIdxContext, "not null interaction code");
+            }
+            catch (RedeemInteractionCodeException redeemInteractionCodeException)
+            {
+                Assert.IsType<ArgumentNullException>(redeemInteractionCodeException.InnerException);
+                ArgumentNullException argumentNullException = (ArgumentNullException)redeemInteractionCodeException.InnerException;
+                Assert.Equal("idxContext.CodeVerifier", argumentNullException.ParamName);
+                exceptionWasThrown = true;
+            }
+            Assert.True(exceptionWasThrown);
+        }
+
+        [Fact]
+        public async Task ThrowRedeemInteractionCodeExceptionIfNoSuccessOnResponse()
+        {
+            string testResponse = @"{
+   ""error"":""some error message""
+}";
+            MockHttpMessageHandler mockHttpMessageHandler = new MockHttpMessageHandler(testResponse, System.Net.HttpStatusCode.BadRequest);
+            HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
+            ILogger logger = NullLogger.Instance;
+
+            IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, logger);
+            bool exceptionWasThrown = false;
+            try
+            {
+                IdxContext idxContext = new IdxContext("non null code verifier", "code challenge", "code challenge method", "interaction handler", "state");
+                await idxClient.RedeemInteractionCodeAsync(idxContext, "non null interaction code value");
+            }
+            catch (RedeemInteractionCodeException redeemInteractionCodeException)
+            {
+                Assert.Equal(testResponse, redeemInteractionCodeException.ApiResponse);
+                exceptionWasThrown = true;
+            }
+            Assert.True(exceptionWasThrown);
+        }
+
+        [Fact]
+        public async Task LogErrorOnRedeemInteractionCodeException()
+        {
+            string testResponse = @"{
+   ""error"":""some error message""
+}";
+            MockHttpMessageHandler mockHttpMessageHandler = new MockHttpMessageHandler(testResponse, System.Net.HttpStatusCode.BadRequest);
+            HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
+            ILogger logger = NullLogger.Instance;
+
+            MockIdxClient idxClient = new MockIdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, logger);
+            bool exceptionWasThrown = false;
+            try
+            {
+                IdxContext idxContext = new IdxContext("non null code verifier", "code challenge", "code challenge method", "interaction handler", "state");
+                await idxClient.RedeemInteractionCodeAsync(idxContext, "non null interaction code value");
+            }
+            catch (RedeemInteractionCodeException)
+            {
+                idxClient.LogErrorCallCount.Should().Be(1);
+                exceptionWasThrown = true;
+            }
+            Assert.True(exceptionWasThrown);
+        }
+
+        [Fact]
+        public async Task CallInteractOnStartSignInWidget()
+        {
+            string interactResponse = @"{""interaction_handle"":""this is a test interaction handle""}";
+            MockHttpMessageHandler mockHttpMessageHandler = new MockHttpMessageHandler();
+            mockHttpMessageHandler.AddTestResponse("/v1/interact", interactResponse);
+            HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
+
+            IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, NullLogger.Instance);
+
+            WidgetSignInResponse widgetResponse = await idxClient.StartWidgetSignInAsync();
+            Assert.NotNull(widgetResponse);
+            Assert.NotNull(widgetResponse.IdxContext);
+            Assert.Equal("this is a test interaction handle", widgetResponse.IdxContext.InteractionHandle);
+            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/v1/interact"]);
+        }
     }
 }

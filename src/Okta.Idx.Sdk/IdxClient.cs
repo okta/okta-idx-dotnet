@@ -281,6 +281,16 @@ namespace Okta.Idx.Sdk
         {
             try
             {
+                if (string.IsNullOrEmpty(interactionCode))
+                {
+                    throw new ArgumentNullException("interactionCode", "Interaction code was not specified.");
+                }
+
+                if (string.IsNullOrEmpty(idxContext.CodeVerifier))
+                {
+                    throw new ArgumentNullException("idxContext.CodeVerifier", "CodeVerifier was not specified.");
+                }
+
                 Uri issuerUri = new Uri(Configuration.Issuer);
                 Uri tokenUri = new Uri(IdxUrlHelper.GetNormalizedUriString(issuerUri.ToString(), "v1/token"));
                 HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenUri);
@@ -310,6 +320,11 @@ namespace Okta.Idx.Sdk
                 TokenResponse response = new TokenResponse();
                 response.Initialize(this, null, data, _logger);
                 return response;
+            }
+            catch (RedeemInteractionCodeException redeemInteractionCodeException)
+            {
+                LogError(redeemInteractionCodeException);
+                throw redeemInteractionCodeException;
             }
             catch (Exception exception)
             {
