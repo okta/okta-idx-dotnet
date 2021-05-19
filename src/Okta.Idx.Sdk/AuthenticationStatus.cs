@@ -56,8 +56,8 @@ namespace Okta.Idx.Sdk
         AwaitingChallengeAuthenticatorSelection,
 
         /// <summary>
-        /// Server returned a message requiring the user's attention
+        /// Flow is done with a message to user, no remediation options available
         /// </summary>
-        MessageToUser,
+        Terminal,
     }
 }

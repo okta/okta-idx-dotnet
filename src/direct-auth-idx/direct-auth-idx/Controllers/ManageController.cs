@@ -271,7 +271,7 @@ namespace direct_auth_idx.Controllers
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         break;
 
-                    case AuthenticationStatus.MessageToUser:
+                    case AuthenticationStatus.Terminal:
                         TempData["MessageToUser"] = skipSelectionResponse.MessageToUser;
                         return RedirectToAction("Login", "Account");
                 }

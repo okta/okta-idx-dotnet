@@ -702,7 +702,7 @@ namespace Okta.Idx.Sdk
             {
                 return new AuthenticationResponse
                 {
-                    AuthenticationStatus = AuthenticationStatus.MessageToUser,
+                    AuthenticationStatus = AuthenticationStatus.Terminal,
                     MessageToUser = skipResponse.IdxMessages.Messages.First().Text,
                 };
             }
