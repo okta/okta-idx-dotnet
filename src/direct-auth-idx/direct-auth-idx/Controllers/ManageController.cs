@@ -72,6 +72,7 @@ namespace direct_auth_idx.Controllers
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["idxContext"] = authnResponse.IdxContext;
                         TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        TempData["canSkip"] = authnResponse.CanSkip;
                         return RedirectToAction("selectAuthenticator", "Manage");
                 }
                 return View("ChangePassword", model);
@@ -124,6 +125,7 @@ namespace direct_auth_idx.Controllers
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["idxContext"] = authnResponse.IdxContext;
                         TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        TempData["canSkip"] = authnResponse.CanSkip;
                         return RedirectToAction("selectAuthenticator", "Manage");
 
                     case AuthenticationStatus.Success:
@@ -238,13 +240,48 @@ namespace direct_auth_idx.Controllers
 
         public ActionResult SelectAuthenticator()
         {
-            var viewModel = new SelectAuthenticatorViewModel();
-            viewModel.Authenticators = (IList<AuthenticatorViewModel>)TempData["authenticators"];
-            viewModel.PasswordId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId;
-            viewModel.PhoneId = viewModel.Authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId;
+            var authenticators = (IList<AuthenticatorViewModel>)TempData["authenticators"];
+            var viewModel = new SelectAuthenticatorViewModel
+            {
+                Authenticators = authenticators,
+                PasswordId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId,
+                PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
+                CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
+            };
 
             TempData["authenticators"] = viewModel.Authenticators;
             return View(viewModel);
+        }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<ActionResult> SkipAuthenticatorSelectionAsync()
+        {
+            try
+            {
+                var idxAuthClient = new IdxClient(null);
+                var skipSelectionResponse = await idxAuthClient.SkipAuthenticatorSelectionAsync((IIdxContext)Session["IdxContext"]);
+
+                switch (skipSelectionResponse.AuthenticationStatus)
+                {
+                    case AuthenticationStatus.Success:
+                        var userName = (string)Session["UserName"] ?? string.Empty;
+                        var identity = AuthenticationHelper.GetIdentityFromAuthResponse(userName, skipSelectionResponse);
+                        _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                        break;
+
+                    case AuthenticationStatus.MessageToUser:
+                        TempData["MessageToUser"] = skipSelectionResponse.MessageToUser;
+                        return RedirectToAction("Login", "Account");
+                }
+                return RedirectToAction("Index", "Home");
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return RedirectToAction("SelectAuthenticator");
+            }
         }
 
         [HttpPost]
@@ -272,11 +309,13 @@ namespace direct_auth_idx.Controllers
 
                     if (model.IsPhoneSelected)
                     {
-                        var selectPhoneOptions = new SelectPhoneAuthenticatorOptions();
-                        ((SelectPhoneAuthenticatorOptions)selectPhoneOptions).EnrollmentId = authenticators
-                                                                    .FirstOrDefault(x => x.AuthenticatorId == model.AuthenticatorId)?
-                                                                    .EnrollmentId;
-                        selectPhoneOptions.AuthenticatorId = model.AuthenticatorId;
+                        var selectPhoneOptions = new SelectPhoneAuthenticatorOptions
+                        {
+                            EnrollmentId = authenticators
+                                            .FirstOrDefault(x => x.AuthenticatorId == model.AuthenticatorId)?
+                                            .EnrollmentId,
+                            AuthenticatorId = model.AuthenticatorId
+                        };
 
                         selectAuthenticatorResponse = await idxAuthClient.SelectChallengeAuthenticatorAsync(selectPhoneOptions, (IIdxContext)Session["IdxContext"]);
                     }

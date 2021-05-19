@@ -2704,5 +2704,50 @@ namespace Okta.Idx.Sdk.UnitTests
 
 
         }
+
+        [Fact]
+        public async Task ProcessInfoMessageResponse()
+        {
+            #region Raw response with a message
+            var rawResponse = @"{
+                  ""version"": ""1.0.0"",
+                  ""stateHandle"": ""02BgAmhAISKk6KZ4fsP-jNTKYqpSMipWcdT6Nw5JZH"",
+                  ""expiresAt"": ""2021 -05-18T18:59:56.000Z"",
+                  ""intent"": ""LOGIN"",
+                  ""messages"": {
+                                ""type"": ""array"",
+                    ""value"": [
+                      {
+                                    ""message"": ""To finish signing in, check your email."",
+                        ""i18n"": {
+                                        ""key"": ""idx.email.verification.required""
+                        },
+                        ""class"": ""INFO""
+                      }
+                    ]
+                  }
+                }";
+            #endregion Raw response with a message
+
+            // Response with a message to user
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+            var resourceFactory = new ResourceFactory(testClient, NullLogger.Instance, new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
+            var data = new DefaultSerializer().Deserialize(rawResponse);
+            var responseWithMessage = resourceFactory.CreateNew<IdxResponse>(data);
+
+            responseWithMessage.IdxMessages.Messages.Should().HaveCount(1);
+            responseWithMessage.IdxMessages.Messages.First().Class.Should().Be("INFO");
+            responseWithMessage.IdxMessages.Messages.First().Text.Should().Be("To finish signing in, check your email.");
+
+            // Response with no messages
+            var emptyData = new DefaultSerializer().Deserialize("{}");
+            var responseWithNoMessages = resourceFactory.CreateNew<IdxResponse>(emptyData);
+
+            responseWithNoMessages.IdxMessages.Messages.Should().BeEmpty();
+        }
+
+
+
     }
 }

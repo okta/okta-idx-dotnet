@@ -76,5 +76,10 @@ namespace Okta.Idx.Sdk
         /// Gets a value indicating whether login was successful
         /// </summary>
         bool IsLoginSuccess { get; }
+
+        /// <summary>
+        /// Gets messages from the server
+        /// </summary>
+        IIdxMessages IdxMessages { get; }
     }
 }

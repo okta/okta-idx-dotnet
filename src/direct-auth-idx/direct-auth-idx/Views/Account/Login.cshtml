@@ -8,6 +8,13 @@
 
 <br />
 
+@if(TempData["MessageToUser"]!=null)
+{
+    <div class="text-warning">
+    <h4>@TempData["MessageToUser"]</h4>
+    <hr />
+    </div>
+}
 <div class="row">
     <div class="col-md-8">
         <section id="loginForm">
