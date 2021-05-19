@@ -283,12 +283,12 @@ namespace Okta.Idx.Sdk
             {
                 if (string.IsNullOrEmpty(interactionCode))
                 {
-                    throw new ArgumentNullException("interactionCode", "Interaction code was not specified.");
+                    throw new ArgumentNullException(nameof(interactionCode), "Interaction code was not specified.");
                 }
 
                 if (string.IsNullOrEmpty(idxContext.CodeVerifier))
                 {
-                    throw new ArgumentNullException("idxContext.CodeVerifier", "CodeVerifier was not specified.");
+                    throw new ArgumentNullException(nameof(idxContext.CodeVerifier), "CodeVerifier was not specified.");
                 }
 
                 Uri issuerUri = new Uri(Configuration.Issuer);
@@ -324,7 +324,7 @@ namespace Okta.Idx.Sdk
             catch (RedeemInteractionCodeException redeemInteractionCodeException)
             {
                 LogError(redeemInteractionCodeException);
-                throw redeemInteractionCodeException;
+                throw;
             }
             catch (Exception exception)
             {

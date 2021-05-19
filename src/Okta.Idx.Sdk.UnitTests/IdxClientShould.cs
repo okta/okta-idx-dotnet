@@ -941,7 +941,7 @@ namespace Okta.Idx.Sdk.UnitTests
             {
                 Assert.IsType<ArgumentNullException>(redeemInteractionCodeException.InnerException);
                 ArgumentNullException argumentNullException = (ArgumentNullException)redeemInteractionCodeException.InnerException;
-                Assert.Equal("idxContext.CodeVerifier", argumentNullException.ParamName);
+                Assert.Equal("CodeVerifier", argumentNullException.ParamName);
                 exceptionWasThrown = true;
             }
             Assert.True(exceptionWasThrown);
