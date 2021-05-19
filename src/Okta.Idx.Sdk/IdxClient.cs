@@ -686,6 +686,41 @@ namespace Okta.Idx.Sdk
             return await SelectChallengeAuthenticatorAsync(request, idxContext, cancellationToken);
         }
 
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> SkipAuthenticatorSelectionAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            var skipOption = introspectResponse.FindRemediationOption(RemediationType.Skip, true);
+            var skipRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            var skipResponse = await skipOption.ProceedAsync(skipRequest, cancellationToken);
+            if (skipResponse.IdxMessages.Messages.Any())
+            {
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Terminal,
+                    MessageToUser = skipResponse.IdxMessages.Messages.First().Text,
+                };
+            }
+
+            if (skipResponse.IsLoginSuccess)
+            {
+                var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+
+            throw new UnexpectedRemediationException(RemediationType.SuccessWithInteractionCode, skipResponse);
+        }
+
         private async Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(IdxRequestPayload idxRequestPayload, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
@@ -790,40 +825,27 @@ namespace Okta.Idx.Sdk
             var idxContext = await InteractAsync(cancellationToken: cancellationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
-            // Common request payload
-            var identifyRequest = new IdxRequestPayload
+            var identifyOption = introspectResponse.FindRemediationOption(RemediationType.Identify, throwIfNotFound: true);
+            var requiresCredentials = identifyOption.Form.Any(f => f.Name == "credentials");
+
+            IList<IAuthenticator> authenticators;
+
+            if (requiresCredentials && introspectResponse.CurrentAuthenticator.Value != null)
             {
-                StateHandle = introspectResponse.StateHandle,
-            };
-            identifyRequest.SetProperty("identifier", recoverPasswordOptions.Username);
-
-            // Send username
-            var identifyResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.Identify, identifyRequest, cancellationToken);
-
-            // Get available authenticators
-            var recoveryRequest = new IdxRequestPayload
+                authenticators = await GetOneStepAuthRecoveryAuthenticators(recoverPasswordOptions, introspectResponse, cancellationToken);
+            }
+            else
             {
-                StateHandle = identifyResponse.StateHandle,
-            };
-
-            var currentEnrollment = identifyResponse
-                                        .CurrentAuthenticatorEnrollment
-                                        .Value;
-
-            var recoveryResponse = await currentEnrollment
-                                        .Recover
-                                        .ProceedAsync(recoveryRequest, cancellationToken);
-
-            var recoveryAuthenticators = recoveryResponse
-                .Authenticators
-                .Value;
+                authenticators = await GetTwoStepAuthRecoveryAuthenticators(recoverPasswordOptions, introspectResponse, cancellationToken);
+            }
 
             return new AuthenticationResponse
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorSelection,
-                Authenticators = IdxResponseHelper.ConvertToAuthenticators(recoveryAuthenticators),
+                Authenticators = authenticators,
             };
+
         }
 
         /// <inheritdoc/>
@@ -934,33 +956,7 @@ namespace Okta.Idx.Sdk
 
             var isResetAuthenticator = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.ResetAuthenticator);
             var isAuthenticatorEnroll = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll);
-            // TODO: Assume default authenticators?
-            //var canSkip = challengeAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.Skip);
 
-            //if (canSkip)
-            //{
-            //    var skipRequest = new IdxRequestPayload
-            //    {
-            //        StateHandle = challengeAuthenticatorResponse.StateHandle,
-            //    };
-
-            //    var skipResponse = await challengeAuthenticatorResponse
-            //                            .Remediation
-            //                            .RemediationOptions
-            //                            .FirstOrDefault(x => x.Name == RemediationType.Skip)
-            //                            .ProceedAsync(skipRequest, cancellationToken);
-
-            //    if (skipResponse.IsLoginSuccess)
-            //    {
-            //        var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
-
-            //        return new AuthenticationResponse
-            //        {
-            //            AuthenticationStatus = AuthenticationStatus.Success,
-            //            TokenInfo = tokenResponse,
-            //        };
-            //    }
-            //}
             if (challengeAuthenticatorResponse.IsLoginSuccess)
             {
                 var tokenResponse = await challengeAuthenticatorResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
@@ -987,6 +983,7 @@ namespace Okta.Idx.Sdk
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
                     Authenticators = IdxResponseHelper.ConvertToAuthenticators(challengeAuthenticatorResponse.Authenticators.Value),
                     IdxContext = idxContext,
+                    CanSkip = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.Skip),
                 };
             }
 
@@ -1062,6 +1059,7 @@ namespace Okta.Idx.Sdk
                 IdxContext = idxContext,
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
                 Authenticators = IdxResponseHelper.ConvertToAuthenticators(enrollNewProfileResponse.Authenticators.Value),
+                CanSkip = enrollNewProfileResponse.ContainsRemediationOption(RemediationType.Skip),
             };
         }
 
@@ -1149,6 +1147,67 @@ namespace Okta.Idx.Sdk
             var credentialsObj = jToken.SelectToken($"$.remediation.value[?(@.name == '{remediationOptionName}')].value[?(@.name == 'credentials')]");
 
             return credentialsObj != null;
+        }
+
+        private async Task<IList<IAuthenticator>> GetOneStepAuthRecoveryAuthenticators(RecoverPasswordOptions recoverPasswordOptions, IIdxResponse introspectResponse, CancellationToken cancellationToken)
+        {
+            // Recovery request first
+            var recoveryRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            var currentAuthenticator = introspectResponse
+                            .CurrentAuthenticator
+                            .Value;
+
+            var recoveryResponse = await currentAuthenticator
+                                        .Recover
+                                        .ProceedAsync(recoveryRequest, cancellationToken);
+
+            // Get available authenticators
+            var identifyRequest = new IdxRequestPayload
+            {
+                StateHandle = recoveryResponse.StateHandle,
+            };
+            identifyRequest.SetProperty("identifier", recoverPasswordOptions.Username);
+
+            var identifyResponse = await recoveryResponse.ProceedWithRemediationOptionAsync(RemediationType.IdentifyRecovery, identifyRequest, cancellationToken);
+
+            var recoveryAuthenticators = identifyResponse.Authenticators.Value;
+
+            return IdxResponseHelper.ConvertToAuthenticators(recoveryAuthenticators);
+        }
+
+        private async Task<IList<IAuthenticator>> GetTwoStepAuthRecoveryAuthenticators(RecoverPasswordOptions recoverPasswordOptions, IIdxResponse introspectResponse, CancellationToken cancellationToken)
+        {
+            // Common request payload
+            var identifyRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+            identifyRequest.SetProperty("identifier", recoverPasswordOptions.Username);
+
+            // Send username
+            var identifyResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.Identify, identifyRequest, cancellationToken);
+
+            // Get available authenticators
+            var recoveryRequest = new IdxRequestPayload
+            {
+                StateHandle = identifyResponse.StateHandle,
+            };
+
+            var currentEnrollment = identifyResponse
+                            .CurrentAuthenticatorEnrollment
+                            .Value;
+
+            var recoveryResponse = await currentEnrollment
+                                        .Recover
+                                        .ProceedAsync(recoveryRequest, cancellationToken);
+
+            var recoveryAuthenticators = recoveryResponse.Authenticators.Value;
+
+            return IdxResponseHelper.ConvertToAuthenticators(recoveryAuthenticators);
         }
 
         /// <summary>

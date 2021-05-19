@@ -53,6 +53,11 @@ namespace Okta.Idx.Sdk
         Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Gets the current authenticator
+        /// </summary>
+        IAuthenticatorEnrollmentData CurrentAuthenticator { get; }
+
+        /// <summary>
         /// Gets the current authenticator enrollment
         /// </summary>
         IAuthenticatorEnrollmentData CurrentAuthenticatorEnrollment { get; }
@@ -71,5 +76,10 @@ namespace Okta.Idx.Sdk
         /// Gets a value indicating whether login was successful
         /// </summary>
         bool IsLoginSuccess { get; }
+
+        /// <summary>
+        /// Gets messages from the server
+        /// </summary>
+        IIdxMessages IdxMessages { get; }
     }
 }

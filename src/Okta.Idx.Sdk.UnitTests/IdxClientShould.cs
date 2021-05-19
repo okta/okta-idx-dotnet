@@ -1013,5 +1013,6 @@ namespace Okta.Idx.Sdk.UnitTests
             Assert.Equal("this is a test interaction handle", widgetResponse.IdxContext.InteractionHandle);
             Assert.Equal(1, mockHttpMessageHandler.CallCounts["/v1/interact"]);
         }
+
     }
 }

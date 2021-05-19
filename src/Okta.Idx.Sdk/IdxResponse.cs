@@ -39,6 +39,9 @@ namespace Okta.Idx.Sdk
         public IIdxSuccessResponse SuccessWithInteractionCode => GetResourceProperty<IdxSuccessResponse>("successWithInteractionCode");
 
         /// <inheritdoc/>
+        public IAuthenticatorEnrollmentData CurrentAuthenticator => GetResourceProperty<AuthenticatorEnrollmentData>("currentAuthenticator");
+
+        /// <inheritdoc/>
         public IAuthenticatorEnrollmentData CurrentAuthenticatorEnrollment => GetResourceProperty<AuthenticatorEnrollmentData>("currentAuthenticatorEnrollment");
 
         /// <inheritdoc/>
@@ -46,6 +49,9 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public IAuthenticatorEnrollments AuthenticatorEnrollments => GetResourceProperty<AuthenticatorEnrollments>("authenticatorEnrollments");
+
+        /// <inheritdoc/>
+        public IIdxMessages IdxMessages => GetResourceProperty<IdxMessages>("messages");
 
         /// <inheritdoc/>
         public async Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken = default)

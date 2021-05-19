@@ -17,6 +17,8 @@ namespace direct_auth_idx.Models
         public string PasswordId { get; set; }
 
         public string PhoneId { get; set; }
+        
+        public bool CanSkip { get; set; }
 
         public IList<AuthenticatorViewModel> Authenticators { get; set; }
 

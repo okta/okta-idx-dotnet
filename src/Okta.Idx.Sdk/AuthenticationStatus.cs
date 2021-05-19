@@ -54,5 +54,10 @@ namespace Okta.Idx.Sdk
         /// Waiting for an authenticator selection to continue with the authentication process.
         /// </summary>
         AwaitingChallengeAuthenticatorSelection,
+
+        /// <summary>
+        /// Flow is done with a message to user, no remediation options available
+        /// </summary>
+        Terminal,
     }
 }
