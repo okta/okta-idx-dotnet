@@ -31,14 +31,14 @@ namespace Okta.Idx.Sdk
             this.Version = version ?? DefaultVersion;
 
             this.BaseUrl = idxConfiguration?.Issuer?.Split(new string[] { "/oauth2" }, StringSplitOptions.RemoveEmptyEntries)[0];
-            this.ClientId = idxConfiguration.ClientId;
-            this.RedirectUri = idxConfiguration.RedirectUri;
+            this.ClientId = idxConfiguration?.ClientId;
+            this.RedirectUri = idxConfiguration?.RedirectUri;
             this.AuthParams = new SignInWidgetAuthParams(idxConfiguration);
 
-            this.InteractionHandle = idxContext.InteractionHandle;
-            this.State = idxContext.State;
-            this.CodeChallenge = idxContext.CodeChallenge;
-            this.CodeChallengeMethod = idxContext.CodeChallengeMethod;
+            this.InteractionHandle = idxContext?.InteractionHandle;
+            this.State = idxContext?.State;
+            this.CodeChallenge = idxContext?.CodeChallenge;
+            this.CodeChallengeMethod = idxContext?.CodeChallengeMethod;
         }
 
         /// <summary>
