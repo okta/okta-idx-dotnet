@@ -349,6 +349,7 @@
     <Content Include="Views\Manage\EnrollPhoneAuthenticator.cshtml" />
     <Content Include="Views\Manage\SelectPhoneChallengeMethod.cshtml" />
     <Content Include="Views\Shared\_ProfilePartial.cshtml" />
+    <Content Include="Views\Shared\_LogoutPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

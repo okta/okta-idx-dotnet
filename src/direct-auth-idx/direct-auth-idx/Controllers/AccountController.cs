@@ -91,13 +91,13 @@ namespace direct_auth_idx.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> LogOff()
+        public async Task<ActionResult> LogOut()
         {
             var client = new IdxClient(null);
             var accessToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "access_token");
             await client.RevokeTokensAsync(TokenType.AccessToken, accessToken.Value);
             _authenticationManager.SignOut();
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: Account
@@ -144,10 +144,8 @@ namespace direct_auth_idx.Controllers
                 return View("Register", model);
             }
         }
-
-        [HttpPost]
+        
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public ActionResult ForgotPassword()
         {
             return View();

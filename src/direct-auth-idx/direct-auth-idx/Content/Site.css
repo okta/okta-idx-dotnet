@@ -33,3 +33,11 @@ textarea {
     display: block;
     width: 100%;
 }
+
+.no-padding-left {
+    padding-left: 0px;
+}
+
+.overflow-wrap {
+    overflow-wrap: anywhere;
+}

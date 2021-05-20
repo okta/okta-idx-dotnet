@@ -4,20 +4,24 @@
     <p><h2>Welcome, @User.Identity.GetUserName()!</h2></p>
     <p>You have successfully logged in!</p>
 </div>
-<dl class="dl-horizontal">
-    @foreach (var claim in Model)
-    {
-        <dt title="@claim.Type">
-            @claim.Type
-            <button type="button"
-                    class="btn btn-link btn-xs"
-                    aria-label="Copy to clipboard"
-                    title="Copy to clipboard"
-                    data-clipboard-text="@claim.Value">
-                <span class="glyphicon glyphicon glyphicon-copy" aria-hidden="true"></span>
-            </button>
-        </dt>
+<div class="row d-center">
+    <div class="col-md-8">
+        <dl class="dl-horizontal">
+            @foreach (var claim in Model)
+            {
+                <dt title="@claim.Type">
+                    @claim.Type
+                    <button type="button"
+                            class="btn btn-link btn-xs"
+                            aria-label="Copy to clipboard"
+                            title="Copy to clipboard"
+                            data-clipboard-text="@claim.Value">
+                        <span class="glyphicon glyphicon glyphicon-copy" aria-hidden="true"></span>
+                    </button>
+                </dt>
 
-        <dd id="@String.Format("claim-{0}", claim.Type)">@claim.Value</dd>
-    }
-</dl>
+                <dd id="@String.Format("claim-{0}", claim.Type)" class="overflow-wrap">@claim.Value</dd>
+            }
+        </dl>
+    </div>
+</div>
