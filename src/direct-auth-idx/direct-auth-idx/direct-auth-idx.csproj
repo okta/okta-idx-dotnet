@@ -345,7 +345,7 @@
     <Content Include="Views\Manage\VerifyAuthenticator.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Manage\SelectAuthenticator.cshtml" />
-    <Content Include="Views\Account\SelectRecoveryAuthenticator.cshtml" />
+    <Content Include="Views\Manage\SelectRecoveryAuthenticator.cshtml" />
     <Content Include="Views\Manage\EnrollPhoneAuthenticator.cshtml" />
     <Content Include="Views\Manage\SelectPhoneChallengeMethod.cshtml" />
     <Content Include="Views\Shared\_ProfilePartial.cshtml" />
@@ -353,7 +353,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Recovery\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

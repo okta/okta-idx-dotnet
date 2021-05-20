@@ -57,6 +57,7 @@ namespace direct_auth_idx.Controllers
             try
             {
                 var authnResponse = await idxAuthClient.ChangePasswordAsync(changePasswordOptions, (IIdxContext)Session["idxContext"]).ConfigureAwait(false);
+                Session["idxContext"] = authnResponse.IdxContext;
 
                 switch (authnResponse.AuthenticationStatus)
                 {
@@ -77,7 +78,6 @@ namespace direct_auth_idx.Controllers
                         return RedirectToAction("Index", "Home");
 
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
-                        Session["idxContext"] = authnResponse.IdxContext;
                         TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         TempData["canSkip"] = authnResponse.CanSkip;
                         return RedirectToAction("selectAuthenticator", "Manage");
@@ -119,16 +119,14 @@ namespace direct_auth_idx.Controllers
             try
             {
                 var authnResponse = await _idxClient.VerifyAuthenticatorAsync(verifyAuthenticatorOptions, (IIdxContext)Session["idxContext"]);
+                Session["idxContext"] = authnResponse.IdxContext;
 
                 switch (authnResponse.AuthenticationStatus)
                 {
                     case AuthenticationStatus.AwaitingPasswordReset:
-                        // TODO: Force authentication and redirect to home page
-                        Session["idxContext"] = authnResponse.IdxContext;
                         return RedirectToAction("ChangePassword", "Manage");
 
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
-                        Session["idxContext"] = authnResponse.IdxContext;
                         TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         TempData["canSkip"] = authnResponse.CanSkip;
                         return RedirectToAction("selectAuthenticator", "Manage");
@@ -156,6 +154,9 @@ namespace direct_auth_idx.Controllers
             return await VerifyAuthenticatorAsync(model.Code, "VerifyAuthenticator", model);
         }
 
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<ActionResult> EnrollPhoneAuthenticatorAsync(EnrollPhoneViewModel model)
         {
             if (!ModelState.IsValid)
@@ -174,12 +175,10 @@ namespace direct_auth_idx.Controllers
                 };
 
                 var enrollResponse = await _idxClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+                Session["IdxContext"] = enrollResponse.IdxContext;
 
                 if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
-                {
-                    // TODO: clean session.
-                    Session["IdxContext"] = enrollResponse.IdxContext;
-                    
+                {   
                     return RedirectToAction("VerifyAuthenticator", "Manage");
                 }
 
@@ -354,8 +353,6 @@ namespace direct_auth_idx.Controllers
                         default:
                             return View("SelectAuthenticator", model);
                     }
-                    // TODO
-                    return View("SelectAuthenticator", model);
                 }
                 else
                 {
@@ -391,6 +388,49 @@ namespace direct_auth_idx.Controllers
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
                 return RedirectToAction("SelectAuthenticator", model);
+            }
+        }
+
+        public ActionResult SelectRecoveryAuthenticator()
+        {
+            var viewModel = new SelectRecoveryAuthenticatorViewModel
+                                {
+                                    Authenticators = (List<AuthenticatorViewModel>)TempData["authenticators"],
+                                };
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SelectRecoveryAuthenticatorAsync(SelectRecoveryAuthenticatorViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // TODO: @Andrii why we're redirecting ppl here instead of displaying the actual error in the same view. Same during catch.
+                return RedirectToAction("ForgotPassword", "Account", new ForgotPasswordViewModel());
+            }
+
+            try
+            {
+                var applyAuthenticatorResponse = await _idxClient.SelectRecoveryAuthenticatorAsync(
+                                                     new SelectAuthenticatorOptions { AuthenticatorId = model.AuthenticatorId },
+                                                     (IIdxContext)Session["IdxContext"]);
+
+                Session["IdxContext"] = applyAuthenticatorResponse.IdxContext;
+                Session["isPasswordSelected"] = false;
+
+                if (applyAuthenticatorResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    return RedirectToAction("VerifyAuthenticator", "Manage");
+                }
+
+                return View("SelectRecoveryAuthenticator", model);
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return RedirectToAction("ForgotPassword", "Account", model);
             }
         }
 
