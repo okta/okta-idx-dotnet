@@ -1,11 +1,9 @@
-﻿@model IEnumerable<System.Security.Claims.Claim>
-
-@{
-    ViewBag.Title = "View claims";
-}
-
-<h2>@ViewBag.Title</h2>
-
+﻿@using Microsoft.AspNet.Identity
+@model IEnumerable<System.Security.Claims.Claim>
+<div>
+    <p><h2>Welcome, @User.Identity.GetUserName()!</h2></p>
+    <p>You have successfully logged in!</p>
+</div>
 <dl class="dl-horizontal">
     @foreach (var claim in Model)
     {

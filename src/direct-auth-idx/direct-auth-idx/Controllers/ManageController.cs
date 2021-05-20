@@ -9,14 +9,19 @@ using direct_auth_idx.Models;
 
 namespace direct_auth_idx.Controllers
 {
+    using System.Security.Claims;
+    using System.Web.ModelBinding;
+
     public class ManageController : Controller
     {
 
         private readonly IAuthenticationManager _authenticationManager;
 
-        public ManageController(IAuthenticationManager authenticationManager)
+        private readonly IIdxClient _idxClient;
+        public ManageController(IAuthenticationManager authenticationManager, IIdxClient idxClient)
         {
             _authenticationManager = authenticationManager;
+            _idxClient = idxClient;
         }
 
         // GET: /Manage/ChangePassword
@@ -56,19 +61,21 @@ namespace direct_auth_idx.Controllers
                 switch (authnResponse.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
-                        var userName = (string)Session["UserName"];
-                        if (string.IsNullOrEmpty(userName))
-                        {
-                            return RedirectToAction("Login", "Account");
-                        }
-                        else
-                        {
-                            Session["UserName"] = null;
-                            var identity = AuthenticationHelper.GetIdentityFromAuthResponse(userName, authnResponse);
-                            _authenticationManager.SignIn(new AuthenticationProperties(), identity);
-                            return RedirectToAction("Index", "Home");
-                        }
-            
+                        //if (string.IsNullOrEmpty(userName))
+                        //{
+                        //    return RedirectToAction("Login", "Account");
+                        //}
+                        //else
+                        //{
+                        //    Session["UserName"] = null;
+                        //    ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, authnResponse);
+                        //    _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                        //    return RedirectToAction("Index", "Home");
+                        //}
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, authnResponse);
+                        _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                        return RedirectToAction("Index", "Home");
+
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["idxContext"] = authnResponse.IdxContext;
                         TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
@@ -103,9 +110,7 @@ namespace direct_auth_idx.Controllers
             {
                 return View(view, model);
             }
-
-            var idxAuthClient = new IdxClient(null);
-
+            
             var verifyAuthenticatorOptions = new VerifyAuthenticatorOptions
             {
                 Code = code,
@@ -113,7 +118,7 @@ namespace direct_auth_idx.Controllers
 
             try
             {
-                var authnResponse = await idxAuthClient.VerifyAuthenticatorAsync(verifyAuthenticatorOptions, (IIdxContext)Session["idxContext"]);
+                var authnResponse = await _idxClient.VerifyAuthenticatorAsync(verifyAuthenticatorOptions, (IIdxContext)Session["idxContext"]);
 
                 switch (authnResponse.AuthenticationStatus)
                 {
@@ -129,8 +134,7 @@ namespace direct_auth_idx.Controllers
                         return RedirectToAction("selectAuthenticator", "Manage");
 
                     case AuthenticationStatus.Success:
-                        var userName = (string)Session["UserName"] ?? string.Empty;
-                        var identity = AuthenticationHelper.GetIdentityFromAuthResponse(userName, authnResponse);
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, authnResponse);
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         return RedirectToAction("Index", "Home");
                 }
@@ -161,8 +165,6 @@ namespace direct_auth_idx.Controllers
 
             try
             {
-                // WIP
-                var idxAuthClient = new IdxClient(null);
 
                 var enrollPhoneAuthenticatorOptions = new EnrollPhoneAuthenticatorOptions
                 {
@@ -171,7 +173,7 @@ namespace direct_auth_idx.Controllers
                     MethodType = AuthenticatorMethodType.Sms,
                 };
 
-                var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+                var enrollResponse = await _idxClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
 
                 if (enrollResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
                 {
@@ -218,10 +220,8 @@ namespace direct_auth_idx.Controllers
                     EnrollmentId = model.EnrollmentId,
                     MethodType = AuthenticatorMethodType.Sms,
                 };
-
-                var idxAuthClient = new IdxClient(null);
-
-                var challengeResponse = await idxAuthClient.ChallengeAuthenticatorAsync(challengeOptions, (IIdxContext)Session["IdxContext"]);
+                
+                var challengeResponse = await _idxClient.ChallengeAuthenticatorAsync(challengeOptions, (IIdxContext)Session["IdxContext"]);
 
                 switch (challengeResponse?.AuthenticationStatus)
                 {
@@ -260,15 +260,15 @@ namespace direct_auth_idx.Controllers
         {
             try
             {
-                var idxAuthClient = new IdxClient(null);
-                var skipSelectionResponse = await idxAuthClient.SkipAuthenticatorSelectionAsync((IIdxContext)Session["IdxContext"]);
+                var skipSelectionResponse = await _idxClient.SkipAuthenticatorSelectionAsync((IIdxContext)Session["IdxContext"]);
 
                 switch (skipSelectionResponse.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
                         var userName = (string)Session["UserName"] ?? string.Empty;
-                        var identity = AuthenticationHelper.GetIdentityFromAuthResponse(userName, skipSelectionResponse);
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, skipSelectionResponse);
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                        return RedirectToAction("Index", "Home");
                         break;
 
                     case AuthenticationStatus.Terminal:
@@ -296,8 +296,6 @@ namespace direct_auth_idx.Controllers
 
             try
             {
-                // WIP
-                var idxAuthClient = new IdxClient(null);
                 var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;
                 Session["isPhoneSelected"] = model.IsPhoneSelected;
                 Session["phoneId"] = model.PhoneId;
@@ -317,7 +315,7 @@ namespace direct_auth_idx.Controllers
                             AuthenticatorId = model.AuthenticatorId
                         };
 
-                        selectAuthenticatorResponse = await idxAuthClient.SelectChallengeAuthenticatorAsync(selectPhoneOptions, (IIdxContext)Session["IdxContext"]);
+                        selectAuthenticatorResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectPhoneOptions, (IIdxContext)Session["IdxContext"]);
                     }
                     else
                     {
@@ -326,7 +324,7 @@ namespace direct_auth_idx.Controllers
                             AuthenticatorId = model.AuthenticatorId,
                         };
 
-                        selectAuthenticatorResponse = await idxAuthClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+                        selectAuthenticatorResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
                     }
                     
                     Session["IdxContext"] = selectAuthenticatorResponse.IdxContext;
@@ -366,7 +364,7 @@ namespace direct_auth_idx.Controllers
                         AuthenticatorId = model.AuthenticatorId,
                     };
 
-                    var enrollResponse = await idxAuthClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+                    var enrollResponse = await _idxClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
 
                     Session["IdxContext"] = enrollResponse.IdxContext;
                     Session["isPasswordSelected"] = model.IsPasswordSelected;

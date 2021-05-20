@@ -10,7 +10,7 @@ namespace direct_auth_idx.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return View(HttpContext.GetOwinContext().Authentication.User.Claims);
         }
 
         public ActionResult About()
@@ -25,12 +25,6 @@ namespace direct_auth_idx.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
-        }
-
-        [Authorize]
-        public ActionResult Profile()
-        {
-            return View(HttpContext.GetOwinContext().Authentication.User.Claims);
         }
     }
 }
