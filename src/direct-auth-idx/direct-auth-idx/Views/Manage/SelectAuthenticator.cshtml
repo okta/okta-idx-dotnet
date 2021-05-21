@@ -12,7 +12,7 @@
             @using (Html.BeginForm("SelectAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
-                 if (Model.CanSkip)
+                if (Model.CanSkip)
                  {
                      <h4>Set up optional authenticators</h4>
                  }
@@ -43,7 +43,7 @@
                         <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
                     </div>
                 </div>
-                @if (Model.CanSkip)
+                if (Model.CanSkip)
                 {
                     using (Html.BeginForm("SkipAuthenticatorSelectionAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
                     {
