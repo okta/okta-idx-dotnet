@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Okta.Idx.Sdk
+namespace Okta.Idx.Sdk.Helpers
 {
     /// <summary>
     /// Static url helper methods relevant to Idx.

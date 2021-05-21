@@ -16,7 +16,7 @@ namespace Okta.Idx.Sdk.UnitTests
     public class IdxClientShould
     {
         [Fact]
-        public async Task LoginSuccessfullyWithIdentifierFirstConfiguration()
+        public async Task LoginSuccessfullyWithOneStepLoginConfiguration()
         {
 
             #region mocks
