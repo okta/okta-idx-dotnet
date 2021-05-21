@@ -269,7 +269,7 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default)
         {
-            var idxContext = await this.InteractAsync();
+            var idxContext = await this.InteractAsync(cancellationToken: cancellationToken);
             return new WidgetSignInResponse
             {
                 IdxContext = idxContext,
