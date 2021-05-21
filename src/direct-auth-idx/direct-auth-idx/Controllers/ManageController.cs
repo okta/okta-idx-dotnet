@@ -1,16 +1,17 @@
-﻿using Microsoft.Owin.Security;
-using Okta.Idx.Sdk;
-using Okta.Sdk.Abstractions;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using direct_auth_idx.Models;
-
-namespace direct_auth_idx.Controllers
+﻿namespace direct_auth_idx.Controllers
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Security.Claims;
-    using System.Web.ModelBinding;
+    using System.Threading.Tasks;
+    using System.Web.Mvc;
+
+    using direct_auth_idx.Models;
+
+    using Microsoft.Owin.Security;
+
+    using Okta.Idx.Sdk;
+    using Okta.Sdk.Abstractions;
 
     public class ManageController : Controller
     {
@@ -62,17 +63,6 @@ namespace direct_auth_idx.Controllers
                 switch (authnResponse.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
-                        //if (string.IsNullOrEmpty(userName))
-                        //{
-                        //    return RedirectToAction("Login", "Account");
-                        //}
-                        //else
-                        //{
-                        //    Session["UserName"] = null;
-                        //    ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, authnResponse);
-                        //    _authenticationManager.SignIn(new AuthenticationProperties(), identity);
-                        //    return RedirectToAction("Index", "Home");
-                        //}
                         ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, authnResponse);
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         return RedirectToAction("Index", "Home");
@@ -264,11 +254,9 @@ namespace direct_auth_idx.Controllers
                 switch (skipSelectionResponse.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
-                        var userName = (string)Session["UserName"] ?? string.Empty;
                         ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, skipSelectionResponse);
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         return RedirectToAction("Index", "Home");
-                        break;
 
                     case AuthenticationStatus.Terminal:
                         TempData["MessageToUser"] = skipSelectionResponse.MessageToUser;
@@ -407,8 +395,7 @@ namespace direct_auth_idx.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // TODO: @Andrii why we're redirecting ppl here instead of displaying the actual error in the same view. Same during catch.
-                return RedirectToAction("ForgotPassword", "Account", new ForgotPasswordViewModel());
+                return View("SelectRecoveryAuthenticator", model);
             }
 
             try
@@ -430,7 +417,7 @@ namespace direct_auth_idx.Controllers
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
-                return RedirectToAction("ForgotPassword", "Account", model);
+                return View("SelectRecoveryAuthenticator", model);
             }
         }
 
