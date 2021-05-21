@@ -13,20 +13,10 @@ namespace direct_auth_idx
     using IdentityModel.Client;
 
     using Okta.Idx.Sdk.Configuration;
+    using Okta.Idx.Sdk.Helpers;
 
     public static class AuthenticationHelper
     {
-        //public static ClaimsIdentity GetIdentityFromAuthResponse(string userName, AuthenticationResponse authnResponse) =>
-        //              new ClaimsIdentity(
-        //                    new[]
-        //                        {
-        //                            new Claim(ClaimTypes.Name, userName),
-        //                            new Claim("access_token", authnResponse.TokenInfo.AccessToken),
-        //                            new Claim("id_token", authnResponse.TokenInfo.IdToken),
-        //                            new Claim("refresh_token", authnResponse.TokenInfo.RefreshToken ?? string.Empty),
-        //                         },
-        //                    DefaultAuthenticationTypes.ApplicationCookie);
-
         public static async Task<ClaimsIdentity> GetIdentityFromAuthResponseAsync(IdxConfiguration configuration, AuthenticationResponse authnResponse)
         {
             var claims = await GetClaimsFromUserInfoAsync(configuration, authnResponse.TokenInfo.AccessToken);

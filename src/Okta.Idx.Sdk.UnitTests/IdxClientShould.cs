@@ -16,7 +16,7 @@ namespace Okta.Idx.Sdk.UnitTests
     public class IdxClientShould
     {
         [Fact]
-        public async Task LoginSuccessfullyWithIdentifierFirstConfiguration()
+        public async Task LoginSuccessfullyWithOneStepLoginConfiguration()
         {
 
             #region mocks
@@ -1002,7 +1002,8 @@ namespace Okta.Idx.Sdk.UnitTests
         {
             string interactResponse = @"{""interaction_handle"":""this is a test interaction handle""}";
             MockHttpMessageHandler mockHttpMessageHandler = new MockHttpMessageHandler();
-            mockHttpMessageHandler.AddTestResponse("/v1/interact", interactResponse);
+            mockHttpMessageHandler.AddTestResponse("/oauth2/v1/interact", interactResponse);
+
             HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
 
             IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, NullLogger.Instance);
@@ -1011,7 +1012,7 @@ namespace Okta.Idx.Sdk.UnitTests
             Assert.NotNull(widgetResponse);
             Assert.NotNull(widgetResponse.IdxContext);
             Assert.Equal("this is a test interaction handle", widgetResponse.IdxContext.InteractionHandle);
-            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/v1/interact"]);
+            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/oauth2/v1/interact"]);
         }
 
     }

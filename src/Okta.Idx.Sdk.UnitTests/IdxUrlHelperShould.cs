@@ -7,6 +7,8 @@ using Xunit;
 
 namespace Okta.Idx.Sdk.UnitTests
 {
+    using Okta.Idx.Sdk.Helpers;
+
     public class IdxUrlHelperShould
     {
         [Fact]

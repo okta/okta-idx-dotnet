@@ -220,10 +220,11 @@ namespace Okta.Idx.Sdk
 
             var headers = new Dictionary<string, string>();
             headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
+            Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/interact"));
 
             var request = new HttpRequest
             {
-                Uri = $"{UrlHelper.EnsureTrailingSlash(Configuration.Issuer)}v1/interact",
+                Uri = uri.ToString(),
                 Payload = payload,
                 Headers = headers,
             };
@@ -268,7 +269,7 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default)
         {
-            var idxContext = await this.InteractAsync();
+            var idxContext = await this.InteractAsync(cancellationToken: cancellationToken);
             return new WidgetSignInResponse
             {
                 IdxContext = idxContext,
@@ -906,7 +907,7 @@ namespace Okta.Idx.Sdk
         public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
-            var introspectResponse = await IntrospectAsync(idxContext);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
             var currentRemediationType = RemediationType.Unknown;
 
             // Check if flow is challenge authenticator or enroll authenticator, otherwise throw
@@ -1017,9 +1018,10 @@ namespace Okta.Idx.Sdk
                 { "Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded },
             };
 
+            Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/revoke"));
             var request = new HttpRequest
             {
-                Uri = $"{UrlHelper.EnsureTrailingSlash(Configuration.Issuer)}v1/revoke",
+                Uri = uri.ToString(),
                 Payload = payload,
                 Headers = headers,
             };
