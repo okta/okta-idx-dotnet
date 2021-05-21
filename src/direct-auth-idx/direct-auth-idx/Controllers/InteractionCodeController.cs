@@ -27,6 +27,15 @@ namespace direct_auth_idx.Controllers
             this._idxClient = idxClient;
         }
 
+        /// <summary>
+        /// This method is called by a 302 browser redirect back to the application from Okta after successful authentication to an external
+        /// identity provider.
+        /// </summary>
+        /// <param name="state">The state handle.</param>
+        /// <param name="interaction_code">The interaction code.  This is the value that is exchanged for tokens.</param>
+        /// <param name="error">The error if an error occurred.</param>
+        /// <param name="error_description">The error description if an error occurred.</param>
+        /// <returns></returns>
         public async Task<ActionResult> Callback(string state = null, string interaction_code = null, string error = null, string error_description = null)
         {
             IIdxContext idxContext = Session[state] as IIdxContext;
@@ -81,7 +90,6 @@ namespace direct_auth_idx.Controllers
 
         private void HandleException(Exception ex)
         {
-
             // provide exception handling appropriate to your application
             HttpContext.Response.Redirect("/");
         }
