@@ -267,6 +267,35 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
+        public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default)
+        {
+            IIdxContext idxContext = await this.InteractAsync(state);
+            return await GetIdentityProvidersAsync(idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            IIdxResponse introspectResponse = await this.IntrospectAsync(idxContext);
+
+            return new IdentityProvidersResponse
+            {
+                Context = idxContext,
+                IdpOptions = introspectResponse.Remediation?.RemediationOptions?
+                    .Where(remediationOption => remediationOption.Name.Equals("redirect-idp"))
+                    .Select(remediationOption => new IdpOption
+                    {
+                        State = idxContext.State,
+                        InteractionHandle = idxContext.InteractionHandle,
+                        Id = remediationOption.Idp.Id,
+                        Name = remediationOption.Idp.Name,
+                        Href = remediationOption.Href,
+                    })
+                    .ToList(),
+            };
+        }
+
+        /// <inheritdoc/>
         public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default)
         {
             var idxContext = await this.InteractAsync(cancellationToken: cancellationToken);

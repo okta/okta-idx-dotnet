@@ -23,7 +23,7 @@
             {
                 @Html.AntiForgeryToken()
                 <h4>Login</h4>
-                <hr/>
+                <hr />
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="form-group">
                     <div class="col-md-10 col-md-offset-2">
@@ -50,7 +50,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Log in" class="btn btn-primary btn-stretch-wide"/>
+                        <input type="submit" value="Log in" class="btn btn-primary btn-stretch-wide" />
                     </div>
                 </div>
             }
@@ -62,10 +62,14 @@
                 @Html.AntiForgeryToken()
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Forgot Password?" class="btn btn-default btn-stretch-wide"/>
+                        <input type="submit" value="Forgot Password?" class="btn btn-default btn-stretch-wide" />
                     </div>
                 </div>
             }
+        </section>
+
+        <section id="idpButtons">
+            @Html.Partial("Idps", Model.IdpOptions)
         </section>
 
         <section id="register">
@@ -74,7 +78,7 @@
                 @Html.AntiForgeryToken()
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Register" class="btn btn-info btn-stretch-wide"/>
+                        <input type="submit" value="Register" class="btn btn-info btn-stretch-wide" />
                     </div>
                 </div>
             }
