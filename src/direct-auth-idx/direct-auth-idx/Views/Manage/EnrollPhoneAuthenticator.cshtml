@@ -3,25 +3,32 @@
     ViewBag.Title = ViewBag.Title ?? "Setup phone authentication.";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="row d-center">
+    <div class="col-md-8">
+        @using (Html.BeginForm("EnrollPhoneAuthenticatorAsync", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <hr />
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="form-group">
+                <div class="col-md-10">
+                    <div class="row row-no-gutters">
+                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="row row-no-gutters">
+                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Send a code via SMS" class="btn btn-primary btn-stretch-wide" />
+                </div>
+            </div>
+        }
+    </div>
+</div>
 
-@using (Html.BeginForm("EnrollPhoneAuthenticatorAsync", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-{
-    @Html.AntiForgeryToken()
-    <hr />
-    @Html.ValidationSummary("", new { @class = "text-danger" })
-    <div class="form-group">
-        @Html.LabelFor(m => m.PhoneNumber, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Send a code via SMS" class="btn btn-default" />
-        </div>
-    </div>
-}
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }

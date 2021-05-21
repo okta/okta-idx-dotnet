@@ -5,7 +5,7 @@
 
 <br />
 
-<div class="row">
+<div class="row d-center">
     <div class="col-md-8">
         <section id="forgotPasswordForm">
             @using (Html.BeginForm("VerifyAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
@@ -16,16 +16,20 @@
                 <hr />
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 <div class="form-group">
-                    @Html.LabelFor(m => m.Code, new { @class = "col-md-2 control-label" })
                     <div class="col-md-10">
-                        @Html.PasswordFor(m => m.Code, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                        <div class="row row-no-gutters">
+                            @Html.LabelFor(m => m.Code, new { @class = "control-label" })
+                        </div>
+                        <div class="row row-no-gutters">
+                            @Html.PasswordFor(m => m.Code, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        <input type="submit" value="Verify" class="btn btn-default" />
+                    <div class="col-md-10">
+                        <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
                     </div>
                 </div>
             }

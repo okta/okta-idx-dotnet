@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -11,14 +10,20 @@ using Okta.Sdk.Abstractions;
 
 namespace direct_auth_idx.Controllers
 {
+    using AuthenticationOptions = Okta.Idx.Sdk.AuthenticationOptions;
+
     public class AccountController : Controller
     {
         private readonly IAuthenticationManager _authenticationManager;
 
-        public AccountController(IAuthenticationManager authenticationManager)
+        private readonly IIdxClient _idxClient;
+
+        public AccountController(IAuthenticationManager authenticationManager, IIdxClient idxClient)
         {
             _authenticationManager = authenticationManager;
+            _idxClient = idxClient;
         }
+        
 
         // GET: Account
         [AllowAnonymous]
@@ -38,41 +43,33 @@ namespace direct_auth_idx.Controllers
                 return View("Login");
             }
 
-            // WIP
-            var idxAuthClient = new IdxClient(null);
-
-            var authnOptions = new Okta.Idx.Sdk.AuthenticationOptions()
-            {
-                Username = model.UserName,
-                Password = model.Password,
-            };
-
-            Session["UserName"] = model.UserName;
+            var authnOptions = new AuthenticationOptions()
+                                   {
+                                       Username = model.UserName,
+                                       Password = model.Password,
+                                   };
 
             try
             {
-                var authnResponse = await idxAuthClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
+                var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
+                Session["idxContext"] = authnResponse.IdxContext;
 
                 switch (authnResponse?.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
-                            ClaimsIdentity identity = AuthenticationHelper.GetIdentityFromAuthResponse(model.UserName, authnResponse);
+                            ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, authnResponse);
                             _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, identity);
                             return RedirectToAction("Index", "Home");
 
                     case AuthenticationStatus.PasswordExpired:
-                        // Redirect to ChangePassword
-                        Session["idxContext"] = authnResponse.IdxContext;
                         return RedirectToAction("ChangePassword", "Manage");
 
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
-                        Session["idxContext"] = authnResponse.IdxContext;
                         TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
                         return RedirectToAction("selectAuthenticator", "Manage");
 
                     default:
-                        ModelState.AddModelError(string.Empty, $"Invalid login attempt:");
                         return View("Login", model);
                 }
             }
@@ -86,13 +83,12 @@ namespace direct_auth_idx.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> LogOff()
+        public async Task<ActionResult> LogOut()
         {
-            var client = new IdxClient(null);
             var accessToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "access_token");
-            await client.RevokeTokensAsync(TokenType.AccessToken, accessToken.Value);
+            await _idxClient.RevokeTokensAsync(TokenType.AccessToken, accessToken.Value);
             _authenticationManager.SignOut();
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: Account
@@ -114,16 +110,12 @@ namespace direct_auth_idx.Controllers
 
             try
             {
-                // WIP
-                var idxAuthClient = new IdxClient(null);
-                Session["UserName"] = model.Email;
-
                 var userProfile = new UserProfile();
                 userProfile.SetProperty("firstName", model.FirstName);
                 userProfile.SetProperty("lastName", model.LastName);
                 userProfile.SetProperty("email", model.Email);
 
-                var registerResponse = await idxAuthClient.RegisterAsync(userProfile);
+                var registerResponse = await _idxClient.RegisterAsync(userProfile);
 
                 if (registerResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
                 {
@@ -141,10 +133,8 @@ namespace direct_auth_idx.Controllers
                 return View("Register", model);
             }
         }
-
-        [HttpPost]
+        
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public ActionResult ForgotPassword()
         {
             return View();
@@ -160,23 +150,19 @@ namespace direct_auth_idx.Controllers
                 return View("ForgotPassword", model);
             }
 
-            var idxAuthClient = new IdxClient(null);
 
-            var recoverPasswordOptions = new RecoverPasswordOptions
-            {
-                Username = model.UserName,
-            };
+            var recoverPasswordOptions = new RecoverPasswordOptions { Username = model.UserName, };
 
             try
             {
-                var authnResponse = await idxAuthClient.RecoverPasswordAsync(recoverPasswordOptions);
+                var authnResponse = await _idxClient.RecoverPasswordAsync(recoverPasswordOptions);
 
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorSelection)
                 {
                     Session["idxContext"] = authnResponse.IdxContext;
-                    Session["UserName"] = model.UserName;
-                    TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
-                    return RedirectToAction("SelectRecoveryAuthenticator", "Account");
+                    TempData["authenticators"] =
+                        ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                    return RedirectToAction("SelectRecoveryAuthenticator", "Manage");
                 }
 
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
@@ -193,49 +179,5 @@ namespace direct_auth_idx.Controllers
                 return View("ForgotPassword", model);
             }
         }
-
-        public ActionResult SelectRecoveryAuthenticator()
-        {
-            var viewModel = new SelectRecoveryAuthenticatorViewModel
-            {
-                Authenticators = (List<AuthenticatorViewModel>)TempData["authenticators"],
-            };
-            return View(viewModel);
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SelectRecoveryAuthenticatorAsync(SelectRecoveryAuthenticatorViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View("ForgotPassword", new ForgotPasswordViewModel());
-            }
-
-            try
-            {
-                var idxAuthClient = new IdxClient(null);
-                var applyAuthenticatorResponse = await idxAuthClient.SelectRecoveryAuthenticatorAsync(
-                                                                                    new SelectAuthenticatorOptions { AuthenticatorId = model.AuthenticatorId },
-                                                                                    (IIdxContext)Session["IdxContext"]);
-
-                Session["IdxContext"] = applyAuthenticatorResponse.IdxContext;
-                Session["isPasswordSelected"] = false;
-
-                if (applyAuthenticatorResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
-                {
-                    return RedirectToAction("VerifyAuthenticator", "Manage");
-                }
-
-                return View("SelectAuthenticator", model);
-            }
-            catch (OktaException exception)
-            {
-                ModelState.AddModelError(string.Empty, exception.Message);
-                return RedirectToAction("ForgotPassword", model);
-            }
-        }
-
     }
 }
