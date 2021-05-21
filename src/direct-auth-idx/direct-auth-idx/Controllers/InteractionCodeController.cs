@@ -70,27 +70,13 @@ namespace direct_auth_idx.Controllers
 
         private async Task<ClaimsIdentity> GetClaimsIdentityAsync(Okta.Idx.Sdk.TokenResponse tokens)
         {
-            List<Claim> userInfoClaims = (await GetClaimsFromUserInfoAsync(tokens.AccessToken)).ToList();
-            userInfoClaims.Add(new Claim(ClaimTypes.Name, userInfoClaims.First(c => c.Type.Equals("name")).Value));
+            List<Claim> userInfoClaims = (await AuthenticationHelper.GetClaimsFromUserInfoAsync(_idxClient.Configuration, tokens.AccessToken)).ToList();
 
             Claim[] tokenClaims = AuthenticationHelper.GetClaimsFromTokenResponse(tokens);
             userInfoClaims.AddRange(tokenClaims);
 
             ClaimsIdentity identity = new ClaimsIdentity(userInfoClaims.ToArray(), DefaultAuthenticationTypes.ApplicationCookie);
             return identity;
-        }
-
-        private async Task<IEnumerable<Claim>> GetClaimsFromUserInfoAsync(string accessToken)
-        {
-            Uri userInfoUri = new Uri(IdxUrlHelper.GetNormalizedUriString(_idxClient.Configuration.Issuer, "v1/userinfo"));
-            HttpClient httpClient = new HttpClient();
-            UserInfoResponse userInfoResponse = await httpClient.GetUserInfoAsync(new UserInfoRequest
-            {
-                Address = userInfoUri.ToString(),
-                Token = accessToken,
-            }).ConfigureAwait(false);
-
-            return userInfoResponse.Claims;
         }
 
         private void HandleException(Exception ex)
