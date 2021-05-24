@@ -353,10 +353,10 @@
     <Content Include="Views\Shared\_ProfilePartial.cshtml" />
     <Content Include="Views\Shared\_LogoutPartial.cshtml" />
     <Content Include="Views\Shared\Idps.cshtml" />
+    <Content Include="Views\InteractionCode\Error.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\InteractionCode\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
