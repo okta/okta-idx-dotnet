@@ -40,6 +40,11 @@ namespace direct_auth_idx.Controllers
         {
             IIdxContext idxContext = Session[state] as IIdxContext;
 
+            if("interaction_required".Equals(error))
+            {
+                return View("Error", new InteractionCodeErrorViewModel { Error = error, ErrorDescription = "Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed." });
+            }
+
             if (!string.IsNullOrEmpty(error))
             {
                 return View("Error", new InteractionCodeErrorViewModel { Error = error, ErrorDescription = error_description });

@@ -1,7 +1,7 @@
-﻿
+﻿@model direct_auth_idx.Models.InteractionCodeErrorViewModel
 @{
     ViewBag.Title = "Error";
 }
 
 <h2>Error</h2>
-<h2>Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed.</h2>
+<h2>@Model.ErrorDescription</h2>
