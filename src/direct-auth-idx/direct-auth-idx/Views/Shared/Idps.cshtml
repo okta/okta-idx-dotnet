@@ -14,11 +14,15 @@ else
         @foreach (IdpOption idpOption in Model)
         {
             <div class="col-md-offset-2 col-md-10">
-                <a class="btn btn-primary" href="@idpOption.Href">
-                    Sign in with @(idpOption.Name)
-                </a>
+                <input type="submit" value="Sign in with @(idpOption.Name)" class="btn btn-primary btn-stretch-wide" onclick="goTo(event, '@idpOption.Href')" />
             </div>
         }
     </div>
 </form>
+<script>
+    function goTo(event, href) {
+        event.preventDefault();
+        window.location.href = href;
+    }
+</script>
 }
