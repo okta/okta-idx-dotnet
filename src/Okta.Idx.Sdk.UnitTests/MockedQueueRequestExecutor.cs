@@ -29,6 +29,7 @@ namespace Okta.Idx.Sdk.UnitTests
                                        {
                                            StatusCode = response.StatusCode,
                                            Payload = response.Response,
+                                           Headers = new[] { new KeyValuePair<string, IEnumerable<string>>("Content-Type", new[] { "application/ion+json" }) } 
                                        });
         }
 
