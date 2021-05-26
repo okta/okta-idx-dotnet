@@ -81,6 +81,11 @@ namespace Okta.Idx.Sdk
         public static readonly string SuccessWithInteractionCode = "successWithInteractionCode";
 
         /// <summary>
+        /// redirect-idp
+        /// </summary>
+        public static readonly string RedirectIdp = "redirect-idp";
+
+        /// <summary>
         /// This is not a remediation itself, but it's used internally to identify unknown remediations.
         /// </summary>
         public static readonly string Unknown = "unknown";

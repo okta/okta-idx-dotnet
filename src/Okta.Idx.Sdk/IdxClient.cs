@@ -269,20 +269,20 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default)
         {
-            IIdxContext idxContext = await this.InteractAsync(state);
+            IIdxContext idxContext = await this.InteractAsync(state, cancellationToken);
             return await GetIdentityProvidersAsync(idxContext, cancellationToken);
         }
 
         /// <inheritdoc/>
         public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
-            IIdxResponse introspectResponse = await this.IntrospectAsync(idxContext);
+            IIdxResponse introspectResponse = await this.IntrospectAsync(idxContext, cancellationToken);
 
             return new IdentityProvidersResponse
             {
                 Context = idxContext,
                 IdpOptions = introspectResponse.Remediation?.RemediationOptions?
-                    .Where(remediationOption => remediationOption.Name.Equals("redirect-idp"))
+                    .Where(remediationOption => remediationOption.Name.Equals(RemediationType.RedirectIdp))
                     .Select(remediationOption => new IdpOption
                     {
                         State = idxContext.State,

@@ -37,7 +37,7 @@ namespace direct_auth_idx.Controllers
 
             LoginViewModel loginViewModel = new LoginViewModel
             {
-                IdpOptions = identityProvidersResponse.IdpOptions,
+                IdpOptions = identityProvidersResponse.IdpOptions,  // You can keep IdpOptions unset (set to null) if you don't want or need social login buttons
             };
 
             return View(loginViewModel);

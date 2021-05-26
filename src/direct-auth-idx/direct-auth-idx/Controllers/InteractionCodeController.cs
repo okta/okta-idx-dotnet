@@ -38,65 +38,40 @@ namespace direct_auth_idx.Controllers
         /// <returns></returns>
         public async Task<ActionResult> Callback(string state = null, string interaction_code = null, string error = null, string error_description = null)
         {
-            IIdxContext idxContext = Session[state] as IIdxContext;
-
-            if("interaction_required".Equals(error))
-            {
-                return View("Error", new InteractionCodeErrorViewModel { Error = error, ErrorDescription = "Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed." });
-            }
-
-            if (!string.IsNullOrEmpty(error))
-            {
-                return View("Error", new InteractionCodeErrorViewModel { Error = error, ErrorDescription = error_description });
-            }
-
-            if (string.IsNullOrEmpty(interaction_code))
-            {
-                return View("Error", new InteractionCodeErrorViewModel { Error = "null_interaction_code", ErrorDescription = "interaction_code was not specified" });
-            }
-
-            await RedeemInteractionCodeAndSignInAsync(idxContext, interaction_code);
-            return RedirectToAction("Index", "Home");
-        }
-
-        private async Task RedeemInteractionCodeAndSignInAsync(IIdxContext idxContext, string interactionCode)
-        {
             try
             {
-                Okta.Idx.Sdk.TokenResponse tokens = await _idxClient.RedeemInteractionCodeAsync(idxContext, interactionCode);
+                IIdxContext idxContext = Session[state] as IIdxContext;
 
-                if (tokens == null)
+                if ("interaction_required".Equals(error))
                 {
-                    HttpContext.Response.Redirect("/");
+                    return View("Error", new InteractionCodeErrorViewModel { Error = error, ErrorDescription = "Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed." });
                 }
-                else
+
+                if (!string.IsNullOrEmpty(error))
                 {
-                    ClaimsIdentity claimsIdentity = await GetClaimsIdentityAsync(tokens);
-                    _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = false }, claimsIdentity);
+                    return View("Error", new InteractionCodeErrorViewModel { Error = error, ErrorDescription = error_description });
                 }
+
+                if (string.IsNullOrEmpty(interaction_code))
+                {
+                    return View("Error", new InteractionCodeErrorViewModel { Error = "null_interaction_code", ErrorDescription = "interaction_code was not specified" });
+                }
+
+                Okta.Idx.Sdk.TokenResponse tokens = await _idxClient.RedeemInteractionCodeAsync(idxContext, interaction_code);
+                List<Claim> userInfoClaims = (await AuthenticationHelper.GetClaimsFromUserInfoAsync(_idxClient.Configuration, tokens.AccessToken)).ToList();
+
+                Claim[] tokenClaims = AuthenticationHelper.GetClaimsFromTokenResponse(tokens);
+                userInfoClaims.AddRange(tokenClaims);
+
+                ClaimsIdentity identity = new ClaimsIdentity(userInfoClaims.ToArray(), DefaultAuthenticationTypes.ApplicationCookie);
+                _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = false }, identity);
+
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
-                HandleException(ex);
-                HttpContext.Response.Redirect("/");
+                return View("Error", new InteractionCodeErrorViewModel { Error = ex.GetType().Name, ErrorDescription = ex.Message });
             }
-        }
-
-        private async Task<ClaimsIdentity> GetClaimsIdentityAsync(Okta.Idx.Sdk.TokenResponse tokens)
-        {
-            List<Claim> userInfoClaims = (await AuthenticationHelper.GetClaimsFromUserInfoAsync(_idxClient.Configuration, tokens.AccessToken)).ToList();
-
-            Claim[] tokenClaims = AuthenticationHelper.GetClaimsFromTokenResponse(tokens);
-            userInfoClaims.AddRange(tokenClaims);
-
-            ClaimsIdentity identity = new ClaimsIdentity(userInfoClaims.ToArray(), DefaultAuthenticationTypes.ApplicationCookie);
-            return identity;
-        }
-
-        private void HandleException(Exception ex)
-        {
-            // provide exception handling appropriate to your application
-            HttpContext.Response.Redirect("/");
         }
     }
 }
