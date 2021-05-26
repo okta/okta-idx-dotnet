@@ -1,0 +1,11 @@
+﻿{
+  "okta": {
+    "testing": {
+      "NormalUser": "mary@acme.com",
+      "DeactivatedUser": "mary-deactivated@acme.com",
+      "LockedUser": "mary-locked@acme.com",
+      "SuspendedUser": "mary-suspended@acme.com",
+      "UnassignedUser": "mary-unassigned@mailinator.com"
+    }
+  }
+}
