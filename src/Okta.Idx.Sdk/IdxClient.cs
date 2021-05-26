@@ -430,6 +430,15 @@ namespace Okta.Idx.Sdk
                                             .FirstOrDefault(x => x.Name == RemediationType.Identify)
                                             .ProceedAsync(identifyRequest, cancellationToken);
 
+            if (identifyResponse.IdxMessages.Messages.Any())
+            {
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Terminal,
+                    MessageToUser = identifyResponse.IdxMessages.Messages.First().Text,
+                };
+            }
+
             if (isIdentifyInOneStep)
             {
                 // We expect success

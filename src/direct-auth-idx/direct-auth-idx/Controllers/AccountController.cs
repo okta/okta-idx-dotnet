@@ -71,6 +71,10 @@ namespace direct_auth_idx.Controllers
                         Session["isChallengeFlow"] = true;
                         return RedirectToAction("selectAuthenticator", "Manage");
 
+                    case AuthenticationStatus.Terminal:
+                        ModelState.AddModelError(string.Empty, authnResponse.MessageToUser);
+                        return View("Login", model);
+
                     default:
                         ModelState.AddModelError(string.Empty, $"Invalid login attempt:");
                         return View("Login", model);

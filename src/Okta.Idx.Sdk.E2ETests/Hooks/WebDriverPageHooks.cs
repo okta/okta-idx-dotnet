@@ -1,6 +1,6 @@
 ﻿using BoDi;
 using Okta.Idx.Sdk.E2ETests.Drivers;
-using System.Threading;
+using System.Diagnostics;
 using TechTalk.SpecFlow;
 
 namespace Okta.Idx.Sdk.E2ETests.Hooks
@@ -18,26 +18,24 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
         }
 
         [BeforeScenario]
-        public void BeforeScenario()
+        public void BeforeScenario(ScenarioContext context)
         {
             _webServerDriver.StartWebServer();
 
             var config = ConfigBuilder.Configuration;
             _container.RegisterInstanceAs<ITestConfig>(config);
-
             _container.RegisterInstanceAs<IWebServerDriver>(_webServerDriver);
         }
 
         [AfterScenario]
-        public void AfterScenario(WebDriverDriver wdd)
+        public void AfterScenario(WebDriverDriver webDriverDriver, ScenarioContext context)
         {
-            var webDriver = wdd.WebDriver;
+            var webDriver = webDriverDriver.WebDriver;
 
             _webServerDriver.StopWebServer();
             
             webDriver.Close();
             webDriver.Dispose();
-
         }
 
         #region Before & After test run
