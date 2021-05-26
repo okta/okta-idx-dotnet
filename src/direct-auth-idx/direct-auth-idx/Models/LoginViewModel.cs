@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Okta.Idx.Sdk;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,5 +20,7 @@ namespace direct_auth_idx.Models
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; } = false;
+
+        public List<IdpOption> IdpOptions { get; set; } = new List<IdpOption>();
     }
 }

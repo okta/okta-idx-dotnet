@@ -12,14 +12,14 @@ namespace Okta.Idx.Sdk.UnitTests
     public class IdxUrlHelperShould
     {
         [Fact]
-        public async Task GetNormalizedUriStringWithoutTrailingSlashInArgument()
+        public void GetNormalizedUriStringWithoutTrailingSlashInArgument()
         {
             string normalized = IdxUrlHelper.GetNormalizedUriString("https://org.okta.com/oauth2/default", "the/resource");
             normalized.Should().Be("https://org.okta.com/oauth2/default/the/resource");
         }
 
         [Fact]
-        public async Task GetNormalizedUriStringWithTrailingSlashInArgument()
+        public void GetNormalizedUriStringWithTrailingSlashInArgument()
         {
             string normalized = IdxUrlHelper.GetNormalizedUriString("https://org.okta.com/oauth2/default/", "the/resource");
             normalized.Should().Be("https://org.okta.com/oauth2/default/the/resource");

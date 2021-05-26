@@ -27,10 +27,20 @@ namespace direct_auth_idx.Controllers
 
         // GET: Account
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public async Task<ActionResult> Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View();
+            IdentityProvidersResponse identityProvidersResponse = await _idxClient.GetIdentityProvidersAsync();
+
+            // save the context in session, keyed by state handle, so it can be retrieved on callback.  See InteractionCodeController.Callback
+            Session[identityProvidersResponse.State] = identityProvidersResponse.Context;
+
+            LoginViewModel loginViewModel = new LoginViewModel
+            {
+                IdpOptions = identityProvidersResponse.IdpOptions,  // You can keep IdpOptions unset (set to null) if you don't want or need social login buttons
+            };
+
+            return View(loginViewModel);
         }
 
         [HttpPost]

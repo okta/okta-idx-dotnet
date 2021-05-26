@@ -150,5 +150,21 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> SkipAuthenticatorSelectionAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets available identity providers.
+        /// </summary>
+        /// <param name="state">The state handle to use or null to autogenerate.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The identity providers response.</returns>
+        Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets available identity providers.
+        /// </summary>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The identity providers response.</returns>
+        Task<IdentityProvidersResponse> GetIdentityProvidersAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }
