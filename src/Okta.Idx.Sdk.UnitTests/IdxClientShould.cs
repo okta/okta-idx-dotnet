@@ -2283,5 +2283,85 @@ namespace Okta.Idx.Sdk.UnitTests
             Assert.Equal(1, mockHttpMessageHandler.CallCounts["/oauth2/v1/interact"]);
         }
 
+        [Fact]
+        public async Task CallInteractAndIntrospectOnGetIdentityProviders()
+        {
+            #region mockResponses
+            string interactResponse = @"{ ""interaction_handle"":""AcSDZw_kwcQtFUwLAgyUyBzl_OifS5Nn6IZQ_X1WXWI""}";
+            string introspectResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02WGhu-hBqJ0GVV8IjFiAU18m0fFKWv9sFNQ-E_-bP"",
+    ""expiresAt"": ""2021-05-10T18:13:24.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""name"": ""redirect-idp"",
+                ""type"": ""FACEBOOK"",
+                ""idp"": {
+                    ""id"": ""test-facebook-id"",
+                    ""name"": ""Facebook IdP""
+                },
+                ""href"": ""test facebook href"",
+                ""method"": ""GET""
+            },
+            {
+                ""name"": ""redirect-idp"",
+                ""type"": ""GOOGLE"",
+                ""idp"": {
+                    ""id"": ""test-google-id"",
+                    ""name"": ""Google IdP""
+                },
+                ""href"": ""test google href"",
+                ""method"": ""GET""
+            }
+        ]
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://dev-xxxx.okta.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02WGhu-hBqJ0GVV8IjFiAU18m0fFKWv9sFNQ-E_-bP"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Test App"",
+            ""id"": ""0oanjyc15Srn3JNIU5d6""
+        }
+    }
+}";
+            #endregion
+
+            MockHttpMessageHandler mockHttpMessageHandler = new MockHttpMessageHandler();
+            mockHttpMessageHandler.AddTestResponse("/oauth2/v1/interact", interactResponse);
+            mockHttpMessageHandler.AddTestResponse("/idp/idx/introspect", introspectResponse);
+
+            HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
+
+            IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, NullLogger.Instance);
+
+            IdentityProvidersResponse identityProvidersResponse = await idxClient.GetIdentityProvidersAsync();
+            Assert.NotNull(identityProvidersResponse);
+            Assert.NotNull(identityProvidersResponse.IdpOptions);
+            Assert.Equal(2, identityProvidersResponse.IdpOptions.Count);
+            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/oauth2/v1/interact"]);
+            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/idp/idx/introspect"]);
+        }
     }
 }
