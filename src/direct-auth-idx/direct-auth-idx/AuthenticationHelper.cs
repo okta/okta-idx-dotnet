@@ -27,14 +27,18 @@ namespace direct_auth_idx
             return identity;
         }
 
-        public static Claim[] GetClaimsFromTokenResponse(ITokenResponse tokenResponse)
+        public static async Task<ClaimsIdentity> GetIdentityFromTokenResponseAsync(IdxConfiguration configuration, ITokenResponse tokenResponse)
         {
-            return new[]
+            var claims = await GetClaimsFromUserInfoAsync(configuration, tokenResponse.AccessToken);
+            claims = claims.Append(new Claim("access_token", tokenResponse.AccessToken));
+            claims = claims.Append(new Claim("id_token", tokenResponse.IdToken));
+            if(!string.IsNullOrEmpty(tokenResponse.RefreshToken))
             {
-                new Claim("access_token", tokenResponse.AccessToken),
-                new Claim("id_token", tokenResponse.IdToken),
-                new Claim("refresh_token", tokenResponse.RefreshToken ?? string.Empty),
-            };
+                claims = claims.Append(new Claim("refresh_token", tokenResponse.RefreshToken));
+            }            
+            ClaimsIdentity identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
+
+            return identity;
         }
 
         public static async Task<IEnumerable<Claim>> GetClaimsFromUserInfoAsync(IdxConfiguration configuration, string accessToken)

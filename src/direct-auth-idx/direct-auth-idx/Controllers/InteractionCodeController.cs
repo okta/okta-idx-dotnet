@@ -58,12 +58,8 @@ namespace direct_auth_idx.Controllers
                 }
 
                 Okta.Idx.Sdk.TokenResponse tokens = await _idxClient.RedeemInteractionCodeAsync(idxContext, interaction_code);
-                List<Claim> userInfoClaims = (await AuthenticationHelper.GetClaimsFromUserInfoAsync(_idxClient.Configuration, tokens.AccessToken)).ToList();
 
-                Claim[] tokenClaims = AuthenticationHelper.GetClaimsFromTokenResponse(tokens);
-                userInfoClaims.AddRange(tokenClaims);
-
-                ClaimsIdentity identity = new ClaimsIdentity(userInfoClaims.ToArray(), DefaultAuthenticationTypes.ApplicationCookie);
+                ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, tokens);
                 _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = false }, identity);
 
                 return RedirectToAction("Index", "Home");
