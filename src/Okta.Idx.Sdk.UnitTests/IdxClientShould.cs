@@ -1055,7 +1055,7 @@ namespace Okta.Idx.Sdk.UnitTests
             ""create-form""
         ],
         ""name"": ""cancel"",
-        ""href"": ""https://dev-30426356.okta.com/idp/idx/cancel"",
+        ""href"": ""https://dev-xxxx.okta.com/idp/idx/cancel"",
         ""method"": ""POST"",
         ""produces"": ""application/ion+json; okta-version=1.0.0"",
         ""value"": [
