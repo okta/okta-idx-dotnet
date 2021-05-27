@@ -19,7 +19,7 @@ namespace Okta.Idx.Sdk.E2ETests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.8.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class _11_BasicLoginWithPasswordFactorFeature : object, Xunit.IClassFixture<_11_BasicLoginWithPasswordFactorFeature.FixtureData>, System.IDisposable
+    public partial class _1_1BasicLoginWithPasswordFactorFeature : object, Xunit.IClassFixture<_1_1BasicLoginWithPasswordFactorFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -31,7 +31,7 @@ namespace Okta.Idx.Sdk.E2ETests.Features
 #line 1 "11-BasicLoginWithPasswordFactor.feature"
 #line hidden
         
-        public _11_BasicLoginWithPasswordFactorFeature(_11_BasicLoginWithPasswordFactorFeature.FixtureData fixtureData, Okta_Idx_Sdk_E2ETests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public _1_1BasicLoginWithPasswordFactorFeature(_1_1BasicLoginWithPasswordFactorFeature.FixtureData fixtureData, Okta_Idx_Sdk_E2ETests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace Okta.Idx.Sdk.E2ETests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "11-BasicLoginWithPasswordFactor", "\tAs a user, Mary should be able to login into the app and access her profile", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "1.1 Basic Login with Password Factor", "\tAs a user, Mary should be able to login into the app and access her profile", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -78,9 +78,16 @@ namespace Okta.Idx.Sdk.E2ETests.Features
         public virtual void FeatureBackground()
         {
 #line 4
-#line hidden
+  #line hidden
 #line 5
-    testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+ testRunner.Given("a SPA, WEB APP or MOBILE Sign On Policy that defines Password as required", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 6
+ testRunner.And("the list of Authenticators contains Email and Password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 7
+ testRunner.And("a User named \"Mary\" exists, and this user has already setup email and password fa" +
+                    "ctors", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
         }
         
@@ -89,16 +96,16 @@ namespace Okta.Idx.Sdk.E2ETests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="1.1.1: Mary logs in with a Password")]
-        [Xunit.TraitAttribute("FeatureTitle", "11-BasicLoginWithPasswordFactor")]
-        [Xunit.TraitAttribute("Description", "1.1.1: Mary logs in with a Password")]
+        [Xunit.SkippableFactAttribute(DisplayName="1.1.1 Mary logs in with a Password")]
+        [Xunit.TraitAttribute("FeatureTitle", "1.1 Basic Login with Password Factor")]
+        [Xunit.TraitAttribute("Description", "1.1.1 Mary logs in with a Password")]
         public virtual void _1_1_1MaryLogsInWithAPassword()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("1.1.1: Mary logs in with a Password", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 7
-this.ScenarioInitialize(scenarioInfo);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("1.1.1 Mary logs in with a Password", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 9
+  this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
             bool isFeatureIgnored = default(bool);
@@ -118,31 +125,40 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 4
-this.FeatureBackground();
-#line hidden
-#line 8
-    testRunner.When("she enters correct credentials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 9
-    testRunner.And("she submits the Login form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+  this.FeatureBackground();
 #line hidden
 #line 10
-    testRunner.Then("Mary should get logged-in", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+#line 11
+ testRunner.When("she fills in her correct username", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 12
+ testRunner.And("she fills in her correct password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 13
+ testRunner.And("she submits the Login form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 14
+    testRunner.Then("she is redirected to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 18
+    testRunner.And("Mary should get logged-in", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="1.1.2: Mary doesn\'t know her username")]
-        [Xunit.TraitAttribute("FeatureTitle", "11-BasicLoginWithPasswordFactor")]
-        [Xunit.TraitAttribute("Description", "1.1.2: Mary doesn\'t know her username")]
+        [Xunit.SkippableFactAttribute(DisplayName="1.1.2 Mary doesn\'t know her username")]
+        [Xunit.TraitAttribute("FeatureTitle", "1.1 Basic Login with Password Factor")]
+        [Xunit.TraitAttribute("Description", "1.1.2 Mary doesn\'t know her username")]
         public virtual void _1_1_2MaryDoesntKnowHerUsername()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("1.1.2: Mary doesn\'t know her username", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 12
-this.ScenarioInitialize(scenarioInfo);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("1.1.2 Mary doesn\'t know her username", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 20
+  this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
             bool isFeatureIgnored = default(bool);
@@ -162,19 +178,22 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 4
-this.FeatureBackground();
+  this.FeatureBackground();
 #line hidden
-#line 13
+#line 21
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 14
- testRunner.When("she fills in her incorrect username with password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 22
+ testRunner.When("she fills in her incorrect username", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 23
+ testRunner.And("she fills in her password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 24
  testRunner.And("she submits the Login form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
- testRunner.Then("she should see a message on the Login form \"You do not have permission to perform" +
+#line 25
+    testRunner.Then("she should see a message on the Login form \"You do not have permission to perform" +
                         " the requested action.\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -182,15 +201,15 @@ this.FeatureBackground();
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="1.1.3: Mary doesn\'t know her password")]
-        [Xunit.TraitAttribute("FeatureTitle", "11-BasicLoginWithPasswordFactor")]
+        [Xunit.TraitAttribute("FeatureTitle", "1.1 Basic Login with Password Factor")]
         [Xunit.TraitAttribute("Description", "1.1.3: Mary doesn\'t know her password")]
         public virtual void _1_1_3MaryDoesntKnowHerPassword()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("1.1.3: Mary doesn\'t know her password", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 18
-this.ScenarioInitialize(scenarioInfo);
+#line 27
+  this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
             bool isFeatureIgnored = default(bool);
@@ -210,34 +229,37 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 4
-this.FeatureBackground();
+  this.FeatureBackground();
 #line hidden
-#line 19
+#line 28
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 20
- testRunner.When("she fills in her correct username and incorrect password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 29
+ testRunner.When("she fills in her correct username", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 21
+#line 30
+ testRunner.And("she fills in her incorrect password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 31
  testRunner.And("she submits the Login form  with blank fields", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 22
- testRunner.Then("she should see the message \"Authentication failed\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 32
+    testRunner.Then("she should see the message \"Authentication failed\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
         [Xunit.SkippableFactAttribute(DisplayName="1.1.8: Mary clicks on the \"Forgot Password Link\"")]
-        [Xunit.TraitAttribute("FeatureTitle", "11-BasicLoginWithPasswordFactor")]
+        [Xunit.TraitAttribute("FeatureTitle", "1.1 Basic Login with Password Factor")]
         [Xunit.TraitAttribute("Description", "1.1.8: Mary clicks on the \"Forgot Password Link\"")]
         public virtual void _1_1_8MaryClicksOnTheForgotPasswordLink()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("1.1.8: Mary clicks on the \"Forgot Password Link\"", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 24
-this.ScenarioInitialize(scenarioInfo);
+#line 34
+  this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
             bool isFeatureIgnored = default(bool);
@@ -257,15 +279,15 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 4
-this.FeatureBackground();
+  this.FeatureBackground();
 #line hidden
-#line 25
+#line 35
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 26
+#line 36
  testRunner.When("she clicks on the \"Forgot Password Link\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 27
+#line 37
  testRunner.Then("she is redirected to the Self Service Password Reset View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -279,12 +301,12 @@ this.FeatureBackground();
             
             public FixtureData()
             {
-                _11_BasicLoginWithPasswordFactorFeature.FeatureSetup();
+                _1_1BasicLoginWithPasswordFactorFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                _11_BasicLoginWithPasswordFactorFeature.FeatureTearDown();
+                _1_1BasicLoginWithPasswordFactorFeature.FeatureTearDown();
             }
         }
     }

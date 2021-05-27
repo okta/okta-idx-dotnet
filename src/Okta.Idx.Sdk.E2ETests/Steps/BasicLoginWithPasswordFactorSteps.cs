@@ -13,6 +13,24 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         {
         }
 
+        [Given(@"a SPA, WEB APP or MOBILE Sign On Policy that defines Password as required")]
+        public void GivenASPAWEBAPPOrMOBILESignOnPolicyThatDefinesPasswordAsRequired()
+        {
+            
+        }
+
+        [Given(@"the list of Authenticators contains Email and Password")]
+        public void GivenTheListOfAuthenticatorsContainsEmailAndPassword()
+        {
+            
+        }
+
+        [Given(@"a User named ""(.*)"" exists, and this user has already setup email and password factors")]
+        public void GivenAUserNamedExistsAndThisUserHasAlreadySetupEmailAndPasswordFactors(string p0)
+        {
+            
+        }
+
         [Given(@"Mary navigates to the Basic Login View")]
         public void GivenMaryNavigatesToTheLoginPage()
         {
@@ -21,11 +39,17 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             ClickLinkWithText("Log in", 10);
             AssertTitleContains("Login");
         }
-        
-        [When(@"she enters correct credentials")]
-        public void WhenSheEntersCorrectCredentials()
+
+        [When(@"she fills in her correct username")]
+        public void WhenSheEntersCorrectUsername()
         {
             ElementById("UserName").SendKeys(_testUser.Email);
+        }
+
+        [When(@"she fills in her password")]
+        [When(@"she fills in her correct password")]
+        public void WhenSheEntersCorrectPassword()
+        {
             ElementById("Password").SendKeys(_testUser.Password);
         }
 
@@ -35,6 +59,12 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             ElementById("LogInBtn").Click();
         }
 
+        [Then(@"she is redirected to the Root View")]
+        public void SheIsRedirectedToTheRootView()
+        {
+            AssertTitleContains("Home Page");
+        }
+
         [Then(@"Mary should get logged-in")]
         public void ThenMaryShouldGetLogged_In()
         {
@@ -42,19 +72,17 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             ElementByLinkText($"Hello, {_configuration.NormalUser}!").Displayed.Should().BeTrue();
         }
 
-        [When(@"she fills in her incorrect username with password")]
-        public void WhenSheFillsInHerIncorrectUsernameWithPassword()
+        [When(@"she fills in her incorrect password")]
+        public void WhenSheFillsInHerIncorrectPassword()
         {
-            ElementById("UserName").SendKeys("wrong_name@mail.com");
-            ElementById("Password").SendKeys(_testUser.Password);
+            ElementById("Password").SendKeys("wrong password");
         }
 
-        [When(@"she fills in her correct username and incorrect password")]
-        public void WhenSheFillsInHerCorrectUsernameAndIncorrectPassword()
+        [When(@"she fills in her incorrect username")]
+        public void WhenSheFillsInHerIncorrectUsername()
         {
-            ElementById("UserName").SendKeys(_testUser.Email);
-            ElementById("Password").SendKeys("password");
-        }
+            ElementById("UserName").SendKeys("wrongname@site.com");
+        }        
 
         [Then(@"she should see a message on the Login form ""(.*)""")]
         public void ThenSheShouldSeeAMessageOnTheLoginForm(string p0)
