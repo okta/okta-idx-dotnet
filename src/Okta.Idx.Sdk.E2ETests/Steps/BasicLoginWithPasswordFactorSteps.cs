@@ -93,24 +93,6 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             ScenarioContext.Current.Pending();
         }
 
-        [Given(@"Mary's account is suspended")]
-        public void GivenMarySAccountIsSuspended()
-        {
-            _testUser.Name = _configuration.SuspendedUser;
-        }
-
-        [Given(@"Mary's account is locked")]
-        public void GivenMarySAccountIsLocked()
-        {
-            _testUser.Name = _configuration.LockedUser;
-        }
-
-        [Given(@"Mary's account is deactivated")]
-        public void GivenMarySAccountIsDeactivated()
-        {
-            _testUser.Name = _configuration.DeactivatedUser;
-        }
-
         [When(@"she clicks on the ""(.*)""")]
         public void WhenSheClicksOnThe(string p0)
         {

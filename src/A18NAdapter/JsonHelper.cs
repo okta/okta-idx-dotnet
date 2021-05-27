@@ -13,6 +13,7 @@ namespace A18NAdapter
                     new JsonSerializerSettings 
                     { 
                         NullValueHandling = NullValueHandling.Ignore,
+                        DateTimeZoneHandling = DateTimeZoneHandling.Utc,
                     });
         }
 
