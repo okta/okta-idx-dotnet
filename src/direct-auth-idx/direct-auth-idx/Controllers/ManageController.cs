@@ -51,13 +51,10 @@
             {
                 NewPassword = model.NewPassword,
             };
-
-            // WIP
-            var idxAuthClient = new IdxClient(null);
-
+            
             try
             {
-                var authnResponse = await idxAuthClient.ChangePasswordAsync(changePasswordOptions, (IIdxContext)Session["idxContext"]).ConfigureAwait(false);
+                var authnResponse = await _idxClient.ChangePasswordAsync(changePasswordOptions, (IIdxContext)Session["idxContext"]).ConfigureAwait(false);
                 Session["idxContext"] = authnResponse.IdxContext;
 
                 switch (authnResponse.AuthenticationStatus)
@@ -87,7 +84,6 @@
             }
         }
 
-        // GET
         public ActionResult VerifyAuthenticator()
         {
             return View();
@@ -161,7 +157,7 @@
                 {
                     AuthenticatorId = Session["phoneId"].ToString(),
                     PhoneNumber = model.PhoneNumber,
-                    MethodType = AuthenticatorMethodType.Sms,
+                    MethodType = model.MethodType,
                 };
 
                 var enrollResponse = await _idxClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
@@ -183,7 +179,12 @@
 
         public ActionResult EnrollPhoneAuthenticator()
         {
-            return View();
+            var model = new EnrollPhoneViewModel
+                            {
+                                MethodTypes = (List<AuthenticatorMethodType>)TempData["methodTypes"] ?? new List<AuthenticatorMethodType>(),
+                            };
+            TempData["methodTypes"] = model.MethodTypes;
+            return View(model);
         }
 
         public ActionResult SelectPhoneChallengeMethod()
@@ -207,7 +208,7 @@
                 {
                     AuthenticatorId = model.AuthenticatorId,
                     EnrollmentId = model.EnrollmentId,
-                    MethodType = AuthenticatorMethodType.Sms,
+                    MethodType = model.MethodType,
                 };
                 
                 var challengeResponse = await _idxClient.ChallengeAuthenticatorAsync(challengeOptions, (IIdxContext)Session["IdxContext"]);
@@ -226,7 +227,7 @@
                 return RedirectToAction("SelectPhoneChallengeMethod", model);
             }
         }
-
+        
         public ActionResult SelectAuthenticator()
         {
             var authenticators = (IList<AuthenticatorViewModel>)TempData["authenticators"];
@@ -333,6 +334,7 @@
                                 Profile = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Profile,
                                 EnrollmentId = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.EnrollmentId,
                                 AuthenticatorId = model.AuthenticatorId,
+                                MethodTypes = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.MethodTypes,
                             };
 
                             return RedirectToAction("SelectPhoneChallengeMethod", "Manage");
@@ -365,6 +367,7 @@
                             return RedirectToAction("VerifyAuthenticator", "Manage");
 
                         case AuthenticationStatus.AwaitingAuthenticatorEnrollmentData:
+                            TempData["methodTypes"] = enrollResponse.CurrentAuthenticator.MethodTypes;
                             return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
 
                         default:
@@ -385,6 +388,7 @@
                                 {
                                     Authenticators = (List<AuthenticatorViewModel>)TempData["authenticators"],
                                 };
+            TempData["authenticators"] = viewModel.Authenticators;
             return View(viewModel);
         }
 

@@ -1,5 +1,8 @@
 ﻿namespace Okta.Idx.Sdk
 {
+    using System.Collections;
+    using System.Collections.Generic;
+
     public class EnrollPhoneAuthenticatorOptions : EnrollAuthenticatorOptions
     {
         /// <summary>

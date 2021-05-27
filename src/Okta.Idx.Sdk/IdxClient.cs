@@ -1168,6 +1168,7 @@ namespace Okta.Idx.Sdk
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = status,
+                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value),
             };
         }
 
