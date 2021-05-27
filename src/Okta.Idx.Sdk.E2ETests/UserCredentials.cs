@@ -1,4 +1,4 @@
-﻿namespace Okta.Idx.Sdk.E2ETests.Steps
+﻿namespace Okta.Idx.Sdk.E2ETests
 {
     public class UserCredentials
     {

@@ -6,6 +6,7 @@
       "LockedUser": "mary-locked@acme.com",
       "SuspendedUser": "mary-suspended@acme.com",
       "UnassignedUser": "mary-unassigned@mailinator.com"
-    }
+    },
+    "A18nApiKey": "SSSbEjSVtS786rRZ6Yj1s6HGBwBqKRvpQJHlWWcc"
   }
 }
