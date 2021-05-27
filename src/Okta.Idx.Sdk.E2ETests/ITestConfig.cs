@@ -8,5 +8,6 @@
         public string SuspendedUser { get; set; }
         public string UnassignedUser { get; set; }
         public string UserPassword { get; set; }
+        public string A18nApiKey { get; set; }
     }
 }

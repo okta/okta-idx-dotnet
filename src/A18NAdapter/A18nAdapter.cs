@@ -7,7 +7,7 @@ using A18NAdapter.Dto;
 
 namespace A18NAdapter
 {
-    public class A18nAdapter : IDisposable, IA18nAdapter
+    public class A18nAdapter : IA18nAdapter, IDisposable
     {
         private const string BaseUrl = "https://api.a18n.help";
         private const string RelativePart = "v1/profile";
@@ -181,7 +181,6 @@ namespace A18NAdapter
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetRawAsync($"{effectiveProfileId}/sms/latest/content", cancellationToken);
         }
-​
 
         #region request executors
         private async Task<T> GetAsync<T>(string uri = default, CancellationToken cancellationToken = default)

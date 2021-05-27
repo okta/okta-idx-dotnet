@@ -5,7 +5,8 @@
       "DeactivatedUser": "mary-deactivated@acme.com",
       "LockedUser": "mary-locked@acme.com",
       "SuspendedUser": "mary-suspended@acme.com",
-      "UnassignedUser": "mary-unassigned@mailinator.com"
+      "UnassignedUser": "mary-unassigned@mailinator.com",
+      "UserPassword":  "Abcd1234"
     },
     "A18nApiKey": "SSSbEjSVtS786rRZ6Yj1s6HGBwBqKRvpQJHlWWcc"
   }

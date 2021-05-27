@@ -359,6 +359,10 @@
     <Content Include="Scripts\jquery-3.4.1.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\A18NAdapter\A18NAdapter.csproj">
+      <Project>{765e6d4f-4294-4f61-9cd9-e936c32e4adb}</Project>
+      <Name>A18NAdapter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Okta.Idx.Sdk\Okta.Idx.Sdk.csproj">
       <Project>{996ae278-03a8-45e9-a47f-abab48bf9f2d}</Project>
       <Name>Okta.Idx.Sdk</Name>
