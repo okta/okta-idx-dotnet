@@ -20,7 +20,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             _webServerDriver = webServerDriver;
             _testUser = new UserCredentials
             {
-                Name = _configuration.NormalUser,
+                Email = _configuration.NormalUser,
                 Password = _configuration.UserPassword,
             };
         }

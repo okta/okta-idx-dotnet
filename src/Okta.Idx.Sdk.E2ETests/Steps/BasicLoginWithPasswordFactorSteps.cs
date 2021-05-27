@@ -26,7 +26,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [When(@"she enters correct credentials")]
         public void WhenSheEntersCorrectCredentials()
         {
-            ElementById("UserName").SendKeys(_testUser.Name);
+            ElementById("UserName").SendKeys(_testUser.Email);
             ElementById("Password").SendKeys(_testUser.Password);
         }
 
@@ -53,7 +53,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [When(@"she fills in her correct username and incorrect password")]
         public void WhenSheFillsInHerCorrectUsernameAndIncorrectPassword()
         {
-            ElementById("UserName").SendKeys(_testUser.Name);
+            ElementById("UserName").SendKeys(_testUser.Email);
             ElementById("Password").SendKeys("password");
         }
 
@@ -78,7 +78,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [Given(@"Mary is not a member of the ""(.*)"" group")]
         public void GivenMaryIsNotAMemberOfTheGroup(string p0)
         {
-            _testUser.Name = _configuration.UnassignedUser;
+            _testUser.Email = _configuration.UnassignedUser;
         }
 
         [Then(@"she sees the login form again with blank fields")]

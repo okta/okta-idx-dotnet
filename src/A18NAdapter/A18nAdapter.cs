@@ -7,7 +7,7 @@ using A18NAdapter.Dto;
 
 namespace A18NAdapter
 {
-    public class A18nAdapter : IDisposable
+    public class A18nAdapter : IDisposable, IA18nAdapter
     {
         private const string BaseUrl = "https://api.a18n.help";
         private const string RelativePart = "v1/profile";
@@ -210,7 +210,7 @@ namespace A18NAdapter
             EnsureResponseStatus(response, HttpStatusCode.NoContent);
         }
         #endregion request executors
-        
+
         #region utility functions
         private string EffectiveProfileId(string profileId) => profileId == default ? _defaultProfileId : profileId;
 
@@ -220,7 +220,7 @@ namespace A18NAdapter
             var json = await responseMessage.Content.ReadAsStringAsync();
             return JsonHelper.Deserialize<T>(json);
         }
-        
+
         private void EnsureResponseStatus(HttpResponseMessage response, HttpStatusCode httpStatusCode = HttpStatusCode.OK)
         {
             if (response.StatusCode != httpStatusCode)
