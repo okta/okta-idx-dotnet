@@ -67,7 +67,7 @@ namespace direct_auth_idx.Controllers
                 switch (authnResponse?.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
-                            ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, authnResponse);
+                            ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
                             _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, identity);
                             return RedirectToAction("Index", "Home");
 
