@@ -2366,7 +2366,7 @@ namespace Okta.Idx.Sdk.UnitTests
 
         #region 2FA Tests
 
-
+        /****** BEGIN SCENARIOS 6.1.X ******/
         [Fact]
         public async Task ReturnAwaitingForAuthenticatorSelectionWhenLoginWith2FA()
         {
@@ -3599,6 +3599,151 @@ namespace Okta.Idx.Sdk.UnitTests
                 .WithMessage("*Invalid code. Try again.*");
 
         }
+
+        /****** END SCENARIOS 6.1.X ******/
+
+        /****** BEGIN SCENARIOS 6.2.X ******/
+
+        [Fact]
+        public async Task ReturnAwaitingForAuthenticatorSelectionWhenLoginWith2FA()
+        {
+            var interactResponse = @"{ 'interaction_handle' : 'foo' }";
+            var introspectResponse = @"{
+                                       ""version"":""1.0.0"",
+                                       ""stateHandle"":""026g-m0qr-bk2jbZ5bECFOVCEbnS6I9uXUFjLEn63y"",
+                                       ""expiresAt"":""2021-05-14T18:32:10.000Z"",
+                                       ""intent"":""LOGIN"",
+                                       ""remediation"":{
+                                          ""type"":""array"",
+                                          ""value"":[
+                                             {
+                                                ""rel"":[
+                                                   ""create-form""
+                                                ],
+                                                ""name"":""identify"",
+                                                ""href"":""https://foo.okta.com/idp/idx/identify"",
+                                                ""method"":""POST"",
+                                                ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                ""value"":[
+                                                   {
+                                                      ""name"":""identifier"",
+                                                      ""label"":""Username""
+                                                   },
+                                                   {
+                                                      ""name"":""credentials"",
+                                                      ""type"":""object"",
+                                                      ""form"":{
+                                                         ""value"":[
+                                                            {
+                                                               ""name"":""passcode"",
+                                                               ""label"":""Password"",
+                                                               ""secret"":true
+                                                            }
+                                                         ]
+                                                      },
+                                                      ""required"":true
+                                                   },
+                                                   {
+                                                      ""name"":""rememberMe"",
+                                                      ""type"":""boolean"",
+                                                      ""label"":""Remember this device""
+                                                   },
+                                                   {
+                                                      ""name"":""stateHandle"",
+                                                      ""required"":true,
+                                                      ""value"":""026g-m0qr-bk2jbZ5bECFOVCEbnS6I9uXUFjLEn63y"",
+                                                      ""visible"":false,
+                                                      ""mutable"":false
+                                                   }
+                                                ],
+                                                ""accepts"":""application/json; okta-version=1.0.0""
+                                             }
+                                          ]
+                                       },
+                                       ""currentAuthenticator"":{
+                                          ""type"":""object"",
+                                          ""value"":{
+                                             ""recover"":{
+                                                ""rel"":[
+                                                   ""create-form""
+                                                ],
+                                                ""name"":""recover"",
+                                                ""href"":""https://foo.okta.com/idp/idx/recover"",
+                                                ""method"":""POST"",
+                                                ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                ""value"":[
+                                                   {
+                                                      ""name"":""stateHandle"",
+                                                      ""required"":true,
+                                                      ""value"":""026g-m0qr-bk2jbZ5bECFOVCEbnS6I9uXUFjLEn63y"",
+                                                      ""visible"":false,
+                                                      ""mutable"":false
+                                                   }
+                                                ],
+                                                ""accepts"":""application/json; okta-version=1.0.0""
+                                             },
+                                             ""type"":""password"",
+                                             ""key"":""okta_password"",
+                                             ""id"":""autksbgegGSb3LW2j5d6"",
+                                             ""displayName"":""Password"",
+                                             ""methods"":[
+                                                {
+                                                   ""type"":""password""
+                                                }
+                                             ]
+                                          }
+                                       },
+                                       ""cancel"":{
+                                          ""rel"":[
+                                             ""create-form""
+                                          ],
+                                          ""name"":""cancel"",
+                                          ""href"":""https://foo.okta.com/idp/idx/cancel"",
+                                          ""method"":""POST"",
+                                          ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                          ""value"":[
+                                             {
+                                                ""name"":""stateHandle"",
+                                                ""required"":true,
+                                                ""value"":""026g-m0qr-bk2jbZ5bECFOVCEbnS6I9uXUFjLEn63y"",
+                                                ""visible"":false,
+                                                ""mutable"":false
+                                             }
+                                          ],
+                                          ""accepts"":""application/json; okta-version=1.0.0""
+                                       },
+                                       ""app"":{
+                                          ""type"":""object"",
+                                          ""value"":{
+                                             ""name"":""oidc_client"",
+                                             ""label"":""Laura - My Web App"",
+                                             ""id"":""foo""
+                                          }
+                                       }
+                                    }";
+            var identifyResponse = @"";
+
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = interactResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = introspectResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = identifyResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var authResponse = await testClient.AuthenticateAsync(
+                                   new AuthenticationOptions()
+                                   {
+                                       Username = "user@test.com",
+                                       Password = "p4zzw0rd"
+                                   });
+
+            authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingAuthenticatorEnrollment);
+            authResponse.Authenticators.Should().Contain(x => x.Name == "phone");
+
+        }
+
+        /****** END SCENARIOS 6.2.X ******/
 
         #endregion
     }
