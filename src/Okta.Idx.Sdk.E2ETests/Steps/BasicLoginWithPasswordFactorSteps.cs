@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Okta.Idx.Sdk.E2ETests.Drivers;
 using Okta.Idx.Sdk.E2ETests.Helpers;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps
@@ -26,9 +27,9 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         }
 
         [Given(@"a User named ""(.*)"" exists, and this user has already setup email and password factors")]
-        public void GivenAUserNamedExistsAndThisUserHasAlreadySetupEmailAndPasswordFactors(string p0)
+        public async Task GivenAUserNamedExistsAndThisUserHasAlreadySetupEmailAndPasswordFactors(string p0)
         {
-            _testUser = _userHelper.GetActivePasswordUser();
+            _testUser = await _userHelper.GetActivePasswordUser();
         }
 
         [Given(@"Mary navigates to the Basic Login View")]

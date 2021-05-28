@@ -15,5 +15,6 @@ namespace Okta.Idx.Sdk.E2ETests
         public string UnassignedUser { get; set; }
         public string UserPassword { get; set; }
         public string A18nApiKey { get; set; }
+        public string A18nProfileId { get; set; }
     }
 }

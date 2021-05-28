@@ -2,12 +2,13 @@
 {
     public interface ITestConfig
     {
-        public string NormalUser { get; set; }
-        public string DeactivatedUser { get; set; }
-        public string LockedUser { get; set; }
-        public string SuspendedUser { get; set; }
-        public string UnassignedUser { get; set; }
-        public string UserPassword { get; set; }
-        public string A18nApiKey { get; set; }
+        string NormalUser { get; set; }
+        string DeactivatedUser { get; set; }
+        string LockedUser { get; set; }
+        string SuspendedUser { get; set; }
+        string UnassignedUser { get; set; }
+        string UserPassword { get; set; }
+        string A18nApiKey { get; set; }
+        string A18nProfileId { get; set; }
     }
 }
