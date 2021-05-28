@@ -3,9 +3,13 @@ using BoDi;
 using Okta.Idx.Sdk.E2ETests.Drivers;
 using System.Diagnostics;
 using TechTalk.SpecFlow;
+using Xunit;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace Okta.Idx.Sdk.E2ETests.Hooks
 {
+
     [Binding]
     public class WebDriverPageHooks
     {
@@ -27,20 +31,14 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
             var a18nAdapter = new A18nAdapter(config.A18nApiKey);
 
             _container.RegisterInstanceAs<ITestConfig>(config);
-            _container.RegisterInstanceAs<IA18nAdapter>(a18nAdapter);
-            _container.RegisterInstanceAs<IWebServerDriver>(_webServerDriver);
+            _container.RegisterInstanceAs<IA18nAdapter>(a18nAdapter, dispose: true);
+            _container.RegisterInstanceAs<IWebServerDriver>(_webServerDriver, dispose: true);
         }
 
         [AfterScenario]
-        public void AfterScenario(WebDriverDriver webDriverDriver, A18nAdapter a18nAdapter)
+        public void AfterScenario()
         {
-            var webDriver = webDriverDriver.WebDriver;
-
             _webServerDriver.StopWebServer();
-
-            webDriver.Close();
-            webDriver.Dispose();
-            a18nAdapter.Dispose();
         }
 
 

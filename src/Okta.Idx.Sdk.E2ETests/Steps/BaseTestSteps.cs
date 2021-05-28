@@ -11,7 +11,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
     {
         protected IWebDriver _webDriver;
         protected ITestConfig _configuration;
-        protected UserCredentials _testUser;
+        protected UserProperties _testUser;
         protected A18nAdapter _a18nAdapter;
         private readonly IWebServerDriver _webServerDriver;
 
@@ -21,7 +21,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             _configuration = configuration;
             _webServerDriver = webServerDriver;
             _a18nAdapter = a18nAdapter;
-            _testUser = new UserCredentials
+            _testUser = new UserProperties
             {
                 Email = _configuration.NormalUser,
                 Password = _configuration.UserPassword,

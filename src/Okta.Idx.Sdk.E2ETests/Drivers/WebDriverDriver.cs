@@ -4,7 +4,7 @@ using System;
 
 namespace Okta.Idx.Sdk.E2ETests.Drivers
 {
-    public class WebDriverDriver
+    public class WebDriverDriver : IDisposable
     {
         private Lazy<IWebDriver> _webDriver = new(() => SetupWebDriver());
 
@@ -16,6 +16,15 @@ namespace Okta.Idx.Sdk.E2ETests.Drivers
             options.AddArgument("--start-maximized");
             options.AddArgument("--disable-notifications");
             return new ChromeDriver(options);
+        }
+
+        public void Dispose()
+        {
+            if (_webDriver.IsValueCreated)
+            {
+                WebDriver.Close();
+                WebDriver.Dispose();
+            }
         }
     }
 }

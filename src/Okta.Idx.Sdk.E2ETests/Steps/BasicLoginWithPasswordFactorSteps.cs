@@ -69,7 +69,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         public void ThenMaryShouldGetLogged_In()
         {
             AssertTitleContains("Home Page");
-            ElementByLinkText($"Hello, {_configuration.NormalUser}!").Displayed.Should().BeTrue();
+            ElementByLinkText($"Hello, {_testUser.Email}!").Displayed.Should().BeTrue();
         }
 
         [When(@"she fills in her incorrect password")]

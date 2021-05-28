@@ -1,6 +1,6 @@
 ﻿namespace Okta.Idx.Sdk.E2ETests
 {
-    public class UserCredentials
+    public class UserProperties
     {
         public string Email { get; set; }
         public string PhoneNumber { get; set; }

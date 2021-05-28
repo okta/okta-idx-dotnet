@@ -1,7 +1,7 @@
 ﻿Feature: 1.1 Basic Login with Password Factor
 	As a user, Mary should be able to login into the app and access her profile
 
-  Background:
+  Background: 
 	Given a SPA, WEB APP or MOBILE Sign On Policy that defines Password as required
 	And the list of Authenticators contains Email and Password
 	And a User named "Mary" exists, and this user has already setup email and password factors
