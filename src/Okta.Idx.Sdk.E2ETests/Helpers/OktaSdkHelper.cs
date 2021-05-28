@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Okta.Idx.Sdk.E2ETests.Helpers
 {
-    public class OktaSdkHelper
+    public class OktaSdkHelper : IOktaSdkHelper
     {
         private OktaClient _client;
 

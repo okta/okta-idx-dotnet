@@ -1,6 +1,7 @@
 ﻿using A18NAdapter;
 using BoDi;
 using Okta.Idx.Sdk.E2ETests.Drivers;
+using Okta.Idx.Sdk.E2ETests.Helpers;
 using System.Diagnostics;
 using TechTalk.SpecFlow;
 using Xunit;
@@ -33,6 +34,8 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
             _container.RegisterInstanceAs<ITestConfig>(config);
             _container.RegisterInstanceAs<IA18nAdapter>(a18nAdapter, dispose: true);
             _container.RegisterInstanceAs<IWebServerDriver>(_webServerDriver, dispose: true);
+            _container.RegisterTypeAs<OktaSdkHelper, IOktaSdkHelper>(); 
+            _container.RegisterTypeAs<TestUserHelper, ITestUserHelper>();
         }
 
         [AfterScenario]
@@ -40,7 +43,6 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
         {
             _webServerDriver.StopWebServer();
         }
-
 
         #region Before & After test run
         [BeforeTestRun]

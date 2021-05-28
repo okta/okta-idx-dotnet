@@ -1,6 +1,6 @@
-﻿using A18NAdapter;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Okta.Idx.Sdk.E2ETests.Drivers;
+using Okta.Idx.Sdk.E2ETests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
@@ -10,22 +10,17 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
     public abstract class BaseTestSteps
     {
         protected IWebDriver _webDriver;
-        protected ITestConfig _configuration;
+ //       protected ITestConfig _configuration;
         protected UserProperties _testUser;
-        protected A18nAdapter _a18nAdapter;
+        protected ITestUserHelper _userHelper;
         private readonly IWebServerDriver _webServerDriver;
 
-        public BaseTestSteps(WebDriverDriver webDriver, ITestConfig configuration, IWebServerDriver webServerDriver, A18nAdapter a18nAdapter)
+        public BaseTestSteps(WebDriverDriver webDriverDriver, /*ITestConfig configuration,*/ IWebServerDriver webServerDriver, ITestUserHelper userHelper)
         {
-            _webDriver = webDriver.WebDriver;
-            _configuration = configuration;
+            _webDriver = webDriverDriver.WebDriver;
+//            _configuration = configuration;
             _webServerDriver = webServerDriver;
-            _a18nAdapter = a18nAdapter;
-            _testUser = new UserProperties
-            {
-                Email = _configuration.NormalUser,
-                Password = _configuration.UserPassword,
-            };
+            _userHelper = userHelper;
         }
 
 

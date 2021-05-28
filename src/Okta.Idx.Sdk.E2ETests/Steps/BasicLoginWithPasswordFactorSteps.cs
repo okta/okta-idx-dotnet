@@ -1,6 +1,6 @@
-﻿using A18NAdapter;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Okta.Idx.Sdk.E2ETests.Drivers;
+using Okta.Idx.Sdk.E2ETests.Helpers;
 using TechTalk.SpecFlow;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps
@@ -8,8 +8,8 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
     [Binding]
     public class BasicLoginWithPasswordFactorSteps : BaseTestSteps
     {
-        public BasicLoginWithPasswordFactorSteps(WebDriverDriver webDriver, ITestConfig configuration, IWebServerDriver webServerDriver, A18nAdapter a18nAdapter) 
-            : base(webDriver, configuration, webServerDriver, a18nAdapter)
+        public BasicLoginWithPasswordFactorSteps(WebDriverDriver webDriverDriver, IWebServerDriver webServerDriver, ITestUserHelper userHelper) 
+            : base(webDriverDriver, webServerDriver, userHelper)
         {
         }
 
@@ -28,7 +28,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [Given(@"a User named ""(.*)"" exists, and this user has already setup email and password factors")]
         public void GivenAUserNamedExistsAndThisUserHasAlreadySetupEmailAndPasswordFactors(string p0)
         {
-            
+            _testUser = _userHelper.GetActivePasswordUser();
         }
 
         [Given(@"Mary navigates to the Basic Login View")]
@@ -105,7 +105,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [Given(@"Mary is not a member of the ""(.*)"" group")]
         public void GivenMaryIsNotAMemberOfTheGroup(string p0)
         {
-            _testUser.Email = _configuration.UnassignedUser;
+            _testUser = _userHelper.GetUnassignedUser();
         }
 
         [Then(@"she sees the login form again with blank fields")]
