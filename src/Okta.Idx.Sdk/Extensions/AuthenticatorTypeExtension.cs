@@ -13,13 +13,10 @@ namespace Okta.Idx.Sdk
             {
                 case AuthenticatorType.Email:
                     return "okta_email";
-                    break;
                 case AuthenticatorType.Phone:
                     return "phone_number";
-                    break;
                 case AuthenticatorType.Password:
                     return "okta_password";
-                    break;
                 default:
                     return string.Empty;
             }

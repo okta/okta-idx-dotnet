@@ -16,10 +16,14 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             _client = new OktaClient();
         }
 
-        public async Task CreateActiveUserIdentifiedWithPassword(string userName, string password)
+        public async Task<IUser> CreateActiveUserIdentifiedWithPassword(string userName, string password)
         {
             //var options = new CreateUserWithImportedHashedPasswordOptions
             //_client.Users.CreateUserAsync()
+
+
+
+            return null
         }
 
     }

@@ -4,17 +4,56 @@ using System.Security.Claims;
 
 namespace direct_auth_idx
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    using IdentityModel.Client;
+
+    using Okta.Idx.Sdk.Configuration;
+    using Okta.Idx.Sdk.Helpers;
+
     public static class AuthenticationHelper
     {
-        public static ClaimsIdentity GetIdentityFromAuthResponse(string userName, AuthenticationResponse authnResponse) =>
-                      new ClaimsIdentity(
-                            new[]
-                                {
-                                    new Claim(ClaimTypes.Name, userName),
-                                    new Claim("access_token", authnResponse.TokenInfo.AccessToken),
-                                    new Claim("id_token", authnResponse.TokenInfo.IdToken),
-                                    new Claim("refresh_token", authnResponse.TokenInfo.RefreshToken ?? string.Empty),
-                                 },
-                            DefaultAuthenticationTypes.ApplicationCookie);
+        public static async Task<ClaimsIdentity> GetIdentityFromAuthResponseAsync(IdxConfiguration configuration, AuthenticationResponse authnResponse)
+        {
+            var claims = await GetClaimsFromUserInfoAsync(configuration, authnResponse.TokenInfo.AccessToken);
+            claims = claims.Append(new Claim("access_token", authnResponse.TokenInfo.AccessToken));
+            claims = claims.Append(new Claim("id_token", authnResponse.TokenInfo.IdToken));
+            ClaimsIdentity identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
+
+            return identity;
+        }
+
+        public static async Task<ClaimsIdentity> GetIdentityFromTokenResponseAsync(IdxConfiguration configuration, ITokenResponse tokenResponse)
+        {
+            var claims = await GetClaimsFromUserInfoAsync(configuration, tokenResponse.AccessToken);
+            claims = claims.Append(new Claim("access_token", tokenResponse.AccessToken));
+            claims = claims.Append(new Claim("id_token", tokenResponse.IdToken));
+            if(!string.IsNullOrEmpty(tokenResponse.RefreshToken))
+            {
+                claims = claims.Append(new Claim("refresh_token", tokenResponse.RefreshToken));
+            }            
+            ClaimsIdentity identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
+
+            return identity;
+        }
+
+        public static async Task<IEnumerable<Claim>> GetClaimsFromUserInfoAsync(IdxConfiguration configuration, string accessToken)
+        { 
+            Uri userInfoUri = new Uri(IdxUrlHelper.GetNormalizedUriString(configuration.Issuer, "v1/userinfo"));
+            HttpClient httpClient = new HttpClient();
+            var userInfoResponse = await httpClient.GetUserInfoAsync(new UserInfoRequest
+                                                                         {
+                                                                             Address = userInfoUri.ToString(),
+                                                                             Token = accessToken,
+                                                                         }).ConfigureAwait(false);
+            var nameClaim = new Claim(
+                ClaimTypes.Name,
+                userInfoResponse.Claims.FirstOrDefault(x => x.Type == "name")?.Value);
+            return userInfoResponse.Claims.Append(nameClaim);
+        }
     }
 }

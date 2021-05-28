@@ -16,8 +16,8 @@ using System.Threading.Tasks;
 using FlexibleConfiguration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Idx.Sdk.Extensions;
 using Okta.Idx.Sdk.Helpers;
@@ -220,10 +220,11 @@ namespace Okta.Idx.Sdk
 
             var headers = new Dictionary<string, string>();
             headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
+            Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/interact"));
 
             var request = new HttpRequest
             {
-                Uri = $"{UrlHelper.EnsureTrailingSlash(Configuration.Issuer)}v1/interact",
+                Uri = uri.ToString(),
                 Payload = payload,
                 Headers = headers,
             };
@@ -266,9 +267,38 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
+        public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default)
+        {
+            IIdxContext idxContext = await this.InteractAsync(state, cancellationToken);
+            return await GetIdentityProvidersAsync(idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            IIdxResponse introspectResponse = await this.IntrospectAsync(idxContext, cancellationToken);
+
+            return new IdentityProvidersResponse
+            {
+                Context = idxContext,
+                IdpOptions = introspectResponse.Remediation?.RemediationOptions?
+                    .Where(remediationOption => remediationOption.Name.Equals(RemediationType.RedirectIdp))
+                    .Select(remediationOption => new IdpOption
+                    {
+                        State = idxContext.State,
+                        InteractionHandle = idxContext.InteractionHandle,
+                        Id = remediationOption.Idp.Id,
+                        Name = remediationOption.Idp.Name,
+                        Href = remediationOption.Href,
+                    })
+                    .ToList(),
+            };
+        }
+
+        /// <inheritdoc/>
         public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default)
         {
-            var idxContext = await this.InteractAsync();
+            var idxContext = await this.InteractAsync(cancellationToken: cancellationToken);
             return new WidgetSignInResponse
             {
                 IdxContext = idxContext,
@@ -915,7 +945,7 @@ namespace Okta.Idx.Sdk
         public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
-            var introspectResponse = await IntrospectAsync(idxContext);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
             var currentRemediationType = RemediationType.Unknown;
 
             // Check if flow is challenge authenticator or enroll authenticator, otherwise throw
@@ -1026,9 +1056,10 @@ namespace Okta.Idx.Sdk
                 { "Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded },
             };
 
+            Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/revoke"));
             var request = new HttpRequest
             {
-                Uri = $"{UrlHelper.EnsureTrailingSlash(Configuration.Issuer)}v1/revoke",
+                Uri = uri.ToString(),
                 Payload = payload,
                 Headers = headers,
             };
