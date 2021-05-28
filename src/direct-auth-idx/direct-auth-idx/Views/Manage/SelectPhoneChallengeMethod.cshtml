@@ -11,6 +11,7 @@
                 @Html.AntiForgeryToken()
                 <h4>@ViewBag.Title</h4>
                 <h5>A code will be sent to @Model.Profile</h5>
+                <hr />
                 @Html.HiddenFor(m => m.AuthenticatorId)
                 @Html.HiddenFor(m => m.EnrollmentId)
                 <ul class="no-padding-left">
@@ -18,13 +19,12 @@
                     {
                         <div>
                             <label>
-                                @Html.RadioButtonFor(m => m.MethodType, method.Value)
-                                @method.Value
+                                @Html.RadioButtonFor(m => m.MethodType, method)
+                                @method
                             </label>
                         </div>
                     }
                 </ul>
-                <hr />
                 @Html.ValidationSummary("", new { @class = "text-danger" })
 
                 <div class="form-group">

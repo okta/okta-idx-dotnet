@@ -5,6 +5,8 @@ using System.Web;
 
 namespace direct_auth_idx.Models
 {
+    using System.ComponentModel.DataAnnotations;
+
     using Okta.Idx.Sdk;
 
     public class SelectAuthenticatorMethodViewModel
@@ -15,7 +17,9 @@ namespace direct_auth_idx.Models
 
         public string AuthenticatorId { get; set; }
 
-        public AuthenticatorMethodType MethodType { get; set; }
+        [Required]
+        [Display(Name = "Method Type")]
+        public string MethodType { get; set; }
 
         public IList<AuthenticatorMethodType> MethodTypes { get; set; }
 

@@ -6,11 +6,10 @@ using System.Web;
 
 namespace direct_auth_idx.Models
 {
-    using direct_auth_idx.Utilities;
-
+    
     public class SelectAuthenticatorViewModel
     {
-        [RequiredIf(nameof(CanSkip), false, ErrorMessage = "Authenticator ID is required")]
+        [Required(ErrorMessage = "Authenticator is required")]
         [Display(Name = "Authenticator ID")]
         public string AuthenticatorId { get; set; }
         
