@@ -131,7 +131,7 @@ namespace direct_auth_idx.Controllers
                 {
                     Session["idxContext"] = registerResponse.IdxContext;
                     Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(registerResponse.Authenticators);
-                    return RedirectToAction("selectAuthenticator", "Manage");
+                    return RedirectToAction("SelectAuthenticator", "Manage");
                 }
 
                 ModelState.AddModelError(string.Empty, $"Oops! Something went wrong.");

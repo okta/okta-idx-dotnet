@@ -148,6 +148,7 @@
         {
             if (!ModelState.IsValid)
             {
+                model.MethodTypes = (List<AuthenticatorMethodType>)Session["methodTypes"];
                 return View("EnrollPhoneAuthenticator", model);
             }
 
