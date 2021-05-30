@@ -22,6 +22,7 @@ namespace A18NAdapter
                 BaseAddress = new Uri(BaseUrl)
             };
             _client.DefaultRequestHeaders.Add("x-api-key", apiKey);
+
         }
         public void SetDefaultProfileId(string profileId)
         {

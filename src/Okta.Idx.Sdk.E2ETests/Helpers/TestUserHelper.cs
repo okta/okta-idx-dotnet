@@ -1,5 +1,6 @@
 ﻿using A18NAdapter;
 using A18NAdapter.Dto;
+using Okta.Sdk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
         private ITestConfig _configuration;
         private A18nProfile _a18nProfile;
         private IOktaSdkHelper _oktaHelper;
+       // private IUser oktaUser;
 
         public TestUserHelper(ITestConfig configuration, IA18nAdapter a18nAdapter, IOktaSdkHelper oktaHelper)
         {
@@ -21,40 +23,53 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             _a18nAdapter = a18nAdapter;
             _configuration = configuration;
 
-            _a18nProfile = _a18nAdapter.CreateProfileAsync().Result;
-            _a18nAdapter.SetDefaultProfileId(_configuration.A18nProfileId);
-            CleanUp().Wait();
+            _a18nAdapter.SetDefaultProfileId(configuration.A18nProfileId);
+            _a18nProfile = _a18nAdapter.GetProfileAsync(profileId: default).Result;
         }
-        public async Task<UserProperties> GetActivePasswordUser()
+
+        public async Task<TestUserProperties> GetActivePasswordUserAsync()
         {
-            var user = await _oktaHelper.CreateActiveUserIdentifiedWithPassword(_a18nProfile.EmailAddress, _configuration.UserPassword);
+            await CleanUpAsync();
 
-
-            return new UserProperties()
+            var oktaUser = await _oktaHelper.CreateActiveUserIdentifiedWithPasswordAsync(_a18nProfile.EmailAddress, _configuration.UserPassword);
+            
+            return new TestUserProperties()
             {
-                Email = _configuration.NormalUser,
-                Password = _configuration.UserPassword
+                Email = oktaUser.Profile.Email,
+                PhoneNumber = oktaUser.Profile.PrimaryPhone,        
+                Password = _configuration.UserPassword,
             };
         }
 
-        public UserProperties GetUnassignedUser()
+        public TestUserProperties GetUnassignedUser()
         {
-            return new UserProperties()
+            return new TestUserProperties()
             {
                 Email = _configuration.UnassignedUser,
                 Password = _configuration.UserPassword
             };
         }
 
-        private async Task CleanUp()
+        private async Task CleanUpA18ProfileAsync()
         {
             await _a18nAdapter.DeleteAllProfileEmailsAsync(profileId: default);
             await _a18nAdapter.DeleteAllProfileSmsAsync(profileId: default);
-            await 
+        }
+
+        private async Task CleanUpOktaUserAsync()
+        {
+            await _oktaHelper.DeleteUserAsync(_a18nProfile.EmailAddress);
+        }
+
+        private async Task CleanUpAsync()
+        {
+            await CleanUpA18ProfileAsync();
+            await CleanUpOktaUserAsync();
         }
 
         public void Dispose()
         {
+            CleanUpOktaUserAsync().Wait();
         }
     }
 }

@@ -5,6 +5,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 {
     public interface IOktaSdkHelper
     {
-        Task<IUser> CreateActiveUserIdentifiedWithPassword(string userName, string password);
+        Task<IUser> CreateActiveUserIdentifiedWithPasswordAsync(string userName, string password);
+        Task DeleteUserAsync(string email);
     }
 }

@@ -142,8 +142,14 @@ namespace Okta.Idx.Sdk.E2ETests.Features
 #line 14
     testRunner.Then("she is redirected to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 18
-    testRunner.And("Mary should get logged-in", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 15
+    testRunner.And("the access_token is shown and not empty", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 16
+    testRunner.And("the id_token is shown and not empty", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 17
+ testRunner.And("the preferred_username claim is shown and matches Mary\'s email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -157,7 +163,7 @@ namespace Okta.Idx.Sdk.E2ETests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("1.1.2 Mary doesn\'t know her username", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 20
+#line 19
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -180,21 +186,20 @@ namespace Okta.Idx.Sdk.E2ETests.Features
 #line 4
   this.FeatureBackground();
 #line hidden
-#line 21
+#line 20
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 22
+#line 21
  testRunner.When("she fills in her incorrect username", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 23
+#line 22
  testRunner.And("she fills in her password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 24
+#line 23
  testRunner.And("she submits the Login form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 25
-    testRunner.Then("she should see a message on the Login form \"You do not have permission to perform" +
-                        " the requested action.\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 24
+    testRunner.Then("she should see the message \"There is no account with the Username\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -208,7 +213,7 @@ namespace Okta.Idx.Sdk.E2ETests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("1.1.3: Mary doesn\'t know her password", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 27
+#line 26
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -231,19 +236,19 @@ namespace Okta.Idx.Sdk.E2ETests.Features
 #line 4
   this.FeatureBackground();
 #line hidden
-#line 28
+#line 27
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 29
+#line 28
  testRunner.When("she fills in her correct username", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 30
+#line 29
  testRunner.And("she fills in her incorrect password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 31
- testRunner.And("she submits the Login form  with blank fields", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 30
+ testRunner.And("she submits the Login form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 32
+#line 31
     testRunner.Then("she should see the message \"Authentication failed\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -258,7 +263,7 @@ namespace Okta.Idx.Sdk.E2ETests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("1.1.8: Mary clicks on the \"Forgot Password Link\"", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 34
+#line 33
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -281,13 +286,13 @@ namespace Okta.Idx.Sdk.E2ETests.Features
 #line 4
   this.FeatureBackground();
 #line hidden
-#line 35
+#line 34
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 36
- testRunner.When("she clicks on the \"Forgot Password Link\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 35
+ testRunner.When("she clicks on the Forgot Password button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 37
+#line 36
  testRunner.Then("she is redirected to the Self Service Password Reset View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

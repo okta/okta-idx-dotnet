@@ -12,27 +12,26 @@
 	And she fills in her correct password
 	And she submits the Login form
     Then she is redirected to the Root View
-#    And the access_token is stored in session
-#    And the id_token is stored in session
-#    And the refresh_token is stored in session
-    And Mary should get logged-in
+    And the access_token is shown and not empty
+    And the id_token is shown and not empty
+	And the preferred_username claim is shown and matches Mary's email
 	
   Scenario: 1.1.2 Mary doesn't know her username
 	Given Mary navigates to the Basic Login View
 	When she fills in her incorrect username
 	And she fills in her password
 	And she submits the Login form
-    Then she should see a message on the Login form "You do not have permission to perform the requested action."
+    Then she should see the message "There is no account with the Username"
 	
   Scenario: 1.1.3: Mary doesn't know her password
 	Given Mary navigates to the Basic Login View
 	When she fills in her correct username
 	And she fills in her incorrect password
-	And she submits the Login form  with blank fields
+	And she submits the Login form
     Then she should see the message "Authentication failed"
     
   Scenario: 1.1.8: Mary clicks on the "Forgot Password Link"
 	Given Mary navigates to the Basic Login View
-	When she clicks on the "Forgot Password Link"
+	When she clicks on the Forgot Password button
 	Then she is redirected to the Self Service Password Reset View
 

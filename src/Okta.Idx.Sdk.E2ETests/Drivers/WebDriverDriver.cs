@@ -13,6 +13,7 @@ namespace Okta.Idx.Sdk.E2ETests.Drivers
         private static IWebDriver SetupWebDriver()
         {
             var options = new ChromeOptions();
+//            options.AddArgument("--headless");
             options.AddArgument("--start-maximized");
             options.AddArgument("--disable-notifications");
             return new ChromeDriver(options);
