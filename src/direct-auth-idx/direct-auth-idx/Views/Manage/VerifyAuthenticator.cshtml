@@ -21,7 +21,7 @@
                             @Html.LabelFor(m => m.Code, new { @class = "control-label" })
                         </div>
                         <div class="row row-no-gutters">
-                            @Html.PasswordFor(m => m.Code, new { @class = "form-control" })
+                            @Html.PasswordFor(m => m.Code, new { @class = "form-control", @id="passcodeInput" })
                             @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
                         </div>
                     </div>
@@ -29,7 +29,7 @@
 
                 <div class="form-group">
                     <div class="col-md-10">
-                        <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
+                        <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide"  id="submitBtn" />
                     </div>
                 </div>
             }

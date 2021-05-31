@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using A18NAClient.Dto;
+using A18NClient.Dto;
 
-namespace A18NAClient
+namespace A18NClient
 {
     public class A18nClient : IA18nClient, IDisposable
     {
@@ -231,7 +231,9 @@ namespace A18NAClient
         {
             if (response.StatusCode != httpStatusCode)
             {
-                throw new Exception($"Unexpected status code: {response.StatusCode}");
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                { throw new NotFoundException()}
+                throw new NotFoundException Exception($"Unexpected status code: {response.StatusCode}");
             }
         }
 

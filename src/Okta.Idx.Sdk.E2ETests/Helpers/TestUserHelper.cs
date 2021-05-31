@@ -1,5 +1,5 @@
-﻿using A18NAClient;
-using A18NAClient.Dto;
+﻿using A18NClient;
+using A18NClient.Dto;
 using System;
 using System.Threading.Tasks;
 
@@ -44,6 +44,25 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
                 Email = _configuration.UnassignedUser,
                 Password = _configuration.UserPassword
             };
+        }
+
+        public async Task<string> GetRecoveryCodeFromEmail()
+        {
+            for (int tries = 0; tries < 30; tries++) {
+                var mail = await _a18nClient.GetLatestEmailMessageAsync();
+                if (!string.IsNullOrEmpty(content))
+                {
+                    return extractRecoveryCodeFromEmail(content);
+                }
+                await Task.Delay(1000);    
+            }
+
+            return string.Empty;
+        }
+
+        private string extractRecoveryCodeFromEmail(string content)
+        {
+            throw new NotImplementedException();
         }
 
         private async Task CleanUpA18ProfileAsync()

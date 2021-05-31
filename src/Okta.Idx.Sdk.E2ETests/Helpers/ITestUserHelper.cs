@@ -6,5 +6,6 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
     {
         Task<TestUserProperties> GetActivePasswordUserAsync();
         TestUserProperties GetUnassignedUser();
+        Task<string> GetRecoveryCodeFromEmail();
     }
 }

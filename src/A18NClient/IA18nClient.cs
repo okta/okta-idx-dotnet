@@ -1,8 +1,8 @@
-﻿using A18NAClient.Dto;
+﻿using A18NClient.Dto;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace A18NAClient
+namespace A18NClient
 {
     public interface IA18nClient
     {
