@@ -5,7 +5,7 @@
 
 namespace Okta.Idx.Sdk
 {
-    public class EnrollAuthenticatorOptions
+    public class SelectEnrollAuthenticatorOptions
     {
         public string AuthenticatorId { get; set; }
     }

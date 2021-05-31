@@ -3,7 +3,7 @@
     using System.Collections;
     using System.Collections.Generic;
 
-    public class EnrollPhoneAuthenticatorOptions : EnrollAuthenticatorOptions
+    public class EnrollPhoneAuthenticatorOptions : SelectEnrollAuthenticatorOptions
     {
         /// <summary>
         /// Gets or sets the phone number

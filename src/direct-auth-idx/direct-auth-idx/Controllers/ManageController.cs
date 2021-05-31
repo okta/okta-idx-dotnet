@@ -344,12 +344,12 @@
                 }
                 else
                 {
-                    var enrollAuthenticatorOptions = new EnrollAuthenticatorOptions
+                    var enrollAuthenticatorOptions = new SelectEnrollAuthenticatorOptions
                     {
                         AuthenticatorId = model.AuthenticatorId,
                     };
 
-                    var enrollResponse = await _idxClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+                    var enrollResponse = await _idxClient.SelectEnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
 
                     Session["IdxContext"] = enrollResponse.IdxContext;
                     Session["isPasswordSelected"] = model.IsPasswordSelected;

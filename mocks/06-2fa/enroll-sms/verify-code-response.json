@@ -41,7 +41,7 @@
          "create-form"
       ],
       "name":"issue",
-      "href":"https://foo.com/oauth2/austyqkbjaFoOxkl45d6/v1/token",
+      "href":"https://foo.com/oauth2/foo/v1/token",
       "method":"POST",
       "value":[
          {
