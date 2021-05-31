@@ -4488,7 +4488,7 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
-        public async Task VerifyPhoneDuringEnrollment()
+        public async Task VerifyPhone()
         {
             var enrollPhoneResponse = @"{
                                            ""version"":""1.0.0"",
@@ -5637,6 +5637,883 @@ namespace Okta.Idx.Sdk.UnitTests
             await function.Should()
                 .ThrowAsync<OktaException>()
                 .WithMessage("*Invalid code. Try again.*");
+        }
+
+        [Fact]
+        public async Task SelectPhoneForChallengeSecondFactor()
+        {
+            var identifyResponse = @"{
+                                       ""version"":""1.0.0"",
+                                       ""stateHandle"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                       ""expiresAt"":""2021-05-28T20:48:39.000Z"",
+                                       ""intent"":""LOGIN"",
+                                       ""remediation"":{
+                                          ""type"":""array"",
+                                          ""value"":[
+                                             {
+                                                ""rel"":[
+                                                   ""create-form""
+                                                ],
+                                                ""name"":""authenticator-verification-data"",
+                                                ""relatesTo"":[
+                                                   ""$.currentAuthenticatorEnrollment""
+                                                ],
+                                                ""href"":""https://foo/idp/idx/challenge"",
+                                                ""method"":""POST"",
+                                                ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                ""value"":[
+                                                   {
+                                                      ""name"":""authenticator"",
+                                                      ""label"":""Phone"",
+                                                      ""form"":{
+                                                         ""value"":[
+                                                            {
+                                                               ""name"":""id"",
+                                                               ""required"":true,
+                                                               ""value"":""auttzfsi4eiZIdLK85d6"",
+                                                               ""mutable"":false
+                                                            },
+                                                            {
+                                                               ""name"":""methodType"",
+                                                               ""type"":""string"",
+                                                               ""required"":true,
+                                                               ""options"":[
+                                                                  {
+                                                                     ""label"":""SMS"",
+                                                                     ""value"":""sms""
+                                                                  }
+                                                               ]
+                                                            },
+                                                            {
+                                                               ""name"":""enrollmentId"",
+                                                               ""required"":true,
+                                                               ""value"":""smsu01v750pnUXuCH5d6"",
+                                                               ""mutable"":false
+                                                            }
+                                                         ]
+                                                      }
+                                                   },
+                                                   {
+                                                      ""name"":""stateHandle"",
+                                                      ""required"":true,
+                                                      ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                      ""visible"":false,
+                                                      ""mutable"":false
+                                                   }
+                                                ],
+                                                ""accepts"":""application/json; okta-version=1.0.0""
+                                             },
+                                             {
+                                                ""rel"":[
+                                                   ""create-form""
+                                                ],
+                                                ""name"":""select-authenticator-authenticate"",
+                                                ""href"":""https://foo/idp/idx/challenge"",
+                                                ""method"":""POST"",
+                                                ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                ""value"":[
+                                                   {
+                                                      ""name"":""authenticator"",
+                                                      ""type"":""object"",
+                                                      ""options"":[
+                                                         {
+                                                            ""label"":""Phone"",
+                                                            ""value"":{
+                                                               ""form"":{
+                                                                  ""value"":[
+                                                                     {
+                                                                        ""name"":""id"",
+                                                                        ""required"":true,
+                                                                        ""value"":""auttzfsi4eiZIdLK85d6"",
+                                                                        ""mutable"":false
+                                                                     },
+                                                                     {
+                                                                        ""name"":""methodType"",
+                                                                        ""type"":""string"",
+                                                                        ""required"":false,
+                                                                        ""options"":[
+                                                                           {
+                                                                              ""label"":""SMS"",
+                                                                              ""value"":""sms""
+                                                                           }
+                                                                        ]
+                                                                     },
+                                                                     {
+                                                                        ""name"":""enrollmentId"",
+                                                                        ""required"":true,
+                                                                        ""value"":""smsu01v750pnUXuCH5d6"",
+                                                                        ""mutable"":false
+                                                                     }
+                                                                  ]
+                                                               }
+                                                            },
+                                                            ""relatesTo"":""$.authenticatorEnrollments.value[0]""
+                                                         }
+                                                      ]
+                                                   },
+                                                   {
+                                                      ""name"":""stateHandle"",
+                                                      ""required"":true,
+                                                      ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                      ""visible"":false,
+                                                      ""mutable"":false
+                                                   }
+                                                ],
+                                                ""accepts"":""application/json; okta-version=1.0.0""
+                                             }
+                                          ]
+                                       },
+                                       ""currentAuthenticatorEnrollment"":{
+                                          ""type"":""object"",
+                                          ""value"":{
+                                             ""profile"":{
+                                                ""phoneNumber"":""+1 XXX-XXX-4709""
+                                             },
+                                             ""resend"":{
+                                                ""rel"":[
+                                                   ""create-form""
+                                                ],
+                                                ""name"":""resend"",
+                                                ""href"":""https://foo/idp/idx/challenge/resend"",
+                                                ""method"":""POST"",
+                                                ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                ""value"":[
+                                                   {
+                                                      ""name"":""stateHandle"",
+                                                      ""required"":true,
+                                                      ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                      ""visible"":false,
+                                                      ""mutable"":false
+                                                   }
+                                                ],
+                                                ""accepts"":""application/json; okta-version=1.0.0""
+                                             },
+                                             ""type"":""phone"",
+                                             ""key"":""phone_number"",
+                                             ""id"":""smsu01v750pnUXuCH5d6"",
+                                             ""displayName"":""Phone"",
+                                             ""methods"":[
+                                                {
+                                                   ""type"":""sms""
+                                                }
+                                             ]
+                                          }
+                                       },
+                                       ""authenticators"":{
+                                          ""type"":""array"",
+                                          ""value"":[
+                                             {
+                                                ""type"":""phone"",
+                                                ""key"":""phone_number"",
+                                                ""id"":""auttzfsi4eiZIdLK85d6"",
+                                                ""displayName"":""Phone"",
+                                                ""methods"":[
+                                                   {
+                                                      ""type"":""sms""
+                                                   }
+                                                ]
+                                             }
+                                          ]
+                                       },
+                                       ""authenticatorEnrollments"":{
+                                          ""type"":""array"",
+                                          ""value"":[
+                                             {
+                                                ""profile"":{
+                                                   ""phoneNumber"":""+1 XXX-XXX-4709""
+                                                },
+                                                ""type"":""phone"",
+                                                ""key"":""phone_number"",
+                                                ""id"":""smsu01v750pnUXuCH5d6"",
+                                                ""displayName"":""Phone"",
+                                                ""methods"":[
+                                                   {
+                                                      ""type"":""sms""
+                                                   }
+                                                ]
+                                             }
+                                          ]
+                                       },
+                                       ""user"":{
+                                          ""type"":""object"",
+                                          ""value"":{
+                                             ""id"":""00utzmvli0oz5ReJB5d6""
+                                          }
+                                       },
+                                       ""cancel"":{
+                                          ""rel"":[
+                                             ""create-form""
+                                          ],
+                                          ""name"":""cancel"",
+                                          ""href"":""https://foo/idp/idx/cancel"",
+                                          ""method"":""POST"",
+                                          ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                          ""value"":[
+                                             {
+                                                ""name"":""stateHandle"",
+                                                ""required"":true,
+                                                ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                ""visible"":false,
+                                                ""mutable"":false
+                                             }
+                                          ],
+                                          ""accepts"":""application/json; okta-version=1.0.0""
+                                       },
+                                       ""app"":{
+                                          ""type"":""object"",
+                                          ""value"":{
+                                             ""name"":""oidc_client"",
+                                             ""label"":""Dotnet IDX Web App"",
+                                             ""id"":""foo""
+                                          }
+                                       }
+                                    }";
+            var selectPhoneResponse = @"{
+                                           ""version"":""1.0.0"",
+                                           ""stateHandle"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                           ""expiresAt"":""2021-05-28T20:48:44.000Z"",
+                                           ""intent"":""LOGIN"",
+                                           ""remediation"":{
+                                              ""type"":""array"",
+                                              ""value"":[
+                                                 {
+                                                    ""rel"":[
+                                                       ""create-form""
+                                                    ],
+                                                    ""name"":""authenticator-verification-data"",
+                                                    ""relatesTo"":[
+                                                       ""$.currentAuthenticatorEnrollment""
+                                                    ],
+                                                    ""href"":""https://foo/idp/idx/challenge"",
+                                                    ""method"":""POST"",
+                                                    ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                    ""value"":[
+                                                       {
+                                                          ""name"":""authenticator"",
+                                                          ""label"":""Phone"",
+                                                          ""form"":{
+                                                             ""value"":[
+                                                                {
+                                                                   ""name"":""id"",
+                                                                   ""required"":true,
+                                                                   ""value"":""auttzfsi4eiZIdLK85d6"",
+                                                                   ""mutable"":false
+                                                                },
+                                                                {
+                                                                   ""name"":""methodType"",
+                                                                   ""type"":""string"",
+                                                                   ""required"":true,
+                                                                   ""options"":[
+                                                                      {
+                                                                         ""label"":""SMS"",
+                                                                         ""value"":""sms""
+                                                                      }
+                                                                   ]
+                                                                },
+                                                                {
+                                                                   ""name"":""enrollmentId"",
+                                                                   ""required"":true,
+                                                                   ""value"":""smsu01v750pnUXuCH5d6"",
+                                                                   ""mutable"":false
+                                                                }
+                                                             ]
+                                                          }
+                                                       },
+                                                       {
+                                                          ""name"":""stateHandle"",
+                                                          ""required"":true,
+                                                          ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                          ""visible"":false,
+                                                          ""mutable"":false
+                                                       }
+                                                    ],
+                                                    ""accepts"":""application/json; okta-version=1.0.0""
+                                                 },
+                                                 {
+                                                    ""rel"":[
+                                                       ""create-form""
+                                                    ],
+                                                    ""name"":""select-authenticator-authenticate"",
+                                                    ""href"":""https://foo/idp/idx/challenge"",
+                                                    ""method"":""POST"",
+                                                    ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                    ""value"":[
+                                                       {
+                                                          ""name"":""authenticator"",
+                                                          ""type"":""object"",
+                                                          ""options"":[
+                                                             {
+                                                                ""label"":""Phone"",
+                                                                ""value"":{
+                                                                   ""form"":{
+                                                                      ""value"":[
+                                                                         {
+                                                                            ""name"":""id"",
+                                                                            ""required"":true,
+                                                                            ""value"":""auttzfsi4eiZIdLK85d6"",
+                                                                            ""mutable"":false
+                                                                         },
+                                                                         {
+                                                                            ""name"":""methodType"",
+                                                                            ""type"":""string"",
+                                                                            ""required"":false,
+                                                                            ""options"":[
+                                                                               {
+                                                                                  ""label"":""SMS"",
+                                                                                  ""value"":""sms""
+                                                                               }
+                                                                            ]
+                                                                         },
+                                                                         {
+                                                                            ""name"":""enrollmentId"",
+                                                                            ""required"":true,
+                                                                            ""value"":""smsu01v750pnUXuCH5d6"",
+                                                                            ""mutable"":false
+                                                                         }
+                                                                      ]
+                                                                   }
+                                                                },
+                                                                ""relatesTo"":""$.authenticatorEnrollments.value[0]""
+                                                             }
+                                                          ]
+                                                       },
+                                                       {
+                                                          ""name"":""stateHandle"",
+                                                          ""required"":true,
+                                                          ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                          ""visible"":false,
+                                                          ""mutable"":false
+                                                       }
+                                                    ],
+                                                    ""accepts"":""application/json; okta-version=1.0.0""
+                                                 }
+                                              ]
+                                           },
+                                           ""currentAuthenticatorEnrollment"":{
+                                              ""type"":""object"",
+                                              ""value"":{
+                                                 ""profile"":{
+                                                    ""phoneNumber"":""+1 XXX-XXX-4709""
+                                                 },
+                                                 ""resend"":{
+                                                    ""rel"":[
+                                                       ""create-form""
+                                                    ],
+                                                    ""name"":""resend"",
+                                                    ""href"":""https://foo/idp/idx/challenge/resend"",
+                                                    ""method"":""POST"",
+                                                    ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                    ""value"":[
+                                                       {
+                                                          ""name"":""stateHandle"",
+                                                          ""required"":true,
+                                                          ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                          ""visible"":false,
+                                                          ""mutable"":false
+                                                       }
+                                                    ],
+                                                    ""accepts"":""application/json; okta-version=1.0.0""
+                                                 },
+                                                 ""type"":""phone"",
+                                                 ""key"":""phone_number"",
+                                                 ""id"":""smsu01v750pnUXuCH5d6"",
+                                                 ""displayName"":""Phone"",
+                                                 ""methods"":[
+                                                    {
+                                                       ""type"":""sms""
+                                                    }
+                                                 ]
+                                              }
+                                           },
+                                           ""authenticators"":{
+                                              ""type"":""array"",
+                                              ""value"":[
+                                                 {
+                                                    ""type"":""phone"",
+                                                    ""key"":""phone_number"",
+                                                    ""id"":""auttzfsi4eiZIdLK85d6"",
+                                                    ""displayName"":""Phone"",
+                                                    ""methods"":[
+                                                       {
+                                                          ""type"":""sms""
+                                                       }
+                                                    ]
+                                                 }
+                                              ]
+                                           },
+                                           ""authenticatorEnrollments"":{
+                                              ""type"":""array"",
+                                              ""value"":[
+                                                 {
+                                                    ""profile"":{
+                                                       ""phoneNumber"":""+1 XXX-XXX-4709""
+                                                    },
+                                                    ""type"":""phone"",
+                                                    ""key"":""phone_number"",
+                                                    ""id"":""smsu01v750pnUXuCH5d6"",
+                                                    ""displayName"":""Phone"",
+                                                    ""methods"":[
+                                                       {
+                                                          ""type"":""sms""
+                                                       }
+                                                    ]
+                                                 }
+                                              ]
+                                           },
+                                           ""user"":{
+                                              ""type"":""object"",
+                                              ""value"":{
+                                                 ""id"":""00utzmvli0oz5ReJB5d6""
+                                              }
+                                           },
+                                           ""cancel"":{
+                                              ""rel"":[
+                                                 ""create-form""
+                                              ],
+                                              ""name"":""cancel"",
+                                              ""href"":""https://foo/idp/idx/cancel"",
+                                              ""method"":""POST"",
+                                              ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                              ""value"":[
+                                                 {
+                                                    ""name"":""stateHandle"",
+                                                    ""required"":true,
+                                                    ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                    ""visible"":false,
+                                                    ""mutable"":false
+                                                 }
+                                              ],
+                                              ""accepts"":""application/json; okta-version=1.0.0""
+                                           },
+                                           ""app"":{
+                                              ""type"":""object"",
+                                              ""value"":{
+                                                 ""name"":""oidc_client"",
+                                                 ""label"":""Dotnet IDX Web App"",
+                                                 ""id"":""foo""
+                                              }
+                                           }
+                                        }";
+
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = identifyResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = selectPhoneResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var authResponse = await testClient.SelectChallengeAuthenticatorAsync(
+                                   new SelectPhoneAuthenticatorOptions
+                                   {
+                                       AuthenticatorId = "auttzfsi4eiZIdLK85d6",
+                                       EnrollmentId = "smsu01v750pnUXuCH5d6",
+
+                                   }, Substitute.For<IIdxContext>());
+
+            authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingChallengeAuthenticatorData);
+            authResponse.CurrentAuthenticatorEnrollment.Id.Should().Be("auttzfsi4eiZIdLK85d6");
+            authResponse.CurrentAuthenticatorEnrollment.EnrollmentId.Should().Be("smsu01v750pnUXuCH5d6");
+            authResponse.TokenInfo.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task SelectPhoneMethodTypeDuringChallenge()
+        {
+            var selectPhoneResponse = @"{
+                                           ""version"":""1.0.0"",
+                                           ""stateHandle"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                           ""expiresAt"":""2021-05-28T20:48:44.000Z"",
+                                           ""intent"":""LOGIN"",
+                                           ""remediation"":{
+                                              ""type"":""array"",
+                                              ""value"":[
+                                                 {
+                                                    ""rel"":[
+                                                       ""create-form""
+                                                    ],
+                                                    ""name"":""authenticator-verification-data"",
+                                                    ""relatesTo"":[
+                                                       ""$.currentAuthenticatorEnrollment""
+                                                    ],
+                                                    ""href"":""https://foo/idp/idx/challenge"",
+                                                    ""method"":""POST"",
+                                                    ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                    ""value"":[
+                                                       {
+                                                          ""name"":""authenticator"",
+                                                          ""label"":""Phone"",
+                                                          ""form"":{
+                                                             ""value"":[
+                                                                {
+                                                                   ""name"":""id"",
+                                                                   ""required"":true,
+                                                                   ""value"":""auttzfsi4eiZIdLK85d6"",
+                                                                   ""mutable"":false
+                                                                },
+                                                                {
+                                                                   ""name"":""methodType"",
+                                                                   ""type"":""string"",
+                                                                   ""required"":true,
+                                                                   ""options"":[
+                                                                      {
+                                                                         ""label"":""SMS"",
+                                                                         ""value"":""sms""
+                                                                      }
+                                                                   ]
+                                                                },
+                                                                {
+                                                                   ""name"":""enrollmentId"",
+                                                                   ""required"":true,
+                                                                   ""value"":""smsu01v750pnUXuCH5d6"",
+                                                                   ""mutable"":false
+                                                                }
+                                                             ]
+                                                          }
+                                                       },
+                                                       {
+                                                          ""name"":""stateHandle"",
+                                                          ""required"":true,
+                                                          ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                          ""visible"":false,
+                                                          ""mutable"":false
+                                                       }
+                                                    ],
+                                                    ""accepts"":""application/json; okta-version=1.0.0""
+                                                 },
+                                                 {
+                                                    ""rel"":[
+                                                       ""create-form""
+                                                    ],
+                                                    ""name"":""select-authenticator-authenticate"",
+                                                    ""href"":""https://foo/idp/idx/challenge"",
+                                                    ""method"":""POST"",
+                                                    ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                    ""value"":[
+                                                       {
+                                                          ""name"":""authenticator"",
+                                                          ""type"":""object"",
+                                                          ""options"":[
+                                                             {
+                                                                ""label"":""Phone"",
+                                                                ""value"":{
+                                                                   ""form"":{
+                                                                      ""value"":[
+                                                                         {
+                                                                            ""name"":""id"",
+                                                                            ""required"":true,
+                                                                            ""value"":""auttzfsi4eiZIdLK85d6"",
+                                                                            ""mutable"":false
+                                                                         },
+                                                                         {
+                                                                            ""name"":""methodType"",
+                                                                            ""type"":""string"",
+                                                                            ""required"":false,
+                                                                            ""options"":[
+                                                                               {
+                                                                                  ""label"":""SMS"",
+                                                                                  ""value"":""sms""
+                                                                               }
+                                                                            ]
+                                                                         },
+                                                                         {
+                                                                            ""name"":""enrollmentId"",
+                                                                            ""required"":true,
+                                                                            ""value"":""smsu01v750pnUXuCH5d6"",
+                                                                            ""mutable"":false
+                                                                         }
+                                                                      ]
+                                                                   }
+                                                                },
+                                                                ""relatesTo"":""$.authenticatorEnrollments.value[0]""
+                                                             }
+                                                          ]
+                                                       },
+                                                       {
+                                                          ""name"":""stateHandle"",
+                                                          ""required"":true,
+                                                          ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                          ""visible"":false,
+                                                          ""mutable"":false
+                                                       }
+                                                    ],
+                                                    ""accepts"":""application/json; okta-version=1.0.0""
+                                                 }
+                                              ]
+                                           },
+                                           ""currentAuthenticatorEnrollment"":{
+                                              ""type"":""object"",
+                                              ""value"":{
+                                                 ""profile"":{
+                                                    ""phoneNumber"":""+1 XXX-XXX-4709""
+                                                 },
+                                                 ""resend"":{
+                                                    ""rel"":[
+                                                       ""create-form""
+                                                    ],
+                                                    ""name"":""resend"",
+                                                    ""href"":""https://foo/idp/idx/challenge/resend"",
+                                                    ""method"":""POST"",
+                                                    ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                    ""value"":[
+                                                       {
+                                                          ""name"":""stateHandle"",
+                                                          ""required"":true,
+                                                          ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                          ""visible"":false,
+                                                          ""mutable"":false
+                                                       }
+                                                    ],
+                                                    ""accepts"":""application/json; okta-version=1.0.0""
+                                                 },
+                                                 ""type"":""phone"",
+                                                 ""key"":""phone_number"",
+                                                 ""id"":""smsu01v750pnUXuCH5d6"",
+                                                 ""displayName"":""Phone"",
+                                                 ""methods"":[
+                                                    {
+                                                       ""type"":""sms""
+                                                    }
+                                                 ]
+                                              }
+                                           },
+                                           ""authenticators"":{
+                                              ""type"":""array"",
+                                              ""value"":[
+                                                 {
+                                                    ""type"":""phone"",
+                                                    ""key"":""phone_number"",
+                                                    ""id"":""auttzfsi4eiZIdLK85d6"",
+                                                    ""displayName"":""Phone"",
+                                                    ""methods"":[
+                                                       {
+                                                          ""type"":""sms""
+                                                       }
+                                                    ]
+                                                 }
+                                              ]
+                                           },
+                                           ""authenticatorEnrollments"":{
+                                              ""type"":""array"",
+                                              ""value"":[
+                                                 {
+                                                    ""profile"":{
+                                                       ""phoneNumber"":""+1 XXX-XXX-4709""
+                                                    },
+                                                    ""type"":""phone"",
+                                                    ""key"":""phone_number"",
+                                                    ""id"":""smsu01v750pnUXuCH5d6"",
+                                                    ""displayName"":""Phone"",
+                                                    ""methods"":[
+                                                       {
+                                                          ""type"":""sms""
+                                                       }
+                                                    ]
+                                                 }
+                                              ]
+                                           },
+                                           ""user"":{
+                                              ""type"":""object"",
+                                              ""value"":{
+                                                 ""id"":""00utzmvli0oz5ReJB5d6""
+                                              }
+                                           },
+                                           ""cancel"":{
+                                              ""rel"":[
+                                                 ""create-form""
+                                              ],
+                                              ""name"":""cancel"",
+                                              ""href"":""https://foo/idp/idx/cancel"",
+                                              ""method"":""POST"",
+                                              ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                              ""value"":[
+                                                 {
+                                                    ""name"":""stateHandle"",
+                                                    ""required"":true,
+                                                    ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                    ""visible"":false,
+                                                    ""mutable"":false
+                                                 }
+                                              ],
+                                              ""accepts"":""application/json; okta-version=1.0.0""
+                                           },
+                                           ""app"":{
+                                              ""type"":""object"",
+                                              ""value"":{
+                                                 ""name"":""oidc_client"",
+                                                 ""label"":""Dotnet IDX Web App"",
+                                                 ""id"":""foo""
+                                              }
+                                           }
+                                        }";
+            var challengeWithMethodResponse = @"{
+                                                   ""version"":""1.0.0"",
+                                                   ""stateHandle"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                   ""expiresAt"":""2021-05-28T20:48:51.000Z"",
+                                                   ""intent"":""LOGIN"",
+                                                   ""remediation"":{
+                                                      ""type"":""array"",
+                                                      ""value"":[
+                                                         {
+                                                            ""rel"":[
+                                                               ""create-form""
+                                                            ],
+                                                            ""name"":""challenge-authenticator"",
+                                                            ""relatesTo"":[
+                                                               ""$.currentAuthenticatorEnrollment""
+                                                            ],
+                                                            ""href"":""https://foo/idp/idx/challenge/answer"",
+                                                            ""method"":""POST"",
+                                                            ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                            ""value"":[
+                                                               {
+                                                                  ""name"":""credentials"",
+                                                                  ""type"":""object"",
+                                                                  ""form"":{
+                                                                     ""value"":[
+                                                                        {
+                                                                           ""name"":""passcode"",
+                                                                           ""label"":""Enter code""
+                                                                        }
+                                                                     ]
+                                                                  },
+                                                                  ""required"":true
+                                                               },
+                                                               {
+                                                                  ""name"":""stateHandle"",
+                                                                  ""required"":true,
+                                                                  ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                                  ""visible"":false,
+                                                                  ""mutable"":false
+                                                               }
+                                                            ],
+                                                            ""accepts"":""application/json; okta-version=1.0.0""
+                                                         }
+                                                      ]
+                                                   },
+                                                   ""currentAuthenticatorEnrollment"":{
+                                                      ""type"":""object"",
+                                                      ""value"":{
+                                                         ""profile"":{
+                                                            ""phoneNumber"":""+1 XXX-XXX-4709""
+                                                         },
+                                                         ""resend"":{
+                                                            ""rel"":[
+                                                               ""create-form""
+                                                            ],
+                                                            ""name"":""resend"",
+                                                            ""href"":""https://foo/idp/idx/challenge/resend"",
+                                                            ""method"":""POST"",
+                                                            ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                            ""value"":[
+                                                               {
+                                                                  ""name"":""stateHandle"",
+                                                                  ""required"":true,
+                                                                  ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                                  ""visible"":false,
+                                                                  ""mutable"":false
+                                                               }
+                                                            ],
+                                                            ""accepts"":""application/json; okta-version=1.0.0""
+                                                         },
+                                                         ""type"":""phone"",
+                                                         ""key"":""phone_number"",
+                                                         ""id"":""smsu01v750pnUXuCH5d6"",
+                                                         ""displayName"":""Phone"",
+                                                         ""methods"":[
+                                                            {
+                                                               ""type"":""sms""
+                                                            }
+                                                         ]
+                                                      }
+                                                   },
+                                                   ""authenticators"":{
+                                                      ""type"":""array"",
+                                                      ""value"":[
+                                                         {
+                                                            ""type"":""phone"",
+                                                            ""key"":""phone_number"",
+                                                            ""id"":""auttzfsi4eiZIdLK85d6"",
+                                                            ""displayName"":""Phone"",
+                                                            ""methods"":[
+                                                               {
+                                                                  ""type"":""sms""
+                                                               }
+                                                            ]
+                                                         }
+                                                      ]
+                                                   },
+                                                   ""authenticatorEnrollments"":{
+                                                      ""type"":""array"",
+                                                      ""value"":[
+                                                         {
+                                                            ""profile"":{
+                                                               ""phoneNumber"":""+1 XXX-XXX-4709""
+                                                            },
+                                                            ""type"":""phone"",
+                                                            ""key"":""phone_number"",
+                                                            ""id"":""smsu01v750pnUXuCH5d6"",
+                                                            ""displayName"":""Phone"",
+                                                            ""methods"":[
+                                                               {
+                                                                  ""type"":""sms""
+                                                               }
+                                                            ]
+                                                         }
+                                                      ]
+                                                   },
+                                                   ""user"":{
+                                                      ""type"":""object"",
+                                                      ""value"":{
+                                                         ""id"":""00utzmvli0oz5ReJB5d6""
+                                                      }
+                                                   },
+                                                   ""cancel"":{
+                                                      ""rel"":[
+                                                         ""create-form""
+                                                      ],
+                                                      ""name"":""cancel"",
+                                                      ""href"":""https://foo/idp/idx/cancel"",
+                                                      ""method"":""POST"",
+                                                      ""produces"":""application/ion+json; okta-version=1.0.0"",
+                                                      ""value"":[
+                                                         {
+                                                            ""name"":""stateHandle"",
+                                                            ""required"":true,
+                                                            ""value"":""02Ne-0FN9pKGQELUTxhXSPXVmUtdDuZqO2381oihou"",
+                                                            ""visible"":false,
+                                                            ""mutable"":false
+                                                         }
+                                                      ],
+                                                      ""accepts"":""application/json; okta-version=1.0.0""
+                                                   },
+                                                   ""app"":{
+                                                      ""type"":""object"",
+                                                      ""value"":{
+                                                         ""name"":""oidc_client"",
+                                                         ""label"":""Dotnet IDX Web App"",
+                                                         ""id"":""foo""
+                                                      }
+                                                   }
+                                                }";
+
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = selectPhoneResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = challengeWithMethodResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var authResponse = await testClient.ChallengeAuthenticatorAsync(
+                                   new ChallengePhoneAuthenticatorOptions()
+                                   {
+                                       AuthenticatorId = "auttzfsi4eiZIdLK85d6",
+                                       EnrollmentId = "smsu01v750pnUXuCH5d6",
+                                       MethodType = AuthenticatorMethodType.Sms,
+
+                                   }, Substitute.For<IIdxContext>());
+
+            authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingAuthenticatorVerification);
+            authResponse.TokenInfo.Should().BeNull();
         }
 
         /****** END SCENARIOS 6.2.X ******/

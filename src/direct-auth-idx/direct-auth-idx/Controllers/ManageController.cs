@@ -334,6 +334,7 @@
                                 EnrollmentId = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.EnrollmentId,
                                 AuthenticatorId = model.AuthenticatorId,
                                 MethodTypes = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.MethodTypes,
+                                MethodType = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.MethodTypes.FirstOrDefault(),
                             };
                             return RedirectToAction("SelectPhoneChallengeMethod", "Manage");
                         case AuthenticationStatus.AwaitingAuthenticatorVerification:
