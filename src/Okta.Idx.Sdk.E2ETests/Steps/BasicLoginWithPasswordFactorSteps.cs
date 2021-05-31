@@ -35,7 +35,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         { }
 
         [Given(@"a User named ""(.*)"" exists, and this user has already setup email and password factors")]
-        public async Task GivenAUserNamedExistsAndThisUserHasAlreadySetupEmailAndPasswordFactors(string p0)
+        public async Task GivenAUserNamedExistsAndThisUserHasAlreadySetupEmailAndPasswordFactors(string userName)
         {
             _testUser = await _userHelper.GetActivePasswordUserAsync();
         }
@@ -104,12 +104,6 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             _loginPage.UserNameInput.SendKeys("wrongname@site.com");
         }
 
-        [Then(@"she should see a message on the Login form ""(.*)""")]
-        public void ThenSheShouldSeeAMessageOnTheLoginForm(string p0)
-        {
-            _loginPage.ValidationErrorText.Text.Should().Contain("There is no account with the Username");
-        }
-
         [Then(@"she should see the message ""(.*)""")]
         public void ThenSheShouldSeeTheMessage(string authenticationError)
         {
@@ -127,6 +121,5 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         {
             _resetPasswordPage.AssertPageOpenedAndValid();
         }
-
     }
 }

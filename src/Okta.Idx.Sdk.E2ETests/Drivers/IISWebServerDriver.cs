@@ -6,15 +6,17 @@ namespace Okta.Idx.Sdk.E2ETests.Drivers
 {
     public class IISWebServerDriver: IWebServerDriver
     {
-        private const int iisPort = 8080;
         private const string WebSitePathEnvName = "DirectAuthWebSitePath";
 
+        private readonly int _iisPort;
         private readonly string _pathToWebSite;
         private Process _iisProcess;
 
-        public string SiteUrl => $"http://localhost:{iisPort}";
+        public string SiteUrl => $"http://localhost:{_iisPort}";
         public IISWebServerDriver()
         {
+            var config = ConfigBuilder.Configuration;
+            _iisPort = config.IisPort;
             _pathToWebSite = System.Environment.GetEnvironmentVariable(WebSitePathEnvName);
 
             if (string.IsNullOrEmpty(_pathToWebSite))
@@ -46,7 +48,7 @@ namespace Okta.Idx.Sdk.E2ETests.Drivers
 
             _iisProcess = new Process();
             _iisProcess.StartInfo.FileName = programFiles + "\\IIS Express\\iisexpress.exe";
-            _iisProcess.StartInfo.Arguments = $"/path:\"{_pathToWebSite}\" /port:{iisPort}";
+            _iisProcess.StartInfo.Arguments = $"/path:\"{_pathToWebSite}\" /port:{_iisPort}";
             _iisProcess.Start();
         }
 
