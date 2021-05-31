@@ -193,9 +193,9 @@
             return View(model);
         }
 
-        public ActionResult SelectPhoneChallengeMethod()
+        public ActionResult SelectPhoneChallengeMethod(SelectAuthenticatorMethodViewModel model)
         {
-           return View((SelectAuthenticatorMethodViewModel)TempData["selectMethodModel"]);
+           return View(model);
         }
 
         [HttpPost]
@@ -230,7 +230,7 @@
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
-                return RedirectToAction("SelectPhoneChallengeMethod", model);
+                return View("SelectPhoneChallengeMethod", model);
             }
         }
         
@@ -328,7 +328,7 @@
                     switch (selectAuthenticatorResponse?.AuthenticationStatus)
                     {
                         case AuthenticationStatus.AwaitingChallengeAuthenticatorData:
-                            TempData["selectMethodModel"] = new SelectAuthenticatorMethodViewModel
+                            var methodViewModel = new SelectAuthenticatorMethodViewModel
                             {
                                 Profile = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Profile,
                                 EnrollmentId = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.EnrollmentId,
@@ -336,7 +336,7 @@
                                 MethodTypes = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.MethodTypes,
                                 MethodType = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.MethodTypes.FirstOrDefault(),
                             };
-                            return RedirectToAction("SelectPhoneChallengeMethod", "Manage");
+                            return View("SelectPhoneChallengeMethod", methodViewModel);
                         case AuthenticationStatus.AwaitingAuthenticatorVerification:
                             return RedirectToAction("VerifyAuthenticator", "Manage");
                         default:
