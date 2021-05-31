@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using A18NAClient.Dto;
+using A18NClient.Dto;
 
-namespace A18NAClient
+namespace A18NClient
 {
     public class A18nClient : IA18nClient, IDisposable
     {

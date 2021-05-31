@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace A18NAClient.Dto
+namespace A18NClient.Dto
 {
     public class SmsMessageList
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace A18NAClient.Dto
+namespace A18NClient.Dto
 {
     public class ProfileList
     {

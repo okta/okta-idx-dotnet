@@ -1,4 +1,4 @@
-﻿using A18NAClient;
+﻿using A18NClient;
 using BoDi;
 using Okta.Idx.Sdk.E2ETests.Drivers;
 using Okta.Idx.Sdk.E2ETests.Helpers;

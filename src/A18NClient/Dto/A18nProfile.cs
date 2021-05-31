@@ -1,4 +1,4 @@
-﻿namespace A18NAClient.Dto
+﻿namespace A18NClient.Dto
 {
     public class A18nProfile
     { 
