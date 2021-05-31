@@ -11,6 +11,7 @@ namespace A18NClient
     {
         private const string BaseUrl = "https://api.a18n.help";
         private const string RelativePart = "v1/profile";
+        private bool _disposed = false;
 
         private HttpClient _client;
         private string _defaultProfileId;
@@ -37,8 +38,22 @@ namespace A18NClient
 
         public void Dispose()
         {
-            if (_client != null)
-                _client.Dispose();
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                if (_client != null)
+                    _client.Dispose();
+            }
+            _disposed = true;
         }
 
         //  POST https://api.a18n.help/v1/profile

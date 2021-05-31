@@ -7,13 +7,13 @@ namespace Okta.Idx.Sdk.E2ETests.Drivers
     public class WebDriverDriver : IDisposable
     {
         private Lazy<IWebDriver> _webDriver = new(() => SetupWebDriver());
+        private bool _disposed = false;
 
         public IWebDriver WebDriver => _webDriver.Value;
 
         private static IWebDriver SetupWebDriver()
         {
             var options = new ChromeOptions();
-//            options.AddArgument("--headless");
             options.AddArgument("--start-maximized");
             options.AddArgument("--disable-notifications");
             return new ChromeDriver(options);
@@ -21,11 +21,25 @@ namespace Okta.Idx.Sdk.E2ETests.Drivers
 
         public void Dispose()
         {
-            if (_webDriver.IsValueCreated)
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
             {
-                WebDriver.Close();
-                WebDriver.Dispose();
+                return;
             }
+
+            if (disposing)
+            {
+                if (_webDriver.IsValueCreated)
+                {
+                    WebDriver.Close();
+                    WebDriver.Dispose();
+                }
+            }
+            _disposed = true;
         }
     }
 }

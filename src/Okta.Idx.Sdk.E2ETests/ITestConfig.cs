@@ -10,5 +10,6 @@
         string UserPassword { get; set; }
         string A18nApiKey { get; set; }
         string A18nProfileId { get; set; }
+        int IisPort { get; set; }
     }
 }

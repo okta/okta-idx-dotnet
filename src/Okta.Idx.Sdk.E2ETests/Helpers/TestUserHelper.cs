@@ -11,7 +11,8 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
         private ITestConfig _configuration;
         private A18nProfile _a18nProfile;
         private IOktaSdkHelper _oktaHelper;
-       // private IUser oktaUser;
+        private bool _disposed = false;
+
 
         public TestUserHelper(ITestConfig configuration, IA18nClient a18nClient, IOktaSdkHelper oktaHelper)
         {
@@ -65,7 +66,22 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 
         public void Dispose()
         {
-            CleanUpOktaUserAsync().Wait();
+            Dispose(true);
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                CleanUpOktaUserAsync().Wait();
+            }
+            _disposed = true;
+        }
+
     }
 }
