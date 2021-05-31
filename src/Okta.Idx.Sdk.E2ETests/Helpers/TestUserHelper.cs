@@ -1,5 +1,5 @@
-﻿using A18NAdapter;
-using A18NAdapter.Dto;
+﻿using A18NAClient;
+using A18NAClient.Dto;
 using System;
 using System.Threading.Tasks;
 
@@ -7,20 +7,20 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 {
     public class TestUserHelper : ITestUserHelper, IDisposable
     {
-        private IA18nAdapter _a18nAdapter;
+        private IA18nClient _a18nClient;
         private ITestConfig _configuration;
         private A18nProfile _a18nProfile;
         private IOktaSdkHelper _oktaHelper;
        // private IUser oktaUser;
 
-        public TestUserHelper(ITestConfig configuration, IA18nAdapter a18nAdapter, IOktaSdkHelper oktaHelper)
+        public TestUserHelper(ITestConfig configuration, IA18nClient a18nClient, IOktaSdkHelper oktaHelper)
         {
             _oktaHelper = oktaHelper;
-            _a18nAdapter = a18nAdapter;
+            _a18nClient = a18nClient;
             _configuration = configuration;
 
-            _a18nAdapter.SetDefaultProfileId(configuration.A18nProfileId);
-            _a18nProfile = _a18nAdapter.GetProfileAsync().Result;
+            _a18nClient.SetDefaultProfileId(configuration.A18nProfileId);
+            _a18nProfile = _a18nClient.GetProfileAsync().Result;
         }
 
         public async Task<TestUserProperties> GetActivePasswordUserAsync()
@@ -48,8 +48,8 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 
         private async Task CleanUpA18ProfileAsync()
         {
-            await _a18nAdapter.DeleteAllProfileEmailsAsync();
-            await _a18nAdapter.DeleteAllProfileSmsAsync();
+            await _a18nClient.DeleteAllProfileEmailsAsync();
+            await _a18nClient.DeleteAllProfileSmsAsync();
         }
 
         private async Task CleanUpOktaUserAsync()

@@ -3,11 +3,11 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using A18NAdapter.Dto;
+using A18NAClient.Dto;
 
-namespace A18NAdapter
+namespace A18NAClient
 {
-    public class A18nAdapter : IA18nAdapter, IDisposable
+    public class A18nClient : IA18nClient, IDisposable
     {
         private const string BaseUrl = "https://api.a18n.help";
         private const string RelativePart = "v1/profile";
@@ -15,7 +15,7 @@ namespace A18NAdapter
         private HttpClient _client;
         private string _defaultProfileId;
 
-        public A18nAdapter(string apiKey)
+        public A18nClient(string apiKey)
         {
             _client = new HttpClient
             {
@@ -25,7 +25,7 @@ namespace A18NAdapter
 
         }
 
-        public A18nAdapter(string apiKey, string profileId) : this(apiKey)
+        public A18nClient(string apiKey, string profileId) : this(apiKey)
         {
             _defaultProfileId = profileId;
         }

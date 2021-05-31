@@ -1,4 +1,4 @@
-﻿using A18NAdapter;
+﻿using A18NAClient;
 using BoDi;
 using Okta.Idx.Sdk.E2ETests.Drivers;
 using Okta.Idx.Sdk.E2ETests.Helpers;
@@ -29,10 +29,10 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
             _webServerDriver.StartWebServer();
 
             var config = ConfigBuilder.Configuration;
-            var a18nAdapter = new A18nAdapter(config.A18nApiKey);
+            var a18nClient = new A18nClient(config.A18nApiKey);
 
             _container.RegisterInstanceAs<ITestConfig>(config);
-            _container.RegisterInstanceAs<IA18nAdapter>(a18nAdapter, dispose: true);
+            _container.RegisterInstanceAs<IA18nClient>(a18nClient, dispose: true);
             _container.RegisterInstanceAs<IWebServerDriver>(_webServerDriver, dispose: true);
             _container.RegisterTypeAs<OktaSdkHelper, IOktaSdkHelper>(); 
             _container.RegisterTypeAs<TestUserHelper, ITestUserHelper>();

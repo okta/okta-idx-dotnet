@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace A18NAdapter
+namespace A18NAClient
 {
     public static class JsonHelper
     {
