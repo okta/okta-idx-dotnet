@@ -24,6 +24,12 @@ namespace A18NAdapter
             _client.DefaultRequestHeaders.Add("x-api-key", apiKey);
 
         }
+
+        public A18nAdapter(string apiKey, string profileId) : this(apiKey)
+        {
+            _defaultProfileId = profileId;
+        }
+
         public void SetDefaultProfileId(string profileId)
         {
             _defaultProfileId = profileId;
@@ -49,7 +55,7 @@ namespace A18NAdapter
 
         //Read information about a specific profile
         //GET https://api.a18n.help/v1/profile/:profileId
-        public async Task<A18nProfile> GetProfileAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task<A18nProfile> GetProfileAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetAsync<A18nProfile>(effectiveProfileId, cancellationToken);
@@ -57,7 +63,7 @@ namespace A18NAdapter
 
         // List of current emails
         //GET https://api.a18n.help/v1/profile/:profileId/email
-        public async Task<EmailMessageList> GetAllProfileEmailsAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task<EmailMessageList> GetAllProfileEmailsAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetAsync<EmailMessageList>($"{effectiveProfileId}/email", cancellationToken);
@@ -65,7 +71,7 @@ namespace A18NAdapter
 
         // Delete all emails
         // DELETE https://api.a18n.help/v1/profile/:profileId/email
-        public async Task DeleteAllProfileEmailsAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task DeleteAllProfileEmailsAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             await DeleteAsync($"{effectiveProfileId}/email", cancellationToken);
@@ -73,7 +79,7 @@ namespace A18NAdapter
 
         // Load a specific email
         // GET https://api.a18n.help/v1/profile/:profileId/email/:messageId
-        public async Task<EmailMessage> GetEmailMessageAsync(string profileId, string messageId, CancellationToken cancellationToken = default)
+        public async Task<EmailMessage> GetEmailMessageAsync(string messageId, string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetAsync<EmailMessage>($"{effectiveProfileId}/email/{messageId}", cancellationToken).ConfigureAwait(false);
@@ -81,7 +87,7 @@ namespace A18NAdapter
 
         // Delete a specific email
         // DELETE https://api.a18n.help/v1/profile/:profileId/email/:messageId
-        public async Task DeleteEmailAsync(string profileId, string messageId, CancellationToken cancellationToken = default)
+        public async Task DeleteEmailAsync(string messageId, string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             await DeleteAsync($"{effectiveProfileId}/email/{messageId}", cancellationToken);
@@ -89,7 +95,7 @@ namespace A18NAdapter
 
         // Get the plain-text email content
         // GET https://api.a18n.help/v1/profile/:profileId/email/:messageId/content
-        public async Task<string> GetPlainMessageContentAsync(string profileId, string messageId, CancellationToken cancellationToken = default)
+        public async Task<string> GetPlainMessageContentAsync(string messageId, string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetRawAsync($"{effectiveProfileId}/email/{messageId}/content", cancellationToken);
@@ -97,7 +103,7 @@ namespace A18NAdapter
 
         //Load the latest email message
         //GET https://api.a18n.help/v1/profile/:profileId/email/latest
-        public async Task<EmailMessage> GetLatestEmailMessageAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task<EmailMessage> GetLatestEmailMessageAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetAsync<EmailMessage>($"{effectiveProfileId}/email/latest", cancellationToken).ConfigureAwait(false);
@@ -105,7 +111,7 @@ namespace A18NAdapter
 
         //Delete the latest email message
         //DELETE https://api.a18n.help/v1/profile/:profileId/email/latest
-        public async Task DeleteLatestEmailAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task DeleteLatestEmailAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             await DeleteAsync($"{effectiveProfileId}/email/latest", cancellationToken);
@@ -113,7 +119,7 @@ namespace A18NAdapter
 
         //Get the plain-text content for the latest email message
         //GET https://api.a18n.help/v1/profile/:profileId/email/latest/content
-        public async Task<string> GetLastMessagePlainContentAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task<string> GetLastMessagePlainContentAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetRawAsync($"{effectiveProfileId}/email/latest/content", cancellationToken);
@@ -121,7 +127,7 @@ namespace A18NAdapter
 
         // List of current SMS messages
         // GET https://api.a18n.help/v1/profile/:profileId/sms
-        public async Task<SmsMessageList> GetAllProfileSmsAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task<SmsMessageList> GetAllProfileSmsAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetAsync<SmsMessageList>($"{effectiveProfileId}/sms", cancellationToken);
@@ -129,7 +135,7 @@ namespace A18NAdapter
 
         // Delete all SMS messages
         // DELETE https://api.a18n.help/v1/profile/:profileId/sms
-        public async Task DeleteAllProfileSmsAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task DeleteAllProfileSmsAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             await DeleteAsync($"{effectiveProfileId}/sms", cancellationToken);
@@ -137,7 +143,7 @@ namespace A18NAdapter
 
         // Load a specific SMS message
         // GET https://api.a18n.help/v1/profile/:profileId/sms/:messageId
-        public async Task<SmsMessage> GetSmsMessageAsync(string profileId, string messageId, CancellationToken cancellationToken = default)
+        public async Task<SmsMessage> GetSmsMessageAsync(string messageId, string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetAsync<SmsMessage>($"{effectiveProfileId}/sms/{messageId}", cancellationToken).ConfigureAwait(false);
@@ -145,7 +151,7 @@ namespace A18NAdapter
 
         // Delete a specific SMS message
         // DELETE https://api.a18n.help/v1/profile/:profileId/sms/:messageId
-        public async Task DeleteSmsAsync(string profileId, string messageId, CancellationToken cancellationToken = default)
+        public async Task DeleteSmsAsync(string messageId, string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             await DeleteAsync($"{effectiveProfileId}/sms/{messageId}", cancellationToken);
@@ -153,7 +159,7 @@ namespace A18NAdapter
 
         //Get the plain-text SMS message content
         //GET https://api.a18n.help/v1/profile/:profileId/sms/:messageId/content
-        public async Task<string> GetPlainSmsContentAsync(string profileId, string messageId, CancellationToken cancellationToken = default)
+        public async Task<string> GetPlainSmsContentAsync(string messageId, string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetRawAsync($"{effectiveProfileId}/sms/{messageId}/content", cancellationToken);
@@ -161,7 +167,7 @@ namespace A18NAdapter
 
         //Load the latest SMS message
         //GET https://api.a18n.help/v1/profile/:profileId/sms/latest
-        public async Task<SmsMessage> GetLatestSmsAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task<SmsMessage> GetLatestSmsAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetAsync<SmsMessage>($"{effectiveProfileId}/sms/latest", cancellationToken).ConfigureAwait(false);
@@ -169,7 +175,7 @@ namespace A18NAdapter
 
         //Delete the latest SMS message
         //DELETE https://api.a18n.help/v1/profile/:profileId/sms/latest
-        public async Task DeleteLatestSmsAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task DeleteLatestSmsAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             await DeleteAsync($"{effectiveProfileId}/sms/latest", cancellationToken);
@@ -177,7 +183,7 @@ namespace A18NAdapter
 
         // Get the plain-text content for the latest SMS message message
         // GET https://api.a18n.help/v1/profile/:profileId/sms/latest/content
-        public async Task<string> GetLastSmsPlainContentAsync(string profileId, CancellationToken cancellationToken = default)
+        public async Task<string> GetLastSmsPlainContentAsync(string profileId = default, CancellationToken cancellationToken = default)
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             return await GetRawAsync($"{effectiveProfileId}/sms/latest/content", cancellationToken);
