@@ -20,8 +20,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk.E2ETests", "Ok
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "A18NClient", "A18NClient\A18NClient.csproj", "{765E6D4F-4294-4F61-9CD9-E936C32E4ADB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OktaSdkAdapter", "OktaSdkAdapter\OktaSdkAdapter.csproj", "{DB692E00-87EC-443A-878C-FB88570813F8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
