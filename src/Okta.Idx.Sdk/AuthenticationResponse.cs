@@ -38,6 +38,11 @@ namespace Okta.Idx.Sdk
         public IAuthenticator CurrentAuthenticatorEnrollment { get; set; }
 
         /// <summary>
+        /// Gets or sets the current authenticator.
+        /// </summary>
+        public IAuthenticator CurrentAuthenticator { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether response contains 'skip' remediation option.
         /// </summary>
         public bool CanSkip { get; set; }

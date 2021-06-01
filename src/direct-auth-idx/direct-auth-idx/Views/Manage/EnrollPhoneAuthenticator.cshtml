@@ -8,21 +8,39 @@
         @using (Html.BeginForm("EnrollPhoneAuthenticatorAsync", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
         {
             @Html.AntiForgeryToken()
+            <h4>Set up phone authentication</h4>
+            <h5>Format: {+}{country code}{area code}{number}</h5>
+            <h5>For example: +1555666777</h5>
             <hr />
             @Html.ValidationSummary("", new { @class = "text-danger" })
             <div class="form-group">
                 <div class="col-md-10">
-                    <div class="row row-no-gutters">
-                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "control-label" })
-                    </div>
-                </div>
-                <div class="row row-no-gutters">
-                    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                    <ul class="no-padding-left">
+                        @foreach (var method in Model.MethodTypes)
+                        {
+                            <div>
+                                <label>
+                                    @Html.RadioButtonFor(m => m.MethodType, method.Value)
+                                    @method
+                                </label>
+                            </div>
+                        }
+                    </ul>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-md-offset-2 col-md-10">
-                    <input type="submit" value="Send a code via SMS" class="btn btn-primary btn-stretch-wide" />
+                <div class="col-md-10">
+                    <div>
+                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "control-label" })
+                    </div>
+                    <div>
+                        @Html.EditorFor(m => m.PhoneNumber, new { htmlAttributes = new { @class = "form-control" }})
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
                 </div>
             </div>
         }

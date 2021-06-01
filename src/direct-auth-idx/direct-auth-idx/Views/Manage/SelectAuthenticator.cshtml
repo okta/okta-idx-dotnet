@@ -43,19 +43,20 @@
                         <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
                     </div>
                 </div>
-                if (Model.CanSkip)
-                {
-                    using (Html.BeginForm("SkipAuthenticatorSelectionAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-                    {
-                        <div class="form-group">
-                            <div class="col-md-offset-0 col-md-10">
-                            <input type="submit" name="skip" value="Skip this step" class="btn btn-info btn-stretch-wide" />
-                            </div>
-                        </div>
-                    }
-
-                }
             }
+            @if (Model.CanSkip)
+            {
+                using (Html.BeginForm("SkipAuthenticatorSelectionAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    <div class="form-group">
+                        <div class="col-md-offset-0 col-md-10">
+                        <input type="submit" name="skip" value="Skip this step" class="btn btn-info btn-stretch-wide" />
+                        </div>
+                    </div>
+                }
+
+            }
+            
         </section>
     </div>
 </div>
