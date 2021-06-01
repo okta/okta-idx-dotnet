@@ -79,18 +79,18 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             Dispose(true);
         }
 
-        private string ExtractRecoveryCodeFromEmail(string mailContent)
+        private static string ExtractRecoveryCodeFromEmail(string mailContent)
         {
-            var res = string.Empty;
+            var recoveryCode = string.Empty;
             if (!string.IsNullOrEmpty(mailContent))
             {
                 var pos = mailContent.IndexOf(mailCodeMarker);
                 if (pos > 0)
                 {
-                    res = mailContent.Substring(pos + mailCodeMarker.Length, 6);
+                    recoveryCode = mailContent.Substring(pos + mailCodeMarker.Length, 6);
                 }
             }
-            return res;
+            return recoveryCode;
         }
 
         private async Task CleanUpA18ProfileAsync()
