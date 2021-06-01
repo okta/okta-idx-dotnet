@@ -4,7 +4,7 @@ using System.Text;
 
 namespace A18NClient
 {
-    internal class NotFoundException: Exception
+    public class NotFoundException: Exception
     {
     }
 }

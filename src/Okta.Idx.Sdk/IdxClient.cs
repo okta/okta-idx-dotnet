@@ -1189,7 +1189,10 @@ namespace Okta.Idx.Sdk
             return credentialsObj != null;
         }
 
-        private async Task<IList<IAuthenticator>> GetOneStepAuthRecoveryAuthenticators(RecoverPasswordOptions recoverPasswordOptions, IIdxResponse introspectResponse, CancellationToken cancellationToken)
+        private async Task<IList<IAuthenticator>> GetOneStepAuthRecoveryAuthenticators(
+            RecoverPasswordOptions recoverPasswordOptions,
+            IIdxResponse introspectResponse,
+            CancellationToken cancellationToken)
         {
             // Recovery request first
             var recoveryRequest = new IdxRequestPayload
@@ -1214,6 +1217,11 @@ namespace Okta.Idx.Sdk
 
             var identifyResponse = await recoveryResponse.ProceedWithRemediationOptionAsync(RemediationType.IdentifyRecovery, identifyRequest, cancellationToken);
 
+            if (identifyResponse.IdxMessages.Messages.Count > 0)
+            {
+                throw new TerminalStateException(identifyResponse.IdxMessages);
+            }
+
             var recoveryAuthenticators = identifyResponse.Authenticators.Value;
 
             return IdxResponseHelper.ConvertToAuthenticators(recoveryAuthenticators);
@@ -1230,6 +1238,11 @@ namespace Okta.Idx.Sdk
 
             // Send username
             var identifyResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.Identify, identifyRequest, cancellationToken);
+
+            if (identifyResponse.IdxMessages.Messages.Count > 0)
+            {
+                throw new TerminalStateException(identifyResponse.IdxMessages);
+            }
 
             // Get available authenticators
             var recoveryRequest = new IdxRequestPayload

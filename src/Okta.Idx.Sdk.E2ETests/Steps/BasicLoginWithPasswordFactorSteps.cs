@@ -14,12 +14,11 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         private LoginPage _loginPage;
         private ResetPasswordPage _resetPasswordPage;
 
-        public BasicLoginWithPasswordFactorSteps(WebDriverDriver webDriverDriver, 
-                                                ITestUserHelper userHelper, 
+        public BasicLoginWithPasswordFactorSteps(ITestUserHelper userHelper, 
                                                 HomePage homePage, 
                                                 LoginPage loginPage,
                                                 ResetPasswordPage resetPasswordPage)
-            : base(webDriverDriver, userHelper)
+            : base(userHelper)
         {
             _homePage = homePage;
             _loginPage = loginPage;
@@ -107,7 +106,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [Then(@"she should see the message ""(.*)""")]
         public void ThenSheShouldSeeTheMessage(string authenticationError)
         {
-            _loginPage.ValidationErrorText.Text.Should().Contain(authenticationError);
+            _loginPage.ValidationErrors.Text.Should().Contain(authenticationError);
         }
 
         [When(@"she clicks on the Forgot Password button")]

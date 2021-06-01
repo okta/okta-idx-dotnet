@@ -13,6 +13,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
         public string Title => _webDriver.Title;
         public string FullPageUrl => $"{_baseUrl}/{RelativePageUri}";
         public bool IsPageOpened => _webDriver.Url.Equals(FullPageUrl);
+        public IWebElement ValidationErrors => _webDriver.FindElement(By.XPath("//div[@class=\"validation-summary-errors text-danger\"]"));
         public BasePage(WebDriverDriver webDriverDriver, IWebServerDriver _webServerDriver)
         {
             _webDriver = webDriverDriver.WebDriver;

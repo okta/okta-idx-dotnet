@@ -14,7 +14,6 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
         public IWebElement ForgotPasswordButton => _webDriver.FindElement(By.Id("ForgotPasswordBtn"));
         public IWebElement UserNameInput => _webDriver.FindElement(By.Id("UserName"));
         public IWebElement PasswordInput => _webDriver.FindElement(By.Id("Password"));
-        public IWebElement ValidationErrorText => _webDriver.FindElement(By.Id("validationErrorMessage"));
 
         public override void AssertPageOpenedAndValid() 
         {

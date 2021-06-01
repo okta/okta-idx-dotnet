@@ -152,7 +152,7 @@ namespace Okta.Idx.Sdk.E2ETests.Features
  testRunner.When("she fills in the correct code", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 19
- testRunner.And("she submits the form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("she submits the verification form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 20
  testRunner.Then("she sees a page to set her password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -164,7 +164,7 @@ namespace Okta.Idx.Sdk.E2ETests.Features
  testRunner.And("she confirms that password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 23
- testRunner.And("she submits the form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("she submits the change password form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 24
  testRunner.Then("she is redirected to the Root Page is provided", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -207,9 +207,6 @@ namespace Okta.Idx.Sdk.E2ETests.Features
 #line 27
  testRunner.Given("Mary navigates to the Self Service Password Reset View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 28
- testRunner.When("she selects \"Forgot Password\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
 #line 29
  testRunner.Then("she sees the Password Recovery Page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -217,7 +214,7 @@ namespace Okta.Idx.Sdk.E2ETests.Features
  testRunner.When("she inputs an Email that doesn\'t exist", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 31
- testRunner.And("she submits the form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("she submits the recovery form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 32
  testRunner.Then("she sees a message \"There is no account with the Username {username}.\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

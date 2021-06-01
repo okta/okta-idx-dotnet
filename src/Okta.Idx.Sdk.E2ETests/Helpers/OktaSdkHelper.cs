@@ -34,6 +34,11 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             return await _client.Users.CreateUserAsync(options);
         }
 
+        public Task<IUser> CreateUnassignedUserIdentifiedWithPasswordAsync(string userName, string password)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task DeleteUserAsync(string email)
         {
             var user = await _client.Users.FirstOrDefaultAsync(u => u.Profile.Email.Equals(email));

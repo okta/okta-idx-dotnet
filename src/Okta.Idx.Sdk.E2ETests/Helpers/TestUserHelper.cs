@@ -7,6 +7,8 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 {
     public class TestUserHelper : ITestUserHelper, IDisposable
     {
+        private const string mailCodeMarker = "Can't use the link? Enter a code instead: <b>";
+
         private IA18nClient _a18nClient;
         private ITestConfig _configuration;
         private A18nProfile _a18nProfile;
@@ -38,32 +40,57 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             };
         }
 
-        public TestUserProperties GetUnassignedUser()
+        public async Task<TestUserProperties> GetUnassignedUser()
         {
+            await CleanUpAsync();
+
+            var oktaUser = await _oktaHelper.CreateUnassignedUserIdentifiedWithPasswordAsync(_a18nProfile.EmailAddress, _configuration.UserPassword);
+            
             return new TestUserProperties()
             {
-                Email = _configuration.UnassignedUser,
-                Password = _configuration.UserPassword
+                Email = oktaUser.Profile.Email,
+                PhoneNumber = oktaUser.Profile.PrimaryPhone,
+                Password = _configuration.UserPassword,
             };
         }
 
         public async Task<string> GetRecoveryCodeFromEmail()
         {
             for (int tries = 0; tries < 30; tries++) {
-                var mail = await _a18nClient.GetLatestEmailMessageAsync();
-                if (!string.IsNullOrEmpty(content))
+                try
                 {
-                    return extractRecoveryCodeFromEmail(content);
+                    var mail = await _a18nClient.GetLatestEmailMessageAsync();
+
+                    return ExtractRecoveryCodeFromEmail(mail.Content);
+
                 }
-                await Task.Delay(1000);    
+                catch (NotFoundException)
+                {
+                    // expected exception when a mail box is empty
+                }
+                await Task.Delay(1000);
             }
 
             return string.Empty;
         }
 
-        private string extractRecoveryCodeFromEmail(string content)
+        public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+        }
+
+        private string ExtractRecoveryCodeFromEmail(string mailContent)
+        {
+            var res = string.Empty;
+            if (!string.IsNullOrEmpty(mailContent))
+            {
+                var pos = mailContent.IndexOf(mailCodeMarker);
+                if (pos > 0)
+                {
+                    res = mailContent.Substring(pos + mailCodeMarker.Length, 6);
+                }
+            }
+            return res;
         }
 
         private async Task CleanUpA18ProfileAsync()
@@ -83,11 +110,6 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             await CleanUpOktaUserAsync();
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
@@ -101,6 +123,5 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             }
             _disposed = true;
         }
-
     }
 }

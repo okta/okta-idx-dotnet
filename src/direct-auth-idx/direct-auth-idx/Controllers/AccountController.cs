@@ -164,7 +164,6 @@ namespace direct_auth_idx.Controllers
                 return View("ForgotPassword", model);
             }
 
-
             var recoverPasswordOptions = new RecoverPasswordOptions { Username = model.UserName, };
 
             try
