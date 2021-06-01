@@ -82,9 +82,6 @@ namespace direct_auth_idx.Controllers
                         Session["isChallengeFlow"] = false;
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         return RedirectToAction("SelectAuthenticator", "Manage");
-                    case AuthenticationStatus.Terminal:
-                        ModelState.AddModelError(string.Empty, authnResponse.MessageToUser);
-                        return View("Login", model);
 
                     default:
                         return View("Login", model);
