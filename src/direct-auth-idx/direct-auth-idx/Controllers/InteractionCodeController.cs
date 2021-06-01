@@ -1,17 +1,9 @@
 ﻿using direct_auth_idx.Models;
-using IdentityModel.Client;
-using Microsoft.AspNet.Identity;
-using Microsoft.Extensions.Logging;
 using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
 using Okta.Idx.Sdk;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
 
 namespace direct_auth_idx.Controllers

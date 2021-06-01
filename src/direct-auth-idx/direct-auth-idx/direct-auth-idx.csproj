@@ -49,7 +49,7 @@
       <HintPath>..\packages\FlexibleConfiguration.1.2.2\lib\net45\FlexibleConfiguration.dll</HintPath>
     </Reference>
     <Reference Include="IdentityModel, Version=5.1.0.0, Culture=neutral, PublicKeyToken=e7877f4675df049f, processorArchitecture=MSIL">
-      <HintPath>..\packages\IdentityModel.5.1.0\lib\net472\IdentityModel.dll</HintPath>
+      <HintPath>..\..\packages\IdentityModel.5.1.0\lib\net472\IdentityModel.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.3\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
@@ -107,7 +107,7 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Okta.Sdk.Abstractions, Version=3.0.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Okta.Sdk.Abstractions.3.0.3\lib\netstandard2.0\Okta.Sdk.Abstractions.dll</HintPath>
+      <HintPath>..\..\packages\Okta.Sdk.Abstractions.3.0.3\lib\netstandard2.0\Okta.Sdk.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>

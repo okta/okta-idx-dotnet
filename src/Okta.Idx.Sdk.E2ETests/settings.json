@@ -1,0 +1,8 @@
+﻿{
+  "okta": {
+    "testing": {
+      "IISPort": 8080,
+      "A18nProfileId": "7AmSrKmHZ6"
+    }
+  }
+}
