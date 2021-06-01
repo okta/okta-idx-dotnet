@@ -41,21 +41,6 @@ namespace A18NClient
             Dispose(true);
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                if (_client != null)
-                    _client.Dispose();
-            }
-            _disposed = true;
-        }
-
         //  POST https://api.a18n.help/v1/profile
         public async Task<A18nProfile> CreateProfileAsync(CancellationToken cancellationToken = default)
         {
@@ -204,6 +189,21 @@ namespace A18NClient
             return await GetRawAsync($"{effectiveProfileId}/sms/latest/content", cancellationToken);
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                if (_client != null)
+                    _client.Dispose();
+            }
+            _disposed = true;
+        }
+
         #region request executors
         private async Task<T> GetAsync<T>(string uri = default, CancellationToken cancellationToken = default)
         {
@@ -246,6 +246,10 @@ namespace A18NClient
         {
             if (response.StatusCode != httpStatusCode)
             {
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    throw new NotFoundException();
+                }
                 throw new Exception($"Unexpected status code: {response.StatusCode}");
             }
         }
@@ -261,6 +265,7 @@ namespace A18NClient
                 return $"{RelativePart}/{resource}";
             }
         }
+
         #endregion utility functions
     }
 }
