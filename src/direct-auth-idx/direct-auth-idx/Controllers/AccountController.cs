@@ -75,10 +75,13 @@ namespace direct_auth_idx.Controllers
                         return RedirectToAction("ChangePassword", "Manage");
 
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
-                        TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
                         return RedirectToAction("selectAuthenticator", "Manage");
-
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["isChallengeFlow"] = false;
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        return RedirectToAction("SelectAuthenticator", "Manage");
                     default:
                         return View("Login", model);
                 }
@@ -130,8 +133,8 @@ namespace direct_auth_idx.Controllers
                 if (registerResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
                 {
                     Session["idxContext"] = registerResponse.IdxContext;
-                    TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(registerResponse.Authenticators);
-                    return RedirectToAction("selectAuthenticator", "Manage");
+                    Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(registerResponse.Authenticators);
+                    return RedirectToAction("SelectAuthenticator", "Manage");
                 }
 
                 ModelState.AddModelError(string.Empty, $"Oops! Something went wrong.");
@@ -170,7 +173,7 @@ namespace direct_auth_idx.Controllers
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorSelection)
                 {
                     Session["idxContext"] = authnResponse.IdxContext;
-                    TempData["authenticators"] =
+                    Session["authenticators"] =
                         ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                     return RedirectToAction("SelectRecoveryAuthenticator", "Manage");
                 }

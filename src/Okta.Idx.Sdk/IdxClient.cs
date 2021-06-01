@@ -1095,7 +1095,7 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        public async Task<AuthenticationResponse> SelectEnrollAuthenticatorAsync(SelectEnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var selectAuthenticatorRequest = new IdxRequestPayload();
             selectAuthenticatorRequest.SetProperty("authenticator", new
@@ -1168,6 +1168,7 @@ namespace Okta.Idx.Sdk
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = status,
+                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value),
             };
         }
 

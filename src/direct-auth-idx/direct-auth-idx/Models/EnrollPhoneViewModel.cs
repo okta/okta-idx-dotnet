@@ -9,10 +9,16 @@ namespace direct_auth_idx.Models
 {
     public class EnrollPhoneViewModel
     {
-        public AuthenticatorMethodType MethodType  => AuthenticatorMethodType.Sms;
-
         [Required]
         [Display(Name = "Phone number")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^\+\d*$", ErrorMessage = "Not a valid phone number")]
         public string PhoneNumber { get; set; }
+
+        [Required]
+        [Display(Name = "Method Type")]
+        public string MethodType { get; set; }
+
+        public IList<AuthenticatorMethodType> MethodTypes { get; set; }
     }
 }

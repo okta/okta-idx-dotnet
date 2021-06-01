@@ -1,6 +1,9 @@
 ﻿namespace Okta.Idx.Sdk
 {
-    public class EnrollPhoneAuthenticatorOptions : EnrollAuthenticatorOptions
+    using System.Collections;
+    using System.Collections.Generic;
+
+    public class EnrollPhoneAuthenticatorOptions : SelectEnrollAuthenticatorOptions
     {
         /// <summary>
         /// Gets or sets the phone number
