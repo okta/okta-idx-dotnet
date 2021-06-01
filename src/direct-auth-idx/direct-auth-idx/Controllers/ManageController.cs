@@ -257,10 +257,6 @@
                         ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, skipSelectionResponse);
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         return RedirectToAction("Index", "Home");
-
-                    case AuthenticationStatus.Terminal:
-                        TempData["MessageToUser"] = skipSelectionResponse.MessageToUser;
-                        return RedirectToAction("Login", "Account");
                 }
                 return RedirectToAction("Index", "Home");
             }
