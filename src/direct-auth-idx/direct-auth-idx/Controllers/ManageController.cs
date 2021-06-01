@@ -51,24 +51,21 @@
             {
                 NewPassword = model.NewPassword,
             };
-
-            // WIP
-            var idxAuthClient = new IdxClient(null);
-
+            
             try
             {
-                var authnResponse = await idxAuthClient.ChangePasswordAsync(changePasswordOptions, (IIdxContext)Session["idxContext"]).ConfigureAwait(false);
+                var authnResponse = await _idxClient.ChangePasswordAsync(changePasswordOptions, (IIdxContext)Session["idxContext"]).ConfigureAwait(false);
                 Session["idxContext"] = authnResponse.IdxContext;
 
                 switch (authnResponse.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
-                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, authnResponse);
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         return RedirectToAction("Index", "Home");
 
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
-                        TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         TempData["canSkip"] = authnResponse.CanSkip;
                         return RedirectToAction("selectAuthenticator", "Manage");
                 }
@@ -87,7 +84,6 @@
             }
         }
 
-        // GET
         public ActionResult VerifyAuthenticator()
         {
             return View();
@@ -117,12 +113,13 @@
                         return RedirectToAction("ChangePassword", "Manage");
 
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
-                        TempData["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         TempData["canSkip"] = authnResponse.CanSkip;
+                        Session["isChallengeFlow"] = false;
                         return RedirectToAction("selectAuthenticator", "Manage");
 
                     case AuthenticationStatus.Success:
-                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, authnResponse);
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         return RedirectToAction("Index", "Home");
                 }
@@ -151,6 +148,7 @@
         {
             if (!ModelState.IsValid)
             {
+                model.MethodTypes = (List<AuthenticatorMethodType>)Session["methodTypes"];
                 return View("EnrollPhoneAuthenticator", model);
             }
 
@@ -161,7 +159,7 @@
                 {
                     AuthenticatorId = Session["phoneId"].ToString(),
                     PhoneNumber = model.PhoneNumber,
-                    MethodType = AuthenticatorMethodType.Sms,
+                    MethodType = model.MethodType,
                 };
 
                 var enrollResponse = await _idxClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
@@ -177,18 +175,27 @@
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
-                return RedirectToAction("EnrollPhoneAuthenticator", model);
+                model.MethodTypes = (List<AuthenticatorMethodType>)Session["methodTypes"];
+                return View("EnrollPhoneAuthenticator", model);
             }
         }
 
         public ActionResult EnrollPhoneAuthenticator()
         {
-            return View();
+            var methodTypes = (List<AuthenticatorMethodType>)Session["methodTypes"]
+                              ?? new List<AuthenticatorMethodType>();
+            var model = new EnrollPhoneViewModel
+                            {
+                                MethodTypes = methodTypes,
+                                MethodType = methodTypes.FirstOrDefault(),
+                            };
+
+            return View(model);
         }
 
-        public ActionResult SelectPhoneChallengeMethod()
+        public ActionResult SelectPhoneChallengeMethod(SelectAuthenticatorMethodViewModel model)
         {
-           return View((SelectAuthenticatorMethodViewModel)TempData["selectMethodModel"]);
+           return View(model);
         }
 
         [HttpPost]
@@ -207,7 +214,7 @@
                 {
                     AuthenticatorId = model.AuthenticatorId,
                     EnrollmentId = model.EnrollmentId,
-                    MethodType = AuthenticatorMethodType.Sms,
+                    MethodType = model.MethodType,
                 };
                 
                 var challengeResponse = await _idxClient.ChallengeAuthenticatorAsync(challengeOptions, (IIdxContext)Session["IdxContext"]);
@@ -223,22 +230,23 @@
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
-                return RedirectToAction("SelectPhoneChallengeMethod", model);
+                return View("SelectPhoneChallengeMethod", model);
             }
         }
-
+        
         public ActionResult SelectAuthenticator()
         {
-            var authenticators = (IList<AuthenticatorViewModel>)TempData["authenticators"];
+            var authenticators = (IList<AuthenticatorViewModel>)Session["authenticators"] ?? new List<AuthenticatorViewModel>();
+            
             var viewModel = new SelectAuthenticatorViewModel
-            {
-                Authenticators = authenticators,
-                PasswordId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId,
-                PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
-                CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
-            };
+                                {
+                                    Authenticators = authenticators,
+                                    AuthenticatorId = authenticators.FirstOrDefault()?.AuthenticatorId,
+                                    PasswordId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId,
+                                    PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
+                                    CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
+                                };
 
-            TempData["authenticators"] = viewModel.Authenticators;
             return View(viewModel);
         }
 
@@ -254,7 +262,7 @@
                 switch (skipSelectionResponse.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
-                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromAuthResponseAsync(_idxClient.Configuration, skipSelectionResponse);
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, skipSelectionResponse.TokenInfo);
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         return RedirectToAction("Index", "Home");
 
@@ -276,6 +284,8 @@
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> SelectAuthenticatorAsync(SelectAuthenticatorViewModel model)
         {
+            var authenticators = (IList<AuthenticatorViewModel>)Session["authenticators"];
+
             if (!ModelState.IsValid)
             {
                 return View("SelectAuthenticator", model);
@@ -286,7 +296,6 @@
                 var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;
                 Session["isPhoneSelected"] = model.IsPhoneSelected;
                 Session["phoneId"] = model.PhoneId;
-                var authenticators = (IList<AuthenticatorViewModel>)TempData["authenticators"];
 
                 if (isChallengeFlow)
                 {
@@ -318,24 +327,16 @@
 
                     switch (selectAuthenticatorResponse?.AuthenticationStatus)
                     {
-                        // TODO: Review
-                        //case AuthenticationStatus.AwaitingAuthenticatorEnrollmentData:
-                        //    return RedirectToAction("SelectPhoneChallengeMethod", 
-                        //        new SelectAuthenticatorMethodViewModel
-                        //        {
-                        //            Profile = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Profile,
-                        //            EnrollmentId = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Id,
-                        //            AuthenticatorId = model.AuthenticatorId,
-                        //        });
                         case AuthenticationStatus.AwaitingChallengeAuthenticatorData:
-                            TempData["selectMethodModel"] = new SelectAuthenticatorMethodViewModel
+                            var methodViewModel = new SelectAuthenticatorMethodViewModel
                             {
                                 Profile = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.Profile,
                                 EnrollmentId = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.EnrollmentId,
                                 AuthenticatorId = model.AuthenticatorId,
+                                MethodTypes = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.MethodTypes,
+                                MethodType = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.MethodTypes.FirstOrDefault(),
                             };
-
-                            return RedirectToAction("SelectPhoneChallengeMethod", "Manage");
+                            return View("SelectPhoneChallengeMethod", methodViewModel);
                         case AuthenticationStatus.AwaitingAuthenticatorVerification:
                             return RedirectToAction("VerifyAuthenticator", "Manage");
                         default:
@@ -344,12 +345,12 @@
                 }
                 else
                 {
-                    var enrollAuthenticatorOptions = new EnrollAuthenticatorOptions
+                    var enrollAuthenticatorOptions = new SelectEnrollAuthenticatorOptions
                     {
                         AuthenticatorId = model.AuthenticatorId,
                     };
 
-                    var enrollResponse = await _idxClient.EnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+                    var enrollResponse = await _idxClient.SelectEnrollAuthenticatorAsync(enrollAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
 
                     Session["IdxContext"] = enrollResponse.IdxContext;
                     Session["isPasswordSelected"] = model.IsPasswordSelected;
@@ -362,10 +363,12 @@
                                 return RedirectToAction("ChangePassword", "Manage");
                             }
 
-                            return RedirectToAction("VerifyAuthenticator", "Manage");
+                            return RedirectToAction("VerifyAuthenticator", "Manage"); 
 
                         case AuthenticationStatus.AwaitingAuthenticatorEnrollmentData:
+                            Session["methodTypes"] = enrollResponse.CurrentAuthenticator.MethodTypes;
                             return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
+                            
 
                         default:
                             return View("SelectAuthenticator", model);
@@ -375,7 +378,7 @@
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
-                return RedirectToAction("SelectAuthenticator", model);
+                return View("SelectAuthenticator", model);
             }
         }
 
@@ -383,7 +386,7 @@
         {
             var viewModel = new SelectRecoveryAuthenticatorViewModel
                                 {
-                                    Authenticators = (List<AuthenticatorViewModel>)TempData["authenticators"],
+                                    Authenticators = (List<AuthenticatorViewModel>)Session["authenticators"],
                                 };
             return View(viewModel);
         }

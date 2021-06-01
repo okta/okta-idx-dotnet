@@ -17,16 +17,6 @@ namespace direct_auth_idx
 
     public static class AuthenticationHelper
     {
-        public static async Task<ClaimsIdentity> GetIdentityFromAuthResponseAsync(IdxConfiguration configuration, AuthenticationResponse authnResponse)
-        {
-            var claims = await GetClaimsFromUserInfoAsync(configuration, authnResponse.TokenInfo.AccessToken);
-            claims = claims.Append(new Claim("access_token", authnResponse.TokenInfo.AccessToken));
-            claims = claims.Append(new Claim("id_token", authnResponse.TokenInfo.IdToken));
-            ClaimsIdentity identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
-
-            return identity;
-        }
-
         public static async Task<ClaimsIdentity> GetIdentityFromTokenResponseAsync(IdxConfiguration configuration, ITokenResponse tokenResponse)
         {
             var claims = await GetClaimsFromUserInfoAsync(configuration, tokenResponse.AccessToken);

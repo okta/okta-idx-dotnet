@@ -21,7 +21,7 @@
                             @Html.LabelFor(m => m.Code, new { @class = "control-label" })
                         </div>
                         <div class="row row-no-gutters">
-                            @Html.PasswordFor(m => m.Code, new { @class = "form-control" })
+                            @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
                             @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
                         </div>
                     </div>
