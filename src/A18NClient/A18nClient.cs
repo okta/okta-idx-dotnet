@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using A18NClient.Dto;
@@ -18,8 +19,7 @@ namespace A18NClient
         private string _createdProfileId;
         private bool _needDeleteProfile = false;
 
-        public string DefaultProfileId { get; set; }
-        public A18nClient(string apiKey, bool createNewDefaultProfile = false)
+        public A18nClient(string apiKey, bool createNewDefaultProfile = false, string newProfileTag = default)
         {
             _client = new HttpClient
             {
@@ -29,7 +29,7 @@ namespace A18NClient
 
             if (createNewDefaultProfile)
             {
-                var newProfile = CreateProfileAsync().Result;
+                var newProfile = CreateProfileAsync(newProfileTag).Result;
                 _createdProfileId = newProfile.ProfileId;
                 SetDefaultProfileId(newProfile.ProfileId);
                 _needDeleteProfile = true;
@@ -52,9 +52,19 @@ namespace A18NClient
         }
 
         // POST https://api.a18n.help/v1/profile
-        public async Task<A18nProfile> CreateProfileAsync(CancellationToken cancellationToken = default)
+        public async Task<A18nProfile> CreateProfileAsync(string profileTag = default, CancellationToken cancellationToken = default)
         {
-            return await PostAsync<A18nProfile>(default, null, cancellationToken);
+            StringContent content = null;
+
+            if (profileTag != default)
+            {
+                var requestBody = new
+                {
+                    displayName = profileTag
+                };
+                content = new StringContent(JsonHelper.Serialize(requestBody), Encoding.UTF8, "application/json");
+            }
+            return await PostAsync<A18nProfile>(default, content, cancellationToken);
         }
 
         // DELETE https://api.a18n.help/v1/profile/:profileId
@@ -62,7 +72,7 @@ namespace A18NClient
         {
             var effectiveProfileId = EffectiveProfileId(profileId);
             await DeleteAsync(effectiveProfileId, cancellationToken);
-            if (effectiveProfileId.Equals(_createdProfileId))
+            if (_needDeleteProfile && effectiveProfileId == _createdProfileId)
             {
                 _needDeleteProfile = false;
             }

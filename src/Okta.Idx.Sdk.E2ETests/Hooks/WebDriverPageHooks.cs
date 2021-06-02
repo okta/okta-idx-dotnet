@@ -52,7 +52,7 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
             _config = ConfigBuilder.Configuration;
             _config.SiteUrl = webServerDriver.SiteUrl;
 
-            _a18nClient = new A18nClient(_config.A18nApiKey, createNewDefaultProfile: true);
+            _a18nClient = new A18nClient(_config.A18nApiKey, createNewDefaultProfile: true, "okta-idx-dotnet");
         }
 
         [AfterTestRun]
