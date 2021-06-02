@@ -6,7 +6,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
 {
     public class ResetPasswordPage : BasePage
     {
-        public ResetPasswordPage(WebDriverDriver webDriverDriver, IWebServerDriver _webServerDriver) : base(webDriverDriver, _webServerDriver)
+        public ResetPasswordPage(WebDriverDriver webDriverDriver, ITestConfig testConfiguration) : base(webDriverDriver, testConfiguration)
         { }
         public override string RelativePageUri => "Account/ForgotPassword";
         public IWebElement UserNameInput => _webDriver.FindElement(By.Id("UserName"));

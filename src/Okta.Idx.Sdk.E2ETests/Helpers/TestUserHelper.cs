@@ -22,7 +22,6 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             _a18nClient = a18nClient;
             _configuration = configuration;
 
-            _a18nClient.SetDefaultProfileId(configuration.A18nProfileId);
             _a18nProfile = _a18nClient.GetProfileAsync().Result;
         }
 

@@ -15,8 +15,11 @@ namespace A18NClient
 
         private HttpClient _client;
         private string _defaultProfileId;
+        private string _createdProfileId;
+        private bool _needDeleteProfile = false;
 
-        public A18nClient(string apiKey)
+        public string DefaultProfileId { get; set; }
+        public A18nClient(string apiKey, bool createNewDefaultProfile = false)
         {
             _client = new HttpClient
             {
@@ -24,9 +27,16 @@ namespace A18NClient
             };
             _client.DefaultRequestHeaders.Add("x-api-key", apiKey);
 
+            if (createNewDefaultProfile)
+            {
+                var newProfile = CreateProfileAsync().Result;
+                _createdProfileId = newProfile.ProfileId;
+                SetDefaultProfileId(newProfile.ProfileId);
+                _needDeleteProfile = true;
+            }
         }
 
-        public A18nClient(string apiKey, string profileId) : this(apiKey)
+        public A18nClient(string apiKey, string profileId) : this(apiKey, false)
         {
             _defaultProfileId = profileId;
         }
@@ -41,10 +51,21 @@ namespace A18NClient
             Dispose(true);
         }
 
-        //  POST https://api.a18n.help/v1/profile
+        // POST https://api.a18n.help/v1/profile
         public async Task<A18nProfile> CreateProfileAsync(CancellationToken cancellationToken = default)
         {
             return await PostAsync<A18nProfile>(default, null, cancellationToken);
+        }
+
+        // DELETE https://api.a18n.help/v1/profile/:profileId
+        public async Task DeleteProfileAsync(string profileId = null, CancellationToken cancellationToken = default)
+        {
+            var effectiveProfileId = EffectiveProfileId(profileId);
+            await DeleteAsync(effectiveProfileId, cancellationToken);
+            if (effectiveProfileId.Equals(_createdProfileId))
+            {
+                _needDeleteProfile = false;
+            }
         }
 
         // GET https://api.a18n.help/v1/profile
@@ -198,6 +219,10 @@ namespace A18NClient
 
             if (disposing)
             {
+                if (_needDeleteProfile)
+                {
+                    DeleteProfileAsync(profileId: _createdProfileId).Wait();
+                }
                 if (_client != null)
                     _client.Dispose();
             }
