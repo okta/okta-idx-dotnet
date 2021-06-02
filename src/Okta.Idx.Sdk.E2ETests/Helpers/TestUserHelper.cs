@@ -39,16 +39,13 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             };
         }
 
-        public async Task<TestUserProperties> GetUnassignedUser()
+        public async Task<TestUserProperties> GetUnenrolledUser()
         {
-            await CleanUpAsync();
-
-            var oktaUser = await _oktaHelper.CreateUnassignedUserIdentifiedWithPasswordAsync(_a18nProfile.EmailAddress, _configuration.UserPassword);
-            
+            await CleanUpAsync();            
             return new TestUserProperties()
             {
-                Email = oktaUser.Profile.Email,
-                PhoneNumber = oktaUser.Profile.PrimaryPhone,
+                Email = _a18nProfile.EmailAddress,
+                PhoneNumber = _a18nProfile.PhoneNumber,
                 Password = _configuration.UserPassword,
             };
         }

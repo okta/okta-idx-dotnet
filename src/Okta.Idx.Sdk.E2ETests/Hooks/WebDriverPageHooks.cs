@@ -51,8 +51,14 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
             webServerDriver.StartWebServer();
             _config = ConfigBuilder.Configuration;
             _config.SiteUrl = webServerDriver.SiteUrl;
-
-            _a18nClient = new A18nClient(_config.A18nApiKey, createNewDefaultProfile: true, "okta-idx-dotnet");
+            if (string.IsNullOrWhiteSpace(_config.A18nProfileId))
+            {
+                _a18nClient = new A18nClient(_config.A18nApiKey, createNewDefaultProfile: true, "okta-idx-dotnet");
+            }
+            else
+            {
+                _a18nClient = new A18nClient(_config.A18nApiKey, _config.A18nProfileId);
+            }
         }
 
         [AfterTestRun]
