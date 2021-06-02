@@ -458,6 +458,8 @@ namespace Okta.Idx.Sdk
                                             .FirstOrDefault(x => x.Name == RemediationType.Identify)
                                             .ProceedAsync(identifyRequest, cancellationToken);
 
+            identifyResponse.AssertNotInTerminalState();
+
             if (isIdentifyInOneStep)
             {
                 // We expect success
@@ -733,14 +735,8 @@ namespace Okta.Idx.Sdk
             };
 
             var skipResponse = await skipOption.ProceedAsync(skipRequest, cancellationToken);
-            if (skipResponse.IdxMessages.Messages.Any())
-            {
-                return new AuthenticationResponse
-                {
-                    AuthenticationStatus = AuthenticationStatus.Terminal,
-                    MessageToUser = skipResponse.IdxMessages.Messages.First().Text,
-                };
-            }
+
+            skipResponse.AssertNotInTerminalState();
 
             if (skipResponse.IsLoginSuccess)
             {
@@ -1212,6 +1208,8 @@ namespace Okta.Idx.Sdk
 
             var identifyResponse = await recoveryResponse.ProceedWithRemediationOptionAsync(RemediationType.IdentifyRecovery, identifyRequest, cancellationToken);
 
+            identifyResponse.AssertNotInTerminalState();
+
             var recoveryAuthenticators = identifyResponse.Authenticators.Value;
 
             return IdxResponseHelper.ConvertToAuthenticators(recoveryAuthenticators);
@@ -1228,6 +1226,8 @@ namespace Okta.Idx.Sdk
 
             // Send username
             var identifyResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.Identify, identifyRequest, cancellationToken);
+
+            identifyResponse.AssertNotInTerminalState();
 
             // Get available authenticators
             var recoveryRequest = new IdxRequestPayload

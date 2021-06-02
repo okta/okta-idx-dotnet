@@ -36,5 +36,13 @@ namespace Okta.Idx.Sdk
 
             return option;
         }
+
+        internal static void AssertNotInTerminalState(this IIdxResponse response)
+        {
+            if (response.IdxMessages != null && response.IdxMessages.Messages.Any())
+            {
+                throw new TerminalStateException(response.IdxMessages);
+            }
+        }
     }
 }
