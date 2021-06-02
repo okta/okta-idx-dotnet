@@ -44,11 +44,11 @@ namespace Okta.Idx.Sdk.Helpers
         {
             if (authenticatorEnrollment.Key == AuthenticatorType.Phone.ToIdxKeyString())
             {
-                return authenticatorEnrollment.Profile.GetProperty<string>("phoneNumber");
+                return authenticatorEnrollment.Profile?.GetProperty<string>("phoneNumber");
             }
             else if (authenticatorEnrollment.Key == AuthenticatorType.Email.ToIdxKeyString())
             {
-                return authenticatorEnrollment.Profile.GetProperty<string>("email");
+                return authenticatorEnrollment.Profile?.GetProperty<string>("email");
             }
 
             return string.Empty;

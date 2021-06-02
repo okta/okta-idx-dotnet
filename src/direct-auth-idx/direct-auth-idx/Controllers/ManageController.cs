@@ -68,6 +68,10 @@
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         TempData["canSkip"] = authnResponse.CanSkip;
                         return RedirectToAction("selectAuthenticator", "Manage");
+                    case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        Session["isChallengeFlow"] = true;
+                        return RedirectToAction("selectAuthenticator", "Manage");
                 }
                 return View("ChangePassword", model);
             }
