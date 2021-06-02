@@ -169,10 +169,10 @@ namespace direct_auth_idx.Controllers
             try
             {
                 var authnResponse = await _idxClient.RecoverPasswordAsync(recoverPasswordOptions);
+                Session["idxContext"] = authnResponse.IdxContext;
 
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorSelection)
                 {
-                    Session["idxContext"] = authnResponse.IdxContext;
                     Session["authenticators"] =
                         ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                     return RedirectToAction("SelectRecoveryAuthenticator", "Manage");
@@ -180,7 +180,6 @@ namespace direct_auth_idx.Controllers
 
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
                 {
-                    Session["idxContext"] = authnResponse.IdxContext;
                     return RedirectToAction("VerifyAuthenticator", "Manage");
                 }
 
