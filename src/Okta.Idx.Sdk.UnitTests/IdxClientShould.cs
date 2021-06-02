@@ -4285,6 +4285,320 @@ namespace Okta.Idx.Sdk.UnitTests
             Assert.Equal("test id token", authnResponse.TokenInfo.IdToken);
         }
 
+        [Fact]
+        public async Task ThrowWhenRecoverPasswordWithBadEmail()
+        {
+            string interactResponse = @"{
+    ""interaction_handle"": ""ACv86bsQprBjf4pitCJTMlMbSGVHTwLijEtfIRMvJ6g""
+}";
+            string introspectResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+    ""expiresAt"": ""2021-06-02T14:30:16.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""identify"",
+                ""href"": ""https://fake.example.com/idp/idx/identify"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""identifier"",
+                        ""label"": ""Username""
+                    },
+                    {
+                        ""name"": ""credentials"",
+                        ""type"": ""object"",
+                        ""form"": {
+                            ""value"": [
+                                {
+                                    ""name"": ""passcode"",
+                                    ""label"": ""Password"",
+                                    ""secret"": true
+                                }
+                            ]
+                        },
+                        ""required"": true
+                    },
+                    {
+                        ""name"": ""rememberMe"",
+                        ""type"": ""boolean"",
+                        ""label"": ""Remember this device""
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-enroll-profile"",
+                ""href"": ""https://fake.example.com/idp/idx/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""unlock-account"",
+                ""href"": ""https://fake.example.com/idp/idx/unlock-account"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""name"": ""redirect-idp"",
+                ""type"": ""FACEBOOK"",
+                ""idp"": {
+                    ""id"": ""0oau09xo6XAbbPQSN5d6"",
+                    ""name"": ""Facebook IdP""
+                },
+                ""href"": ""https://fake.example.com/oauth2/austyqkbjaFoOxkl45d6/v1/authorize?client_id=0oatzfskmLm4faAaQ5d6&request_uri=urn:okta:b0NXT3VtWUpBNmFiUTlGdWlFVlF2UTMtWDhZRllGYTl0UWZYVXJaRFZYczowb2F1MDl4bzZYQWJiUFFTTjVkNg"",
+                ""method"": ""GET""
+            }
+        ]
+    },
+    ""currentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""recover"": {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""recover"",
+                ""href"": ""https://fake.example.com/idp/idx/recover"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            ""type"": ""password"",
+            ""key"": ""okta_password"",
+            ""id"": ""auttzfsi2fKQlZVl15d6"",
+            ""displayName"": ""Password"",
+            ""methods"": [
+                {
+                    ""type"": ""password""
+                }
+            ]
+        }
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://fake.example.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Dotnet IDX Web App"",
+            ""id"": ""0oatzfskmLm4faAaQ5d6""
+        }
+    }
+}";
+            string recoverResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+    ""expiresAt"": ""2021-06-02T14:30:26.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""identify-recovery"",
+                ""href"": ""https://fake.example.com/idp/idx/identify"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""identifier"",
+                        ""label"": ""Username""
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://fake.example.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Dotnet IDX Web App"",
+            ""id"": ""0oatzfskmLm4faAaQ5d6""
+        }
+    }
+}";
+            string identifyResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+    ""expiresAt"": ""2021-06-02T14:30:38.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""identify-recovery"",
+                ""href"": ""https://fake.example.com/idp/idx/identify"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""identifier"",
+                        ""label"": ""Username""
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""messages"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""message"": ""There is no account with the Username non-existentuser@threeheadz.com."",
+                ""i18n"": {
+                    ""key"": ""idx.unknown.user"",
+                    ""params"": []
+                },
+                ""class"": ""INFO""
+            }
+        ]
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://fake.example.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02_fiCBXrxDU-lpkYgZD_cZ4taUvBeJiibQo0KDM2O"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Dotnet IDX Web App"",
+            ""id"": ""0oatzfskmLm4faAaQ5d6""
+        }
+    }
+}";
+
+            MockHttpMessageHandler mockHttpMessageHandler = new MockHttpMessageHandler();
+            mockHttpMessageHandler.AddTestResponse("/oauth2/v1/interact", interactResponse);
+            mockHttpMessageHandler.AddTestResponse("/idp/idx/introspect", introspectResponse);
+            mockHttpMessageHandler.AddTestResponse("/idp/idx/recover", recoverResponse);
+            mockHttpMessageHandler.AddTestResponse("/idp/idx/identify", identifyResponse);            
+
+            HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
+            IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, NullLogger.Instance);
+            RecoverPasswordOptions recoverPasswordOptions = new RecoverPasswordOptions { Username = "non-existent-user@email.bad", };
+            await Assert.ThrowsAsync<TerminalStateException>(() => idxClient.RecoverPasswordAsync(recoverPasswordOptions));
+        }
         #endregion
 
         #region 2FA Tests
