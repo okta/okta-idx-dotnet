@@ -695,7 +695,13 @@ namespace Okta.Idx.Sdk
                 };
             }
 
-            throw new UnexpectedRemediationException(RemediationType.SuccessWithInteractionCode, resetPasswordResponse);
+            throw new UnexpectedRemediationException(
+                new List<string>
+                    {
+                        RemediationType.SuccessWithInteractionCode,
+                        RemediationType.SelectAuthenticatorAuthenticate,
+                    },
+                resetPasswordResponse);
         }
 
         /// <inheritdoc/>
