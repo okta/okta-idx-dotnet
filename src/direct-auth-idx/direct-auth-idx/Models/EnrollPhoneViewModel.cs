@@ -12,7 +12,6 @@ namespace direct_auth_idx.Models
         [Required]
         [Display(Name = "Phone number")]
         [DataType(DataType.PhoneNumber)]
-        [RegularExpression(@"^\+\d*$", ErrorMessage = "Not a valid phone number")]
         public string PhoneNumber { get; set; }
 
         [Required]
