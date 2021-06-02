@@ -3783,7 +3783,7 @@ namespace Okta.Idx.Sdk.UnitTests
         ""type"": ""object"",
         ""value"": {
             ""name"": ""oidc_client"",
-            ""label"": ""Bryan Apellanes Unit Test Web App"",
+            ""label"": ""- Unit Test Web App"",
             ""id"": ""0oatiq0j3Mw5an9Br5d6""
         }
     }
@@ -3975,7 +3975,7 @@ namespace Okta.Idx.Sdk.UnitTests
         ""type"": ""object"",
         ""value"": {
             ""name"": ""oidc_client"",
-            ""label"": ""Bryan Apellanes Unit Test Web App"",
+            ""label"": ""- Unit Test Web App"",
             ""id"": ""0oatiq0j3Mw5an9Br5d6""
         }
     }
