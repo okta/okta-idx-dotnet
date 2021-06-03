@@ -11739,7 +11739,6 @@ namespace Okta.Idx.Sdk.UnitTests
             HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
 
             IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, NullLogger.Instance);
-            //auttzfsi4eiZIdLK85d6
 
             SelectEnrollAuthenticatorOptions enrollAuthenticatorOptions = new SelectEnrollAuthenticatorOptions
             {
