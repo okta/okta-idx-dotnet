@@ -1,0 +1,102 @@
+{
+    "version": "1.0.0",
+    "stateHandle": "02To44MY4BUY8oq7zYVpOnsJfQ42bxS0b6wn488n5W",
+    "expiresAt": "2021-06-02T16:32:21.000Z",
+    "intent": "LOGIN",
+    "remediation": {
+        "type": "array",
+        "value": [
+            {
+                "rel": [
+                    "create-form"
+                ],
+                "name": "enroll-profile",
+                "href": "https://fake.example.com/idp/idx/enroll/new",
+                "method": "POST",
+                "produces": "application/ion+json; okta-version=1.0.0",
+                "value": [
+                    {
+                        "name": "userProfile",
+                        "form": {
+                            "value": [
+                                {
+                                    "name": "firstName",
+                                    "label": "First name",
+                                    "required": true,
+                                    "minLength": 1,
+                                    "maxLength": 50
+                                },
+                                {
+                                    "name": "lastName",
+                                    "label": "Last name",
+                                    "required": true,
+                                    "minLength": 1,
+                                    "maxLength": 50
+                                },
+                                {
+                                    "name": "email",
+                                    "label": "Email",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "stateHandle",
+                        "required": true,
+                        "value": "02To44MY4BUY8oq7zYVpOnsJfQ42bxS0b6wn488n5W",
+                        "visible": false,
+                        "mutable": false
+                    }
+                ],
+                "accepts": "application/json; okta-version=1.0.0"
+            },
+            {
+                "rel": [
+                    "create-form"
+                ],
+                "name": "select-identify",
+                "href": "https://fake.example.com/idp/idx/identify/select",
+                "method": "POST",
+                "produces": "application/ion+json; okta-version=1.0.0",
+                "value": [
+                    {
+                        "name": "stateHandle",
+                        "required": true,
+                        "value": "02To44MY4BUY8oq7zYVpOnsJfQ42bxS0b6wn488n5W",
+                        "visible": false,
+                        "mutable": false
+                    }
+                ],
+                "accepts": "application/json; okta-version=1.0.0"
+            }
+        ]
+    },
+    "cancel": {
+        "rel": [
+            "create-form"
+        ],
+        "name": "cancel",
+        "href": "https://fake.example.com/idp/idx/cancel",
+        "method": "POST",
+        "produces": "application/ion+json; okta-version=1.0.0",
+        "value": [
+            {
+                "name": "stateHandle",
+                "required": true,
+                "value": "02To44MY4BUY8oq7zYVpOnsJfQ42bxS0b6wn488n5W",
+                "visible": false,
+                "mutable": false
+            }
+        ],
+        "accepts": "application/json; okta-version=1.0.0"
+    },
+    "app": {
+        "type": "object",
+        "value": {
+            "name": "oidc_client",
+            "label": "Dotnet IDX Web App",
+            "id": "xxxxxxxx"
+        }
+    }
+}
