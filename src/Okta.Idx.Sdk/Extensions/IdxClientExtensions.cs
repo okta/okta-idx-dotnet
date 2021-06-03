@@ -20,13 +20,13 @@ namespace Okta.Idx.Sdk
         }
 
         internal static bool ContainsRemediationOption(this IIdxResponse response, string remediationType) =>
-                    response.Remediation.RemediationOptions.Any(x => x.Name == remediationType);
+                    response.Remediation?.RemediationOptions?.Any(x => x.Name == remediationType) ?? false;
 
         internal static IRemediationOption FindRemediationOption(this IIdxResponse response, string remediationType, bool throwIfNotFound = false)
         {
             var option = response
-                .Remediation
-                .RemediationOptions
+                .Remediation?
+                .RemediationOptions?
                 .FirstOrDefault(x => x.Name == remediationType);
 
             if (option == null && throwIfNotFound)

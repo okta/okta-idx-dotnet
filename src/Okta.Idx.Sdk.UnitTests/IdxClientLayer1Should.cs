@@ -379,7 +379,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var emptyData = new DefaultSerializer().Deserialize("{}");
             var responseWithNoMessages = resourceFactory.CreateNew<IdxResponse>(emptyData);
 
-            responseWithNoMessages.IdxMessages.Messages.Should().BeEmpty();
+            responseWithNoMessages.IdxMessages.Should().BeNull();
         }
 
         [Fact]
