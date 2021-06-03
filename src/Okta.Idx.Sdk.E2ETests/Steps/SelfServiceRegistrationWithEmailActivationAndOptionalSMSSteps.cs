@@ -65,7 +65,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [When(@"she fills out her First Name")]
         public void WhenSheFillsOutHerFirstName()
         {
-            _registerPage.FirstNameInput.SendKeys("User");
+            _registerPage.FirstNameInput.SendKeys("Mary");
         }
 
         [When(@"she fills out her Last Name")]
@@ -199,19 +199,19 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [When(@"she fills out her Email with an invalid email format")]
         public void WhenSheFillsOutHerEmailWithAnInvalidEmailFormat()
         {
-            ScenarioContext.Current.Pending();
+            _registerPage.EmailInput.SendKeys("invalid email format");
         }
         
         [When(@"she inputs an invalid phone number")]
         public void WhenSheInputsAnInvalidPhoneNumber()
         {
-            ScenarioContext.Current.Pending();
+            _enrollPhoneAuthenticatorPage.PhoneNumberInput.SendKeys("+1");
         }
         
         [When(@"submits the enrollment form")]
         public void WhenSubmitsTheEnrollmentForm()
         {
-            ScenarioContext.Current.Pending();
+            _enrollPhoneAuthenticatorPage.SubmitButton.Click();
         }
         
         [Then(@"an application session is created")]
@@ -223,15 +223,11 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         }
         
         [Then(@"she sees an error message ""(.*)""")]
-        public void ThenSheSeesAnErrorMessage(string p0)
+        [Then(@"she should see an error message ""(.*)""")]
+        public void ThenSheSeesAnErrorMessage(string errorMessage)
         {
-            ScenarioContext.Current.Pending();
+            _registerPage.ValidationErrors.Text.Contains(errorMessage);
         }
         
-        [Then(@"she should see an error message ""(.*)""")]
-        public void ThenSheShouldSeeAnErrorMessage(string p0)
-        {
-            ScenarioContext.Current.Pending();
-        }
     }
 }

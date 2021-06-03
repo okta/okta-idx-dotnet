@@ -12,25 +12,16 @@
 	When she fills out her First Name
 	And she fills out her Last Name
 	And she fills out her Email
-
-# next 3 lines were added
 	And she submits the registration form
 	Then she sees the Select Authenticator page with password as an only opton
 	When she choses password factor option
-
-# next line was "she submits the enroll password form"
 	And she submits the select authenticator form
 	Then she sees the set new password form
-
-# next line was "Then ..."
 	When she fills out her Password
-#
 	And she confirms her Password
 	And she submits the change password form
-
 	Then she sees a list of required factors to setup
 	When she selects Email
-
 	Then she sees a page to input a code
 	When she inputs the correct code from her email
 	Then she sees the list of optional factors (SMS)
@@ -38,25 +29,19 @@
 	Then she is redirected to the Root View
     And an application session is created
 
-###################################### 4.1.2 starts here	
   Scenario: 4.1.2: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
 	Given Mary navigates to the Self Service Registration View
 	When she fills out her First Name
 	And she fills out her Last Name
 	And she fills out her Email
-
-# next lines were added
 	And she submits the registration form
 	Then she sees the Select Authenticator page with password as an only opton
 	When she choses password factor option
 	And she submits the select authenticator form
 	Then she sees the set new password form
-#
 	When she fills out her Password
 	And she confirms her Password
 	And she submits the registration form
-
-# next line was changed to be consistent with 4.1.1 scenario	
 	Then she sees a list of required factors to setup
 	When she selects Email
 	Then she sees a page to input a code
@@ -65,11 +50,8 @@
 	When she selects Phone from the list
 
 	And She inputs a valid phone number
-# the step below doesn't exist - left the handler empty
 	And She selects "Receive a Code"
-# the step below is the same as "she sees a page to input a code" above
 	Then the screen changes to receive an input for a code
-
 	When She inputs the correct code from her SMS
 	And She selects "Verify"
 	Then she is redirected to the Root View
@@ -81,17 +63,22 @@
 	And she fills out her Last Name
 	And she fills out her Email with an invalid email format
 	And she submits the registration form
-	Then she sees an error message "'Email' must be in the form of an email address,Provided value for property 'Email' does not match required pattern"
-	
+	Then she sees an error message "'Email' must be in the form of an email address"
+	And she sees an error message "Provided value for property 'Email' does not match required pattern"
+
   Scenario: 4.1.4: Mary signs up for an account with Password, sets up required Email factor, And sets up optional SMS with an invalid phone number
 	Given Mary navigates to the Self Service Registration View
 	When she fills out her First Name
 	And she fills out her Last Name
 	And she fills out her Email
-	And she fills out her Password
+	And she submits the registration form
+	Then she sees the Select Authenticator page with password as an only opton
+	When she choses password factor option
+	And she submits the select authenticator form
+	Then she sees the set new password form
+	When she fills out her Password
 	And she confirms her Password
 	And she submits the registration form
-# next line was changed to be consistent with 4.1.1 scenario	
 	Then she sees a list of required factors to setup
 	When she selects Email
 	Then she sees a page to input a code

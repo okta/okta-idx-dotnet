@@ -57,7 +57,8 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 
         public async Task<string> GetRecoveryCodeFromEmail()
         {
-            for (int tries = 0; tries < 30; tries++) {
+            for (int tries = 0; tries < 30; tries++) 
+            {
                 try
                 {
                     var mail = await _a18nClient.GetLatestEmailMessageAsync();
@@ -79,15 +80,21 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
         {
             for (int tries = 0; tries < 30; tries++)
             {
-                var smsContent = await _a18nClient.GetLastSmsPlainContentAsync();
-
-                if (!string.IsNullOrEmpty(smsContent))
+                try
                 {
-                    return ExtractRecoveryCodeFromMessage(smsContent);
-                }
+                    var smsContent = await _a18nClient.GetLastSmsPlainContentAsync();
 
+                    if (!string.IsNullOrEmpty(smsContent))
+                    {
+                        return ExtractRecoveryCodeFromMessage(smsContent);
+                    }
+                }
+                catch (NotFoundException)
+                {
+                    // expected exception when a mail box is empty
+                }
             }
-                await Task.Delay(1000);
+            await Task.Delay(1000);
 
             return string.Empty;
         }
