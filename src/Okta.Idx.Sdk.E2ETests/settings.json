@@ -1,6 +1,7 @@
 ﻿{
   "okta": {
     "testing": {
+      "A18nProfileTag": "okta-idx-dotnet",
       "IISPort": 8080
     }
   }

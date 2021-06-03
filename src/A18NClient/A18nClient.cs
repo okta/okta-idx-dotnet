@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -19,7 +20,7 @@ namespace A18NClient
         private string _createdProfileId;
         private bool _needDeleteProfile = false;
 
-        public A18nClient(string apiKey, bool createNewDefaultProfile = false, string newProfileTag = default)
+        public A18nClient(string apiKey, bool createNewDefaultProfile = false, string newProfileUniqueTag = default)
         {
             _client = new HttpClient
             {
@@ -29,7 +30,12 @@ namespace A18NClient
 
             if (createNewDefaultProfile)
             {
-                var newProfile = CreateProfileAsync(newProfileTag).Result;
+                if (!string.IsNullOrEmpty(newProfileUniqueTag))
+                {
+                    CleanUpOldUsedProfiles(newProfileUniqueTag);
+                }
+
+                var newProfile = CreateProfileAsync(newProfileUniqueTag).Result;
                 _createdProfileId = newProfile.ProfileId;
                 SetDefaultProfileId(newProfile.ProfileId);
                 _needDeleteProfile = true;
@@ -298,6 +304,16 @@ namespace A18NClient
             else
             {
                 return $"{RelativePart}/{resource}";
+            }
+        }
+
+        private void CleanUpOldUsedProfiles(string newProfileUniqueTag)
+        {
+            var activeProfiles = GetActiveProfilesAsync().Result;
+
+            foreach (var profile in activeProfiles.Profiles.Where(p => p.DisplayName == newProfileUniqueTag))
+            {
+                DeleteProfileAsync(profile.ProfileId).Wait();
             }
         }
 

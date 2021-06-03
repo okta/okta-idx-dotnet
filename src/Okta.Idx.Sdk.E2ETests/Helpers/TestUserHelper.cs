@@ -7,13 +7,18 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 {
     public class TestUserHelper : ITestUserHelper, IDisposable
     {
-        private const string mailCodeMarker = "Can't use the link? Enter a code instead: <b>";
-
-        private IA18nClient _a18nClient;
-        private ITestConfig _configuration;
-        private A18nProfile _a18nProfile;
-        private IOktaSdkHelper _oktaHelper;
+        private readonly IA18nClient _a18nClient;
+        private readonly ITestConfig _configuration;
+        private readonly A18nProfile _a18nProfile;
+        private readonly IOktaSdkHelper _oktaHelper;
         private bool _disposed = false;
+
+        private readonly string[] messageCodeMarkers = new[]
+        {
+            "Can't use the link? Enter a code instead: <b>",
+            "To verify manually, enter this code: <b>",
+            "Your verification code is "
+        };
 
 
         public TestUserHelper(ITestConfig configuration, IA18nClient a18nClient, IOktaSdkHelper oktaHelper)
@@ -57,7 +62,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
                 {
                     var mail = await _a18nClient.GetLatestEmailMessageAsync();
 
-                    return ExtractRecoveryCodeFromEmail(mail.Content);
+                    return ExtractRecoveryCodeFromMessage(mail.Content);
 
                 }
                 catch (NotFoundException)
@@ -70,20 +75,41 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             return string.Empty;
         }
 
+        public async Task<string> GetRecoveryCodeFromSms()
+        {
+            for (int tries = 0; tries < 30; tries++)
+            {
+                var smsContent = await _a18nClient.GetLastSmsPlainContentAsync();
+
+                if (!string.IsNullOrEmpty(smsContent))
+                {
+                    return ExtractRecoveryCodeFromMessage(smsContent);
+                }
+
+            }
+                await Task.Delay(1000);
+
+            return string.Empty;
+        }
+
+
         public void Dispose()
         {
             Dispose(true);
         }
 
-        private static string ExtractRecoveryCodeFromEmail(string mailContent)
+        private string ExtractRecoveryCodeFromMessage(string text)
         {
             var recoveryCode = string.Empty;
-            if (!string.IsNullOrEmpty(mailContent))
+            if (!string.IsNullOrEmpty(text))
             {
-                var pos = mailContent.IndexOf(mailCodeMarker);
-                if (pos > 0)
+                foreach (var marker in messageCodeMarkers)
                 {
-                    recoveryCode = mailContent.Substring(pos + mailCodeMarker.Length, 6);
+                    var pos = text.IndexOf(marker);
+                    if (pos >= 0)
+                    {
+                        recoveryCode = text.Substring(pos + marker.Length, 6);
+                    }
                 }
             }
             return recoveryCode;

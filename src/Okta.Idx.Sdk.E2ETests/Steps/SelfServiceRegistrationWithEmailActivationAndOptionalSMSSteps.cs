@@ -14,16 +14,25 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         private HomePage _homePage;
         private RegisterPage _registerPage;
         private SelectAuthenticatorPage _selectAuthenticatorPage;
+        private ChangePasswordPage _changePasswordPage;
+        private VerifyAuthenticatorPage _verifyAuthenticatorPage;
+        private EnrollPhoneAuthenticatorPage _enrollPhoneAuthenticatorPage;
 
         public SelfServiceRegistrationWithEmailActivationAndOptionalSMSSteps(ITestUserHelper userHelper, 
             HomePage homePage, 
             RegisterPage registerPage,
-            SelectAuthenticatorPage selectAuthenticatorPage) 
+            SelectAuthenticatorPage selectAuthenticatorPage,
+            ChangePasswordPage changePasswordPage,
+            VerifyAuthenticatorPage verifyAuthenticatorPage,
+            EnrollPhoneAuthenticatorPage enrollPhoneAuthenticatorPage)
             : base(userHelper)
         {
             _homePage = homePage;
             _registerPage = registerPage;
             _selectAuthenticatorPage = selectAuthenticatorPage;
+            _changePasswordPage = changePasswordPage;
+            _verifyAuthenticatorPage = verifyAuthenticatorPage;
+            _enrollPhoneAuthenticatorPage = enrollPhoneAuthenticatorPage;
         }
 
         [Given(@"a Profile Enrollment policy defined assigning new users to the Everyone Group and by collecting ""(.*)"", ""(.*)"", and ""(.*)"", is allowed and assigned to a SPA, WEB APP or MOBILE application")]
@@ -47,6 +56,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [Given(@"Mary navigates to the Self Service Registration View")]
         public void GivenMaryNavigatesToTheSelfServiceRegistrationView()
         {
+            _homePage.GoToPage();
             _homePage.AssertPageOpenedAndValid();
             _homePage.RegisterButton.Click();
             _registerPage.AssertPageOpenedAndValid();
@@ -57,7 +67,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         {
             _registerPage.FirstNameInput.SendKeys("User");
         }
-        
+
         [When(@"she fills out her Last Name")]
         public void WhenSheFillsOutHerLastName()
         {
@@ -90,8 +100,8 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             _selectAuthenticatorPage.PasswordAuthenticator.Click();
         }
 
-        [When(@"she submits the enroll password form")]
-        public void WhenSheSubmitsTheEnrollPasswordForm()
+        [When(@"she submits the select authenticator form")]
+        public void WhenSheSubmitsTheSelectAuthenticatorForm()
         {
             _selectAuthenticatorPage.SubmitButton.Click();
         }
@@ -99,82 +109,93 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [Then(@"she sees the set new password form")]
         public void ThenSheSeesTheSetNewPasswordForm()
         {
-            ScenarioContext.Current.Pending();
+            _changePasswordPage.AssertPageOpenedAndValid();
         }
-
-        [Then(@"she fills out her Password")]
-        public void ThenSheFillsOutHerPassword()
-        {
-            ScenarioContext.Current.Pending();
-        }
-
-        [Then(@"she confirms her Password")]
-        public void ThenSheConfirmsHerPassword()
-        {
-            ScenarioContext.Current.Pending();
-        }
-
-        [Then(@"she submits the change password form")]
-        public void ThenSheSubmitsTheChangePasswordForm()
-        {
-            ScenarioContext.Current.Pending();
-        }
-
 
         [When(@"she fills out her Password")]
         public void WhenSheFillsOutHerPassword()
         {
-            ScenarioContext.Current.Pending();
+            _changePasswordPage.NewPasswordInput.SendKeys(_testUser.Password);
         }
-        
+
         [When(@"she confirms her Password")]
         public void WhenSheConfirmsHerPassword()
         {
-            ScenarioContext.Current.Pending();
+            _changePasswordPage.ConfirmPasswordInput.SendKeys(_testUser.Password);
+        }
+
+        [Then(@"she sees a list of factors to register")]
+        [Then(@"she sees a list of required factors to setup")]
+        public void ThenSheSeesAListOfRequiredFactorsToSetup()
+        {
+            _selectAuthenticatorPage.AssertPageOpenedAndValid();
         }
 
         [When(@"she selects Email")]
         public void WhenSheSelectsEmail()
         {
-            ScenarioContext.Current.Pending();
+            _selectAuthenticatorPage.EmailAuthenticator.Click();
+            _selectAuthenticatorPage.SubmitButton.Click();
         }
-        
-        [When(@"she inputs the correct code from her email")]
-        public void WhenSheInputsTheCorrectCodeFromHerEmail()
+
+        [Then(@"she sees a page to input a code")]
+        [Then(@"the screen changes to receive an input for a code")]
+        public void ThenSheSeesAPageToInputACode()
         {
-            ScenarioContext.Current.Pending();
+            _verifyAuthenticatorPage.AssertPageOpenedAndValid();
         }
-        
+
+        [When(@"she inputs the correct code from her email")]
+        public async Task WhenSheInputsTheCorrectCodeFromHerEmail()
+        {
+            var theCode = await _userHelper.GetRecoveryCodeFromEmail();
+            _verifyAuthenticatorPage.PasscodeInput.SendKeys(theCode);
+            _verifyAuthenticatorPage.SubmitButton.Click();
+        }
+
+        [Then(@"she sees the list of optional factors \(SMS\)")]
+        public void ThenSheSeesTheListOfOptionalFactorsSMS()
+        {
+            _selectAuthenticatorPage.AssertPageOpenedAndValid();
+            Func<IWebElement> getSmsFactor = () => _selectAuthenticatorPage.PhoneAuthenticator;
+            getSmsFactor.Should().NotThrow<NoSuchElementException>();
+            _selectAuthenticatorPage.PhoneAuthenticator.Displayed.Should().BeTrue();
+        }
+
         [When(@"she selects ""(.*)"" on SMS")]
         public void WhenSheSelectsOnSMS(string p0)
         {
-            ScenarioContext.Current.Pending();
+            _selectAuthenticatorPage.SkipThisStepButton.Click();
         }
         
         [When(@"she selects Phone from the list")]
         public void WhenSheSelectsPhoneFromTheList()
         {
-            ScenarioContext.Current.Pending();
+            _selectAuthenticatorPage.PhoneAuthenticator.Click();
+            _selectAuthenticatorPage.SubmitButton.Click();
         }
-        
+
         [When(@"She inputs a valid phone number")]
         public void WhenSheInputsAValidPhoneNumber()
         {
-            ScenarioContext.Current.Pending();
+            _enrollPhoneAuthenticatorPage.PhoneNumberInput.SendKeys(_testUser.PhoneNumber);
+            _enrollPhoneAuthenticatorPage.SubmitButton.Click();
         }
         
         [When(@"She selects ""(.*)""")]
         public void WhenSheSelects(string p0)
         {
-            ScenarioContext.Current.Pending();
+            //ScenarioContext.Current.Pending();
         }
         
         [When(@"She inputs the correct code from her SMS")]
-        public void WhenSheInputsTheCorrectCodeFromHerSMS()
+        public async Task WhenSheInputsTheCorrectCodeFromHerSMS()
         {
-            ScenarioContext.Current.Pending();
+            var theCode = await _userHelper.GetRecoveryCodeFromSms();
+            _verifyAuthenticatorPage.PasscodeInput.SendKeys(theCode);
+            _verifyAuthenticatorPage.SubmitButton.Click();
         }
-        
+
         [When(@"she fills out her Email with an invalid email format")]
         public void WhenSheFillsOutHerEmailWithAnInvalidEmailFormat()
         {
@@ -193,46 +214,12 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             ScenarioContext.Current.Pending();
         }
         
-        [Then(@"she sees a list of required factors to setup")]
-        public void ThenSheSeesAListOfRequiredFactorsToSetup()
-        {
-            ScenarioContext.Current.Pending();
-        }
-        
-        [Then(@"she sees a page to input a code")]
-        public void ThenSheSeesAPageToInputACode()
-        {
-            ScenarioContext.Current.Pending();
-        }
-        
-        [Then(@"she sees the list of optional factors \(SMS\)")]
-        public void ThenSheSeesTheListOfOptionalFactorsSMS()
-        {
-            ScenarioContext.Current.Pending();
-        }
-        
         [Then(@"an application session is created")]
         public void ThenAnApplicationSessionIsCreated()
         {
-            ScenarioContext.Current.Pending();
-        }
-        
-        [Then(@"she sees a list of available factors to setup")]
-        public void ThenSheSeesAListOfAvailableFactorsToSetup()
-        {
-            ScenarioContext.Current.Pending();
-        }
-        
-        [Then(@"she sees a list of factors to register")]
-        public void ThenSheSeesAListOfFactorsToRegister()
-        {
-            ScenarioContext.Current.Pending();
-        }
-        
-        [Then(@"the screen changes to receive an input for a code")]
-        public void ThenTheScreenChangesToReceiveAnInputForACode()
-        {
-            ScenarioContext.Current.Pending();
+            _homePage.ClaimAccessTokenLabel.Text.Should().NotBeEmpty();
+            _homePage.ClaimIdTokenLabel.Text.Should().NotBeEmpty();
+            _homePage.ClaimUserNameLabel.Text.Should().Be(_testUser.Email);
         }
         
         [Then(@"she sees an error message ""(.*)""")]

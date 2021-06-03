@@ -19,6 +19,7 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
         private static IWebServerDriver _webServerDriver;
         private static TestConfig _config;
         private static A18nClient _a18nClient;
+        private const string DefaultProfileTag= "okta-idx-dotnet";
 
         public WebDriverPageHooks(IObjectContainer container)
         {
@@ -51,9 +52,13 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
             webServerDriver.StartWebServer();
             _config = ConfigBuilder.Configuration;
             _config.SiteUrl = webServerDriver.SiteUrl;
+            if (string.IsNullOrEmpty(_config.A18nProfileTag))
+            {
+                _config.A18nProfileTag = DefaultProfileTag;
+            }
             if (string.IsNullOrWhiteSpace(_config.A18nProfileId))
             {
-                _a18nClient = new A18nClient(_config.A18nApiKey, createNewDefaultProfile: true, "okta-idx-dotnet");
+                _a18nClient = new A18nClient(_config.A18nApiKey, createNewDefaultProfile: true, _config.A18nProfileTag);
             }
             else
             {

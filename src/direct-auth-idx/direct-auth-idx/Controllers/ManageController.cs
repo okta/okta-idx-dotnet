@@ -67,7 +67,7 @@
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         TempData["canSkip"] = authnResponse.CanSkip;
-                        return RedirectToAction("selectAuthenticator", "Manage");
+                        return RedirectToAction("SelectAuthenticator", "Manage");
                 }
                 return View("ChangePassword", model);
             }
@@ -116,7 +116,7 @@
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         TempData["canSkip"] = authnResponse.CanSkip;
                         Session["isChallengeFlow"] = false;
-                        return RedirectToAction("selectAuthenticator", "Manage");
+                        return RedirectToAction("SelectAuthenticator", "Manage");
 
                     case AuthenticationStatus.Success:
                         ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
