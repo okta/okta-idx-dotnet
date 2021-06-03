@@ -36,7 +36,7 @@
 	And she fills out her Email
 	And she submits the registration form
 	Then she sees the Select Authenticator page with password as the only option
-	When she choses password factor option
+	When she chooses password factor option
 	And she submits the select authenticator form
 	Then she sees the set new password form
 	When she fills out her Password

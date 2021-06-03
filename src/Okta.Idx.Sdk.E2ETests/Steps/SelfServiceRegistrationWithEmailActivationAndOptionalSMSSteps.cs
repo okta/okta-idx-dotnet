@@ -94,8 +94,8 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             getPasswordFunc.Should().NotThrow<NoSuchElementException>();
         }
 
-        [When(@"she choses password factor option")]
-        public void WhenSheChosesPasswordFactorOption()
+        [When(@"she chooses password factor option")]
+        public void WhenSheChoosesPasswordFactorOption()
         {
             _selectAuthenticatorPage.PasswordAuthenticator.Click();
         }
