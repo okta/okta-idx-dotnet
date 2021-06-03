@@ -9576,7 +9576,7 @@ namespace Okta.Idx.Sdk.UnitTests
     ""value"": {
       ""name"": ""oidc_client"",
       ""label"": "".NET Unit Test"",
-      ""id"": ""0oal2s4yhspmifyt65d6""
+      ""id"": ""xxxxxxxx""
     }
   }
 }";
@@ -10275,7 +10275,7 @@ namespace Okta.Idx.Sdk.UnitTests
         ""value"": {
             ""name"": ""oidc_client"",
             ""label"": ""Dotnet IDX Web App"",
-            ""id"": ""0oatzfskmLm4faAaQ5d6""
+            ""id"": ""xxxxxxxx""
         }
     }
 }";
@@ -10562,7 +10562,7 @@ namespace Okta.Idx.Sdk.UnitTests
         ""value"": {
             ""name"": ""oidc_client"",
             ""label"": ""Dotnet IDX Web App"",
-            ""id"": ""0oatzfskmLm4faAaQ5d6""
+            ""id"": ""xxxxxxxx""
         }
     }
 }";
@@ -10870,7 +10870,7 @@ namespace Okta.Idx.Sdk.UnitTests
         ""value"": {
             ""name"": ""oidc_client"",
             ""label"": ""Dotnet IDX Web App"",
-            ""id"": ""0oatzfskmLm4faAaQ5d6""
+            ""id"": ""xxxxxxxx""
         }
     }
 }";
@@ -11033,7 +11033,7 @@ namespace Okta.Idx.Sdk.UnitTests
         ""value"": {
             ""name"": ""oidc_client"",
             ""label"": ""Dotnet IDX Web App"",
-            ""id"": ""0oatzfskmLm4faAaQ5d6""
+            ""id"": ""xxxxxxxx""
         }
     }
 }";
