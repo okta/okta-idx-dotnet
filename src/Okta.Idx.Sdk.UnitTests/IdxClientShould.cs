@@ -10071,24 +10071,22 @@ namespace Okta.Idx.Sdk.UnitTests
     }
 }";
             #endregion;
-            IIdxContext idxContext = new IdxContext("test code verifier", "test code challenge", "test code challenge method", "test interaction handle", "test state");
-            MockHttpMessageHandler mockHttpMessageHandler = new MockHttpMessageHandler();
-            mockHttpMessageHandler.AddTestResponse("/idp/idx/introspect", introspectResponse);
-            mockHttpMessageHandler.AddTestResponse("/idp/idx/credential/enroll", enrollResponse, System.Net.HttpStatusCode.BadRequest);
-
-            HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
-
-            IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, NullLogger.Instance);
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = introspectResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 400, Response = enrollResponse });
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
             EnrollPhoneAuthenticatorOptions enrollPhoneAuthenticatorOptions = new EnrollPhoneAuthenticatorOptions
             {
                 AuthenticatorId = "testAuthenticatorId",
                 PhoneNumber = "12345678901",
                 MethodType = AuthenticatorMethodType.Sms
             };
-
-            await Assert.ThrowsAsync<OktaApiException>(() => idxClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, idxContext));
-            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/idp/idx/introspect"]);
-            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/idp/idx/credential/enroll"]);
+            Func<Task<AuthenticationResponse>> function = async () => await testClient.EnrollAuthenticatorAsync(
+                                                                          enrollPhoneAuthenticatorOptions, Substitute.For<IIdxContext>());
+            await function.Should()
+                .ThrowAsync<OktaException>()
+                .WithMessage("*Unable to initiate factor enrollment: Invalid Phone Number.*");
         }
 
         [Fact]
@@ -12148,26 +12146,21 @@ namespace Okta.Idx.Sdk.UnitTests
     }
 }";
             #endregion
-
-            MockHttpMessageHandler mockHttpMessageHandler = new MockHttpMessageHandler();
-            mockHttpMessageHandler.AddTestResponse("/oauth2/v1/interact", interactResponse);
-            mockHttpMessageHandler.AddTestResponse("/idp/idx/introspect", introspectResponse);
-            mockHttpMessageHandler.AddTestResponse("/idp/idx/enroll", enrollResponse);
-            mockHttpMessageHandler.AddTestResponse("/idp/idx/enroll/new", enrollNewResponse, System.Net.HttpStatusCode.BadRequest);
-
-            HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
-
-            IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, NullLogger.Instance);
             UserProfile userProfile = new UserProfile();
             userProfile.SetProperty("firstName", "test-firstname");
             userProfile.SetProperty("lastName", "test-lastname");
             userProfile.SetProperty("email", "notagoodemail");
-
-            await Assert.ThrowsAsync<OktaApiException>(() => idxClient.RegisterAsync(userProfile));
-            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/oauth2/v1/interact"]);
-            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/idp/idx/introspect"]);
-            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/idp/idx/enroll"]);
-            Assert.Equal(1, mockHttpMessageHandler.CallCounts["/idp/idx/enroll/new"]);
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = interactResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = introspectResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = enrollResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 400, Response = enrollNewResponse });
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+            Func<Task<AuthenticationResponse>> function = async () => await testClient.RegisterAsync(userProfile);
+            await function.Should()
+                .ThrowAsync<OktaException>()
+                .WithMessage("*'Email' must be in the form of an email address*");
         }
         #endregion
     }
