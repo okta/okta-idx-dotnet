@@ -21,9 +21,9 @@ namespace Okta.Idx.Sdk.Configuration
         public string ClientSecret { get; set; }
 
         /// <summary>
-        /// Gets or sets a list of string based scopes.
+        /// String that holds scopes.
         /// </summary>
-        public List<string> Scopes { get; set; } = OktaDefaults.Scopes;
+        public string Scopes { get; set; }
 
         /// <summary>
         /// Gets or sets the issuer.

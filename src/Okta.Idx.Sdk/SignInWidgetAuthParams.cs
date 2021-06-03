@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Okta.Idx.Sdk.Configuration;
+using Okta.Idx.Sdk.Extensions;
 
 namespace Okta.Idx.Sdk
 {
@@ -28,7 +29,7 @@ namespace Okta.Idx.Sdk
         public SignInWidgetAuthParams(IdxConfiguration idxConfiguration)
         {
             Issuer = idxConfiguration.Issuer;
-            Scopes = idxConfiguration.Scopes;
+            Scopes = idxConfiguration.Scopes.ToList();
         }
 
         /// <summary>

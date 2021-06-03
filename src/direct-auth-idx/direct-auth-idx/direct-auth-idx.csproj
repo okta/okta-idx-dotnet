@@ -354,6 +354,7 @@
     <Content Include="Views\Shared\_LogoutPartial.cshtml" />
     <Content Include="Views\Shared\Idps.cshtml" />
     <Content Include="Views\InteractionCode\Error.cshtml" />
+    <None Include="okta.yaml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

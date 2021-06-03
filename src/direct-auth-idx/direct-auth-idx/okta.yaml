@@ -1,0 +1,7 @@
+﻿okta:
+  idx:
+    issuer: "https://dev-86505495.okta.com/oauth2/default"
+    clientId: "0oatkejg9TPSHaDDA5d6"
+    clientSecret: "u1BdF9-m8JL0v0xs_SZyVPPEGXwfygrloEBzS_0l"
+    scopes: "openid profile offline_access"
+    redirectUri: "http://localhost:8080/authorization-code/callback"
