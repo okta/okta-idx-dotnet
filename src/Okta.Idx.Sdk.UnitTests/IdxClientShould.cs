@@ -10086,7 +10086,7 @@ namespace Okta.Idx.Sdk.UnitTests
                 MethodType = AuthenticatorMethodType.Sms
             };
 
-            await Assert.ThrowsAsync<OktaException>(() => idxClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, idxContext));
+            await Assert.ThrowsAsync<OktaApiException>(() => idxClient.EnrollAuthenticatorAsync(enrollPhoneAuthenticatorOptions, idxContext));
             Assert.Equal(1, mockHttpMessageHandler.CallCounts["/idp/idx/introspect"]);
             Assert.Equal(1, mockHttpMessageHandler.CallCounts["/idp/idx/credential/enroll"]);
         }
@@ -10295,7 +10295,7 @@ namespace Okta.Idx.Sdk.UnitTests
                 ""relatesTo"": [
                     ""$.currentAuthenticator""
                 ],
-                ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/challenge/answer"",
+                ""href"": ""https://fake.example.com/idp/idx/challenge/answer"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -10327,7 +10327,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""select-authenticator-enroll"",
-                ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/credential/enroll"",
+                ""href"": ""https://fake.example.com/idp/idx/credential/enroll"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -10406,7 +10406,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""skip"",
-                ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/skip"",
+                ""href"": ""https://fake.example.com/idp/idx/skip"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -10430,7 +10430,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""resend"",
-                ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/challenge/resend"",
+                ""href"": ""https://fake.example.com/idp/idx/challenge/resend"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -10449,7 +10449,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""poll"",
-                ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/challenge/poll"",
+                ""href"": ""https://fake.example.com/idp/idx/challenge/poll"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""refresh"": 4000,
@@ -10543,7 +10543,7 @@ namespace Okta.Idx.Sdk.UnitTests
             ""create-form""
         ],
         ""name"": ""cancel"",
-        ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/cancel"",
+        ""href"": ""https://fake.example.com/idp/idx/cancel"",
         ""method"": ""POST"",
         ""produces"": ""application/ion+json; okta-version=1.0.0"",
         ""value"": [
@@ -10887,7 +10887,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""select-authenticator-enroll"",
-                ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/credential/enroll"",
+                ""href"": ""https://fake.example.com/idp/idx/credential/enroll"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -10944,7 +10944,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""skip"",
-                ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/skip"",
+                ""href"": ""https://fake.example.com/idp/idx/skip"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -11014,7 +11014,7 @@ namespace Okta.Idx.Sdk.UnitTests
             ""create-form""
         ],
         ""name"": ""cancel"",
-        ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/cancel"",
+        ""href"": ""https://fake.example.com/idp/idx/cancel"",
         ""method"": ""POST"",
         ""produces"": ""application/ion+json; okta-version=1.0.0"",
         ""value"": [
@@ -11315,6 +11315,440 @@ namespace Okta.Idx.Sdk.UnitTests
             Assert.NotNull(enrollResponse.TokenInfo);
             Assert.Equal("test access token", enrollResponse.TokenInfo.AccessToken);
             Assert.Equal("test id token", enrollResponse.TokenInfo.IdToken);
+        }
+
+        [Fact]
+        public async Task SelectPhoneEnrollmentAfterEmailVerficationDuringRegistration()
+        {
+            string introspectResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+    ""expiresAt"": ""2021-06-03T15:06:29.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-authenticator-enroll"",
+                ""href"": ""https://fake.example.com/idp/idx/credential/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""type"": ""object"",
+                        ""options"": [
+                            {
+                                ""label"": ""Phone"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""auttzfsi4eiZIdLK85d6"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""type"": ""string"",
+                                                ""required"": false,
+                                                ""options"": [
+                                                    {
+                                                        ""label"": ""SMS"",
+                                                        ""value"": ""sms""
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                ""name"": ""phoneNumber"",
+                                                ""label"": ""Phone number"",
+                                                ""required"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[0]""
+                            }
+                        ]
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""skip"",
+                ""href"": ""https://fake.example.com/idp/idx/skip"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""authenticators"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""type"": ""phone"",
+                ""key"": ""phone_number"",
+                ""id"": ""auttzfsi4eiZIdLK85d6"",
+                ""displayName"": ""Phone"",
+                ""methods"": [
+                    {
+                        ""type"": ""sms""
+                    }
+                ]
+            }
+        ]
+    },
+    ""authenticatorEnrollments"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""type"": ""email"",
+                ""key"": ""okta_email"",
+                ""id"": ""eaev4tju8wZBuXHK05d6"",
+                ""displayName"": ""Email"",
+                ""methods"": [
+                    {
+                        ""type"": ""email""
+                    }
+                ]
+            },
+            {
+                ""type"": ""password"",
+                ""key"": ""okta_password"",
+                ""id"": ""lae1yogd5BjwVVnLu5d6"",
+                ""displayName"": ""Password"",
+                ""methods"": [
+                    {
+                        ""type"": ""password""
+                    }
+                ]
+            }
+        ]
+    },
+    ""user"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""id"": ""00uv4robkjiLYqVk15d6""
+        }
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://fake.example.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Dotnet IDX Web App"",
+            ""id"": ""0oatzfskmLm4faAaQ5d6""
+        }
+    }
+}";
+            string credentialEnrollResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+    ""expiresAt"": ""2021-06-03T15:06:59.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""authenticator-enrollment-data"",
+                ""relatesTo"": [
+                    ""$.currentAuthenticator""
+                ],
+                ""href"": ""https://fake.example.com/idp/idx/credential/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""label"": ""Phone"",
+                        ""form"": {
+                            ""value"": [
+                                {
+                                    ""name"": ""id"",
+                                    ""required"": true,
+                                    ""value"": ""auttzfsi4eiZIdLK85d6"",
+                                    ""mutable"": false
+                                },
+                                {
+                                    ""name"": ""methodType"",
+                                    ""type"": ""string"",
+                                    ""required"": true,
+                                    ""options"": [
+                                        {
+                                            ""label"": ""SMS"",
+                                            ""value"": ""sms""
+                                        }
+                                    ]
+                                },
+                                {
+                                    ""name"": ""phoneNumber"",
+                                    ""required"": true
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-authenticator-enroll"",
+                ""href"": ""https://fake.example.com/idp/idx/credential/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""type"": ""object"",
+                        ""options"": [
+                            {
+                                ""label"": ""Phone"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""auttzfsi4eiZIdLK85d6"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""type"": ""string"",
+                                                ""required"": false,
+                                                ""options"": [
+                                                    {
+                                                        ""label"": ""SMS"",
+                                                        ""value"": ""sms""
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                ""name"": ""phoneNumber"",
+                                                ""label"": ""Phone number"",
+                                                ""required"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[0]""
+                            }
+                        ]
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""skip"",
+                ""href"": ""https://fake.example.com/idp/idx/skip"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""currentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""resend"": {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""resend"",
+                ""href"": ""https://fake.example.com/idp/idx/challenge/resend"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            ""type"": ""phone"",
+            ""key"": ""phone_number"",
+            ""id"": ""auttzfsi4eiZIdLK85d6"",
+            ""displayName"": ""Phone"",
+            ""methods"": [
+                {
+                    ""type"": ""sms""
+                }
+            ]
+        }
+    },
+    ""authenticators"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""type"": ""phone"",
+                ""key"": ""phone_number"",
+                ""id"": ""auttzfsi4eiZIdLK85d6"",
+                ""displayName"": ""Phone"",
+                ""methods"": [
+                    {
+                        ""type"": ""sms""
+                    }
+                ]
+            }
+        ]
+    },
+    ""authenticatorEnrollments"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""type"": ""email"",
+                ""key"": ""okta_email"",
+                ""id"": ""eaev4tju8wZBuXHK05d6"",
+                ""displayName"": ""Email"",
+                ""methods"": [
+                    {
+                        ""type"": ""email""
+                    }
+                ]
+            },
+            {
+                ""type"": ""password"",
+                ""key"": ""okta_password"",
+                ""id"": ""lae1yogd5BjwVVnLu5d6"",
+                ""displayName"": ""Password"",
+                ""methods"": [
+                    {
+                        ""type"": ""password""
+                    }
+                ]
+            }
+        ]
+    },
+    ""user"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""id"": ""00uv4robkjiLYqVk15d6""
+        }
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://fake.example.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""025igIyJgsxf9OnM-U47KTA7GuSJqupEiQYGUnt-Yw"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Dotnet IDX Web App"",
+            ""id"": ""0oatzfskmLm4faAaQ5d6""
+        }
+    }
+}";
+
+            IIdxContext idxContext = new IdxContext("test code verifier", "test code challenge", "test code challenge method", "test interaction handle", "test state");
+            MockHttpMessageHandler mockHttpMessageHandler = new MockHttpMessageHandler();
+            mockHttpMessageHandler.AddTestResponse("/idp/idx/introspect", introspectResponse);
+            mockHttpMessageHandler.AddTestResponse("/idp/idx/credential/enroll", credentialEnrollResponse);
+
+            HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
+
+            IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, NullLogger.Instance);
+            //auttzfsi4eiZIdLK85d6
+
+            SelectEnrollAuthenticatorOptions enrollAuthenticatorOptions = new SelectEnrollAuthenticatorOptions
+            {
+                AuthenticatorId = "auttzfsi4eiZIdLK85d6",
+            };
+
+            AuthenticationResponse enrollResponse = await idxClient.SelectEnrollAuthenticatorAsync(enrollAuthenticatorOptions, idxContext);
+
+            Assert.Equal(AuthenticationStatus.AwaitingAuthenticatorEnrollmentData, enrollResponse.AuthenticationStatus);
         }
 
         [Fact]
