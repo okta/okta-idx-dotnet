@@ -13,7 +13,7 @@
 	And she fills out her Last Name
 	And she fills out her Email
 	And she submits the registration form
-	Then she sees the Select Authenticator page with password as an only opton
+	Then she sees the Select Authenticator page with password as the only option
 	When she choses password factor option
 	And she submits the select authenticator form
 	Then she sees the set new password form
@@ -35,7 +35,7 @@
 	And she fills out her Last Name
 	And she fills out her Email
 	And she submits the registration form
-	Then she sees the Select Authenticator page with password as an only opton
+	Then she sees the Select Authenticator page with password as the only option
 	When she choses password factor option
 	And she submits the select authenticator form
 	Then she sees the set new password form
@@ -72,7 +72,7 @@
 	And she fills out her Last Name
 	And she fills out her Email
 	And she submits the registration form
-	Then she sees the Select Authenticator page with password as an only opton
+	Then she sees the Select Authenticator page with password as the only option
 	When she choses password factor option
 	And she submits the select authenticator form
 	Then she sees the set new password form

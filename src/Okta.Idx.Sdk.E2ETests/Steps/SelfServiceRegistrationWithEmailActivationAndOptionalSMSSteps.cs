@@ -86,8 +86,8 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
             _registerPage.SubmitButton.Click();
         }
 
-        [Then(@"she sees the Select Authenticator page with password as an only opton")]
-        public void ThenSheSeesTheSelectAuthenticatorPageWithPasswordAsAnOnlyOpton()
+        [Then(@"she sees the Select Authenticator page with password as the only option")]
+        public void ThenSheSeesTheSelectAuthenticatorPageWithPasswordAsAnOnlyOption()
         {
             _selectAuthenticatorPage.AssertPageOpenedAndValid();
             Func<IWebElement> getPasswordFunc = () => _selectAuthenticatorPage.PasswordAuthenticator;
