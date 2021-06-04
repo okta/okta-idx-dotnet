@@ -12,6 +12,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
         private readonly A18nProfile _a18nProfile;
         private readonly IOktaSdkHelper _oktaHelper;
         private bool _disposed = false;
+        private const int MaxAttempts = 30; // with delay 1000 ms between attempts, it's 30 seconds of total waiting time 
 
         private readonly string[] messageCodeMarkers = new[]
         {
@@ -57,7 +58,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 
         public async Task<string> GetRecoveryCodeFromEmail()
         {
-            for (int tries = 0; tries < 30; tries++) 
+            for (int tries = 0; tries < MaxAttempts; tries++) 
             {
                 try
                 {
@@ -78,7 +79,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 
         public async Task<string> GetRecoveryCodeFromSms()
         {
-            for (int tries = 0; tries < 30; tries++)
+            for (int tries = 0; tries < MaxAttempts; tries++)
             {
                 try
                 {
@@ -93,8 +94,8 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
                 {
                     // expected exception when a mail box is empty
                 }
+                await Task.Delay(1000);
             }
-            await Task.Delay(1000);
 
             return string.Empty;
         }
