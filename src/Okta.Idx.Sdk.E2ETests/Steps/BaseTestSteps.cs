@@ -1,9 +1,4 @@
-﻿using FluentAssertions;
-using Okta.Idx.Sdk.E2ETests.Drivers;
-using Okta.Idx.Sdk.E2ETests.Helpers;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using System;
+﻿using Okta.Idx.Sdk.E2ETests.Helpers;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps
 {

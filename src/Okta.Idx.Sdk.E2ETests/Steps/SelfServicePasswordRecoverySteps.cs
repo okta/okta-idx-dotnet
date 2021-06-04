@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Okta.Idx.Sdk.E2ETests.Drivers;
 using Okta.Idx.Sdk.E2ETests.Helpers;
 using Okta.Idx.Sdk.E2ETests.PageObjectModels;
 using OpenQA.Selenium;

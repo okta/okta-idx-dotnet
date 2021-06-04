@@ -77,7 +77,7 @@ namespace embedded_auth_with_sdk.Controllers
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
-                        return RedirectToAction("selectAuthenticator", "Manage");
+                        return RedirectToAction("SelectAuthenticator", "Manage");
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["isChallengeFlow"] = false;
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);

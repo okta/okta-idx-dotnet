@@ -6,8 +6,8 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
 {
     public class VerifyAuthenticatorPage : BasePage
     {
-        public VerifyAuthenticatorPage(WebDriverDriver webDriverDriver, IWebServerDriver _webServerDriver)
-            : base(webDriverDriver, _webServerDriver) { }
+        public VerifyAuthenticatorPage(WebDriverDriver webDriverDriver, ITestConfig testConfiguration)
+            : base(webDriverDriver, testConfiguration) { }
 
         public override string RelativePageUri => "Manage/VerifyAuthenticator";
         public IWebElement SubmitButton => _webDriver.FindElement(By.Id("submitBtn"));

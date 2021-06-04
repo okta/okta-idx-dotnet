@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using A18NClient.Dto;
@@ -15,8 +17,10 @@ namespace A18NClient
 
         private HttpClient _client;
         private string _defaultProfileId;
+        private string _createdProfileId;
+        private bool _needDeleteProfile = false;
 
-        public A18nClient(string apiKey)
+        public A18nClient(string apiKey, bool createNewDefaultProfile = false, string newProfileUniqueTag = default)
         {
             _client = new HttpClient
             {
@@ -24,9 +28,21 @@ namespace A18NClient
             };
             _client.DefaultRequestHeaders.Add("x-api-key", apiKey);
 
+            if (createNewDefaultProfile)
+            {
+                if (!string.IsNullOrEmpty(newProfileUniqueTag))
+                {
+                    CleanUpOldUsedProfiles(newProfileUniqueTag);
+                }
+
+                var newProfile = CreateProfileAsync(newProfileUniqueTag).Result;
+                _createdProfileId = newProfile.ProfileId;
+                SetDefaultProfileId(newProfile.ProfileId);
+                _needDeleteProfile = true;
+            }
         }
 
-        public A18nClient(string apiKey, string profileId) : this(apiKey)
+        public A18nClient(string apiKey, string profileId) : this(apiKey, false)
         {
             _defaultProfileId = profileId;
         }
@@ -41,10 +57,31 @@ namespace A18NClient
             Dispose(true);
         }
 
-        //  POST https://api.a18n.help/v1/profile
-        public async Task<A18nProfile> CreateProfileAsync(CancellationToken cancellationToken = default)
+        // POST https://api.a18n.help/v1/profile
+        public async Task<A18nProfile> CreateProfileAsync(string profileTag = default, CancellationToken cancellationToken = default)
         {
-            return await PostAsync<A18nProfile>(default, null, cancellationToken);
+            StringContent content = null;
+
+            if (profileTag != default)
+            {
+                var requestBody = new
+                {
+                    displayName = profileTag
+                };
+                content = new StringContent(JsonHelper.Serialize(requestBody), Encoding.UTF8, "application/json");
+            }
+            return await PostAsync<A18nProfile>(default, content, cancellationToken);
+        }
+
+        // DELETE https://api.a18n.help/v1/profile/:profileId
+        public async Task DeleteProfileAsync(string profileId = null, CancellationToken cancellationToken = default)
+        {
+            var effectiveProfileId = EffectiveProfileId(profileId);
+            await DeleteAsync(effectiveProfileId, cancellationToken);
+            if (_needDeleteProfile && effectiveProfileId == _createdProfileId)
+            {
+                _needDeleteProfile = false;
+            }
         }
 
         // GET https://api.a18n.help/v1/profile
@@ -198,6 +235,10 @@ namespace A18NClient
 
             if (disposing)
             {
+                if (_needDeleteProfile)
+                {
+                    DeleteProfileAsync(profileId: _createdProfileId).Wait();
+                }
                 if (_client != null)
                     _client.Dispose();
             }
@@ -263,6 +304,16 @@ namespace A18NClient
             else
             {
                 return $"{RelativePart}/{resource}";
+            }
+        }
+
+        private void CleanUpOldUsedProfiles(string newProfileUniqueTag)
+        {
+            var activeProfiles = GetActiveProfilesAsync().Result;
+
+            foreach (var profile in activeProfiles.Profiles.Where(p => p.DisplayName == newProfileUniqueTag))
+            {
+                DeleteProfileAsync(profile.ProfileId).Wait();
             }
         }
 

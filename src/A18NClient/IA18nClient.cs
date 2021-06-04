@@ -6,7 +6,8 @@ namespace A18NClient
 {
     public interface IA18nClient
     {
-        Task<A18nProfile> CreateProfileAsync(CancellationToken cancellationToken = default);
+        Task<A18nProfile> CreateProfileAsync(string profileTag = default, CancellationToken cancellationToken = default);
+        Task DeleteProfileAsync(string profileId = default, CancellationToken cancellationToken = default);
         Task DeleteAllProfileEmailsAsync(string profileId = default, CancellationToken cancellationToken = default);
         Task DeleteAllProfileSmsAsync(string profileId = default, CancellationToken cancellationToken = default);
         Task DeleteEmailAsync(string messageId, string profileId = default, CancellationToken cancellationToken = default);
