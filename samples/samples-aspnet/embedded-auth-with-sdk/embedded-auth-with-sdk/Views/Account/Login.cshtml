@@ -1,0 +1,94 @@
+﻿@model embedded_auth_with_sdk.Models.LoginViewModel
+
+@{
+    ViewBag.Title = "Sign In";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<br />
+
+@if(TempData["MessageToUser"]!=null)
+{
+    <div class="text-warning">
+    <h4>@TempData["MessageToUser"]</h4>
+    <hr />
+    </div>
+}
+<div class="row d-center">
+
+    <div class="col-md-8">
+        <section id="loginForm">
+            @using (Html.BeginForm("LoginAsync", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <h4>Sign In</h4>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger", @id="validationErrorMessage" })
+                <div class="form-group">
+                    <div class="col-md-10 col-md-offset-2">
+                        <div class="row row-no-gutters">
+                            @Html.LabelFor(m => m.UserName, new { @class = "control-label" })
+                        </div>
+                        <div class="row row-no-gutters">
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-10 col-md-offset-2">
+                        <div class="row row-no-gutters">
+                            @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                        </div>
+                        <div class="row row-no-gutters">
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Sign In" class="btn btn-primary btn-stretch-wide" id="LoginBtn"/>
+                    </div>
+                </div>
+            }
+        </section>
+
+        <section id="forgotPasswordForm">
+            @using (Html.BeginForm("ForgotPassword", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Forgot Password?" class="btn btn-default btn-stretch-wide" id="ForgotPasswordBtn"/>
+                    </div>
+                </div>
+            }
+        </section>
+
+        @* Remove this section if you don't want or need social login buttons *@
+        <section id="idpButtons">
+            @Html.Partial("Idps", Model.IdpOptions)
+        </section>
+
+        <section id="register">
+            @using (Html.BeginForm("Register", "Account", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Register" class="btn btn-info btn-stretch-wide" id="RegisterBtn"/>
+                    </div>
+                </div>
+            }
+        </section>
+
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

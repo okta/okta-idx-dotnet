@@ -1,0 +1,48 @@
+﻿@model embedded_auth_with_sdk.Models.SelectRecoveryAuthenticatorViewModel
+
+@{
+   ViewBag.Title = "Reset password";
+   Layout = "~/Views/Shared/_Layout.cshtml"; 
+ }
+<h2>@ViewBag.Title</h2>
+
+<hr />
+<div class="row d-center">
+    <div class="col-md-8">
+        <section id="selectAuthenticatorForm">
+
+            @using (Html.BeginForm("SelectRecoveryAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <h4>Reset your password</h4>
+                <h5>Verify with one of the following authenticators to reset your password.</h5>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <ul class="no-padding-left" id="authenticatorsList">
+                            @foreach (var authenticator in Model.Authenticators)
+                            {
+                                <div>
+                                    <label name="AuthenticatorName">
+                                        @Html.RadioButtonFor(m => m.AuthenticatorId, authenticator.AuthenticatorId)
+                                        @authenticator.Name
+                                    </label>
+                                </div>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                    @Html.ValidationMessageFor(m => m.AuthenticatorId, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <div class="col-md-10">
+                            <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" id="submitBtn" />
+                        </div>
+                    </div>
+                    }
+            </section>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
