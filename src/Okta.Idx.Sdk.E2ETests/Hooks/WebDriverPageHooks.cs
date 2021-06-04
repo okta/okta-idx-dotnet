@@ -1,8 +1,8 @@
 ﻿using A18NClient;
+using A18NClient.Dto;
 using BoDi;
 using Okta.Idx.Sdk.E2ETests.Drivers;
 using Okta.Idx.Sdk.E2ETests.Helpers;
-using System.Diagnostics;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -14,44 +14,65 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
     [Binding]
     public class WebDriverPageHooks
     {
-        private IWebServerDriver _webServerDriver;
         private IObjectContainer _container;
 
-        public WebDriverPageHooks(IObjectContainer container, IISWebServerDriver webServerDriver)
+        private static IWebServerDriver _webServerDriver;
+        private static TestConfig _config;
+        private static A18nClient _a18nClient;
+        private const string DefaultProfileTag= "okta-idx-dotnet";
+
+        public WebDriverPageHooks(IObjectContainer container)
         {
             _container = container;
-            _webServerDriver = webServerDriver;
         }
 
         [BeforeScenario]
         public void BeforeScenario()
         {
-            _webServerDriver.StartWebServer();
-
-            var config = ConfigBuilder.Configuration;
-            var a18nClient = new A18nClient(config.A18nApiKey);
-
-            _container.RegisterInstanceAs<ITestConfig>(config);
-            _container.RegisterInstanceAs<IA18nClient>(a18nClient, dispose: true);
-            _container.RegisterInstanceAs<IWebServerDriver>(_webServerDriver, dispose: true);
+            _container.RegisterInstanceAs<ITestConfig>(_config);
+            _container.RegisterInstanceAs<IA18nClient>(_a18nClient);
             _container.RegisterTypeAs<OktaSdkHelper, IOktaSdkHelper>(); 
             _container.RegisterTypeAs<TestUserHelper, ITestUserHelper>();
         }
 
         [AfterScenario]
         public void AfterScenario()
-        {
-            _webServerDriver.StopWebServer();
-        }
+        { }
 
         #region Before & After test run
         [BeforeTestRun]
-        public static void BeforeTestRunInjection()
-        { }
+        public static void BeforeTestRunInjection(IISWebServerDriver webServerDriver)
+        {
+            _webServerDriver = webServerDriver;
+            SetUpTestEnvironment(webServerDriver); 
+        }
+
+        private static void SetUpTestEnvironment(IISWebServerDriver webServerDriver)
+        {
+            webServerDriver.StartWebServer();
+            _config = ConfigBuilder.Configuration;
+            _config.SiteUrl = webServerDriver.SiteUrl;
+            if (string.IsNullOrEmpty(_config.A18nProfileTag))
+            {
+                _config.A18nProfileTag = DefaultProfileTag;
+            }
+            if (string.IsNullOrWhiteSpace(_config.A18nProfileId))
+            {
+                _a18nClient = new A18nClient(_config.A18nApiKey, createNewDefaultProfile: true, _config.A18nProfileTag);
+            }
+            else
+            {
+                _a18nClient = new A18nClient(_config.A18nApiKey, _config.A18nProfileId);
+            }
+        }
 
         [AfterTestRun]
         public static void AfterTestRun()
-        { }
+        {
+            _a18nClient.Dispose();
+
+            _webServerDriver.StopWebServer();
+        }
         #endregion Before & After test run
     }
 }

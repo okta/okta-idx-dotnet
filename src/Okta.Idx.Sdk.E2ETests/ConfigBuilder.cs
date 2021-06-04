@@ -19,7 +19,7 @@ namespace Okta.Idx.Sdk.E2ETests
             var applicationAppSettingsLocation = Path.Combine(configurationFileRoot ?? string.Empty, "settings.json");
 
             var configBuilder = new ConfigurationBuilder()
-                .AddJsonFile(applicationAppSettingsLocation, optional: false)
+                .AddJsonFile(applicationAppSettingsLocation, optional: true)
                 .AddEnvironmentVariables("okta_testing", "_", root: "okta:testing");
 
 
