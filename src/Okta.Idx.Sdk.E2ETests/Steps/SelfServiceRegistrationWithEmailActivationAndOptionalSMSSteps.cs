@@ -185,7 +185,6 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [When(@"She selects ""(.*)""")]
         public void WhenSheSelects(string p0)
         {
-            //ScenarioContext.Current.Pending();
         }
         
         [When(@"She inputs the correct code from her SMS")]
