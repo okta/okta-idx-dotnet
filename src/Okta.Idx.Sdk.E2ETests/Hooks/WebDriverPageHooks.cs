@@ -1,8 +1,7 @@
-﻿using A18NClient;
-using A18NClient.Dto;
-using BoDi;
+﻿using BoDi;
 using Okta.Idx.Sdk.E2ETests.Drivers;
 using Okta.Idx.Sdk.E2ETests.Helpers;
+using Okta.Idx.Sdk.E2ETests.Helpers.A18NClient;
 using TechTalk.SpecFlow;
 using Xunit;
 

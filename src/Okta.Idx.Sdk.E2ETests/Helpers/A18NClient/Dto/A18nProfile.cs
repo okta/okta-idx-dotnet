@@ -1,4 +1,4 @@
-﻿namespace A18NClient.Dto
+﻿namespace Okta.Idx.Sdk.E2ETests.Helpers.A18NClient.Dto
 {
     public class A18nProfile
     { 
