@@ -40,9 +40,9 @@ namespace embedded_auth_with_sdk.Controllers
                 IdpOptions = identityProvidersResponse.IdpOptions,  // You can keep IdpOptions unset (set to null) if you don't want or need social login buttons
             };
 
-            if (TempData.ContainsKey("MessageToUser"))
+            if (TempData.ContainsKey("TerminalStateMessage"))
             {
-                ModelState.AddModelError(string.Empty, (string)TempData["MessageToUser"]);
+                ModelState.AddModelError(string.Empty, (string)TempData["TerminalStateMessage"]);
             }
 
             return View(loginViewModel);

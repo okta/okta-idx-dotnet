@@ -274,7 +274,7 @@
             }
             catch (TerminalStateException exception)
             {
-                TempData["MessageToUser"] = exception.Message;
+                TempData["TerminalStateMessage"] = exception.Message;
                 return RedirectToAction("Login", "Account");
             }
             catch (OktaException exception)
