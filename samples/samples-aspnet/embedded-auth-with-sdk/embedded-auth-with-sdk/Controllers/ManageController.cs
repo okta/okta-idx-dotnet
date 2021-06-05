@@ -272,6 +272,11 @@
                 }
                 return RedirectToAction("Index", "Home");
             }
+            catch (TerminalStateException exception)
+            {
+                TempData["MessageToUser"] = exception.Message;
+                return RedirectToAction("Login", "Account");
+            }
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
