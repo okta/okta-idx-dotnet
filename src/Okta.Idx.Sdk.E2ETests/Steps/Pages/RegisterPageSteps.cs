@@ -1,21 +1,16 @@
 ﻿using Okta.Idx.Sdk.E2ETests.PageObjectModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
 {
     [Binding]
-    public class RegisterPageSteps : BasePageSteps
+    public class RegisterPageSteps : BaseTestSteps
     {
         private RegisterPage _registerPageModel;
 
-        public RegisterPageSteps(ITestConfig testConfig,
+        public RegisterPageSteps(ITestContext context,
             RegisterPage registerPageModel)
-            : base(testConfig)
+            : base(context)
         {
             _registerPageModel = registerPageModel;
         }
@@ -23,19 +18,19 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         [When(@"she fills out her First Name")]
         public void WhenSheFillsOutHerFirstName()
         {
-            _registerPageModel.FirstNameInput.SendKeys(_testConfig.TestUser.FirstName);
+            _registerPageModel.FirstNameInput.SendKeys(_context.UserProfile.FirstName);
         }
 
         [When(@"she fills out her Last Name")]
         public void WhenSheFillsOutHerLastName()
         {
-            _registerPageModel.LastNameInput.SendKeys(_testConfig.TestUser.LastName);
+            _registerPageModel.LastNameInput.SendKeys(_context.UserProfile.LastName);
         }
 
         [When(@"she fills out her Email")]
         public void WhenSheFillsOutHerEmail()
         {
-            _registerPageModel.EmailInput.SendKeys(_testConfig.TestUser.Email);
+            _registerPageModel.EmailInput.SendKeys(_context.UserProfile.Email);
         }
 
         [When(@"she submits the registration form")]

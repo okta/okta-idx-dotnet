@@ -5,16 +5,16 @@ using TechTalk.SpecFlow;
 namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
 {
     [Binding]
-    public class ChangePasswordPageSteps : BasePageSteps
+    public class ChangePasswordPageSteps : BaseTestSteps
     {
         private ChangePasswordPage _changePasswordPageModel;
 
         private const string NewPasswordStarts = "OneC0mpl3xP@S5w0rd!";
         private string AllNewComplexPassword = string.Empty;
 
-        public ChangePasswordPageSteps(ITestConfig testConfig,
+        public ChangePasswordPageSteps(ITestContext context,
             ChangePasswordPage changePasswordPageModel)
-            : base(testConfig)
+            : base(context)
         {
             _changePasswordPageModel = changePasswordPageModel;
         }
@@ -29,13 +29,13 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         [When(@"she fills out her Password")]
         public void WhenSheFillsOutHerPassword()
         {
-            _changePasswordPageModel.NewPasswordInput.SendKeys(_testConfig.TestUser.Password);
+            _changePasswordPageModel.NewPasswordInput.SendKeys(_context.UserProfile.Password);
         }
 
         [When(@"she confirms her Password")]
         public void WhenSheConfirmsHerPassword()
         {
-            _changePasswordPageModel.ConfirmPasswordInput.SendKeys(_testConfig.TestUser.Password);
+            _changePasswordPageModel.ConfirmPasswordInput.SendKeys(_context.UserProfile.Password);
         }
 
         [When(@"she fills a password that fits within the password policy")]

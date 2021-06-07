@@ -6,7 +6,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
 {
     public class VerifyAuthenticatorPage : BasePage
     {
-        public VerifyAuthenticatorPage(WebDriverDriver webDriverDriver, ITestConfig testConfiguration)
+        public VerifyAuthenticatorPage(WebDriverDriver webDriverDriver, IConfiguration testConfiguration)
             : base(webDriverDriver, testConfiguration) { }
 
         public override string RelativePageUri => "Manage/VerifyAuthenticator";

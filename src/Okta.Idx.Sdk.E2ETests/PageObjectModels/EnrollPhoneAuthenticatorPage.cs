@@ -6,7 +6,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
 {
     public class EnrollPhoneAuthenticatorPage : BasePage
     {
-        public EnrollPhoneAuthenticatorPage(WebDriverDriver webDriverDriver, ITestConfig testConfiguration)
+        public EnrollPhoneAuthenticatorPage(WebDriverDriver webDriverDriver, IConfiguration testConfiguration)
             : base(webDriverDriver, testConfiguration) { }
 
         public override string RelativePageUri => "Manage/EnrollPhoneAuthenticator";

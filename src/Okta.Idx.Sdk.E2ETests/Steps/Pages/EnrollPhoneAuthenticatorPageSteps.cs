@@ -1,21 +1,16 @@
 ﻿using Okta.Idx.Sdk.E2ETests.PageObjectModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
 {
     [Binding]
-    public class EnrollPhoneAuthenticatorPageSteps : BasePageSteps
+    public class EnrollPhoneAuthenticatorPageSteps : BaseTestSteps
     {
         private EnrollPhoneAuthenticatorPage _enrollPhoneAuthenticatorPageModel;
 
-        public EnrollPhoneAuthenticatorPageSteps(ITestConfig testConfig,
+        public EnrollPhoneAuthenticatorPageSteps(ITestContext context,
             EnrollPhoneAuthenticatorPage enrollPhoneAuthenticatorPageModel)
-            : base(testConfig)
+            : base(context)
         {
             _enrollPhoneAuthenticatorPageModel = enrollPhoneAuthenticatorPageModel;
         }
@@ -23,7 +18,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         [When(@"She inputs a valid phone number")]
         public void WhenSheInputsAValidPhoneNumber()
         {
-            _enrollPhoneAuthenticatorPageModel.PhoneNumberInput.SendKeys(_testConfig.TestUser.PhoneNumber);
+            _enrollPhoneAuthenticatorPageModel.PhoneNumberInput.SendKeys(_context.UserProfile.PhoneNumber);
             _enrollPhoneAuthenticatorPageModel.SubmitButton.Click();
         }
 
@@ -33,6 +28,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         }
 
         [When(@"she inputs an invalid phone number")]
+        [When(@"She inputs a invalid phone number")]
         public void WhenSheInputsAnInvalidPhoneNumber()
         {
             _enrollPhoneAuthenticatorPageModel.PhoneNumberInput.SendKeys("+1");

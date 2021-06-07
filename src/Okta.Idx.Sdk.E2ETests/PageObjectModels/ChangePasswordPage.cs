@@ -6,7 +6,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
 {
     public class ChangePasswordPage:BasePage
     {
-        public ChangePasswordPage(WebDriverDriver webDriverDriver, ITestConfig testConfiguration) : base(webDriverDriver, testConfiguration)
+        public ChangePasswordPage(WebDriverDriver webDriverDriver, IConfiguration testConfiguration) : base(webDriverDriver, testConfiguration)
         { }
 
         public override string RelativePageUri => "Manage/ChangePassword";

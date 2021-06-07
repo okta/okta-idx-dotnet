@@ -5,13 +5,13 @@ using TechTalk.SpecFlow;
 namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
 {
     [Binding]
-    public class LoginPageSteps : BasePageSteps
+    public class LoginPageSteps : BaseTestSteps
     {
         private LoginPage _loginPageModel;
 
-        public LoginPageSteps(ITestConfig testConfig,
+        public LoginPageSteps(ITestContext context,
             LoginPage loginPageModel)
-            :base(testConfig)
+            :base(context)
         {
 
             _loginPageModel = loginPageModel;
@@ -22,7 +22,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         [When(@"she fills in her username")]
         public void WhenSheEntersCorrectUsername()
         {
-            _loginPageModel.UserNameInput.SendKeys(_testConfig.TestUser.Email);
+            _loginPageModel.UserNameInput.SendKeys(_context.UserProfile.Email);
         }
 
         [When(@"she fills in her password")]
@@ -30,7 +30,12 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         [Given(@"she has inserted her password")]
         public void WhenSheEntersCorrectPassword()
         {
-            _loginPageModel.PasswordInput.SendKeys(_testConfig.TestUser.Password);
+            _loginPageModel.PasswordInput.SendKeys(_context.UserProfile.Password);
+        }
+
+        [Given(@"her password is correct")]
+        public void GivenHerPasswordIsCorrect()
+        {
         }
 
         [When(@"she submits the Login form")]

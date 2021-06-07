@@ -8,9 +8,8 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
     public class SelfServicePasswordRecoverySteps : BaseTestSteps
     {
 
-        public SelfServicePasswordRecoverySteps(ITestUserHelper userHelper,
-                                                ITestConfig testConfig)
-            : base(userHelper, testConfig)
+        public SelfServicePasswordRecoverySteps(ITestContext context)
+            : base(context)
         { }
 
         [Given(@"an org with an ORG Policy that defines Authenticators with Password and Email as required")]
@@ -20,7 +19,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [Given(@"a user named ""(.*)""")]
         public async Task GivenAUserNamed(string firstName)
         {
-            _testConfig.TestUser = await _userHelper.GetActivePasswordUserAsync(firstName);
+            await _context.SetActivePasswordUserAsync(firstName);
         }
 
         [Given(@"Mary is a user with a verified email and a set password")]

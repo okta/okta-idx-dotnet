@@ -2,24 +2,20 @@
 using Okta.Idx.Sdk.E2ETests.PageObjectModels;
 using OpenQA.Selenium;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
 {
     [Binding]
-    public class ResetPasswordPageSteps : BasePageSteps
+    public class ResetPasswordPageSteps : BaseTestSteps
     {
         private ResetPasswordPage _resetPasswordPageModel;
 
         private const string WrongEmailAddress = "wrongemail@gmail.kp";
 
-        public ResetPasswordPageSteps(ITestConfig testConfig,
+        public ResetPasswordPageSteps(ITestContext context,
             ResetPasswordPage resetPasswordPageModel)
-            : base(testConfig)
+            : base(context)
         {
             _resetPasswordPageModel = resetPasswordPageModel;
         }
@@ -33,7 +29,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         [When(@"she inputs her correct Email")]
         public void WhenSheInputsHerCorrectEmail()
         {
-            _resetPasswordPageModel.UserNameInput.SendKeys(_testConfig.TestUser.Email);
+            _resetPasswordPageModel.UserNameInput.SendKeys(_context.UserProfile.Email);
         }
 
         [When(@"she submits the recovery form")]
