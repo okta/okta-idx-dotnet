@@ -51,6 +51,5 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         {
             _registerPageModel.ValidationErrors.Text.Contains(errorMessage);
         }
-
     }
 }

@@ -56,6 +56,5 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         {
             _changePasswordPageModel.SubmitButton.Click();
         }
-
     }
 }

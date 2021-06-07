@@ -1,4 +1,5 @@
-﻿using Okta.Idx.Sdk.E2ETests.PageObjectModels;
+﻿using FluentAssertions;
+using Okta.Idx.Sdk.E2ETests.PageObjectModels;
 using TechTalk.SpecFlow;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
@@ -38,6 +39,12 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         public void WhenSubmitsTheEnrollmentForm()
         {
             _enrollPhoneAuthenticatorPageModel.SubmitButton.Click();
+        }
+
+        [Then(@"she should see a message ""(.*)""")]
+        public void ThenSheShouldSeeAMessage(string errorMessage)
+        {
+            _enrollPhoneAuthenticatorPageModel.ValidationErrors.Text.Should().Contain(errorMessage);
         }
 
     }

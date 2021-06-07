@@ -33,6 +33,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         }
 
         [When(@"She inputs the incorrect code from the email")]
+        [When(@"She inputs the incorrect code from the sms")]
         public void WhenSheInputsTheIncorrectCodeFromTheEmail()
         {
             _verifyAuthenticatorPageModel.PasscodeInput.SendKeys("not a code");
@@ -71,9 +72,17 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         }
 
         [Then(@"the sample shows an error message ""(.*)"" on the Sample App")]
+        [Then(@"the sample show as error message ""(.*)"" on the SMS Challenge page")]
         public void ThenTheSampleShowsAnErrorMessageOnTheSampleApp(string errorMessage)
         {
             _verifyAuthenticatorPageModel.ValidationErrors.Text.Should().Contain(errorMessage);
+        }
+
+
+        [Then(@"she sees a field to re-enter another code")]
+        public void ThenSheSeesAFieldToRe_EnterAnotherCode()
+        {
+            _verifyAuthenticatorPageModel.PasscodeInput.Displayed.Should().BeTrue();
         }
     }
 }

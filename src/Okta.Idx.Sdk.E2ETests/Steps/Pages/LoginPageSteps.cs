@@ -13,7 +13,6 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
             LoginPage loginPageModel)
             :base(context)
         {
-
             _loginPageModel = loginPageModel;
         }
 
@@ -68,6 +67,5 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         {
             _loginPageModel.ForgotPasswordButton.Click();
         }
-
     }
 }

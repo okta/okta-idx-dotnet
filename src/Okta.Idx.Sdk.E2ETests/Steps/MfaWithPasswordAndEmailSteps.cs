@@ -1,5 +1,4 @@
 ﻿using TechTalk.SpecFlow;
-using Okta.Idx.Sdk.E2ETests.Helpers;
 using System.Threading.Tasks;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps
@@ -20,6 +19,5 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         {
             await _context.SetActivePasswordAndEmailUserAsync(firstName);
         }
-
     }
 }

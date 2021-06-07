@@ -10,12 +10,15 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
     public class SelectAuthenticatorPageSteps : BaseTestSteps
     {
         private SelectAuthenticatorPage _selectAuthenticatorPageModel;
+        private SelectAuthenticatorAsyncPage _selectAuthenticatorAsyncPageModel;
 
         public SelectAuthenticatorPageSteps(ITestContext context,
-            SelectAuthenticatorPage selectAuthenticatorPageModel)
+            SelectAuthenticatorPage selectAuthenticatorPageModel,
+            SelectAuthenticatorAsyncPage selectAuthenticatorAsyncPageModel)
             : base(context)
         {
             _selectAuthenticatorPageModel = selectAuthenticatorPageModel;
+            _selectAuthenticatorAsyncPageModel = selectAuthenticatorAsyncPageModel;
         }
 
         [Then(@"She sees a list of factors")]
@@ -37,7 +40,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         }
 
         [Then(@"she sees the list of optional factors \(SMS\)")]
-        [Then(@"she is presented with an option to select SMS to verify")]
+        [Then(@"she is presented with an option to select Phone")]
         [Then(@"she is presented with an option to select SMS to enroll")]
         public void ThenSheSeesTheListOfOptionalFactorsSMS()
         {
@@ -47,6 +50,14 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
             _selectAuthenticatorPageModel.PhoneAuthenticator.Displayed.Should().BeTrue();
         }
 
+        [Then(@"she is presented with an option to select SMS to verify")]
+        public void ThenSheIsPresentedWithAnOptionToSelectSmsToVerify()
+        {
+            _selectAuthenticatorAsyncPageModel.AssertPageOpenedAndValid();
+            Func<IWebElement> getSmsFactor = () => _selectAuthenticatorAsyncPageModel.SmsAuthenticator;
+            getSmsFactor.Should().NotThrow<NoSuchElementException>();
+            _selectAuthenticatorAsyncPageModel.SmsAuthenticator.Displayed.Should().BeTrue();
+        }
 
         [Then(@"she is presented with an option to select Email to verify")]
         public void SheIsPresentedWithAnOptionToSelectEmailToVerify()
@@ -60,6 +71,15 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         [When(@"She selects SMS from the list")]
         public void WhenSheSelectsSMSFromTheList()
         {
+            _selectAuthenticatorAsyncPageModel.SmsAuthenticator.Click();
+            _selectAuthenticatorAsyncPageModel.SubmitButton.Click();
+        }
+
+        [When(@"she selects Phone")]
+        [When(@"She selects Phone from the list")]
+        [When(@"she selects Phone from the list")]
+        public void WhenSheSelectsPhone()
+        {            
             _selectAuthenticatorPageModel.PhoneAuthenticator.Click();
             _selectAuthenticatorPageModel.SubmitButton.Click();
         }
@@ -88,13 +108,6 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         public void WhenSheSelectsOnSMS(string p0)
         {
             _selectAuthenticatorPageModel.SkipThisStepButton.Click();
-        }
-
-        [When(@"she selects Phone from the list")]
-        public void WhenSheSelectsPhoneFromTheList()
-        {
-            _selectAuthenticatorPageModel.PhoneAuthenticator.Click();
-            _selectAuthenticatorPageModel.SubmitButton.Click();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Okta.Idx.Sdk.E2ETests.Helpers;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps

@@ -26,23 +26,5 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         {
             await _context.EnrollPhoneAuthenticator();
         }
-
-        [Then(@"she should see a message ""(.*)""")]
-        public void ThenSheShouldSeeAMessage(string p0)
-        {
-            ScenarioContext.Current.Pending();
-        }
-
-        [Then(@"the sample show as error message ""(.*)"" on the SMS Challenge page")]
-        public void ThenTheSampleShowAsErrorMessageOnTheSMSChallengePage(string p0)
-        {
-            ScenarioContext.Current.Pending();
-        }
-
-        [Then(@"she sees a field to re-enter another code")]
-        public void ThenSheSeesAFieldToRe_EnterAnotherCode()
-        {
-            ScenarioContext.Current.Pending();
-        }
     }
 }
