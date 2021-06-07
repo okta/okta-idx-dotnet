@@ -1,0 +1,65 @@
+﻿@model embedded_auth_with_sdk.Models.SelectAuthenticatorViewModel
+
+@{
+    ViewBag.Title = "Set up Authenticators";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<hr />
+<div class="row d-center">
+    <div class="col-md-8">
+        <section id="selectAuthenticatorForm">
+            @using (Html.BeginForm("SelectAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                if (Model.CanSkip)
+                 {
+                     <h4>Set up optional authenticators</h4>
+                 }
+                 else
+                {
+                     <h4>Set up required</h4>
+
+                }
+                <h5>Set up authenticators for Okta to ensure that only you have access to your account.</h5>
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(m => m.PasswordId)
+                @Html.HiddenFor(m => m.PhoneId)
+                <ul class="no-padding-left">
+                    @foreach (var authenticator in Model.Authenticators)
+                    {
+                        <div>
+                            <label>
+                                @Html.RadioButtonFor(m => m.AuthenticatorId, authenticator.AuthenticatorId)
+                                @authenticator.Name
+                            </label>
+                        </div>
+                    }
+                </ul>
+                @Html.ValidationMessageFor(m => m.AuthenticatorId, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    <div class="col-md-offset-0 col-md-10">
+                        <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
+                    </div>
+                </div>
+            }
+            @if (Model.CanSkip)
+            {
+                using (Html.BeginForm("SkipAuthenticatorSelectionAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    <div class="form-group">
+                        <div class="col-md-offset-0 col-md-10">
+                        <input type="submit" name="skip" value="Skip this step" class="btn btn-info btn-stretch-wide" />
+                        </div>
+                    </div>
+                }
+
+            }
+            
+        </section>
+    </div>
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

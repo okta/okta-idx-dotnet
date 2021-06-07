@@ -1,0 +1,73 @@
+{
+    "version": "1.0.0",
+    "stateHandle": "02n7XX7W94pY8QZblFexcnHGR5XZNN_Qp3gVYDTFEv",
+    "expiresAt": "2021-06-01T18:58:15.000Z",
+    "intent": "LOGIN",
+    "user": {
+        "type": "object",
+        "value": {
+            "id": "00uuh90p3LLkky72y5d6"
+        }
+    },
+    "cancel": {
+        "rel": [
+            "create-form"
+        ],
+        "name": "cancel",
+        "href": "https://fake.example.com/idp/idx/cancel",
+        "method": "POST",
+        "produces": "application/ion+json; okta-version=1.0.0",
+        "value": [
+            {
+                "name": "stateHandle",
+                "required": true,
+                "value": "02n7XX7W94pY8QZblFexcnHGR5XZNN_Qp3gVYDTFEv",
+                "visible": false,
+                "mutable": false
+            }
+        ],
+        "accepts": "application/json; okta-version=1.0.0"
+    },
+    "app": {
+        "type": "object",
+        "value": {
+            "name": "oidc_client",
+            "label": "Dotnet IDX Web App",
+            "id": "xxxxxxxxxxxx"
+        }
+    },
+    "successWithInteractionCode": {
+        "rel": [
+            "create-form"
+        ],
+        "name": "issue",
+        "href": "https://fake.example.com/oauth2/austyqkbjaFoOxkl45d6/v1/token",
+        "method": "POST",
+        "value": [
+            {
+                "name": "grant_type",
+                "required": true,
+                "value": "interaction_code"
+            },
+            {
+                "name": "interaction_code",
+                "required": true,
+                "value": "T6J_vuM3rcvXxU8Awrx2uxE56bBXMDvcBZ9Z03gz-zk"
+            },
+            {
+                "name": "client_id",
+                "required": true,
+                "value": "xxxxxxxxxxxx"
+            },
+            {
+                "name": "client_secret",
+                "required": true
+            },
+            {
+                "name": "code_verifier",
+                "required": true
+            }
+        ],
+        "accepts": "application/x-www-form-urlencoded"
+    }
+}

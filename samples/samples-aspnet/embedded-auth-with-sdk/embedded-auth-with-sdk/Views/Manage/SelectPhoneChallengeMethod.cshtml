@@ -1,0 +1,43 @@
+﻿@model embedded_auth_with_sdk.Models.SelectAuthenticatorMethodViewModel
+@{
+    ViewBag.Title = ViewBag.Title ?? "Please choose the method for this authenticator";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row d-center">
+    <div class="col-md-8">
+        <section>
+            @using (Html.BeginForm("SelectPhoneChallengeMethodAsync", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <h4>@ViewBag.Title</h4>
+                <h5>A code will be sent to @Model.Profile</h5>
+                <hr />
+                @Html.HiddenFor(m => m.AuthenticatorId)
+                @Html.HiddenFor(m => m.EnrollmentId)
+                <ul class="no-padding-left">
+                    @foreach (var method in Model.MethodTypes)
+                    {
+                        <div>
+                            <label>
+                                @Html.RadioButtonFor(m => m.MethodType, method)
+                                @method
+                            </label>
+                        </div>
+                    }
+                </ul>
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    <div class="col-md-offset-0 col-md-10">
+                        <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

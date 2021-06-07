@@ -1,0 +1,52 @@
+﻿@model embedded_auth_with_sdk.Models.EnrollPhoneViewModel
+@{
+    ViewBag.Title = ViewBag.Title ?? "Setup phone authentication.";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+        @using (Html.BeginForm("EnrollPhoneAuthenticatorAsync", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <h4>Set up phone authentication</h4>
+            <h5>Format: {+}{country code}{area code}{number}</h5>
+            <h5>For example: +1555666777</h5>
+            <hr />
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="form-group">
+                <div class="col-md-10">
+                    <ul class="no-padding-left">
+                        @foreach (var method in Model.MethodTypes)
+                        {
+                            <div>
+                                <label>
+                                    @Html.RadioButtonFor(m => m.MethodType, method.Value)
+                                    @method
+                                </label>
+                            </div>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <div>
+                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "control-label" })
+                    </div>
+                    <div>
+                        @Html.EditorFor(m => m.PhoneNumber, new { htmlAttributes = new { @class = "form-control" }})
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

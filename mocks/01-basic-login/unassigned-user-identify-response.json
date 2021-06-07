@@ -1,0 +1,122 @@
+{
+   "version":"1.0.0",
+   "stateHandle":"02Clu3ID3n-BKnpbg3i6_dGHDJm54NKo4ML2IRAFMr",
+   "expiresAt":"2021-05-25T17:36:20.000Z",
+   "intent":"LOGIN",
+   "remediation":{
+      "type":"array",
+      "value":[
+         {
+            "rel":[
+               "create-form"
+            ],
+            "name":"identify",
+            "href":"https://foo.okta.com/idp/idx/identify",
+            "method":"POST",
+            "produces":"application/ion+json; okta-version=1.0.0",
+            "value":[
+               {
+                  "name":"identifier",
+                  "label":"Username"
+               },
+               {
+                  "name":"credentials",
+                  "type":"object",
+                  "form":{
+                     "value":[
+                        {
+                           "name":"passcode",
+                           "label":"Password",
+                           "secret":true
+                        }
+                     ]
+                  },
+                  "required":true
+               },
+               {
+                  "name":"rememberMe",
+                  "type":"boolean",
+                  "label":"Remember this device"
+               },
+               {
+                  "name":"stateHandle",
+                  "required":true,
+                  "value":"02Clu3ID3n-BKnpbg3i6_dGHDJm54NKo4ML2IRAFMr",
+                  "visible":false,
+                  "mutable":false
+               }
+            ],
+            "accepts":"application/json; okta-version=1.0.0"
+         }
+      ]
+   },
+   "messages":{
+      "type":"array",
+      "value":[
+         {
+            "message":"User is not assigned to this application",
+            "class":"ERROR"
+         }
+      ]
+   },
+   "currentAuthenticator":{
+      "type":"object",
+      "value":{
+         "recover":{
+            "rel":[
+               "create-form"
+            ],
+            "name":"recover",
+            "href":"https://foo.okta.com/idp/idx/recover",
+            "method":"POST",
+            "produces":"application/ion+json; okta-version=1.0.0",
+            "value":[
+               {
+                  "name":"stateHandle",
+                  "required":true,
+                  "value":"02Clu3ID3n-BKnpbg3i6_dGHDJm54NKo4ML2IRAFMr",
+                  "visible":false,
+                  "mutable":false
+               }
+            ],
+            "accepts":"application/json; okta-version=1.0.0"
+         },
+         "type":"password",
+         "key":"okta_password",
+         "id":"autsz6n08UcSpixTa5d6",
+         "displayName":"Password",
+         "methods":[
+            {
+               "type":"password"
+            }
+         ]
+      }
+   },
+   "cancel":{
+      "rel":[
+         "create-form"
+      ],
+      "name":"cancel",
+      "href":"https://foo.okta.com/idp/idx/cancel",
+      "method":"POST",
+      "produces":"application/ion+json; okta-version=1.0.0",
+      "value":[
+         {
+            "name":"stateHandle",
+            "required":true,
+            "value":"02Clu3ID3n-BKnpbg3i6_dGHDJm54NKo4ML2IRAFMr",
+            "visible":false,
+            "mutable":false
+         }
+      ],
+      "accepts":"application/json; okta-version=1.0.0"
+   },
+   "app":{
+      "type":"object",
+      "value":{
+         "name":"oidc_client",
+         "label":"Dotnet IDX Web App",
+         "id":"foo"
+      }
+   }
+}

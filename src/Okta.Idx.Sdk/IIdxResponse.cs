@@ -48,17 +48,38 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// The method to call when you want to cancel the Okta Identity Engine flow. This will return an IdxResponse
         /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>An IdxResponse.</returns>
         Task<IIdxResponse> CancelAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Gets the current authenticator
+        /// </summary>
+        IAuthenticatorEnrollmentData CurrentAuthenticator { get; }
+
+        /// <summary>
         /// Gets the current authenticator enrollment
         /// </summary>
-        IAuthenticatorEnrollment CurrentAuthenticatorEnrollment { get; }
+        IAuthenticatorEnrollmentData CurrentAuthenticatorEnrollment { get; }
+
+        /// <summary>
+        /// Gets the authenticators
+        /// </summary>
+        IAuthenticators Authenticators { get;  }
+
+        /// <summary>
+        /// Gets the user's authenticator enrollments
+        /// </summary>
+        IAuthenticatorEnrollments AuthenticatorEnrollments { get; }
 
         /// <summary>
         /// Gets a value indicating whether login was successful
         /// </summary>
         bool IsLoginSuccess { get; }
+
+        /// <summary>
+        /// Gets messages from the server
+        /// </summary>
+        IIdxMessages IdxMessages { get; }
     }
 }

@@ -41,6 +41,11 @@ namespace Okta.Idx.Sdk
         string Href { get; }
 
         /// <summary>
+        /// Gets the Idp
+        /// </summary>
+        IIdp Idp { get; }
+
+        /// <summary>
         /// Gets the Accepts Header for this remediation option.
         /// </summary>
         string Accepts { get; }
