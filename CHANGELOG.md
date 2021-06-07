@@ -2,9 +2,12 @@
 
 ## 0.1.0-beta04
 
-* Add new methods to represent different actions in the authentication flow.
+### Features
 
-### New Methods
+* Add new methods to represent different actions in the authentication flow.
+* Add ASP.NET 4.8 samples showing how to use the SDK.
+
+#### New Methods
 
 * `Task<AuthenticationResponse> ChangePasswordAsync(ChangePasswordOptions changePasswordOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);`
 

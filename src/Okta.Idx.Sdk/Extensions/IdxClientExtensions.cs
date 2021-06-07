@@ -39,7 +39,7 @@ namespace Okta.Idx.Sdk
 
         internal static void AssertNotInTerminalState(this IIdxResponse response)
         {
-            if (response.IdxMessages != null && response.IdxMessages.Messages.Any())
+            if (response?.IdxMessages?.Messages?.Any() ?? false)
             {
                 throw new TerminalStateException(response.IdxMessages);
             }
