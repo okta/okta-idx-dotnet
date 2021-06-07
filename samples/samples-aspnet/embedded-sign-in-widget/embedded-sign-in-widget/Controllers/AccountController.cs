@@ -1,17 +1,12 @@
 ﻿using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using embedded_auth_with_sdk.Models;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
-using Okta.Sdk.Abstractions;
 
 namespace embedded_auth_with_sdk.Controllers
 {
-    using AuthenticationOptions = Okta.Idx.Sdk.AuthenticationOptions;
-
     public class AccountController : Controller
     {
         private readonly IAuthenticationManager _authenticationManager;
