@@ -105,7 +105,7 @@ Type: `AuthenticationStatus.AwaitingAuthenticatorEnrollment`
 
 The user needs to enroll an authenticator to continue with the authentication flow and retrieve tokens. You can retrieve the authenticators information by calling `authnResponse.Authenticators`.
 
-### Awaiting for challenge authenticator selection
+#### Awaiting for challenge authenticator selection
 
 Type: `AwaitingChallengeAuthenticatorSelection`
 
@@ -113,25 +113,25 @@ The user needs to select and challenge an additional authenticator to continue w
 
 There other statuses that you can get when calling other methods of the `IdxClient`:
 
-### Awaiting for Authenticator Verification
+#### Awaiting for Authenticator Verification
 
 Type: `AwaitingAuthenticatorVerification`
 
 The user has successfully selected an authenticator to challenge so they now need to verify the selected authenticator. For example, if the user selected phone, this status indicates that they have to provide they code they received to verify the authenticator.
 
-### Awaiting for Authenticator Enrollment Data
+#### Awaiting for Authenticator Enrollment Data
 
 Type: `AwaitingAuthenticatorEnrollmentData`
 
 The user needs to provide additional authenticator information. For example, when a user selects to enroll phone they will have to provide their phone number to complete the enrollment process. You can retrieve current authenticator information by calling  `authnResponse.CurrentAuthenticator`.
 
-### Awaiting for Challenge Authenticator Data
+#### Awaiting for Challenge Authenticator Data
 
 Type: `AwaitingChallengeAuthenticatorData`
 
 The user needs to provide additional authenticator information. For example, when a user selects to challenge phone they will have to choose if they want to receive the code via voice or SMS. You can retrieve current authenticator enrollment information by calling `authnResponse.CurrentAuthenticatorEnrollment`.
 
-### Awaiting for Password Reset
+#### Awaiting for Password Reset
 
 Type: `AwaitingPasswordReset`
 
@@ -152,6 +152,8 @@ The SDK throws an `OktaException` everytime the server responds with an invalid 
 `UnexpectedRemediationException` is an `OktaException` derived class that usually indicates inconsistencies in the configuration. It is recommended to verify your policy configuration when you face with this error.
 
 `RedeemInteractionCodeException` is an `OktaException` derived class that indicates there was an error when redeeming the interaction code.
+
+`TerminalException`  is an `OktaException` derived class that indicates that the user cannot continue the current flow, possibly due to an error or required additional actions outside of the authentication flow.
 
 For more usage examples check out our [ASP.NET Sample Application](samples/samples-aspnet).
 
