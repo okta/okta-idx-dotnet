@@ -32,7 +32,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers.A18NClient
             {
                 if (!string.IsNullOrEmpty(newProfileUniqueTag))
                 {
-                    CleanUpOldUsedProfiles(newProfileUniqueTag);
+                    CleanUpOldProfiles(newProfileUniqueTag);
                 }
 
                 var newProfile = CreateProfileAsync(newProfileUniqueTag).Result;
@@ -307,7 +307,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers.A18NClient
             }
         }
 
-        private void CleanUpOldUsedProfiles(string newProfileUniqueTag)
+        private void CleanUpOldProfiles(string newProfileUniqueTag)
         {
             var activeProfiles = GetActiveProfilesAsync().Result;
 
