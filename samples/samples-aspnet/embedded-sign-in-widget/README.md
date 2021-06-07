@@ -35,20 +35,7 @@ Run the example with your preferred tool, see [Run the web application from Visu
 
 #### Run the web application from Visual Studio
 
-When you run this project in Visual Studio it starts the web application on port 44314 using HTTPS. You can change this configuration in the `launchSettings.json` in the Properties folder.
-
-#### Run the web application from dotnet CLI
-
-When you run this project via the dotnet CLI it will start the web application on port 5001 using HTTPS. You can change this configuration in the `launchSettings.json` in the Properties folder.
-
-Navigate to the folder where the project file is located and type the following:
-
-```dotnet run```
-
-### Trust the local dev certificate if necessary
-
-When you run an ASP.NET Core 3.x application for the first time, you may notice an error page warning you that the site is potentially unsafe.
-This is because ASP.NET Core creates an HTTPS development certificate for you as part of the first-run experience that needs to be trusted by your browser. You can ignore the warning by clicking on Advanced and telling the browser to visit this site even though there is no certificate for it. Or you can trust the certificate to get rid of this warning, check out [Configuring HTTPS in ASP.NET Core across different platforms] for more details.
+When you run this project in Visual Studio it starts the web application on port 44314 using HTTPS. 
 
 ### Configure your application in the Okta Developer Console
 
