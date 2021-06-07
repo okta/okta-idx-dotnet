@@ -26,8 +26,6 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
         [Given(@"her password is correct")]
         public void GivenHerPasswordIsCorrect()
         {
-            //???
         }
-
     }
 }
