@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 
-namespace embedded_auth_with_sdk
+namespace embedded_sign_in_widget
 {
     public class FilterConfig
     {

@@ -5,7 +5,7 @@ using Unity;
 using Unity.Injection;
 using Unity.Mvc5;
 
-namespace embedded_auth_with_sdk
+namespace embedded_sign_in_widget
 {
     using Okta.Idx.Sdk;
 

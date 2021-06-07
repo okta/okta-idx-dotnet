@@ -2,7 +2,7 @@
 using Okta.Idx.Sdk;
 using System.Security.Claims;
 
-namespace embedded_auth_with_sdk
+namespace embedded_sign_in_widget
 {
     using System;
     using System.Collections.Generic;

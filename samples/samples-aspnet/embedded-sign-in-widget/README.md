@@ -25,13 +25,11 @@ Before running this sample, you will need the following:
 
 ### Clone the repository
 
-```git clone https://github.com/okta/samples-aspnetcore.git```
+Clone this repo and add your Okta configuration by following the [IDX SDK Configuration Reference](../../../README.md#configuration-reference) 
 
 ### Run the web application
 
 Run the example with your preferred tool, see [Run the web application from Visual Studio](#run-the-web-application-from-visual-studio) or [Run the web application from dotnet CLI](#run-the-web-application-from-dotnet-cli).
-
-> **NOTE:** This sample is using ASP.NET Core 3.1 which enforces HTTPS. This is a recommended practice for web applications. See [Enforce HTTPS in ASP.NET Core] for more details.
 
 > Because of [Set-Cookie behavior (SameSite)](https://web.dev/samesite-cookies-explained) this code will only work properly if it's configured to use https. See [Work with SameSite cookies in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/samesite?view=aspnetcore-3.1) for more details.
 
@@ -69,13 +67,6 @@ Your application must be configured to allow your application to make requests t
 
 For step-by-step instructions, visit the Okta [Sign Users in to Your Web Application guide] which shows how to sign users in using Okta and, [Sign Users Out guide] which shows how to sign users out of your application and out of Okta.
 
-### Configure your project
-
-Replace the okta configuration placeholders in the `appsettings.json` with configuration values from your [Okta Developer Console]. 
-All the available configuration options are documented here [https://github.com/okta/okta-aspnet/blob/master/docs/aspnetcore-mvc.md#configuration-reference](https://github.com/okta/okta-aspnet/blob/master/docs/aspnetcore-mvc.md#configuration-reference).
-
-For step-by-step instructions, visit the Okta [Sign Users in to Your Web Application guide]. The guide will walk you through adding Okta sign-in to your ASP.NET application.
-
 ### Run your application and sign in
 
 Click the **Sign In** link on the Home page and you are directed to the sign-in page.
@@ -83,11 +74,3 @@ Click the **Sign In** link on the Home page and you are directed to the sign-in 
 Sign in using the same account you created when you signed up for your Developer Org, or you can use a known username and password from your Okta Directory.
 
 **Note:** If you are currently using your Developer Console, you already have a Single Sign-On (SSO) session for your Org.  You will be automatically signed into your application as the same user that is using the Developer Console.  You may want to use an incognito tab to test the flow from a blank slate.
-
-[Okta ASP.NET Core SDK]: https://github.com/okta/okta-aspnet
-[OIDC Web Application Setup Instructions]: https://developer.okta.com/authentication-guide/implementing-authentication/auth-code#1-setting-up-your-application
-[Enforce HTTPS in ASP.NET Core]: https://docs.microsoft.com/en-us/aspnet/core/security/enforcing-ssl?view=aspnetcore-2.2&tabs=visual-studio
-[Configuring HTTPS in ASP.NET Core across different platforms]:https://devblogs.microsoft.com/aspnet/configuring-https-in-asp-net-core-across-different-platforms/
-[Sign Users in to Your Web Application guide]: https://developer.okta.com/guides/sign-into-web-app/aspnet/before-you-begin/
-[Sign Users Out guide]: https://developer.okta.com/guides/sign-users-out/aspnetcore/before-you-begin/
-[Okta Developer Console]: https://login.okta.com

@@ -8,7 +8,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 
-namespace embedded_auth_with_sdk
+namespace embedded_sign_in_widget
 {
     public class MvcApplication : System.Web.HttpApplication
     {

@@ -5,7 +5,7 @@ using System.Web.Mvc;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 
-namespace embedded_auth_with_sdk.Controllers
+namespace embedded_sign_in_widget.Controllers
 {
     public class AccountController : Controller
     {

@@ -4,7 +4,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
 
-namespace embedded_auth_with_sdk
+namespace embedded_sign_in_widget
 {
     [ExcludeFromCodeCoverage]
 #pragma warning disable SA1601 // Partial elements should be documented

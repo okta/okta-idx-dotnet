@@ -1,4 +1,4 @@
-﻿using embedded_auth_with_sdk.Models;
+﻿using embedded_sign_in_widget.Models;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 using System;
@@ -6,7 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
-namespace embedded_auth_with_sdk.Controllers
+namespace embedded_sign_in_widget.Controllers
 {
     public class InteractionCodeController : Controller
     {

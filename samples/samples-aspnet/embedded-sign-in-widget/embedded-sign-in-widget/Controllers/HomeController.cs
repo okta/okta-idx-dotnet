@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace embedded_auth_with_sdk.Controllers
+namespace embedded_sign_in_widget.Controllers
 {
     public class HomeController : Controller
     {
