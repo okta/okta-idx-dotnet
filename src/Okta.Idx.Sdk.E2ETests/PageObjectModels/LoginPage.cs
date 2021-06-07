@@ -18,7 +18,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
         public override void AssertPageOpenedAndValid() 
         {
             base.AssertPageOpenedAndValid();
-            Title.Should().StartWith("Login");
+            Title.Should().StartWith("Sign In");
         }
     }
 }

@@ -5,9 +5,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using A18NClient.Dto;
+using Okta.Idx.Sdk.E2ETests.Helpers.A18NClient.Dto;
 
-namespace A18NClient
+namespace Okta.Idx.Sdk.E2ETests.Helpers.A18NClient
 {
     public class A18nClient : IA18nClient, IDisposable
     {
@@ -32,7 +32,7 @@ namespace A18NClient
             {
                 if (!string.IsNullOrEmpty(newProfileUniqueTag))
                 {
-                    CleanUpOldUsedProfiles(newProfileUniqueTag);
+                    CleanUpOldProfiles(newProfileUniqueTag);
                 }
 
                 var newProfile = CreateProfileAsync(newProfileUniqueTag).Result;
@@ -307,7 +307,7 @@ namespace A18NClient
             }
         }
 
-        private void CleanUpOldUsedProfiles(string newProfileUniqueTag)
+        private void CleanUpOldProfiles(string newProfileUniqueTag)
         {
             var activeProfiles = GetActiveProfilesAsync().Result;
 

@@ -1,7 +1,7 @@
-﻿using A18NClient;
-using A18NClient.Dto;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Okta.Idx.Sdk.E2ETests.Helpers.A18NClient;
+using Okta.Idx.Sdk.E2ETests.Helpers.A18NClient.Dto;
 
 namespace Okta.Idx.Sdk.E2ETests.Helpers
 {
@@ -57,54 +57,41 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
         }
 
         public async Task<string> GetRecoveryCodeFromEmail()
-        {
-            for (int tries = 0; tries < MaxAttempts; tries++) 
-            {
-                try
-                {
-                    var mail = await _a18nClient.GetLatestEmailMessageAsync();
-
-                    return ExtractRecoveryCodeFromMessage(mail.Content);
-
-                }
-                catch (NotFoundException)
-                {
-                    // expected exception when a mail box is empty
-                }
-                await Task.Delay(1000);
-            }
-
-            return string.Empty;
+        {            
+            return await GetRecoveryCodeFromMessage(() => _a18nClient.GetLastMessagePlainContentAsync());
         }
 
         public async Task<string> GetRecoveryCodeFromSms()
         {
-            for (int tries = 0; tries < MaxAttempts; tries++)
-            {
-                try
-                {
-                    var smsContent = await _a18nClient.GetLastSmsPlainContentAsync();
-
-                    if (!string.IsNullOrEmpty(smsContent))
-                    {
-                        return ExtractRecoveryCodeFromMessage(smsContent);
-                    }
-                }
-                catch (NotFoundException)
-                {
-                    // expected exception when a mail box is empty
-                }
-                await Task.Delay(1000);
-            }
-
-            return string.Empty;
+            return await GetRecoveryCodeFromMessage(()=>_a18nClient.GetLastSmsPlainContentAsync());
         }
-
 
         public void Dispose()
         {
             Dispose(true);
         }
+
+        private async Task<string> GetRecoveryCodeFromMessage(Func<Task<string>> getMessageBodyFunc)
+        {
+            for (int tries = 0; tries < MaxAttempts; tries++)
+            {
+                try
+                {
+                    var messageBody = await getMessageBodyFunc();
+
+                    return ExtractRecoveryCodeFromMessage(messageBody);
+
+                }
+                catch (NotFoundException)
+                {
+                    // expected exception when a mail box is empty
+                }
+                await Task.Delay(1000);
+            }
+
+            return string.Empty;
+        }
+
 
         private string ExtractRecoveryCodeFromMessage(string text)
         {

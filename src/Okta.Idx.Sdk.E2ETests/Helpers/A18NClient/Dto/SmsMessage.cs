@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace A18NClient.Dto
+namespace Okta.Idx.Sdk.E2ETests.Helpers.A18NClient.Dto
 {
     public class SmsMessage
     {

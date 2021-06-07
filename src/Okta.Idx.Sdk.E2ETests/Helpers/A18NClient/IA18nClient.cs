@@ -1,8 +1,8 @@
-﻿using A18NClient.Dto;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Okta.Idx.Sdk.E2ETests.Helpers.A18NClient.Dto;
 
-namespace A18NClient
+namespace Okta.Idx.Sdk.E2ETests.Helpers.A18NClient
 {
     public interface IA18nClient
     {
