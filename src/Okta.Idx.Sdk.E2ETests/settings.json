@@ -1,7 +1,7 @@
 ﻿{
   "okta": {
     "testing": {
-      "A18nProfileTag": "dotnet-idx-sdk",
+      "A18nProfileTag": "okta-idx-dotnet",
       "IISPort": 8080,
       "MfaRequiredGroup": "MFA Required",
       "PhoneEnrollmentRequiredGroup": "Phone Enrollment Required"
