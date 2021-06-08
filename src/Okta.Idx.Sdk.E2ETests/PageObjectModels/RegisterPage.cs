@@ -9,7 +9,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
     public class RegisterPage : BasePage
     {
         public override string RelativePageUri => "Account/Register";
-        public RegisterPage(WebDriverDriver webDriverDriver, ITestConfig testConfiguration)
+        public RegisterPage(WebDriverDriver webDriverDriver, ITestConfiguration testConfiguration)
             : base(webDriverDriver, testConfiguration)
         { }
 

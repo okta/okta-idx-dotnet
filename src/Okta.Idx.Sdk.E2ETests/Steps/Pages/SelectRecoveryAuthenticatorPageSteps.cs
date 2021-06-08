@@ -1,24 +1,17 @@
 ﻿using FluentAssertions;
-using Okta.Idx.Sdk.E2ETests.Helpers;
 using Okta.Idx.Sdk.E2ETests.PageObjectModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
 {
     [Binding]
-    public class SelectRecoveryAuthenticatorPageSteps : BasePageSteps
+    public class SelectRecoveryAuthenticatorPageSteps : BaseTestSteps
     {
         private SelectRecoveryAuthenticatorPage _selectRecoveryAuthenticatorPageModel;
 
-        public SelectRecoveryAuthenticatorPageSteps(ITestConfig testConfig,
-            ITestUserHelper userHelper,
+        public SelectRecoveryAuthenticatorPageSteps(ITestContext context,
             SelectRecoveryAuthenticatorPage selectRecoveryAuthenticatorPageModel)
-            : base(testConfig)
+            : base(context)
         {
             _selectRecoveryAuthenticatorPageModel = selectRecoveryAuthenticatorPageModel;
         }

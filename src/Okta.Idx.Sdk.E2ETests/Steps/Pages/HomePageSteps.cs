@@ -5,19 +5,19 @@ using TechTalk.SpecFlow;
 namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
 {
     [Binding]
-    public class HomePageSteps: BasePageSteps
+    public class HomePageSteps: BaseTestSteps
     {
         private HomePage _homePageModel;
         private LoginPage _loginPageModel;
         private ResetPasswordPage _resetPasswordPageModel;
         private RegisterPage _registerPageModel;
 
-        public HomePageSteps(ITestConfig testConfig, 
+        public HomePageSteps(ITestContext context, 
             HomePage homePageModel, 
             LoginPage loginPageModel,
             ResetPasswordPage resetPasswordPageModel,
             RegisterPage registerPageModel)
-            :base(testConfig)
+            :base(context)
         {
             _homePageModel = homePageModel;
             _loginPageModel = loginPageModel;
@@ -74,7 +74,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         [Then(@"the preferred_username claim is shown and matches Mary's email")]
         public void ThenThePreferred_UsernameClaimIsShownAndMatchesMarySEmail()
         {
-            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_testConfig.TestUser.Email);
+            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.UserProfile.Email);
         }
 
         [Then(@"an application session is created")]
@@ -82,7 +82,7 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         {
             _homePageModel.ClaimAccessTokenLabel.Text.Should().NotBeEmpty();
             _homePageModel.ClaimIdTokenLabel.Text.Should().NotBeEmpty();
-            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_testConfig.TestUser.Email);
+            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.UserProfile.Email);
         }
 
     }
