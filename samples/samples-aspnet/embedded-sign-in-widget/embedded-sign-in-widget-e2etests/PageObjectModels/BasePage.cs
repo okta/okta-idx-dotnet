@@ -39,6 +39,7 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
         protected IWebElement TryFindElement(By by)
         {
             int tryCount = 0;
+            Exception thrown = null;
             while (tryCount < 3)
             {
                 try
@@ -46,13 +47,14 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
                     tryCount++;
                     return _webDriver.FindElement(by);
                 }
-                catch (System.Exception)
+                catch (System.Exception ex)
                 {
+                    thrown = ex;
                     Thread.Sleep(500);
                 }
             }
 
-            throw new Exception("Something went wrong");
+            throw thrown ?? new Exception("Something went wrong");
         }
     }
 }
