@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNet.Identity
+@model IEnumerable<System.Security.Claims.Claim>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+@if (!Request.IsAuthenticated)
+{
+    <div class="jumbotron">
+        <h1>Welcome to the Okta Samples for ASP.NET MVC!</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Congrats on starting this sample application in ASP.NET MVC!</h2>
+            <p>
+                This sample will demonstrate how to build views that facilitate some common authentication flows:
+                <ul>
+                    <li>
+            <p>Sign In
+            <p /></li>
+            <li>
+                <p>Sign Up
+                <p />
+            </li>
+            <li>
+                <p>Sign Out
+                <p />
+            </li>
+            </ul>
+            </p>
+            <p>
+                To learn more about enabling advanced authentication use cases in this application check out this guide. To get started, click a button below.
+            <p />
+            <div>
+
+            @Html.ActionLink("Sign In", "SignInWidget", "Account", routeValues: null, htmlAttributes: new { @class = "btn btn-primary", @id = "LoginBtn" })
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @Html.Partial("_ProfilePartial", Model)
+}
