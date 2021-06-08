@@ -1,6 +1,6 @@
 ﻿namespace Okta.Idx.Sdk.E2ETests
 {
-    public interface IConfiguration
+    public interface ITestConfiguration
     {
         string UserPassword { get; set; }
         string A18nApiKey { get; set; }

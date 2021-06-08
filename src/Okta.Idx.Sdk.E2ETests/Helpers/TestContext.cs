@@ -8,7 +8,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
     public class TestContext : ITestContext, IDisposable
     {
         private readonly IA18nClient _a18nClient;
-        private readonly IConfiguration _configuration;
+        private readonly ITestConfiguration _configuration;
         private readonly A18nProfile _a18nProfile;
         private readonly IOktaSdkHelper _oktaHelper;
 
@@ -24,7 +24,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
 
         public UserProfile UserProfile { get; private set; }
 
-        public TestContext(IConfiguration configuration, IA18nClient a18nClient, IOktaSdkHelper oktaHelper)
+        public TestContext(ITestConfiguration configuration, IA18nClient a18nClient, IOktaSdkHelper oktaHelper)
         {
             _oktaHelper = oktaHelper;
             _a18nClient = a18nClient;

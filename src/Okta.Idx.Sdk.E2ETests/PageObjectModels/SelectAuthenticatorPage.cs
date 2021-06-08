@@ -12,7 +12,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
         public IWebElement SubmitButton => _webDriver.FindElement(By.XPath("//input[@Value=\"Submit\"]"));
         public IWebElement SkipThisStepButton => _webDriver.FindElement(By.XPath("//input[@name=\"skip\"]"));
 
-        public SelectAuthenticatorPage(WebDriverDriver webDriverDriver, IConfiguration testConfiguration)
+        public SelectAuthenticatorPage(WebDriverDriver webDriverDriver, ITestConfiguration testConfiguration)
             : base(webDriverDriver, testConfiguration)
         {
 

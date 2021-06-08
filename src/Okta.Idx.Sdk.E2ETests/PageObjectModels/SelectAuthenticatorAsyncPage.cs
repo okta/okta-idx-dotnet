@@ -6,7 +6,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
     public class SelectAuthenticatorAsyncPage : BasePage
     {
         public override string RelativePageUri => "Manage/SelectAuthenticatorAsync";
-        public SelectAuthenticatorAsyncPage(WebDriverDriver webDriverDriver, IConfiguration testConfiguration)
+        public SelectAuthenticatorAsyncPage(WebDriverDriver webDriverDriver, ITestConfiguration testConfiguration)
             : base(webDriverDriver, testConfiguration)
         { }
 

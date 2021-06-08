@@ -6,10 +6,10 @@ namespace Okta.Idx.Sdk.E2ETests
 {
     internal static class ConfigBuilder 
     {
-        private static Lazy<Configuration> _testConfig = new Lazy<Configuration>(() => BuildProperties());
-        internal static Configuration Configuration => _testConfig.Value;
+        private static Lazy<TestConfiguration> _testConfig = new Lazy<TestConfiguration>(() => BuildProperties());
+        internal static TestConfiguration Configuration => _testConfig.Value;
 
-        private static Configuration BuildProperties()
+        private static TestConfiguration BuildProperties()
         {
             string configurationFileRoot = Directory.GetCurrentDirectory();
             var applicationAppSettingsLocation = Path.Combine(configurationFileRoot ?? string.Empty, "settings.json");
@@ -19,7 +19,7 @@ namespace Okta.Idx.Sdk.E2ETests
                 .AddEnvironmentVariables("okta_testing", "_", root: "okta:testing");
 
 
-            var compiledConfig = new Configuration();
+            var compiledConfig = new TestConfiguration();
             configBuilder.Build().GetSection("okta").GetSection("testing").Bind(compiledConfig);
             configBuilder.Build().Bind(compiledConfig);
 

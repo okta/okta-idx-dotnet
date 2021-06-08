@@ -16,7 +16,7 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
         private IObjectContainer _container;
 
         private static IWebServerDriver _webServerDriver;
-        private static IConfiguration _config;
+        private static ITestConfiguration _config;
         private static A18nClient _a18nClient;
         private const string DefaultProfileTag= "okta-idx-dotnet";
 
@@ -28,7 +28,7 @@ namespace Okta.Idx.Sdk.E2ETests.Hooks
         [BeforeScenario]
         public void BeforeScenario()
         {
-            _container.RegisterInstanceAs<IConfiguration>(_config);
+            _container.RegisterInstanceAs<ITestConfiguration>(_config);
             _container.RegisterInstanceAs<IA18nClient>(_a18nClient);
             _container.RegisterTypeAs<OktaSdkHelper, IOktaSdkHelper>(); 
             _container.RegisterTypeAs<TestContext, ITestContext>();

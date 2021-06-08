@@ -29,7 +29,6 @@ namespace Okta.Idx.Sdk.E2ETests.Steps.Pages
         }
 
         [When(@"she inputs an invalid phone number")]
-        [When(@"She inputs a invalid phone number")]
         public void WhenSheInputsAnInvalidPhoneNumber()
         {
             _enrollPhoneAuthenticatorPageModel.PhoneNumberInput.SendKeys("+1");
