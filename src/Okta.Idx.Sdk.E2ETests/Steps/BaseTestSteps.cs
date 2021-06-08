@@ -4,12 +4,13 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
 {
     public abstract class BaseTestSteps
     {
-        protected TestUserProperties _testUser;
         protected ITestUserHelper _userHelper;
+        protected ITestConfig _testConfig;
 
-        public BaseTestSteps(ITestUserHelper userHelper)
+        public BaseTestSteps(ITestUserHelper userHelper, ITestConfig testConfig)
         {
             _userHelper = userHelper;
+            _testConfig = testConfig;
         }
     }
 }

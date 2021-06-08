@@ -2,7 +2,8 @@
   "okta": {
     "testing": {
       "A18nProfileTag": "okta-idx-dotnet",
-      "IISPort": 8080
+      "IISPort": 8080,
+      "MfaRequiredGroupName": "MFA Required"
     }
   }
 }

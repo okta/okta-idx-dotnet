@@ -8,5 +8,8 @@
         string A18nProfileTag { get; set; }
         int IisPort { get; set; }
         string SiteUrl { get; set; }
+        string MfaRequiredGroupName { get; set; }
+        TestUserProperties TestUser { get; set; }
+
     }
 }
