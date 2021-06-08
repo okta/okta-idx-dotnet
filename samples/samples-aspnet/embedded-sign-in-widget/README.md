@@ -7,12 +7,8 @@ to request to gain access to the Okta Identity Engine, please reach out to your 
 do not have an account manager, please reach out to oie@okta.com for more information.
 
 This Sample Application will show you the best practices for integrating Authentication by embedding the 
-Sign In Widget into your application. The Sign In Widget is powered by [Okta's Identity Engine](https://
-developer.okta.com/docs/concepts/ie-intro/) and will adjust your user experience based on policies. 
+Sign In Widget into your application. The Sign In Widget is powered by [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/) and will adjust your user experience based on policies. 
 Once integrated, you will be able to utilize all the features of Okta's Sign In Widget in your application.
-
-For information and guides on how to build your app with this sample, please take a look at the [{FRAMEWORK} 
-guides for Embedded Sign In Widget Authentication](link to DevDoc SBS guide)
 
 ## Installation & Running The App
 
@@ -27,13 +23,11 @@ Before running this sample, you will need the following:
 
 Clone this repo and add your Okta configuration by following the [IDX SDK Configuration Reference](../../../README.md#configuration-reference) 
 
-### Run the web application
+> Note: This application assumes you have your configuration in an okta.yaml file located in a .okta folder in the application or project's root directory. 
+> The `IdxClient` , which is provided to the application via DI in the `App_Start > UnityConfig.cs` file, grabs the required configuration from the yaml file.
 
-Run the example with your preferred tool, see [Run the web application from Visual Studio](#run-the-web-application-from-visual-studio) or [Run the web application from dotnet CLI](#run-the-web-application-from-dotnet-cli).
 
-> Because of [Set-Cookie behavior (SameSite)](https://web.dev/samesite-cookies-explained) this code will only work properly if it's configured to use https. See [Work with SameSite cookies in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/samesite?view=aspnetcore-3.1) for more details.
-
-#### Run the web application from Visual Studio
+### Run the web application from Visual Studio
 
 When you run this project in Visual Studio it starts the web application on port 44314 using HTTPS. 
 
@@ -52,8 +46,6 @@ Your application must be configured to allow your application to make requests t
 - In your [Okta Developer Console], go to **Security > API > Trusted Origins** 
 - Add your web application’s base URL `https://localhost:44314/` as a **Trusted Origin**.
 
-For step-by-step instructions, visit the Okta [Sign Users in to Your Web Application guide] which shows how to sign users in using Okta and, [Sign Users Out guide] which shows how to sign users out of your application and out of Okta.
-
 ### Run your application and sign in
 
 Click the **Sign In** link on the Home page and you are directed to the sign-in page.
@@ -61,3 +53,7 @@ Click the **Sign In** link on the Home page and you are directed to the sign-in 
 Sign in using the same account you created when you signed up for your Developer Org, or you can use a known username and password from your Okta Directory.
 
 **Note:** If you are currently using your Developer Console, you already have a Single Sign-On (SSO) session for your Org.  You will be automatically signed into your application as the same user that is using the Developer Console.  You may want to use an incognito tab to test the flow from a blank slate.
+
+[OIDC Web Application Setup Instructions]: https://developer.okta.com/authentication-guide/implementing-authentication/auth-code#1-setting-up-your-application
+[Sign Users in to Your Web Application guide]: https://developer.okta.com/guides/sign-into-web-app/aspnet/before-you-begin/
+[Okta Developer Console]: https://login.okta.com
