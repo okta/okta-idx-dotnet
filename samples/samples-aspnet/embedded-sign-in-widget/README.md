@@ -27,10 +27,6 @@ Before running this sample, you will need the following:
 
 Clone this repo and add your Okta configuration by following the [IDX SDK Configuration Reference](../../../README.md#configuration-reference) 
 
-### Run the web application
-
-Run the example with your preferred tool, see [Run the web application from Visual Studio](#run-the-web-application-from-visual-studio).
-
 #### Run the web application from Visual Studio
 
 When you run this project in Visual Studio it starts the web application on port 44314 using HTTPS. 
