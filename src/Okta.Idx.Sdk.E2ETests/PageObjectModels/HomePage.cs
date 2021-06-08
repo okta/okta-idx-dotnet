@@ -6,7 +6,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
 {
     public class HomePage : BasePage
     {
-        public HomePage(WebDriverDriver webDriverDriver, IConfiguration testConfiguration) : base(webDriverDriver, testConfiguration)
+        public HomePage(WebDriverDriver webDriverDriver, ITestConfiguration testConfiguration) : base(webDriverDriver, testConfiguration)
         { }
 
         public IWebElement LoginButton => _webDriver.FindElement(By.Id("LoginBtn"));

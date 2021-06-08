@@ -6,7 +6,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
 {
     public class LoginPage : BasePage
     {
-        public LoginPage(WebDriverDriver webDriverDriver, IConfiguration testConfiguration) : base(webDriverDriver, testConfiguration)
+        public LoginPage(WebDriverDriver webDriverDriver, ITestConfiguration testConfiguration) : base(webDriverDriver, testConfiguration)
         { }
 
         public override string RelativePageUri => "Account/Login";

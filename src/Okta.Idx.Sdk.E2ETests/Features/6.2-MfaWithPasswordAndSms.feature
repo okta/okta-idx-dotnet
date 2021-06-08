@@ -53,7 +53,7 @@
 	When she clicks Login
 	Then she is presented with an option to select SMS to enroll
 	When She selects Phone from the list
-	And She inputs a invalid phone number
+	And she inputs an invalid phone number
 	#And She selects "Receive a Code"
 	And submits the enrollment form
 	Then she should see a message "Unable to initiate factor enrollment: Invalid Phone Number"
