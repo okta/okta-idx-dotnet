@@ -14,7 +14,6 @@
 	And her password is correct
 	When she clicks Login
 	Then she is presented with a list of factors
-
 #
 	When She selects Phone from the list
 	And She inputs a valid phone number
@@ -37,7 +36,6 @@
 	Then she is presented with an option to select Phone
 	When she selects Phone
 	Then she is presented with an option to select SMS to verify
-
 	When She selects SMS from the list
 	And She selects "Receive a Code"
 	Then the screen changes to receive an input for a code
@@ -78,7 +76,7 @@
 	When She selects SMS from the list
 
 	Then the screen changes to receive an input for a code
-# When She inputs the incorrect code from the email
+# was: When She inputs the incorrect code from the email
 	When She inputs the incorrect code from the sms
 	Then the sample show as error message "Invalid code. Try again." on the SMS Challenge page
 	And she sees a field to re-enter another code
