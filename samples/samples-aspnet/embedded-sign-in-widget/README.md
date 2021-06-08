@@ -29,9 +29,7 @@ Clone this repo and add your Okta configuration by following the [IDX SDK Config
 
 ### Run the web application
 
-Run the example with your preferred tool, see [Run the web application from Visual Studio](#run-the-web-application-from-visual-studio) or [Run the web application from dotnet CLI](#run-the-web-application-from-dotnet-cli).
-
-> Because of [Set-Cookie behavior (SameSite)](https://web.dev/samesite-cookies-explained) this code will only work properly if it's configured to use https. See [Work with SameSite cookies in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/security/samesite?view=aspnetcore-3.1) for more details.
+Run the example with your preferred tool, see [Run the web application from Visual Studio](#run-the-web-application-from-visual-studio).
 
 #### Run the web application from Visual Studio
 
