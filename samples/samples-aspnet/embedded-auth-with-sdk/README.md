@@ -32,6 +32,9 @@ Before running this sample, you will need the following:
 
 Clone this repo and add your Okta configuration by following the [IDX SDK Configuration Reference](../../../README.md#configuration-reference) 
 
+> Note: This application assumes you have your configuration in an okta.yaml file located in a .okta folder in the application or project's root directory. 
+> The `IdxClient` , which is provided to the application via DI in the `App_Start > UnityConfig.cs` file, grabs the required configuration from the yaml file.
+
 Now start your server and navigate to https://localhost:44314 in your browser.
 
 If you see a home page that allows you to login, then things are working! 
@@ -40,3 +43,5 @@ You can login with the same account that you created when signing up for your De
 
 To see some examples for use cases using this sample application, please take a look at the [.NET guides
 for Embedded Authentication](TBD)
+
+[OIDC Web Application Setup Instructions]: https://developer.okta.com/authentication-guide/implementing-authentication/auth-code#1-setting-up-your-application
