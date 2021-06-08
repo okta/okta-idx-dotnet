@@ -8,8 +8,8 @@ namespace embedded_sign_in_widget_e2etests
 {
     public class TestConfiguration : ITestConfiguration
     {
-        public string UserPassword { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public int IisPort { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string SiteUrl { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string UserPassword { get; set; }
+        public int IisPort { get; set; }
+        public string SiteUrl { get; set; }
     }
 }

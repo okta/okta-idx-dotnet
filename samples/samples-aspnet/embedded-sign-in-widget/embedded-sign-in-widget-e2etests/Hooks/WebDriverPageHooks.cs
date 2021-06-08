@@ -36,6 +36,7 @@ namespace embedded_sign_in_widget_e2etests.Hooks
             _webServerDriver = webServerDriver;
             _config = ConfigBuilder.Configuration;
             _config.SiteUrl = webServerDriver.SiteUrl;
+            webServerDriver.StartWebServer();
         }
 
         [AfterTestRun]
