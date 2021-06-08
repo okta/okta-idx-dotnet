@@ -31,27 +31,47 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             _a18nProfile = _a18nClient.GetProfileAsync().Result;
         }
 
-        public async Task<TestUserProperties> GetActivePasswordUserAsync()
+        public async Task<TestUserProperties> GetActivePasswordUserAsync(string firstName)
         {
             await CleanUpAsync();
 
-            var oktaUser = await _oktaHelper.CreateActiveUserIdentifiedWithPasswordAsync(_a18nProfile.EmailAddress, _configuration.UserPassword);
+            var oktaUser = await _oktaHelper.CreateActiveUserIdentifiedWithPasswordAsync(_a18nProfile.EmailAddress, firstName, _configuration.UserPassword);
             
             return new TestUserProperties()
             {
+                FirstName = firstName,
+                LastName = "Lastname",
                 Email = oktaUser.Profile.Email,
-                PhoneNumber = oktaUser.Profile.PrimaryPhone,        
+                PhoneNumber = oktaUser.Profile.PrimaryPhone,
                 Password = _configuration.UserPassword,
             };
         }
 
-        public async Task<TestUserProperties> GetUnenrolledUser()
+        public async Task<TestUserProperties> GetUnenrolledUserAsync(string firstName)
         {
             await CleanUpAsync();            
             return new TestUserProperties()
             {
+                FirstName = firstName,
+                LastName = "Lastname",
                 Email = _a18nProfile.EmailAddress,
                 PhoneNumber = _a18nProfile.PhoneNumber,
+                Password = _configuration.UserPassword,
+            };
+        }
+
+        public async Task<TestUserProperties> GetActivePasswordAndEmailUserAsync(string firstName)
+        {
+            await CleanUpAsync();
+
+            var oktaUser = await _oktaHelper.CreateActiveUserAndAddToGroupAsync(_a18nProfile.EmailAddress, firstName, _configuration.UserPassword, _configuration.MfaRequiredGroupName);
+
+            return new TestUserProperties()
+            {
+                FirstName = firstName,
+                LastName = "Lastname",
+                Email = oktaUser.Profile.Email,
+                PhoneNumber = oktaUser.Profile.PrimaryPhone,
                 Password = _configuration.UserPassword,
             };
         }
@@ -80,7 +100,6 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
                     var messageBody = await getMessageBodyFunc();
 
                     return ExtractRecoveryCodeFromMessage(messageBody);
-
                 }
                 catch (NotFoundException)
                 {
