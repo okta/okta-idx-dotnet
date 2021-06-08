@@ -8,7 +8,7 @@ namespace Okta.Idx.Sdk.E2ETests.PageObjectModels
 {
     public class SelectRecoveryAuthenticatorPage : BasePage
     {
-        public SelectRecoveryAuthenticatorPage(WebDriverDriver webDriverDriver, ITestConfig testConfiguration) 
+        public SelectRecoveryAuthenticatorPage(WebDriverDriver webDriverDriver, ITestConfiguration testConfiguration) 
             : base(webDriverDriver, testConfiguration) { }
 
         public override string RelativePageUri => "Manage/SelectRecoveryAuthenticator";

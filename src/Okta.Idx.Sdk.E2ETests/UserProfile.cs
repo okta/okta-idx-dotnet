@@ -1,6 +1,6 @@
 ﻿namespace Okta.Idx.Sdk.E2ETests
 {
-    public class TestUserProperties
+    public class UserProfile
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
