@@ -124,6 +124,20 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             Dispose(true);
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                CleanUpOktaUserAsync().Wait();
+            }
+            _disposed = true;
+        }
+
         private async Task<string> GetRecoveryCodeFromMessage(Func<Task<string>> getMessageBodyFunc)
         {
             for (int tries = 0; tries < MaxAttempts; tries++)
@@ -176,20 +190,6 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
         {
             await CleanUpA18ProfileAsync();
             await CleanUpOktaUserAsync();
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                CleanUpOktaUserAsync().Wait();
-            }
-            _disposed = true;
         }
     }
 }
