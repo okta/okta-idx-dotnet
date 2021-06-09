@@ -1,18 +1,7 @@
 ﻿Feature: 0.1: Root page for Direct Auth Demo Application
 
   Background:
-  
-  Scenario: 0.1.1: Mary visits the Root View WITHOUT an authentcation session (no tokens)
-    Given Mary has an UNauthenticated session
-    When Mary navigates to the Root View
-    Then the Root Page shows links to the Entry Points as defined in https://oktawiki.atlassian.net/l/c/Pw7DVm1t  
 
-  Scenario: 0.1.2: Mary visits the Root View and WITH an authentcation session
-    Given Mary has an authenticated session
-    When Mary navigates to the Root View
-    Then Mary sees a table with the claims from the /userinfo response
-    And Mary sees a logout button
- 
   Scenario: 0.1.3: Mary logs out of the app
     Given Mary has an authenticated session
     And Mary navigates to the Root View

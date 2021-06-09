@@ -1,4 +1,7 @@
-﻿using System;
+﻿using FluentAssertions;
+using Okta.Idx.Sdk.E2ETests.PageObjectModels;
+using OpenQA.Selenium;
+using System;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -7,76 +10,68 @@ namespace Okta.Idx.Sdk.E2ETests.Steps
     [Binding]
     public class RootPageForDirectAuthDemoApplicationSteps : BaseTestSteps
     {
-        public RootPageForDirectAuthDemoApplicationSteps(ITestContext context)
+        private HomePage _homePageModel;
+        private LoginPage _loginPageModel;
+
+        public RootPageForDirectAuthDemoApplicationSteps(ITestContext context,
+            HomePage homePageModel,
+            LoginPage loginPageModel)
             : base(context)
         {
-        }
-
-        [Given(@"Mary has an UNauthenticated session")]
-        public async Task GivenMaryHasAnUNauthenticatedSession()
-        {
-            await _context.SetActivePasswordUserAsync("Mary");
-
+            _homePageModel = homePageModel;
+            _loginPageModel = loginPageModel;
         }
 
         [Given(@"Mary has an authenticated session")]
-        public void GivenMaryHasAnAuthenticatedSession()
+        public async Task GivenMaryHasAnAuthenticatedSession()
         {
-            ScenarioContext.Current.Pending();
+            await _context.SetActivePasswordUserAsync("Mary");
+            _loginPageModel.GoToPage();
+            _loginPageModel.UserNameInput.SendKeys(_context.UserProfile.Email);
+            _loginPageModel.PasswordInput.SendKeys(_context.UserProfile.Password);
+            _loginPageModel.LoginButton.Click();
         }
 
         [Given(@"Mary navigates to the Root View")]
         public void GivenMaryNavigatesToTheRootView()
         {
-            ScenarioContext.Current.Pending();
-        }
-
-        [When(@"Mary navigates to the Root View")]
-        public void WhenMaryNavigatesToTheRootView()
-        {
-            ScenarioContext.Current.Pending();
+            _homePageModel.GoToPage();
         }
 
         [When(@"Mary clicks the logout button")]
         public void WhenMaryClicksTheLogoutButton()
         {
-            ScenarioContext.Current.Pending();
-        }
-
-        [Then(@"the Root Page shows links to the Entry Points as defined in https://oktawiki\.atlassian\.net/l/c/Pw(.*)DVm(.*)t")]
-        public void ThenTheRootPageShowsLinksToTheEntryPointsAsDefinedInHttpsOktawiki_Atlassian_NetLCPwDVmt(int p0, int p1)
-        {
-            ScenarioContext.Current.Pending();
-        }
-
-        [Then(@"Mary sees a table with the claims from the /userinfo response")]
-        public void ThenMarySeesATableWithTheClaimsFromTheUserinfoResponse()
-        {
-            ScenarioContext.Current.Pending();
-        }
-
-        [Then(@"Mary sees a logout button")]
-        public void ThenMarySeesALogoutButton()
-        {
-            ScenarioContext.Current.Pending();
+            _homePageModel.LogoutButton.Click();
         }
 
         [Then(@"she is redirected back to the Root View")]
         public void ThenSheIsRedirectedBackToTheRootView()
         {
-            ScenarioContext.Current.Pending();
+            _homePageModel.AssertPageOpenedAndValid();
         }
 
         [Then(@"Mary sees login, registration buttons")]
         public void ThenMarySeesLoginRegistrationButtons()
         {
-            ScenarioContext.Current.Pending();
+            Action getLoginAndRegisterButtons = () =>
+            {
+                _ = _homePageModel.LoginButton;
+                _ = _homePageModel.RegisterButton;
+            };
+
+            getLoginAndRegisterButtons.Should().NotThrow<NoSuchElementException>();
         }
 
         [Then(@"she does not see claims from /userinfo")]
         public void ThenSheDoesNotSeeClaimsFromUserinfo()
         {
-            ScenarioContext.Current.Pending();
+            Func<IWebElement> getClaimAccessTokenLabel = () => _homePageModel.ClaimAccessTokenLabel;
+            Func<IWebElement> getClaimIdTokenLabel = () => _homePageModel.ClaimIdTokenLabel;
+            Func<IWebElement> getClaimUserNameTokenLabel = () => _homePageModel.ClaimUserNameLabel;
+
+            getClaimAccessTokenLabel.Should().Throw<NoSuchElementException>();
+            getClaimIdTokenLabel.Should().Throw<NoSuchElementException>();
+            getClaimUserNameTokenLabel.Should().Throw<NoSuchElementException>();
         }
     }
 }

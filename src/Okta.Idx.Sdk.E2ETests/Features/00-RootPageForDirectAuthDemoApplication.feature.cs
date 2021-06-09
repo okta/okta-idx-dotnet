@@ -86,14 +86,14 @@ namespace Okta.Idx.Sdk.E2ETests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="0.1.1: Mary visits the Root View WITHOUT an authentcation session (no tokens)")]
+        [Xunit.SkippableFactAttribute(DisplayName="0.1.3: Mary logs out of the app")]
         [Xunit.TraitAttribute("FeatureTitle", "0.1: Root page for Direct Auth Demo Application")]
-        [Xunit.TraitAttribute("Description", "0.1.1: Mary visits the Root View WITHOUT an authentcation session (no tokens)")]
-        public virtual void _0_1_1MaryVisitsTheRootViewWITHOUTAnAuthentcationSessionNoTokens()
+        [Xunit.TraitAttribute("Description", "0.1.3: Mary logs out of the app")]
+        public virtual void _0_1_3MaryLogsOutOfTheApp()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("0.1.1: Mary visits the Root View WITHOUT an authentcation session (no tokens)", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("0.1.3: Mary logs out of the app", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
 #line 5
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -118,113 +118,21 @@ namespace Okta.Idx.Sdk.E2ETests.Features
   this.FeatureBackground();
 #line hidden
 #line 6
-    testRunner.Given("Mary has an UNauthenticated session", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+    testRunner.Given("Mary has an authenticated session", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 7
-    testRunner.When("Mary navigates to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 8
-    testRunner.Then("the Root Page shows links to the Entry Points as defined in https://oktawiki.atla" +
-                        "ssian.net/l/c/Pw7DVm1t", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="0.1.2: Mary visits the Root View and WITH an authentcation session")]
-        [Xunit.TraitAttribute("FeatureTitle", "0.1: Root page for Direct Auth Demo Application")]
-        [Xunit.TraitAttribute("Description", "0.1.2: Mary visits the Root View and WITH an authentcation session")]
-        public virtual void _0_1_2MaryVisitsTheRootViewAndWITHAnAuthentcationSession()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("0.1.2: Mary visits the Root View and WITH an authentcation session", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 10
-  this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 3
-  this.FeatureBackground();
-#line hidden
-#line 11
-    testRunner.Given("Mary has an authenticated session", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 12
-    testRunner.When("Mary navigates to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 13
-    testRunner.Then("Mary sees a table with the claims from the /userinfo response", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 14
-    testRunner.And("Mary sees a logout button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="0.1.3: Mary logs out of the app")]
-        [Xunit.TraitAttribute("FeatureTitle", "0.1: Root page for Direct Auth Demo Application")]
-        [Xunit.TraitAttribute("Description", "0.1.3: Mary logs out of the app")]
-        public virtual void _0_1_3MaryLogsOutOfTheApp()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("0.1.3: Mary logs out of the app", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 16
-  this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            bool isScenarioIgnored = default(bool);
-            bool isFeatureIgnored = default(bool);
-            if ((tagsOfScenario != null))
-            {
-                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((this._featureTags != null))
-            {
-                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
-            }
-            if ((isScenarioIgnored || isFeatureIgnored))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-#line 3
-  this.FeatureBackground();
-#line hidden
-#line 17
-    testRunner.Given("Mary has an authenticated session", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-#line 18
     testRunner.And("Mary navigates to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 19
+#line 8
     testRunner.When("Mary clicks the logout button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 20
+#line 9
     testRunner.Then("she is redirected back to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 21
+#line 10
     testRunner.And("Mary sees login, registration buttons", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 22
+#line 11
     testRunner.And("she does not see claims from /userinfo", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
