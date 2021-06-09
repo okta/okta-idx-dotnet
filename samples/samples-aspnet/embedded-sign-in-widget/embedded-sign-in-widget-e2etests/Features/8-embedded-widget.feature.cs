@@ -140,7 +140,7 @@ namespace embedded_sign_in_widget_e2etests.Features
  testRunner.And("she submits the Login form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 13
-    testRunner.Then("she is redirected to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("she is redirected to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 14
     testRunner.And("the access_token is shown and not empty", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

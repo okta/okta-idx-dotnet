@@ -53,19 +53,6 @@ namespace embedded_sign_in_widget_e2etests.Helpers
             await _client.Groups.AddUserToGroupAsync(group.Id, user.Id);
         }
 
-        public async Task<IUserFactor> EnrollPhoneFactor(string emailAddress, string phoneNumber)
-        {
-            var user = await _client.Users.FirstOrDefaultAsync(u => u.Profile.Email.Equals(emailAddress));
-            if (user != default)
-            {
-                return await user.AddFactorAsync(new AddSmsFactorOptions()
-                {
-                    PhoneNumber = phoneNumber,
-                });
-            }
-            return default;
-        }
-
         public async Task ActivateFactor(IUserFactor factor, string emailAddress, string passCode)
         {
             var user = await _client.Users.FirstOrDefaultAsync(u => u.Profile.Email.Equals(emailAddress));

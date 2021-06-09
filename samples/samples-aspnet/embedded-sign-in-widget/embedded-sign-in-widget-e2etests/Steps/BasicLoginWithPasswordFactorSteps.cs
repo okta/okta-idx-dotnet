@@ -15,11 +15,6 @@ namespace embedded_sign_in_widget_e2etests.Steps
         public BasicLoginWithPasswordFactorSteps(ITestContext context)
             : base(context)
         {
-            context.TestUserProfile = new TestUserProfile
-            {
-                Email = "testuser@threeheadz.com",
-                Password = "Abcd1234"
-            };
         }
 
         [Given(@"a SPA, WEB APP or MOBILE Sign On Policy that defines Password as required")]

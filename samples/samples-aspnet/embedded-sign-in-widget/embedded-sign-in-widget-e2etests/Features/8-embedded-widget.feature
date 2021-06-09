@@ -10,7 +10,7 @@
 	When she fills in her correct username
 	And she fills in her correct password
 	And she submits the Login form
-    Then she is redirected to the Root View
+	Then she is redirected to the Root View
     And the access_token is shown and not empty
     And the id_token is shown and not empty
     And the refresh_token is shown and not empty
