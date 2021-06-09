@@ -53,7 +53,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
         public async Task<IUserFactor> EnrollPhoneFactor(string emailAddress, string phoneNumber)
         {
             var user = await _client.Users.FirstOrDefaultAsync(u => u.Profile.Email.Equals(emailAddress));
-            if (user!=default)
+            if (user != default)
             {
                 return await user.AddFactorAsync(new AddSmsFactorOptions()
                 {

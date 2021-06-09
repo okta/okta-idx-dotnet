@@ -30,7 +30,7 @@ namespace Okta.Idx.Sdk.E2ETests.Helpers
             _a18nClient = a18nClient;
             _configuration = configuration;
 
-            _a18nProfile = _a18nClient.GetProfileAsync().Result;
+            _a18nProfile = Task.Run(() => _a18nClient.GetProfileAsync()).Result;
         }
 
         public async Task SetActivePasswordUserAsync(string firstName)
