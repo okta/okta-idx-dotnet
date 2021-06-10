@@ -1,6 +1,6 @@
 os: windows
 language: csharp
-mono: latest
+#mono: latest
 dotnet: 5.0
 before_install:
   - sudo apt-get install dotnet-sdk-3.1
