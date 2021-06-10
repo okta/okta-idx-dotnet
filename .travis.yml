@@ -1,3 +1,4 @@
+os: windows
 language: csharp
 mono: latest
 dotnet: 5.0
