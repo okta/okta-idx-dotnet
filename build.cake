@@ -1,4 +1,4 @@
-#addin nuget:?package=Cake.Figlet&version=2.0.1
+//#addin nuget:?package=Cake.Figlet&version=2.0.1
 var configuration = Argument("configuration", "Release");
 
 /**************************************** BEGIN SDK ****************************************/
@@ -81,7 +81,7 @@ Task("IntegrationTest")
 Task("Info")
 .Does(() => 
 {
-    Information(Figlet("Okta.Idx.Sdk"));
+    Information("Okta.Idx.Sdk");
 
     var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
 
