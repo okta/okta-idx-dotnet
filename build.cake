@@ -1,4 +1,4 @@
-#addin nuget:?package=Cake.Figlet&version=1.3.1
+#addin nuget:?package=Cake.Figlet&version=2.0.1
 var configuration = Argument("configuration", "Release");
 
 /**************************************** BEGIN SDK ****************************************/
