@@ -1,8 +1,7 @@
 #addin nuget:?package=Cake.Figlet&version=1.3.1
-
-var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 
+/**************************************** BEGIN SDK ****************************************/
 Task("Clean")
 .Does(() =>
 {
@@ -89,6 +88,51 @@ Task("Info")
     Information("Building using {0} version of Cake", cakeVersion);
 });
 
+/**************************************** END SDK ****************************************/
+
+/*************************** BEGIN EMBEDDED AUTH SAMPLE APP/E2E **************************/
+Task("RestoreEmbeddedAuthSampleApp")
+.IsDependentOn("Clean")
+.Does(() =>
+{
+    var projects = new List<string>{ "embedded-auth-with-sdk.sln" };
+    projects.ForEach(name =>
+    {
+        Console.WriteLine($"\nRestoring packages for {name}");
+        DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/{name}");
+    });
+});
+
+Task("BuildEmbeddedAuthSampleApp")
+.IsDependentOn("RestoreEmbeddedAuthSampleApp")
+.Does(() =>
+{
+    var solutionPath = "./samples/samples-aspnet/embedded-auth-with-sdk/embedded-auth-with-sdk.sln";
+    Console.WriteLine("Building {0}", solutionPath);
+    MSBuild(solutionPath, settings => settings.SetConfiguration(configuration)
+                                                            .SetVerbosity(Verbosity.Minimal)
+                                                            .SetMSBuildPlatform(MSBuildPlatform.x86));
+});
+
+Task("TestEmbeddedAuthSampleApp")
+.IsDependentOn("RestoreEmbeddedAuthSampleApp")
+.IsDependentOn("BuildEmbeddedAuthSampleApp")
+.Does(() =>
+{
+    var testProjects = new[] { "embedded-auth-with-sdk.E2ETests" };
+    // For now, we won't run integration tests in CI
+
+    foreach (var name in testProjects)
+    {
+        DotNetCoreTest(string.Format("./samples/samples-aspnet/embedded-auth-with-sdk/Okta.Idx.Sdk.E2ETests/{0}.csproj", name), new DotNetCoreTestSettings()
+                {
+                    Configuration = configuration,
+                    NoBuild = true
+                });
+    }
+});
+
+/*************************** END EMBEDDED AUTH SAMPLE APP/E2E ******************************/
 
 // Define top-level tasks
 
@@ -100,11 +144,17 @@ Task("Default")
     .IsDependentOn("Test")
     .IsDependentOn("Pack");
 
-Task("DefaultIT")
+Task("DefaultE2e")
+    .IsDependentOn("Info")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
-    .IsDependentOn("IntegrationTest")
+    .IsDependentOn("Test")
+    .IsDependentOn("RestoreEmbeddedAuthSampleApp")
+    .IsDependentOn("BuildEmbeddedAuthSampleApp")
+    .IsDependentOn("TestEmbeddedAuthSampleApp")
     .IsDependentOn("Pack");
+
+var target = (!BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default";
 
 RunTarget(target);
