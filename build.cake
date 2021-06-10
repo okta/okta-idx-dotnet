@@ -120,7 +120,6 @@ Task("TestEmbeddedAuthSampleApp")
 .Does(() =>
 {
     var testProjects = new[] { "embedded-auth-with-sdk.E2ETests" };
-    // For now, we won't run integration tests in CI
 
     foreach (var name in testProjects)
     {
