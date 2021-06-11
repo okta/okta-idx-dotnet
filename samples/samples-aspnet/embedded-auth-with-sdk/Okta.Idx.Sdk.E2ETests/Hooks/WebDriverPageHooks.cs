@@ -2,6 +2,9 @@
 using embedded_auth_with_sdk.E2ETests.Drivers;
 using embedded_auth_with_sdk.E2ETests.Helpers;
 using embedded_auth_with_sdk.E2ETests.Helpers.A18NClient;
+using OpenQA.Selenium;
+using System;
+using System.IO;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -35,8 +38,22 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
         }
 
         [AfterScenario]
-        public void AfterScenario()
-        { }
+        public void AfterScenario(ScenarioContext context, WebDriverDriver driver)
+        {
+            if (context.ScenarioExecutionStatus==ScenarioExecutionStatus.TestError)
+            {
+                var screenshotDriver = (ITakesScreenshot)driver.WebDriver;
+                TakeScreenshot(screenshotDriver);
+            }
+        }
+
+        private static void TakeScreenshot(ITakesScreenshot driver)
+        {
+            Screenshot screenShot = driver.GetScreenshot();
+            var fileName = $"./screenshots/screenshot-{DateTime.UtcNow.Hour}-{DateTime.UtcNow.Minute}-{DateTime.UtcNow.Second}.png";
+            Directory.CreateDirectory("./screenshots");
+            screenShot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
+        }
 
         #region Before & After test run
         [BeforeTestRun]
