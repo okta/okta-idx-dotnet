@@ -21,7 +21,7 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
         private static IWebServerDriver _webServerDriver;
         private static ITestConfiguration _config;
         private static A18nClient _a18nClient;
-        private const string DefaultProfileTag= "okta-idx-dotnet";
+        private const string DefaultProfileTag = "okta-idx-dotnet";
 
         public WebDriverPageHooks(IObjectContainer container)
         {
@@ -33,24 +33,27 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
         {
             _container.RegisterInstanceAs<ITestConfiguration>(_config);
             _container.RegisterInstanceAs<IA18nClient>(_a18nClient);
-            _container.RegisterTypeAs<OktaSdkHelper, IOktaSdkHelper>(); 
+            _container.RegisterTypeAs<OktaSdkHelper, IOktaSdkHelper>();
             _container.RegisterTypeAs<TestContext, ITestContext>();
         }
 
         [AfterScenario]
         public void AfterScenario(ScenarioContext context, WebDriverDriver driver)
         {
-            if (context.ScenarioExecutionStatus==ScenarioExecutionStatus.TestError)
+            if (context.ScenarioExecutionStatus == ScenarioExecutionStatus.TestError)
             {
                 var screenshotDriver = (ITakesScreenshot)driver.WebDriver;
-                TakeScreenshot(screenshotDriver);
+                TakeScreenshot(screenshotDriver, context.ScenarioInfo.Title);
             }
         }
 
-        private static void TakeScreenshot(ITakesScreenshot driver)
+        private static void TakeScreenshot(ITakesScreenshot driver, string testName)
         {
             Screenshot screenShot = driver.GetScreenshot();
-            var fileName = $"./screenshots/screenshot-{DateTime.UtcNow.Hour}-{DateTime.UtcNow.Minute}-{DateTime.UtcNow.Second}.png";
+            var allowedName = testName.Replace(':', '-')
+                .Replace(' ', '-');
+            var time = DateTime.UtcNow;
+            var fileName = $"./screenshots/{allowedName}-{time.Day:D2}-{time.Hour:D2}-{time.Minute:D2}-{time.Second:D2}.png";
             Directory.CreateDirectory("./screenshots");
             screenShot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
         }
@@ -60,7 +63,7 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
         public static void BeforeTestRunInjection(IISWebServerDriver webServerDriver)
         {
             _webServerDriver = webServerDriver;
-            SetUpTestEnvironment(webServerDriver); 
+            SetUpTestEnvironment(webServerDriver);
         }
 
         private static void SetUpTestEnvironment(IISWebServerDriver webServerDriver)

@@ -13,7 +13,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         private readonly IOktaSdkHelper _oktaHelper;
 
         private bool _disposed = false;
-        private const int MaxAttempts = 30; // with delay 1000 ms between attempts, it's 30 seconds of total waiting time 
+        private const int MaxAttempts = 45; // with delay 1000 ms between attempts, it's 45 seconds of total waiting time 
 
         private readonly string[] messageCodeMarkers = new[]
         {
