@@ -14,6 +14,14 @@ Task("Clean")
     GetDirectories("./src/**/obj")
         .ToList()
         .ForEach(d => CleanDirectory(d));
+
+    GetDirectories("./samples/**/bin")
+        .ToList()
+        .ForEach(d => CleanDirectory(d));
+
+    GetDirectories("./samples/**/obj")
+        .ToList()
+        .ForEach(d => CleanDirectory(d));
 });
 
 Task("Restore")
@@ -106,6 +114,7 @@ Task("RestoreEmbeddedAuthSampleApp")
     //     DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/{name}");
     // });
     NuGetRestore("./samples/samples-aspnet/embedded-auth-with-sdk/embedded-auth-with-sdk.sln");
+    DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/Okta.Idx.Sdk.E2ETests/embedded-auth-with-sdk.E2ETests.csproj");
 });
 
 Task("BuildEmbeddedAuthSampleApp")
