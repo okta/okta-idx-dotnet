@@ -95,7 +95,11 @@ Task("RestoreEmbeddedAuthSampleApp")
 .IsDependentOn("Clean")
 .Does(() =>
 {
-    var projects = new List<string>{ "embedded-auth-with-sdk.sln" };
+    // Restore solution
+    DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/embedded-auth-with-sdk.sln");
+
+    // Restore individual projects
+    var projects = new List<string>{ "embedded-auth-with-sdk/embedded-auth-with-sdk.csproj", "Okta.Idx.Sdk.E2ETests/embedded-auth-with-sdk.E2ETests.csproj" };
     projects.ForEach(name =>
     {
         Console.WriteLine($"\nRestoring packages for {name}");
