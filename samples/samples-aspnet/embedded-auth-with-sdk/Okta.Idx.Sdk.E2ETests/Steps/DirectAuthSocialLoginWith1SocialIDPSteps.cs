@@ -23,7 +23,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps
         [Given(@"Mary does not have an account in the org but has a Facebook account")]
         public void GivenMaryDoesNotHaveAnAccountInTheOrgButHasAFacebookAccount()
         {
-            _context.SetUnenrolledUserWithFaceBookAccount("Mary");
+            _context.SetUnenrolledUserWithFacebookAccount("Mary");
         }
 
     }

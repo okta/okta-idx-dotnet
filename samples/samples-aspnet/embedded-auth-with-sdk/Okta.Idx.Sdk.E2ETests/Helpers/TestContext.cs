@@ -103,7 +103,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             };
         }
 
-        public void SetUnenrolledUserWithFaceBookAccount(string firstName)
+        public void SetUnenrolledUserWithFacebookAccount(string firstName)
         {
             UserProfile = new UserProfile()
             {
