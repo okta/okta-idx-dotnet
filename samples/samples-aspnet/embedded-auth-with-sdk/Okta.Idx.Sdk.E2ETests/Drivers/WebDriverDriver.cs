@@ -14,7 +14,8 @@ namespace embedded_auth_with_sdk.E2ETests.Drivers
         private static IWebDriver SetupWebDriver()
         {
             var options = new ChromeOptions();
-            options.AddArgument("--start-maximized");
+            options.AddArgument("--headless");
+            options.AddArgument("--start-maximized");            
             options.AddArgument("--disable-notifications");
             options.AddArgument("--no-sandbox");
             return new ChromeDriver(options);

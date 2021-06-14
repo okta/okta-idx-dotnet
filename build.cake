@@ -1,4 +1,4 @@
-#addin nuget:?package=Cake.Figlet&version=1.3.1
+//#addin nuget:?package=Cake.Figlet&version=2.0.1
 var configuration = Argument("configuration", "Release");
 
 /**************************************** BEGIN SDK ****************************************/
@@ -12,6 +12,14 @@ Task("Clean")
         .ForEach(d => CleanDirectory(d));
 
     GetDirectories("./src/**/obj")
+        .ToList()
+        .ForEach(d => CleanDirectory(d));
+
+    GetDirectories("./samples/**/bin")
+        .ToList()
+        .ForEach(d => CleanDirectory(d));
+
+    GetDirectories("./samples/**/obj")
         .ToList()
         .ForEach(d => CleanDirectory(d));
 });
@@ -81,7 +89,7 @@ Task("IntegrationTest")
 Task("Info")
 .Does(() => 
 {
-    Information(Figlet("Okta.Idx.Sdk"));
+    Information("Okta.Idx.Sdk");
 
     var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
 
@@ -95,12 +103,18 @@ Task("RestoreEmbeddedAuthSampleApp")
 .IsDependentOn("Clean")
 .Does(() =>
 {
-    var projects = new List<string>{ "embedded-auth-with-sdk.sln" };
-    projects.ForEach(name =>
-    {
-        Console.WriteLine($"\nRestoring packages for {name}");
-        DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/{name}");
-    });
+    // // Restore solution
+    // DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/embedded-auth-with-sdk.sln");
+
+    // // Restore individual projects
+    // var projects = new List<string>{ "embedded-auth-with-sdk/embedded-auth-with-sdk.csproj", "Okta.Idx.Sdk.E2ETests/embedded-auth-with-sdk.E2ETests.csproj" };
+    // projects.ForEach(name =>
+    // {
+    //     Console.WriteLine($"\nRestoring packages for {name}");
+    //     DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/{name}");
+    // });
+    NuGetRestore("./samples/samples-aspnet/embedded-auth-with-sdk/embedded-auth-with-sdk.sln");
+    DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/Okta.Idx.Sdk.E2ETests/embedded-auth-with-sdk.E2ETests.csproj");
 });
 
 Task("BuildEmbeddedAuthSampleApp")
