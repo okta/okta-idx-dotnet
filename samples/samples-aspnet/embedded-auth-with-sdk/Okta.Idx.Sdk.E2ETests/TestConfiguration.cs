@@ -10,5 +10,6 @@
         public string SiteUrl { get; set; }
         public string MfaRequiredGroup { get; set; }
         public string PhoneEnrollmentRequiredGroup { get; set; }
+        public string ScreenshotsFolder { get; set; }
     }
 }

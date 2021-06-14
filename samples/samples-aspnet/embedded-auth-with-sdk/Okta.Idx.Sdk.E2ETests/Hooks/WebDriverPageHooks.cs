@@ -1,12 +1,10 @@
 ﻿using BoDi;
+using System;
+using Xunit;
+using TechTalk.SpecFlow;
 using embedded_auth_with_sdk.E2ETests.Drivers;
 using embedded_auth_with_sdk.E2ETests.Helpers;
 using embedded_auth_with_sdk.E2ETests.Helpers.A18NClient;
-using OpenQA.Selenium;
-using System;
-using System.IO;
-using TechTalk.SpecFlow;
-using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
@@ -21,7 +19,7 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
         private static IWebServerDriver _webServerDriver;
         private static ITestConfiguration _config;
         private static A18nClient _a18nClient;
-        private const string DefaultProfileTag= "okta-idx-dotnet";
+        private const string DefaultProfileTag = "okta-idx-dotnet";
 
         public WebDriverPageHooks(IObjectContainer container)
         {
@@ -33,26 +31,20 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
         {
             _container.RegisterInstanceAs<ITestConfiguration>(_config);
             _container.RegisterInstanceAs<IA18nClient>(_a18nClient);
-            _container.RegisterTypeAs<OktaSdkHelper, IOktaSdkHelper>(); 
+            _container.RegisterTypeAs<OktaSdkHelper, IOktaSdkHelper>();
             _container.RegisterTypeAs<TestContext, ITestContext>();
         }
 
         [AfterScenario]
-        public void AfterScenario(ScenarioContext context, WebDriverDriver driver)
+        public void AfterScenario(ScenarioContext scenarioContext, ITestContext testContext)
         {
-            if (context.ScenarioExecutionStatus==ScenarioExecutionStatus.TestError)
+            if (scenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.TestError)
             {
-                var screenshotDriver = (ITakesScreenshot)driver.WebDriver;
-                TakeScreenshot(screenshotDriver);
-            }
-        }
+                var time = DateTime.UtcNow;
+                var name = $"{scenarioContext.ScenarioInfo.Title}-{time.Day:D2}-{time.Hour:D2}-{time.Minute:D2}-{time.Second:D2}";
 
-        private static void TakeScreenshot(ITakesScreenshot driver)
-        {
-            Screenshot screenShot = driver.GetScreenshot();
-            var fileName = $"./screenshots/screenshot-{DateTime.UtcNow.Hour}-{DateTime.UtcNow.Minute}-{DateTime.UtcNow.Second}.png";
-            Directory.CreateDirectory("./screenshots");
-            screenShot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
+                testContext.TakeScreenshot(name);
+            }
         }
 
         #region Before & After test run
@@ -60,7 +52,7 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
         public static void BeforeTestRunInjection(IISWebServerDriver webServerDriver)
         {
             _webServerDriver = webServerDriver;
-            SetUpTestEnvironment(webServerDriver); 
+            SetUpTestEnvironment(webServerDriver);
         }
 
         private static void SetUpTestEnvironment(IISWebServerDriver webServerDriver)
