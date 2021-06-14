@@ -9,7 +9,7 @@ namespace embedded_sign_in_widget_e2etests.Drivers
 {
     public class IISWebServerDriver : IWebServerDriver
     {
-        private const string WebSitePathEnvName = "DirectAuthWebSitePath";
+        private const string WebSitePathEnvName = "EmbeddedSIWWebSitePath";
 
         private readonly int _iisPort;
         private readonly string _pathToWebSite;
