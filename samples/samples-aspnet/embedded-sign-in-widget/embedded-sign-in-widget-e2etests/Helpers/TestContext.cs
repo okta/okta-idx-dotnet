@@ -12,9 +12,6 @@ namespace embedded_sign_in_widget_e2etests.Helpers
         private readonly ITestConfiguration _configuration;
         private readonly IOktaSdkHelper _oktaHelper;
         private bool _disposed = false;
-
-        private string _testUsername = "";
-
         public TestUserProfile TestUserProfile { get; set; }
 
         public TestContext(ITestConfiguration configuration, IOktaSdkHelper oktaHelper)
@@ -43,8 +40,6 @@ namespace embedded_sign_in_widget_e2etests.Helpers
                 Email = oktaUser.Profile.Email,
                 Password = password
             };
-
-            this._testUsername = username;
         }
 
 
@@ -62,7 +57,7 @@ namespace embedded_sign_in_widget_e2etests.Helpers
 
             if (disposing)
             {
-                _oktaHelper.DeleteUserAsync(this._testUsername).Wait();
+                _oktaHelper.DeleteUserAsync(TestUserProfile.Email).Wait();
             }
             _disposed = true;
         }
