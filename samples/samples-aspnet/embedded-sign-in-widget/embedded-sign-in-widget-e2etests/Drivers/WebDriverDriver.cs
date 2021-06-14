@@ -18,8 +18,10 @@ namespace embedded_sign_in_widget_e2etests.Drivers
         private static IWebDriver SetupWebDriver()
         {
             var options = new ChromeOptions();
+            options.AddArgument("--headless");
             options.AddArgument("--start-maximized");
             options.AddArgument("--disable-notifications");
+            options.AddArgument("--no-sandbox");
             return new ChromeDriver(options);
         }
 

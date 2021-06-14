@@ -103,17 +103,9 @@ Task("RestoreEmbeddedAuthSampleApp")
 .IsDependentOn("Clean")
 .Does(() =>
 {
-    // // Restore solution
-    // DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/embedded-auth-with-sdk.sln");
-
-    // // Restore individual projects
-    // var projects = new List<string>{ "embedded-auth-with-sdk/embedded-auth-with-sdk.csproj", "Okta.Idx.Sdk.E2ETests/embedded-auth-with-sdk.E2ETests.csproj" };
-    // projects.ForEach(name =>
-    // {
-    //     Console.WriteLine($"\nRestoring packages for {name}");
-    //     DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/{name}");
-    // });
+    // Restore solution
     NuGetRestore("./samples/samples-aspnet/embedded-auth-with-sdk/embedded-auth-with-sdk.sln");
+    // Restore  e2e
     DotNetCoreRestore($"./samples/samples-aspnet/embedded-auth-with-sdk/Okta.Idx.Sdk.E2ETests/embedded-auth-with-sdk.E2ETests.csproj");
 });
 
@@ -147,6 +139,49 @@ Task("TestEmbeddedAuthSampleApp")
 
 /*************************** END EMBEDDED AUTH SAMPLE APP/E2E ******************************/
 
+
+/*************************** BEGIN EMBEDDED WIDGET SAMPLE APP/E2E **************************/
+Task("RestoreEmbeddedWidgetSampleApp")
+.IsDependentOn("Clean")
+.Does(() =>
+{
+    // Restore solution
+    NuGetRestore("./samples/samples-aspnet/embedded-sign-in-widget/embedded-sign-in-widget.sln");
+    // Restore  e2e
+    DotNetCoreRestore($"./samples/samples-aspnet/embedded-sign-in-widget/embedded-sign-in-widget-e2etests/embedded-sign-in-widget-e2etests.csproj");
+});
+
+
+Task("BuildEmbeddedWidgetSampleApp")
+.IsDependentOn("RestoreEmbeddedWidgetSampleApp")
+.Does(() =>
+{
+    var solutionPath = "./samples/samples-aspnet/embedded-sign-in-widget/embedded-sign-in-widget.sln";
+    Console.WriteLine("Building {0}", solutionPath);
+    MSBuild(solutionPath, settings => settings.SetConfiguration(configuration)
+                                                .SetVerbosity(Verbosity.Minimal)
+                                                .SetMSBuildPlatform(MSBuildPlatform.x86));
+});
+
+Task("TestEmbeddedWidgetSampleApp")
+.IsDependentOn("RestoreEmbeddedWidgetSampleApp")
+.IsDependentOn("BuildEmbeddedWidgetSampleApp")
+.Does(() =>
+{
+    var testProjects = new[] { "embedded-sign-in-widget-e2etests" };
+
+    foreach (var name in testProjects)
+    {
+        DotNetCoreTest(string.Format("./samples/samples-aspnet/embedded-sign-in-widget/embedded-sign-in-widget-e2etests/{0}.csproj", name), new DotNetCoreTestSettings()
+                {
+                    Configuration = configuration,
+                    NoBuild = true
+                });
+    }
+});
+
+/*************************** END EMBEDDED WIDGET SAMPLE APP/E2E ******************************/
+
 // Define top-level tasks
 
 Task("Default")
@@ -166,6 +201,9 @@ Task("DefaultE2e")
     .IsDependentOn("RestoreEmbeddedAuthSampleApp")
     .IsDependentOn("BuildEmbeddedAuthSampleApp")
     .IsDependentOn("TestEmbeddedAuthSampleApp")
+    .IsDependentOn("RestoreEmbeddedWidgetSampleApp")
+    .IsDependentOn("BuildEmbeddedWidgetSampleApp")
+    .IsDependentOn("TestEmbeddedWidgetSampleApp")
     .IsDependentOn("Pack");
 
 var target = (BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default";

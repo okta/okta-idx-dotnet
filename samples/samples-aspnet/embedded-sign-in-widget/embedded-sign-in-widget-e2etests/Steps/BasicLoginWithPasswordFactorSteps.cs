@@ -22,10 +22,10 @@ namespace embedded_sign_in_widget_e2etests.Steps
         public void GivenASPAWEBAPPOrMOBILESignOnPolicyThatDefinesPasswordAsRequired()
         { }
 
-        [Given(@"a User named ""(.*)"" exists, and this user has already setup email and password factors")]
-        public async Task GivenAUserNamedExistsAndThisUserHasAlreadySetupEmailAndPasswordFactors(string userName)
+        [Given(@"a User named Mary exists, and this user has already setup email and password factors")]
+        public async Task GivenAUserNamedExistsAndThisUserHasAlreadySetupEmailAndPasswordFactors()
         {
-            await _context.SetActivePasswordUserAsync(userName);
+            await _context.SetActivePasswordUserAsync();
         }
     }
 }
