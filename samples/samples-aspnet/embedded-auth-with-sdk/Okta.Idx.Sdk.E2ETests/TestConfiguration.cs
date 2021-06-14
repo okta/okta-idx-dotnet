@@ -11,5 +11,7 @@
         public string MfaRequiredGroup { get; set; }
         public string PhoneEnrollmentRequiredGroup { get; set; }
         public string ScreenshotsFolder { get; set; }
+        public string FacebookUserEmail { get; set; }
+        public string FacebookUserPassword { get; set; }
     }
 }

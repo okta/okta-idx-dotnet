@@ -4,8 +4,7 @@
       "A18nProfileTag": "okta-idx-dotnet",
       "IISPort": 8080,
       "MfaRequiredGroup": "MFA Required",
-      "PhoneEnrollmentRequiredGroup": "Phone Enrollment Required",
-      "ScreenshotsFolder": "c:/screenshots"
+      "PhoneEnrollmentRequiredGroup": "Phone Enrollment Required"
     }
   }
 }

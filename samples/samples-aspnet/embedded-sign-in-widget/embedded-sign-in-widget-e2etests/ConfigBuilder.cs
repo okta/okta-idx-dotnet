@@ -1,10 +1,6 @@
 ﻿using FlexibleConfiguration;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace embedded_sign_in_widget_e2etests
 {
