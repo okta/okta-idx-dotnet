@@ -26,6 +26,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         }
 
         [Given(@"Mary navigates to the Basic Login View")]
+        [Given(@"Mary navigates to the Login View")]
         public void GivenMaryNavigatesToTheLoginPage()
         {
             _homePageModel.GoToPage();
@@ -72,12 +73,14 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         }
 
         [Then(@"the preferred_username claim is shown and matches Mary's email")]
+        [Then(@"the cell for the value of email is shown and contains her email")]
         public void ThenThePreferred_UsernameClaimIsShownAndMatchesMarySEmail()
         {
             _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.UserProfile.Email);
         }
 
         [Then(@"an application session is created")]
+        [Then(@"she sees a table with her profile info")]
         public void ThenAnApplicationSessionIsCreated()
         {
             _homePageModel.ClaimAccessTokenLabel.Text.Should().NotBeEmpty();

@@ -67,5 +67,12 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         {
             _loginPageModel.ForgotPasswordButton.Click();
         }
+
+        [When(@"she clicks the Login with Facebook button")]
+        public void WhenSheClicksTheFacebookButton()
+        {
+            _loginPageModel.FacebookIdpButton.Click();
+        }
+
     }
 }
