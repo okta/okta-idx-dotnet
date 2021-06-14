@@ -86,8 +86,8 @@ namespace embedded_sign_in_widget_e2etests.Features
  testRunner.And("the list of Authenticators contains Email and Password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 6
- testRunner.And("a User named \"Mary\" exists, and this user has already setup email and password fa" +
-                    "ctors", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("a User named Mary exists, and this user has already setup email and password fact" +
+                    "ors", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
         }
         
@@ -147,9 +147,6 @@ namespace embedded_sign_in_widget_e2etests.Features
 #line hidden
 #line 15
     testRunner.And("the id_token is shown and not empty", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 16
-    testRunner.And("the refresh_token is shown and not empty", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

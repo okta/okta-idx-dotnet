@@ -11,6 +11,9 @@ namespace embedded_sign_in_widget_e2etests.Helpers
     {
         private readonly ITestConfiguration _configuration;
         private readonly IOktaSdkHelper _oktaHelper;
+        private bool _disposed = false;
+
+        private string _testUsername = "";
 
         public TestUserProfile TestUserProfile { get; set; }
 
@@ -22,20 +25,46 @@ namespace embedded_sign_in_widget_e2etests.Helpers
             TestUserProfile = new TestUserProfile();
         }
 
-        public async Task SetActivePasswordUserAsync(string firstName)
+        public async Task SetActivePasswordUserAsync()
         {
-            await _oktaHelper.DeleteUserAsync(_configuration.UserName);
+            // create user dynamically +Guid
+            var guid = Guid.NewGuid();
+            var username = $"mary-embedded-siw-{guid}@example.com";
+            var firstName = $"Mary";
+            var password = "P4zzw0rd1";
+            
 
-            var oktaUser = await _oktaHelper.CreateActiveUser(_configuration.UserName, firstName, _configuration.UserPassword);
+            var oktaUser = await _oktaHelper.CreateActiveUser(username, firstName, password);
 
             TestUserProfile = new TestUserProfile()
             {
                 FirstName = firstName,
                 LastName = "Lastname",
                 Email = oktaUser.Profile.Email,
-                Password = _configuration.UserPassword
+                Password = password
             };
+
+            this._testUsername = username;
         }
 
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _oktaHelper.DeleteUserAsync(this._testUsername).Wait();
+            }
+            _disposed = true;
+        }
     }
 }

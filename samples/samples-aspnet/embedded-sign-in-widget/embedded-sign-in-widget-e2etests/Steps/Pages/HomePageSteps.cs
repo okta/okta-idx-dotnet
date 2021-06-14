@@ -50,10 +50,10 @@ namespace embedded_sign_in_widget_e2etests.Steps.Pages
             _homePageModel.ClaimIdTokenLabel.Text.Should().NotBeEmpty();
         }
 
-        [Then(@"the refresh_token is shown and not empty")]
-        public void ThenTheRefresh_TokenIsShownAndNotEmpty()
-        {
-            _homePageModel.ClaimRefreshTokenLabel.Text.Should().NotBeEmpty();
-        }
+        //[Then(@"the refresh_token is shown and not empty")]
+        //public void ThenTheRefresh_TokenIsShownAndNotEmpty()
+        //{
+        //    _homePageModel.ClaimRefreshTokenLabel.Text.Should().NotBeEmpty();
+        //}
     }
 }

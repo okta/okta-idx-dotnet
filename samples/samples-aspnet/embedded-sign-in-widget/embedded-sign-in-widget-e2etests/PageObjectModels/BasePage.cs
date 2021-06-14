@@ -40,7 +40,9 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
         {
             int tryCount = 0;
             Exception thrown = null;
-            while (tryCount < 3)
+            int maxAttempts = 5;
+            
+            while (tryCount < maxAttempts)
             {
                 try
                 {
@@ -50,11 +52,11 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
                 catch (System.Exception ex)
                 {
                     thrown = ex;
-                    Thread.Sleep(500);
+                    Thread.Sleep(1000);
                 }
             }
 
-            throw thrown ?? new Exception("Something went wrong");
+            throw thrown ?? new Exception($"{by} was not found after {maxAttempts} attempts");
         }
     }
 }
