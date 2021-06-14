@@ -1,12 +1,10 @@
 ﻿using BoDi;
+using System;
+using Xunit;
+using TechTalk.SpecFlow;
 using embedded_auth_with_sdk.E2ETests.Drivers;
 using embedded_auth_with_sdk.E2ETests.Helpers;
 using embedded_auth_with_sdk.E2ETests.Helpers.A18NClient;
-using OpenQA.Selenium;
-using System;
-using System.IO;
-using TechTalk.SpecFlow;
-using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
@@ -38,24 +36,15 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
         }
 
         [AfterScenario]
-        public void AfterScenario(ScenarioContext context, WebDriverDriver driver)
+        public void AfterScenario(ScenarioContext scenarioContext, ITestContext testContext)
         {
-            if (context.ScenarioExecutionStatus == ScenarioExecutionStatus.TestError)
+            if (scenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.TestError)
             {
-                var screenshotDriver = (ITakesScreenshot)driver.WebDriver;
-                TakeScreenshot(screenshotDriver, context.ScenarioInfo.Title);
-            }
-        }
+                var time = DateTime.UtcNow;
+                var name = $"{scenarioContext.ScenarioInfo.Title}-{time.Day:D2}-{time.Hour:D2}-{time.Minute:D2}-{time.Second:D2}";
 
-        private static void TakeScreenshot(ITakesScreenshot driver, string testName)
-        {
-            Screenshot screenShot = driver.GetScreenshot();
-            var allowedName = testName.Replace(':', '-')
-                .Replace(' ', '-');
-            var time = DateTime.UtcNow;
-            var fileName = $"./screenshots/{allowedName}-{time.Day:D2}-{time.Hour:D2}-{time.Minute:D2}-{time.Second:D2}.png";
-            Directory.CreateDirectory("./screenshots");
-            screenShot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
+                testContext.TakeScreenshot(name);
+            }
         }
 
         #region Before & After test run
