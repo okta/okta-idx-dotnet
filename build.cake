@@ -206,6 +206,6 @@ Task("DefaultE2e")
     .IsDependentOn("BuildEmbeddedAuthSampleApp")
     .IsDependentOn("TestEmbeddedAuthSampleApp");
 
-var target = (BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default";
+var target = (!BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default";
 
 RunTarget(target);
