@@ -12,10 +12,11 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         private readonly ITestConfiguration _configuration;
         private readonly IOktaSdkHelper _oktaHelper;
         private readonly IA18nClientHelper _ia18nHelper;
-        private bool _disposed = false;
-        private const int MaxAttempts = 61; // seconds
-        private const string DefaultScreenshotFolder = "./screenshots";
         private readonly string _passwordToUse;
+        private bool _disposed = false;
+        private const int MaxAttempts = 100; // seconds
+        private const string DefaultScreenshotFolder = "./screenshots";
+        private bool _keepOktaUser = false;
 
         private readonly string[] messageCodeMarkers = new[]
         {
@@ -166,6 +167,16 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             screenShot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
         }
 
+        public void SetMfaFacebookUser()
+        {
+            UserProfile = new UserProfile()
+            {
+                Email = _configuration.FacebookMfaUserEmail,
+                Password = _configuration.FacebookMfaUserPassword,
+            };
+            _keepOktaUser = true;
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -224,7 +235,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
 
         private async Task CleanUpOktaUserAsync()
         {
-            if (!string.IsNullOrEmpty(UserProfile?.Email))
+            if (!string.IsNullOrEmpty(UserProfile?.Email) && !_keepOktaUser)
             {
                 await _oktaHelper.DeleteUserAsync(UserProfile.Email);
             }
@@ -235,6 +246,5 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             _ia18nHelper.CleanUpProfile();
             await CleanUpOktaUserAsync();
         }
-
     }
 }

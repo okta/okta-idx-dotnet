@@ -13,5 +13,7 @@
         public string ScreenshotsFolder { get; set; }
         public string FacebookUserEmail { get; set; }
         public string FacebookUserPassword { get; set; }
+        public string FacebookMfaUserEmail { get; set; }
+        public string FacebookMfaUserPassword { get; set; }
     }
 }
