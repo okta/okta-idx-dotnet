@@ -1,4 +1,4 @@
-//#addin nuget:?package=Cake.Figlet&version=2.0.1
+#addin nuget:?package=Cake.Figlet&version=2.0.1
 var configuration = Argument("configuration", "Release");
 
 /**************************************** BEGIN SDK ****************************************/
@@ -89,7 +89,7 @@ Task("IntegrationTest")
 Task("Info")
 .Does(() => 
 {
-    Information("Okta.Idx.Sdk");
+    Information(Figlet("Okta.Idx.Sdk"));
 
     var cakeVersion = typeof(ICakeContext).Assembly.GetName().Version.ToString();
 
@@ -198,12 +198,12 @@ Task("DefaultE2e")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
-    .IsDependentOn("RestoreEmbeddedAuthSampleApp")
-    .IsDependentOn("BuildEmbeddedAuthSampleApp")
-    .IsDependentOn("TestEmbeddedAuthSampleApp")
     .IsDependentOn("RestoreEmbeddedWidgetSampleApp")
     .IsDependentOn("BuildEmbeddedWidgetSampleApp")
     .IsDependentOn("TestEmbeddedWidgetSampleApp")
+    .IsDependentOn("RestoreEmbeddedAuthSampleApp")
+    .IsDependentOn("BuildEmbeddedAuthSampleApp")
+    .IsDependentOn("TestEmbeddedAuthSampleApp")
     .IsDependentOn("Pack");
 
 var target = (BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default";
