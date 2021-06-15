@@ -61,7 +61,7 @@ namespace embedded_auth_with_sdk.E2ETests.PageObjectModels
                     tryCount++;
                     if (condition())
                         return true;
-                    Thread.Sleep(200);
+                    Thread.Sleep(1000);
             }
             return false;
         }

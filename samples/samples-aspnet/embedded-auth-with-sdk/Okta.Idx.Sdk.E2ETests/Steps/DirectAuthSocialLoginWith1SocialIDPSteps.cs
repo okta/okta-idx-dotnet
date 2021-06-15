@@ -20,7 +20,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps
         public void GivenAnIDPRoutingRuleDefinedToAllowUsersInTheSampleAppToUseTheIDP()
         { }
 
-        [Given(@"Mary does not have an account in the org but has a Facebook account")]
+        [Given(@"a user named Mary does not have an account in the org but has a Facebook account")]
         public void GivenMaryDoesNotHaveAnAccountInTheOrgButHasAFacebookAccount()
         {
             _context.SetUnenrolledUserWithFacebookAccount("Mary");

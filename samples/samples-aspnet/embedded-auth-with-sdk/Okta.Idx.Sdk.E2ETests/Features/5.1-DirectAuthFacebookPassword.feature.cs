@@ -89,11 +89,8 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 6
  testRunner.And("an IDP routing rule defined to allow users in the Sample App to use the IDP", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 7
- testRunner.And("a user named \"Mary\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
 #line 8
- testRunner.And("Mary does not have an account in the org but has a Facebook account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("a user named Mary does not have an account in the org but has a Facebook account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
         }
         
