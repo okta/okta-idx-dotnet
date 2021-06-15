@@ -89,7 +89,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 6
  testRunner.And("an IDP routing rule defined to allow users in the Sample App to use the IDP", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 8
+#line 7
  testRunner.And("a user named Mary does not have an account in the org but has a Facebook account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
         }
@@ -107,7 +107,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("5.1.1: Mary Logs in with Social IDP", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 10
+#line 9
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -130,22 +130,22 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 3
  this.FeatureBackground();
 #line hidden
-#line 11
+#line 10
  testRunner.Given("Mary navigates to the Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 12
+#line 11
  testRunner.When("she clicks the Login with Facebook button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 13
+#line 12
  testRunner.And("logs in to Facebook", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 14
+#line 13
  testRunner.Then("she is redirected to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 15
+#line 14
     testRunner.And("she sees a table with her profile info", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
+#line 15
     testRunner.And("the cell for the value of email is shown and contains her email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
