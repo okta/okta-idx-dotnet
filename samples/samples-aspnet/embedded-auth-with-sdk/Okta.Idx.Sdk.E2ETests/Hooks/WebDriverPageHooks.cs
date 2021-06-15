@@ -4,7 +4,6 @@ using Xunit;
 using TechTalk.SpecFlow;
 using embedded_auth_with_sdk.E2ETests.Drivers;
 using embedded_auth_with_sdk.E2ETests.Helpers;
-using embedded_auth_with_sdk.E2ETests.Helpers.A18NClient;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
@@ -18,7 +17,6 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
 
         private static IWebServerDriver _webServerDriver;
         private static ITestConfiguration _config;
-        private static A18nClient _a18nClient;
         private const string DefaultProfileTag = "okta-idx-dotnet";
 
         public WebDriverPageHooks(IObjectContainer container)
@@ -30,7 +28,7 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
         public void BeforeScenario()
         {
             _container.RegisterInstanceAs<ITestConfiguration>(_config);
-            _container.RegisterInstanceAs<IA18nClient>(_a18nClient);
+            _container.RegisterTypeAs<A18nClientHelper, IA18nClientHelper>();
             _container.RegisterTypeAs<OktaSdkHelper, IOktaSdkHelper>();
             _container.RegisterTypeAs<TestContext, ITestContext>();
         }
@@ -64,21 +62,11 @@ namespace embedded_auth_with_sdk.E2ETests.Hooks
             {
                 _config.A18nProfileTag = DefaultProfileTag;
             }
-            if (string.IsNullOrWhiteSpace(_config.A18nProfileId))
-            {
-                _a18nClient = new A18nClient(_config.A18nApiKey, createNewDefaultProfile: true, _config.A18nProfileTag);
-            }
-            else
-            {
-                _a18nClient = new A18nClient(_config.A18nApiKey, _config.A18nProfileId);
-            }
         }
 
         [AfterTestRun]
         public static void AfterTestRun()
         {
-            _a18nClient.Dispose();
-
             _webServerDriver.StopWebServer();
         }
         #endregion Before & After test run

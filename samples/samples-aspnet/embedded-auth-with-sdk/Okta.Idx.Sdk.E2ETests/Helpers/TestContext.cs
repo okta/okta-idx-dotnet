@@ -2,23 +2,20 @@
 using System.IO;
 using System.Threading.Tasks;
 using embedded_auth_with_sdk.E2ETests.Drivers;
-using embedded_auth_with_sdk.E2ETests.Helpers.A18NClient;
-using embedded_auth_with_sdk.E2ETests.Helpers.A18NClient.Dto;
 using OpenQA.Selenium;
 
 namespace embedded_auth_with_sdk.E2ETests.Helpers
 {
     public class TestContext : ITestContext, IDisposable
     {
-        private readonly IA18nClient _a18nClient;
         private readonly WebDriverDriver _webDriver;
         private readonly ITestConfiguration _configuration;
-        private readonly A18nProfile _a18nProfile;
         private readonly IOktaSdkHelper _oktaHelper;
-
+        private readonly IA18nClientHelper _ia18nHelper;
         private bool _disposed = false;
         private const int MaxAttempts = 61; // seconds
         private const string DefaultScreenshotFolder = "./screenshots";
+        private readonly string _passwordToUse;
 
         private readonly string[] messageCodeMarkers = new[]
         {
@@ -29,21 +26,20 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
 
         public UserProfile UserProfile { get; private set; }
 
-        public TestContext(ITestConfiguration configuration, IA18nClient a18nClient, IOktaSdkHelper oktaHelper, WebDriverDriver webDriver)
+        public TestContext(ITestConfiguration configuration, IA18nClientHelper ia18nHelper, IOktaSdkHelper oktaHelper, WebDriverDriver webDriver)
         {
             _oktaHelper = oktaHelper;
-            _a18nClient = a18nClient;
+            _ia18nHelper = ia18nHelper;
             _webDriver = webDriver;
             _configuration = configuration;
-
-            _a18nProfile = Task.Run(() => _a18nClient.GetProfileAsync()).Result;
+            _passwordToUse = $"{configuration.UserPassword}{Guid.NewGuid()}";
         }
 
         public async Task SetActivePasswordUserAsync(string firstName)
         {
             await CleanUpAsync();
-
-            var oktaUser = await _oktaHelper.CreateActiveUser(_a18nProfile.EmailAddress, _a18nProfile.PhoneNumber, firstName, _configuration.UserPassword);
+            var a18nprofile = _ia18nHelper.GetDefaultProfile();
+            var oktaUser = await _oktaHelper.CreateActiveUser(a18nprofile.EmailAddress, a18nprofile.PhoneNumber, firstName, _passwordToUse);
             
             UserProfile = new UserProfile()
             {
@@ -51,28 +47,31 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 LastName = "Lastname",
                 Email = oktaUser.Profile.Email,
                 PhoneNumber = oktaUser.Profile.PrimaryPhone,
-                Password = _configuration.UserPassword,
+                Password = _passwordToUse,
             };
         }
 
         public async Task SetUnenrolledUserAsync(string firstName)
         {
-            await CleanUpAsync();            
+            await CleanUpAsync();
+            var a18nProfile = _ia18nHelper.GetDefaultProfile();
+
             UserProfile = new UserProfile()
             {
                 FirstName = firstName,
                 LastName = "Lastname",
-                Email = _a18nProfile.EmailAddress,
-                PhoneNumber = _a18nProfile.PhoneNumber,
-                Password = _configuration.UserPassword,
+                Email = a18nProfile.EmailAddress,
+                PhoneNumber = a18nProfile.PhoneNumber,
+                Password = _passwordToUse,
             };
         }
 
         public async Task SetActivePasswordAndEmailUserAsync(string firstName)
         {
             await CleanUpAsync();
+            var a18nProfile = _ia18nHelper.GetDefaultProfile();
 
-            var oktaUser = await _oktaHelper.CreateActiveUser(_a18nProfile.EmailAddress, _a18nProfile.PhoneNumber, firstName, _configuration.UserPassword);
+            var oktaUser = await _oktaHelper.CreateActiveUser(a18nProfile.EmailAddress, a18nProfile.PhoneNumber, firstName, _passwordToUse);
             await _oktaHelper.AddUserToGroup(oktaUser, _configuration.MfaRequiredGroup);
 
             UserProfile = new UserProfile()
@@ -81,15 +80,16 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 LastName = "Lastname",
                 Email = oktaUser.Profile.Email,
                 PhoneNumber = oktaUser.Profile.PrimaryPhone,
-                Password = _configuration.UserPassword,
+                Password = _passwordToUse,
             };
         }
 
         public async Task SetActivePasswordAndSmsUserAsync(string firstName)
         {
             await CleanUpAsync();
+            var a18nProfile = _ia18nHelper.GetDefaultProfile();
 
-            var oktaUser = await _oktaHelper.CreateActiveUser(_a18nProfile.EmailAddress, _a18nProfile.PhoneNumber, firstName, _configuration.UserPassword);
+            var oktaUser = await _oktaHelper.CreateActiveUser(a18nProfile.EmailAddress, a18nProfile.PhoneNumber, firstName, _passwordToUse);
             await _oktaHelper.AddUserToGroup(oktaUser, _configuration.MfaRequiredGroup);
             await _oktaHelper.AddUserToGroup(oktaUser, _configuration.PhoneEnrollmentRequiredGroup);
 
@@ -99,7 +99,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 LastName = "Lastname",
                 Email = oktaUser.Profile.Email,
                 PhoneNumber = oktaUser.Profile.PrimaryPhone,
-                Password = _configuration.UserPassword,
+                Password = _passwordToUse,
             };
         }
 
@@ -116,23 +116,35 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
 
         public async Task EnrollPhoneAuthenticator()
         {
-            var factor = await _oktaHelper.EnrollPhoneFactor(_a18nProfile.EmailAddress, _a18nProfile.PhoneNumber);
+            var factor = await _oktaHelper.EnrollPhoneFactor(UserProfile.Email, UserProfile.PhoneNumber);
             var passCode = await GetRecoveryCodeFromSms();
 
-            await _oktaHelper.ActivateFactor(factor, _a18nProfile.EmailAddress, passCode);
+            await _oktaHelper.ActivateFactor(factor, UserProfile.Email, passCode);
         }
 
         public async Task<string> GetRecoveryCodeFromEmail()
-        {            
-            var code = await GetRecoveryCodeFromMessage(() => _a18nClient.GetLastMessagePlainContentAsync());
-            await _a18nClient.DeleteAllProfileEmailsAsync();
-            return code;
+        {
+            var a18nClient = _ia18nHelper.GetClient();
+
+            var passCode = await GetRecoveryCodeFromMessage(() => a18nClient.GetLastMessagePlainContentAsync());
+            if (string.IsNullOrEmpty(passCode))
+            {
+                throw new Exception("Cannot get an email recovery code");
+            }
+            await a18nClient.DeleteAllProfileEmailsAsync();
+            return passCode;
         }
 
         public async Task<string> GetRecoveryCodeFromSms()
         {
-            var passCode = await GetRecoveryCodeFromMessage(()=>_a18nClient.GetLastSmsPlainContentAsync());
-            await _a18nClient.DeleteAllProfileSmsAsync();
+            var a18nClient = _ia18nHelper.GetClient();
+
+            var passCode = await GetRecoveryCodeFromMessage(()=>a18nClient.GetLastSmsPlainContentAsync());
+            if (string.IsNullOrEmpty(passCode))
+            {
+                throw new Exception("Cannot get an sms recovery code");
+            }
+            await a18nClient.DeleteAllProfileSmsAsync();
             return passCode;
         }
 
@@ -210,20 +222,17 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             return recoveryCode;
         }
 
-        private async Task CleanUpA18ProfileAsync()
-        {
-            await _a18nClient.DeleteAllProfileEmailsAsync();
-            await _a18nClient.DeleteAllProfileSmsAsync();
-        }
-
         private async Task CleanUpOktaUserAsync()
         {
-            await _oktaHelper.DeleteUserAsync(_a18nProfile.EmailAddress);
+            if (!string.IsNullOrEmpty(UserProfile?.Email))
+            {
+                await _oktaHelper.DeleteUserAsync(UserProfile.Email);
+            }
         }
 
         private async Task CleanUpAsync()
         {
-            await CleanUpA18ProfileAsync();
+            _ia18nHelper.CleanUpProfile();
             await CleanUpOktaUserAsync();
         }
 
