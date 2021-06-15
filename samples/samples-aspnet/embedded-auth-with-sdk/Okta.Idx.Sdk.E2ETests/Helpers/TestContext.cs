@@ -15,6 +15,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         private bool _disposed = false;
         private const int MaxAttempts = 61; // seconds
         private const string DefaultScreenshotFolder = "./screenshots";
+        private readonly string _passwordToUse;
 
         private readonly string[] messageCodeMarkers = new[]
         {
@@ -29,16 +30,16 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         {
             _oktaHelper = oktaHelper;
             _ia18nHelper = ia18nHelper;
-             _webDriver = webDriver;
+            _webDriver = webDriver;
             _configuration = configuration;
-
+            _passwordToUse = $"{configuration.UserPassword}{Guid.NewGuid()}";
         }
 
         public async Task SetActivePasswordUserAsync(string firstName)
         {
             await CleanUpAsync();
             var a18nprofile = _ia18nHelper.GetDefaultProfile();
-            var oktaUser = await _oktaHelper.CreateActiveUser(a18nprofile.EmailAddress, a18nprofile.PhoneNumber, firstName, _configuration.UserPassword);
+            var oktaUser = await _oktaHelper.CreateActiveUser(a18nprofile.EmailAddress, a18nprofile.PhoneNumber, firstName, _passwordToUse);
             
             UserProfile = new UserProfile()
             {
@@ -46,7 +47,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 LastName = "Lastname",
                 Email = oktaUser.Profile.Email,
                 PhoneNumber = oktaUser.Profile.PrimaryPhone,
-                Password = _configuration.UserPassword,
+                Password = _passwordToUse,
             };
         }
 
@@ -61,7 +62,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 LastName = "Lastname",
                 Email = a18nProfile.EmailAddress,
                 PhoneNumber = a18nProfile.PhoneNumber,
-                Password = _configuration.UserPassword,
+                Password = _passwordToUse,
             };
         }
 
@@ -70,7 +71,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             await CleanUpAsync();
             var a18nProfile = _ia18nHelper.GetDefaultProfile();
 
-            var oktaUser = await _oktaHelper.CreateActiveUser(a18nProfile.EmailAddress, a18nProfile.PhoneNumber, firstName, _configuration.UserPassword);
+            var oktaUser = await _oktaHelper.CreateActiveUser(a18nProfile.EmailAddress, a18nProfile.PhoneNumber, firstName, _passwordToUse);
             await _oktaHelper.AddUserToGroup(oktaUser, _configuration.MfaRequiredGroup);
 
             UserProfile = new UserProfile()
@@ -79,7 +80,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 LastName = "Lastname",
                 Email = oktaUser.Profile.Email,
                 PhoneNumber = oktaUser.Profile.PrimaryPhone,
-                Password = _configuration.UserPassword,
+                Password = _passwordToUse,
             };
         }
 
@@ -88,7 +89,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             await CleanUpAsync();
             var a18nProfile = _ia18nHelper.GetDefaultProfile();
 
-            var oktaUser = await _oktaHelper.CreateActiveUser(a18nProfile.EmailAddress, a18nProfile.PhoneNumber, firstName, _configuration.UserPassword);
+            var oktaUser = await _oktaHelper.CreateActiveUser(a18nProfile.EmailAddress, a18nProfile.PhoneNumber, firstName, _passwordToUse);
             await _oktaHelper.AddUserToGroup(oktaUser, _configuration.MfaRequiredGroup);
             await _oktaHelper.AddUserToGroup(oktaUser, _configuration.PhoneEnrollmentRequiredGroup);
 
@@ -98,7 +99,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 LastName = "Lastname",
                 Email = oktaUser.Profile.Email,
                 PhoneNumber = oktaUser.Profile.PrimaryPhone,
-                Password = _configuration.UserPassword,
+                Password = _passwordToUse,
             };
         }
 
@@ -109,18 +110,16 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 FirstName = firstName,
                 LastName = "Lastname",
                 Email = _configuration.FacebookUserEmail,
-                Password = _configuration.FacebookUserPassword,
+                Password = _passwordToUse,
             };
         }
 
         public async Task EnrollPhoneAuthenticator()
         {
-            var a18nProfile = _ia18nHelper.GetDefaultProfile();
-
-            var factor = await _oktaHelper.EnrollPhoneFactor(a18nProfile.EmailAddress, a18nProfile.PhoneNumber);
+            var factor = await _oktaHelper.EnrollPhoneFactor(UserProfile.Email, UserProfile.PhoneNumber);
             var passCode = await GetRecoveryCodeFromSms();
 
-            await _oktaHelper.ActivateFactor(factor, a18nProfile.EmailAddress, passCode);
+            await _oktaHelper.ActivateFactor(factor, UserProfile.Email, passCode);
         }
 
         public async Task<string> GetRecoveryCodeFromEmail()
