@@ -35,7 +35,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers.A18NClient
                     CleanUpOldProfiles(newProfileUniqueTag);
                 }
 
-                var newProfile = CreateProfileAsync(newProfileUniqueTag).Result;
+                var newProfile = Task.Run(()=>CreateProfileAsync(newProfileUniqueTag)).Result;
                 _createdProfileId = newProfile.ProfileId;
                 SetDefaultProfileId(newProfile.ProfileId);
                 _needDeleteProfile = true;
@@ -237,7 +237,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers.A18NClient
             {
                 if (_needDeleteProfile)
                 {
-                    DeleteProfileAsync(profileId: _createdProfileId).Wait();
+                    Task.Run(()=>DeleteProfileAsync(profileId: _createdProfileId)).Wait();
                 }
                 if (_client != null)
                     _client.Dispose();
@@ -309,12 +309,15 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers.A18NClient
 
         private void CleanUpOldProfiles(string newProfileUniqueTag)
         {
-            var activeProfiles = GetActiveProfilesAsync().Result;
+            Task.Run(async () =>
+           {
+               var activeProfiles = await GetActiveProfilesAsync();
 
-            foreach (var profile in activeProfiles.Profiles.Where(p => p.DisplayName == newProfileUniqueTag))
-            {
-                DeleteProfileAsync(profile.ProfileId).Wait();
-            }
+               foreach (var profile in activeProfiles.Profiles.Where(p => p.DisplayName == newProfileUniqueTag))
+               {
+                   await DeleteProfileAsync(profile.ProfileId);
+               }
+           }).Wait();
         }
 
         #endregion utility functions

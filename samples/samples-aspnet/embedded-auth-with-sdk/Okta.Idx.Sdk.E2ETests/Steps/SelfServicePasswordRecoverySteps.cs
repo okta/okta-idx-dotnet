@@ -16,14 +16,15 @@ namespace embedded_auth_with_sdk.E2ETests.Steps
         { }
 
         [Given(@"a user named ""(.*)""")]
-        public async Task GivenAUserNamed(string firstName)
+        public void GivenAUserNamed(string firstName)
         {
-            await _context.SetActivePasswordUserAsync(firstName);
         }
 
         [Given(@"Mary is a user with a verified email and a set password")]
-        public void GivenMaryIsAUserWithAVerifiedEmailAndASetPasswordAsync()
-        { }
+        public async Task GivenMaryIsAUserWithAVerifiedEmailAndASetPasswordAsync()
+        {
+            await _context.SetActivePasswordUserAsync("Mary");
+        }
 
     }
 }
