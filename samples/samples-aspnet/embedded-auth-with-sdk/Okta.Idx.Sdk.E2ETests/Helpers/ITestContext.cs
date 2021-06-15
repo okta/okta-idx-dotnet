@@ -14,5 +14,6 @@ namespace embedded_auth_with_sdk.E2ETests
         Task<string> GetRecoveryCodeFromSms();
         Task EnrollPhoneAuthenticator();
         void TakeScreenshot(string name);
+        void SetMfaFacebookUser();
     }
 }
