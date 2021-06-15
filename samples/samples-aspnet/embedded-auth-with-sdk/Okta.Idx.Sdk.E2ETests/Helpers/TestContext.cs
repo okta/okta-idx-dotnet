@@ -110,7 +110,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 FirstName = firstName,
                 LastName = "Lastname",
                 Email = _configuration.FacebookUserEmail,
-                Password = _passwordToUse,
+                Password = _configuration.FacebookUserPassword,
             };
         }
 
