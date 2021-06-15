@@ -56,6 +56,14 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Resend Code
+        /// </summary>
+        /// /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> ResendCodeAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Verify an authenticator
         /// </summary>
         /// <param name="verifyAuthenticatorOptions">The options to verify an authenticator.</param>

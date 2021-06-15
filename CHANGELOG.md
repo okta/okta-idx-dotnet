@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta05
+
+### Features
+
+* Add support to resend code during MFA.
+
 ## 0.1.0-beta04
 
 ### Features
