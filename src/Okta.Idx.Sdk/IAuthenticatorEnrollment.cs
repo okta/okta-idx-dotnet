@@ -42,5 +42,10 @@ namespace Okta.Idx.Sdk
         /// Gets the recover object.
         /// </summary>
         IRecover Recover { get; }
+
+        /// <summary>
+        /// Gets the resend object.
+        /// </summary>
+        IResend Resend { get;  }
     }
 }

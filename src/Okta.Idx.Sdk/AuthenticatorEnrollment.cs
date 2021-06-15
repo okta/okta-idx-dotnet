@@ -26,6 +26,9 @@ namespace Okta.Idx.Sdk
         public IRecover Recover => GetResourceProperty<Recover>("recover");
 
         /// <inheritdoc/>
+        public IResend Resend => GetResourceProperty<Resend>("resend");
+
+        /// <inheritdoc/>
         public Resource Profile => GetResourceProperty<Resource>("profile");
     }
 }
