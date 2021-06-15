@@ -19,7 +19,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.8.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class _5_1DirectAuthSocialLoginWith1SocialIDPFeature : object, Xunit.IClassFixture<_5_1DirectAuthSocialLoginWith1SocialIDPFeature.FixtureData>, System.IDisposable
+    public partial class _5_2DirectAuthSocialLoginWithMFAFeature : object, Xunit.IClassFixture<_5_2DirectAuthSocialLoginWithMFAFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace embedded_auth_with_sdk.E2ETests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "5.1-DirectAuthFacebookPassword.feature"
+#line 1 "5.2-DirectAuthSocialLoginWthMFA.feature"
 #line hidden
         
-        public _5_1DirectAuthSocialLoginWith1SocialIDPFeature(_5_1DirectAuthSocialLoginWith1SocialIDPFeature.FixtureData fixtureData, embedded_auth_with_sdk_E2ETests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public _5_2DirectAuthSocialLoginWithMFAFeature(_5_2DirectAuthSocialLoginWithMFAFeature.FixtureData fixtureData, embedded_auth_with_sdk_E2ETests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "5.1: Direct Auth Social Login with 1 Social IDP", null, ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "5.2: Direct Auth Social Login with MFA", null, ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -78,7 +78,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
         public virtual void FeatureBackground()
         {
 #line 3
- #line hidden
+  #line hidden
 #line 4
  testRunner.Given("a SPA, WEB APP or MOBILE Policy that defines Password as the only factor required" +
                     " for authentication", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
@@ -90,7 +90,10 @@ namespace embedded_auth_with_sdk.E2ETests.Features
  testRunner.And("an IDP routing rule defined to allow users in the Sample App to use the IDP", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 7
- testRunner.And("a user named Mary does not have an account in the org but has a Facebook account", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    testRunner.And("the Application Sign on Policy is set to \"Password + Another Factor\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 8
+ testRunner.And("a user named Mary does not have an account in the org", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
         }
         
@@ -99,15 +102,15 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="5.1.1: Mary Logs in with Social IDP")]
-        [Xunit.TraitAttribute("FeatureTitle", "5.1: Direct Auth Social Login with 1 Social IDP")]
-        [Xunit.TraitAttribute("Description", "5.1.1: Mary Logs in with Social IDP")]
-        public virtual void _5_1_1MaryLogsInWithSocialIDP()
+        [Xunit.SkippableFactAttribute(DisplayName="5.2.1: Mary logs in with a social IDP and gets an error message")]
+        [Xunit.TraitAttribute("FeatureTitle", "5.2: Direct Auth Social Login with MFA")]
+        [Xunit.TraitAttribute("Description", "5.2.1: Mary logs in with a social IDP and gets an error message")]
+        public virtual void _5_2_1MaryLogsInWithASocialIDPAndGetsAnErrorMessage()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("5.1.1: Mary Logs in with Social IDP", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 9
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("5.2.1: Mary logs in with a social IDP and gets an error message", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 10
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -128,25 +131,20 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             {
                 this.ScenarioStart();
 #line 3
- this.FeatureBackground();
-#line hidden
-#line 10
- testRunner.Given("Mary navigates to the Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+  this.FeatureBackground();
 #line hidden
 #line 11
- testRunner.When("she clicks the Login with Facebook button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 12
- testRunner.And("logs in to Facebook", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.When("she clicks the Login with Facebook button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 13
- testRunner.Then("she is redirected to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 14
-    testRunner.And("she sees a table with her profile info", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("logs in to Facebook", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 15
-    testRunner.And("the cell for the value of email is shown and contains her email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.Then("Mary should see an error message \"Multifactor Authentication and Social Identity " +
+                        "Providers is not currently supported, Authentication failed.\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -159,12 +157,12 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             
             public FixtureData()
             {
-                _5_1DirectAuthSocialLoginWith1SocialIDPFeature.FeatureSetup();
+                _5_2DirectAuthSocialLoginWithMFAFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                _5_1DirectAuthSocialLoginWith1SocialIDPFeature.FeatureTearDown();
+                _5_2DirectAuthSocialLoginWithMFAFeature.FeatureTearDown();
             }
         }
     }
