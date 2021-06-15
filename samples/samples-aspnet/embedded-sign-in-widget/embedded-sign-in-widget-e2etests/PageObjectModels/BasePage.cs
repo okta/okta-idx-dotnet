@@ -40,7 +40,7 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
         {
             int tryCount = 0;
             Exception thrown = null;
-            int maxAttempts = 5;
+            int maxAttempts = 10;
             
             while (tryCount < maxAttempts)
             {
