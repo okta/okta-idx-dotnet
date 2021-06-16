@@ -34,6 +34,17 @@
                 </div>
             }
         </section>
+        <section id="resendCodeForm">
+            @using (Html.BeginForm("ResendAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-md-10">
+                        <input type="submit" value="Resend Code" class="btn btn-primary btn-stretch-wide" id="resendCodeBtn" />
+                    </div>
+                </div>
+            }
+        </section>
     </div>
 </div>
 

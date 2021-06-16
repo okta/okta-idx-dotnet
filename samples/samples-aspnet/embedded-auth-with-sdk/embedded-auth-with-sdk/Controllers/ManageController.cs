@@ -137,6 +137,27 @@
             }
         }
 
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ResendAuthenticatorAsync()
+        {
+            try
+            {
+                var authnResponse = await _idxClient.ResendCodeAsync((IIdxContext)Session["idxContext"]);
+                Session["idxContext"] = authnResponse.IdxContext;
+
+                return View("VerifyAuthenticator");
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return View("VerifyAuthenticator");
+            }
+
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -293,6 +314,7 @@
 
             if (!ModelState.IsValid)
             {
+                model.Authenticators = authenticators;
                 return View("SelectAuthenticator", model);
             }
 

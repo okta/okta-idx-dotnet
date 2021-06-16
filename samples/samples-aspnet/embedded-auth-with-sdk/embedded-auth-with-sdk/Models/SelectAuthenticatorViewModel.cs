@@ -25,7 +25,7 @@ namespace embedded_auth_with_sdk.Models
         {
             get
             {
-                return PasswordId == AuthenticatorId;
+                return (PasswordId!= null && PasswordId == AuthenticatorId);
             }
         }
 
@@ -33,7 +33,7 @@ namespace embedded_auth_with_sdk.Models
         {
             get
             {
-                return PhoneId == AuthenticatorId;
+                return (PhoneId != null && PhoneId == AuthenticatorId);
             }
         }
     }

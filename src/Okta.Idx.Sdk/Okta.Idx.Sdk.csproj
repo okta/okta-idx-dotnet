@@ -6,6 +6,16 @@
     <Version>0.1.0-beta05</Version>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Description>Official Okta .NET IDX SDK.</Description>
+    <RepositoryUrl>https://github.com/okta/okta-idx-dotnet</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/okta/okta-idx-dotnet</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/okta/okta-idx-dotnet/blob/master/LICENSE</PackageLicenseUrl>
+    <Authors>Okta, Inc.</Authors>
+    <PackageTags>okta api authentication identity management</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/okta/okta-sdk-dotnet/master/icon.png</PackageIconUrl>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Okta.Sdk.Abstractions" Version="4.0.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
