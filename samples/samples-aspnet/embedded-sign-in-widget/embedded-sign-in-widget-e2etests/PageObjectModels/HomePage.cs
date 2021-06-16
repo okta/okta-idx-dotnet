@@ -17,10 +17,10 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
 
         public IWebElement LoginButton => TryFindElement(By.Id("LoginBtn"));
         public IWebElement RegisterButton => TryFindElement(By.Id("RegisterBtn"));
-        public IWebElement ClaimUserNameLabel => TryFindElement(By.Id("claim-preferred_username"));
-        public IWebElement ClaimIdTokenLabel => TryFindElement(By.Id("claim-id_token"));
-        public IWebElement ClaimAccessTokenLabel => TryFindElement(By.Id("claim-access_token"));
-        public IWebElement ClaimRefreshTokenLabel => TryFindElement(By.Id("claim-refresh_token"));
+        public IWebElement ClaimUserNameLabel => TryFindElement(By.Id("claim_preferred_username"));
+        public IWebElement ClaimIdTokenLabel => TryFindElement(By.Id("claim_id_token"));
+        public IWebElement ClaimAccessTokenLabel => TryFindElement(By.Id("claim_access_token"));
+        public IWebElement ClaimRefreshTokenLabel => TryFindElement(By.Id("claim_refresh_token"));
 
         public override string RelativePageUri => string.Empty;
 
