@@ -15,7 +15,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         private readonly string _passwordToUse;
         private bool _disposed = false;
         private const int MaxRetries = 3; // when resend option is available
-        private const int OneAttemptTime = 60; // seconds
+        private const int OneAttemptTime = 30; // seconds
         private const string DefaultScreenshotFolder = "./screenshots";
         private bool _keepOktaUser = false;
 

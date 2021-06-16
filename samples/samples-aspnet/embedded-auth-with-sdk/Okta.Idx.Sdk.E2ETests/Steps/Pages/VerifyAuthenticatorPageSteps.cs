@@ -27,7 +27,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         [When(@"she fills in the correct code")]
         public async Task WhenSheFillsInTheCorrectCode()
         {
-            var recoveryCode = await _context.GetActivationCodeFromEmail();
+            var recoveryCode = await _context.GetActivationCodeFromEmail(InitiateResendCode);
             _verifyAuthenticatorPageModel.PasscodeInput.SendKeys(recoveryCode);
         }
 
@@ -56,7 +56,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         [When(@"She inputs the correct code from the Email")]
         public async Task WhenSheInputsTheCorrectCodeFromHerEmail()
         {
-            var theCode = await _context.GetActivationCodeFromEmail();
+            var theCode = await _context.GetActivationCodeFromEmail(InitiateResendCode);
             _verifyAuthenticatorPageModel.PasscodeInput.SendKeys(theCode);
             _verifyAuthenticatorPageModel.SubmitButton.Click();
         }
@@ -65,7 +65,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         [When(@"She inputs the correct code from her SMS")]
         public async Task WhenSheInputsTheCorrectCodeFromHerSMS()
         {
-            var theCode = await _context.GetActivationCodeFromSms();
+            var theCode = await _context.GetActivationCodeFromSms(InitiateResendCode);
             _verifyAuthenticatorPageModel.PasscodeInput.SendKeys(theCode);
             _verifyAuthenticatorPageModel.SubmitButton.Click();
         }
@@ -82,6 +82,11 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         public void ThenSheSeesAFieldToRe_EnterAnotherCode()
         {
             _verifyAuthenticatorPageModel.PasscodeInput.Displayed.Should().BeTrue();
+        }
+
+        private void InitiateResendCode()
+        {
+            _verifyAuthenticatorPageModel.ResendCodeButton.Click();
         }
     }
 }
