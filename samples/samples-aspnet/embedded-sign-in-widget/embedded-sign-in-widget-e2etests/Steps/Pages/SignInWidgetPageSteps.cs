@@ -44,5 +44,10 @@ namespace embedded_sign_in_widget_e2etests.Steps.Pages
             _signInWidgetPage.SignonWithGoogleButton.Click();
         }
 
+        [When(@"she clicks the Login with Facebook button")]
+        public void WhenSheClicksTheFacebookButton()
+        {
+            _signInWidgetPage.SignonWithFacebookButton.Click();
+        }
     }
 }

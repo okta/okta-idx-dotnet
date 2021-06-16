@@ -25,6 +25,7 @@ namespace embedded_sign_in_widget_e2etests.Steps.Pages
 
         [Given(@"Mary navigates to the Embedded Widget View")]
         [Given(@"Mary navigates to Login with Social IDP")]
+        [Given(@"Mary navigates to the Login View")]
         public void GivenMaryNavigatesToTheEmbeddedWidgetView()
         {
             _homePageModel.GoToPage();
@@ -60,5 +61,18 @@ namespace embedded_sign_in_widget_e2etests.Steps.Pages
             _homePageModel.ClaimIdTokenLabel.Text.Should().NotBeEmpty();
         }
 
+        [Then(@"the cell for the value of email is shown and contains her email")]
+        public void ThenThePreferred_UsernameClaimIsShownAndMatchesMarySEmail()
+        {
+            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.TestUserProfile.Email);
+        }
+
+        [Then(@"she sees a table with her profile info")]
+        public void ThenAnApplicationSessionIsCreated()
+        {
+            _homePageModel.ClaimAccessTokenLabel.Text.Should().NotBeEmpty();
+            _homePageModel.ClaimIdTokenLabel.Text.Should().NotBeEmpty();
+            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.TestUserProfile.Email);
+        }
     }
 }

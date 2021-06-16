@@ -14,5 +14,7 @@ namespace embedded_sign_in_widget_e2etests
         public string SiteUrl { get; set; }
         public string GoogleUserEmail { get; set; }
         public string GoogleUserPassword { get; set; }
+        public string FacebookUserEmail { get; set; }
+        public string FacebookUserPassword { get; set; }
     }
 }
