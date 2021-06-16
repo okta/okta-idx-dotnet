@@ -12,5 +12,7 @@ namespace embedded_sign_in_widget_e2etests
         public string UserPassword { get; set; }
         public int IisPort { get; set; }
         public string SiteUrl { get; set; }
+        public string GoogleUserEmail { get; set; }
+        public string GoogleUserPassword { get; set; }
     }
 }

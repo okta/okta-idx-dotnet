@@ -1,4 +1,5 @@
 ﻿using Okta.Sdk;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +8,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
     public class OktaSdkHelper : IOktaSdkHelper
     {
         private OktaClient _client;
+        private string _resendUri;
 
         public OktaSdkHelper()
         {
@@ -55,12 +57,29 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             var user = await _client.Users.FirstOrDefaultAsync(u => u.Profile.Email.Equals(emailAddress));
             if (user != default)
             {
-                return await user.AddFactorAsync(new AddSmsFactorOptions()
+                var response = await user.AddFactorAsync(new AddSmsFactorOptions()
                 {
                     PhoneNumber = phoneNumber,
                 });
+
+                var links = (Dictionary<string, object>)response.GetData()["_links"];
+                var resendLink = ((List<object>)links["resend"])[0];
+
+                _resendUri = (string)((Dictionary<string, object>)resendLink)["href"];
+                return response;
             }
             return default;
+        }
+
+        public async Task ResendEnrollCode()
+        {
+            if (!string.IsNullOrEmpty(_resendUri))
+            {
+                await _client.PostAsync(new HttpRequest
+                {
+                    Uri = _resendUri,
+                });
+            }
         }
 
         public async Task ActivateFactor(IUserFactor factor, string emailAddress, string passCode)
@@ -74,6 +93,8 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 },
                 user.Id);
             }
+
+            _resendUri = null;
         }
     }
 }

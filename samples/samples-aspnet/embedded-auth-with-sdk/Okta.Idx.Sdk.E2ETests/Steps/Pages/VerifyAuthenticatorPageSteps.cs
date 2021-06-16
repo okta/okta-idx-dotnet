@@ -27,8 +27,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         [When(@"she fills in the correct code")]
         public async Task WhenSheFillsInTheCorrectCode()
         {
-            var recoveryCode = await _context.GetRecoveryCodeFromEmail();
-            recoveryCode.Should().NotBeNullOrEmpty();
+            var recoveryCode = await _context.GetActivationCodeFromEmail();
             _verifyAuthenticatorPageModel.PasscodeInput.SendKeys(recoveryCode);
         }
 
@@ -57,7 +56,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         [When(@"She inputs the correct code from the Email")]
         public async Task WhenSheInputsTheCorrectCodeFromHerEmail()
         {
-            var theCode = await _context.GetRecoveryCodeFromEmail();
+            var theCode = await _context.GetActivationCodeFromEmail();
             _verifyAuthenticatorPageModel.PasscodeInput.SendKeys(theCode);
             _verifyAuthenticatorPageModel.SubmitButton.Click();
         }
@@ -66,7 +65,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         [When(@"She inputs the correct code from her SMS")]
         public async Task WhenSheInputsTheCorrectCodeFromHerSMS()
         {
-            var theCode = await _context.GetRecoveryCodeFromSms();
+            var theCode = await _context.GetActivationCodeFromSms();
             _verifyAuthenticatorPageModel.PasscodeInput.SendKeys(theCode);
             _verifyAuthenticatorPageModel.SubmitButton.Click();
         }
