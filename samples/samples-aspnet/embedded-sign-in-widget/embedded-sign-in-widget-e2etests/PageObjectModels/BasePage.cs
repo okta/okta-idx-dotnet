@@ -2,11 +2,7 @@
 using FluentAssertions;
 using OpenQA.Selenium;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace embedded_sign_in_widget_e2etests.PageObjectModels
 {
@@ -47,16 +43,21 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
                 try
                 {
                     tryCount++;
-                    return _webDriver.FindElement(by);
+                    var element = _webDriver.FindElement(by);
+                    if (element.Displayed)
+                    {
+                        return element;
+                    }
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     thrown = ex;
-                    Thread.Sleep(1000);
                 }
+                Thread.Sleep(1000);
             }
 
             throw thrown ?? new Exception($"{by} was not found after {maxAttempts} attempts");
         }
     }
+
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace embedded_auth_with_sdk.E2ETests
 {
@@ -10,8 +11,8 @@ namespace embedded_auth_with_sdk.E2ETests
         Task SetActivePasswordAndEmailUserAsync(string firstName);
         Task SetActivePasswordAndSmsUserAsync(string firstName);
         void SetUnenrolledUserWithFacebookAccount(string firstName);
-        Task<string> GetRecoveryCodeFromEmail();
-        Task<string> GetRecoveryCodeFromSms();
+        Task<string> GetActivationCodeFromEmail(Action resendRequest = default);
+        Task<string> GetActivationCodeFromSms(Action resendRequest = default);
         Task EnrollPhoneAuthenticator();
         void TakeScreenshot(string name);
         void SetMfaFacebookUser();
