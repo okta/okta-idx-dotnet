@@ -35,22 +35,27 @@ namespace embedded_auth_with_sdk.E2ETests.PageObjectModels
         protected IWebElement TryFindElement(By by)
         {
             int tryCount = 0;
-            Exception thrown = null;
-            while (tryCount < 10)
+            Exception thrown;
+            while (true)
             {
                 try
                 {
-                    tryCount++;
                     return _webDriver.FindElement(by);
                 }
                 catch (Exception ex)
                 {
                     thrown = ex;
-                    Thread.Sleep(200);
                 }
+
+                if (++tryCount >= 10)
+                {
+                    break;
+                }
+
+                Thread.Sleep(200);
             }
 
-            throw thrown ?? new Exception($"Cannot find the element with thjijs condition: {by}");
+            throw new Exception($"Cannot find the element with this condition: {by}\n{thrown.Message}");
         }
 
         protected bool WaitForCondition (Func<bool> condition)
