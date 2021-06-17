@@ -18,3 +18,4 @@ namespace embedded_sign_in_widget_e2etests
         public string FacebookUserPassword { get; set; }
     }
 }
+
