@@ -27,7 +27,7 @@ namespace embedded_sign_in_widget_e2etests.Steps
         [Given(@"a user named Mary does not have an account in the org")]
         public void GivenMaryDoesNotHaveAnAccountInTheOrg()
         {
-            _context.SetUnenrolledUserWithFacebookAccount();
+            _context.SetUnenrolledUserWithGoogleAccount();
         }
         
         [Then(@"the Widget is reinitialized to re-enter the remediation flow to complete authentication")]

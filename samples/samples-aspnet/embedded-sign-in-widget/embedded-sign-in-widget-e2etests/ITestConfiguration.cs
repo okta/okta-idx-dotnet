@@ -8,5 +8,7 @@
         string SiteUrl { get; set; }
         string GoogleUserEmail { get; set; }
         string GoogleUserPassword { get; set; }
+        string FacebookUserEmail { get; set; }
+        string FacebookUserPassword { get; set; }
     }
 }

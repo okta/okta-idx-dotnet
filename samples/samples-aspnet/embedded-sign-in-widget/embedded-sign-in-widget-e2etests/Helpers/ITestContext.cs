@@ -6,6 +6,7 @@ namespace embedded_sign_in_widget_e2etests.Helpers
     {
         TestUserProfile TestUserProfile { get; set; }
         Task SetActivePasswordUserAsync();
+        void SetUnenrolledUserWithGoogleAccount();
         void SetUnenrolledUserWithFacebookAccount();
     }
 }

@@ -1,4 +1,5 @@
-﻿Feature: 7.1: Direct Auth with Self Hosted Sign In Widget Social Login with 1 Social IDP
+﻿@ignore
+Feature: 7.1: Direct Auth with Self Hosted Sign In Widget Social Login with 1 Social IDP
 
   Background:
 	Given a SPA, WEB APP or MOBILE Policy that defines Password as the only factor required for authentication

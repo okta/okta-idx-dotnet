@@ -198,13 +198,13 @@ Task("DefaultE2e")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
-    .IsDependentOn("Pack")
     .IsDependentOn("RestoreEmbeddedWidgetSampleApp")
     .IsDependentOn("BuildEmbeddedWidgetSampleApp")
     .IsDependentOn("TestEmbeddedWidgetSampleApp")
     .IsDependentOn("RestoreEmbeddedAuthSampleApp")
     .IsDependentOn("BuildEmbeddedAuthSampleApp")
-    .IsDependentOn("TestEmbeddedAuthSampleApp");
+    .IsDependentOn("TestEmbeddedAuthSampleApp")
+    .IsDependentOn("Pack");
 
 var target = (BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default";
 

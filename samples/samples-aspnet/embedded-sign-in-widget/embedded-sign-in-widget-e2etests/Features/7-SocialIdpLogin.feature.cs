@@ -24,7 +24,8 @@ namespace embedded_sign_in_widget_e2etests.Features
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
         
-        private string[] _featureTags = ((string[])(null));
+        private string[] _featureTags = new string[] {
+                "ignore"};
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
@@ -40,7 +41,8 @@ namespace embedded_sign_in_widget_e2etests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "7.1: Direct Auth with Self Hosted Sign In Widget Social Login with 1 Social IDP", null, ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "7.1: Direct Auth with Self Hosted Sign In Widget Social Login with 1 Social IDP", null, ProgrammingLanguage.CSharp, new string[] {
+                        "ignore"});
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -77,19 +79,19 @@ namespace embedded_sign_in_widget_e2etests.Features
         
         public virtual void FeatureBackground()
         {
-#line 3
-  #line hidden
 #line 4
+  #line hidden
+#line 5
  testRunner.Given("a SPA, WEB APP or MOBILE Policy that defines Password as the only factor required" +
                     " for authentication", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 5
+#line 6
  testRunner.And("a configured IDP object for Google", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 6
+#line 7
  testRunner.And("an IDP routing rule defined to allow users in the Sample App to use the IDP", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 7
+#line 8
  testRunner.And("a user named Mary does not have an account in the org", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
         }
@@ -99,7 +101,7 @@ namespace embedded_sign_in_widget_e2etests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="7.1.1: Mary Logs in with Social IDP")]
+        [Xunit.SkippableFactAttribute(DisplayName="7.1.1: Mary Logs in with Social IDP", Skip="Ignored")]
         [Xunit.TraitAttribute("FeatureTitle", "7.1: Direct Auth with Self Hosted Sign In Widget Social Login with 1 Social IDP")]
         [Xunit.TraitAttribute("Description", "7.1.1: Mary Logs in with Social IDP")]
         public virtual void _7_1_1MaryLogsInWithSocialIDP()
@@ -107,7 +109,7 @@ namespace embedded_sign_in_widget_e2etests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("7.1.1: Mary Logs in with Social IDP", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 9
+#line 10
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -127,26 +129,26 @@ namespace embedded_sign_in_widget_e2etests.Features
             else
             {
                 this.ScenarioStart();
-#line 3
+#line 4
   this.FeatureBackground();
 #line hidden
-#line 10
+#line 11
  testRunner.Given("Mary navigates to Login with Social IDP", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 11
+#line 12
  testRunner.When("she clicks the Login with Google button in the embedded Sign In Widget", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 12
+#line 13
  testRunner.And("logs in to Google", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 13
+#line 14
  testRunner.Then("she is redirected back to the Sample App", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 14
+#line 15
  testRunner.And("the Widget is reinitialized to re-enter the remediation flow to complete authenti" +
                         "cation", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 15
+#line 16
  testRunner.And("Mary is redirected back to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -160,12 +162,10 @@ namespace embedded_sign_in_widget_e2etests.Features
             
             public FixtureData()
             {
-                _7_1DirectAuthWithSelfHostedSignInWidgetSocialLoginWith1SocialIDPFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                _7_1DirectAuthWithSelfHostedSignInWidgetSocialLoginWith1SocialIDPFeature.FeatureTearDown();
             }
         }
     }
