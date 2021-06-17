@@ -1,9 +1,4 @@
-﻿using Okta.Sdk;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace embedded_sign_in_widget_e2etests.Helpers
 {
@@ -11,5 +6,7 @@ namespace embedded_sign_in_widget_e2etests.Helpers
     {
         TestUserProfile TestUserProfile { get; set; }
         Task SetActivePasswordUserAsync();
+        void SetUnenrolledUserWithGoogleAccount();
+        void SetUnenrolledUserWithFacebookAccount();
     }
 }

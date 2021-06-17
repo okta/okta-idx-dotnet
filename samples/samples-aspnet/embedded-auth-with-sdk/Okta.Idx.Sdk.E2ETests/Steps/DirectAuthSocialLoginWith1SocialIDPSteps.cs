@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using TechTalk.SpecFlow;
+﻿using TechTalk.SpecFlow;
 
 namespace embedded_auth_with_sdk.E2ETests.Steps
 {

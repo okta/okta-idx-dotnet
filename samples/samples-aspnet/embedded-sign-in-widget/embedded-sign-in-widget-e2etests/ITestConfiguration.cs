@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace embedded_sign_in_widget_e2etests
+﻿namespace embedded_sign_in_widget_e2etests
 {
     public interface ITestConfiguration
     {
@@ -12,5 +6,9 @@ namespace embedded_sign_in_widget_e2etests
         string UserPassword { get; set; }
         int IisPort { get; set; }
         string SiteUrl { get; set; }
+        string GoogleUserEmail { get; set; }
+        string GoogleUserPassword { get; set; }
+        string FacebookUserEmail { get; set; }
+        string FacebookUserPassword { get; set; }
     }
 }

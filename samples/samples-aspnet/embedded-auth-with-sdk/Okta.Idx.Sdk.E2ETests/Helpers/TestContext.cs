@@ -14,7 +14,8 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         private readonly IA18nClientHelper _ia18nHelper;
         private readonly string _passwordToUse;
         private bool _disposed = false;
-        private const int MaxAttempts = 100; // seconds
+        private const int MaxRetries = 3; // when resend option is available
+        private const int OneAttemptTime = 30; // seconds
         private const string DefaultScreenshotFolder = "./screenshots";
         private bool _keepOktaUser = false;
 
@@ -117,33 +118,37 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
 
         public async Task EnrollPhoneAuthenticator()
         {
-            var factor = await _oktaHelper.EnrollPhoneFactor(UserProfile.Email, UserProfile.PhoneNumber);
-            var passCode = await GetRecoveryCodeFromSms();
+            var a18nClient = _ia18nHelper.GetClient();
 
+            var factor = await _oktaHelper.EnrollPhoneFactor(UserProfile.Email, UserProfile.PhoneNumber);
+
+            var passCode = await GetActivationCodeFromSms(() => _oktaHelper.ResendEnrollCode());
             await _oktaHelper.ActivateFactor(factor, UserProfile.Email, passCode);
         }
 
-        public async Task<string> GetRecoveryCodeFromEmail()
+        public async Task<string> GetActivationCodeFromEmail(Action resendRequest = default)
         {
             var a18nClient = _ia18nHelper.GetClient();
 
-            var passCode = await GetRecoveryCodeFromMessage(() => a18nClient.GetLastMessagePlainContentAsync());
+            var passCode = await GetRecoveryCodeFromMessage(() => a18nClient.GetLastMessagePlainContentAsync(),
+                                                                resendRequest);
             if (string.IsNullOrEmpty(passCode))
             {
-                throw new Exception("Cannot get an email recovery code");
+                throw new Exception("Cannot get an email activation code");
             }
             await a18nClient.DeleteAllProfileEmailsAsync();
             return passCode;
         }
 
-        public async Task<string> GetRecoveryCodeFromSms()
+        public async Task<string> GetActivationCodeFromSms(Action resendRequest = default)
         {
             var a18nClient = _ia18nHelper.GetClient();
 
-            var passCode = await GetRecoveryCodeFromMessage(()=>a18nClient.GetLastSmsPlainContentAsync());
+            var passCode = await GetRecoveryCodeFromMessage(() => a18nClient.GetLastSmsPlainContentAsync(), 
+                                                            resendRequest);
             if (string.IsNullOrEmpty(passCode))
             {
-                throw new Exception("Cannot get an sms recovery code");
+                throw new Exception("Cannot get an sms activation code");
             }
             await a18nClient.DeleteAllProfileSmsAsync();
             return passCode;
@@ -196,23 +201,32 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             _disposed = true;
         }
 
-        private async Task<string> GetRecoveryCodeFromMessage(Func<Task<string>> getMessageBodyFunc)
+        private async Task<string> GetRecoveryCodeFromMessage(Func<Task<string>> getMessageBodyFunc,
+                                                            Action resendRequest = default)
         {
-            for (int tries = 0; tries < MaxAttempts; tries++)
+            int retry = 0;
+            while (retry < MaxRetries)
             {
-                try
+                for (int seconds = 0; seconds < OneAttemptTime; seconds++)
                 {
-                    var messageBody = await getMessageBodyFunc();
+                    await Task.Delay(1000);
+                    try
+                    {
+                        var messageBody = await getMessageBodyFunc();
+                        return ExtractRecoveryCodeFromMessage(messageBody);
+                    }
+                    catch (A18NClient.NotFoundException)
+                    {
+                        // expected exception when a mail box is empty
+                    }
+                }
 
-                    return ExtractRecoveryCodeFromMessage(messageBody);
-                }
-                catch (A18NClient.NotFoundException)
+                if (resendRequest == default || ++retry == MaxRetries)
                 {
-                    // expected exception when a mail box is empty
+                    break;
                 }
-                await Task.Delay(1000);
+                resendRequest();
             }
-
             return string.Empty;
         }
 

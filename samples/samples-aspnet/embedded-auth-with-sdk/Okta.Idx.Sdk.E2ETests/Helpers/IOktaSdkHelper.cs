@@ -10,5 +10,6 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         Task DeleteUserAsync(string email);
         Task<IUserFactor> EnrollPhoneFactor(string emailAddress, string phoneNumber);
         Task ActivateFactor(IUserFactor factor, string emailAddress, string passCode);
+        Task ResendEnrollCode();
     }
 }

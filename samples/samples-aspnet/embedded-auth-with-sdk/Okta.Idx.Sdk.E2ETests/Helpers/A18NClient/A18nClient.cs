@@ -237,7 +237,12 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers.A18NClient
             {
                 if (_needDeleteProfile)
                 {
-                    Task.Run(()=>DeleteProfileAsync(profileId: _createdProfileId)).Wait();
+                    Task.Run(async () =>
+                    {
+                        await DeleteAllProfileEmailsAsync(profileId: _createdProfileId);
+                        await DeleteAllProfileSmsAsync(profileId: _createdProfileId);
+                        await DeleteProfileAsync(profileId: _createdProfileId);
+                    }).Wait();
                 }
                 if (_client != null)
                     _client.Dispose();

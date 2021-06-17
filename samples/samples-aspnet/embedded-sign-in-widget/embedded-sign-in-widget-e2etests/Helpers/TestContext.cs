@@ -42,6 +42,26 @@ namespace embedded_sign_in_widget_e2etests.Helpers
             };
         }
 
+        public void SetUnenrolledUserWithFacebookAccount()
+        {
+            TestUserProfile = new TestUserProfile()
+            {
+                FirstName = "User",
+                LastName = "Facebook",
+                Email = _configuration.FacebookUserEmail,
+                Password = _configuration.FacebookUserPassword
+            };
+        }
+        public void SetUnenrolledUserWithGoogleAccount()
+        {
+            TestUserProfile = new TestUserProfile()
+            {
+                FirstName = "User",
+                LastName = "Google",
+                Email = _configuration.GoogleUserEmail,
+                Password = _configuration.GoogleUserPassword
+            };
+        }
 
         public void Dispose()
         {
@@ -61,5 +81,6 @@ namespace embedded_sign_in_widget_e2etests.Helpers
             }
             _disposed = true;
         }
+
     }
 }

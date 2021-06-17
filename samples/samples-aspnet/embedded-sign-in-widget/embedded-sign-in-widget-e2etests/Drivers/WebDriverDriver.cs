@@ -1,10 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace embedded_sign_in_widget_e2etests.Drivers
 {
@@ -18,7 +14,7 @@ namespace embedded_sign_in_widget_e2etests.Drivers
         private static IWebDriver SetupWebDriver()
         {
             var options = new ChromeOptions();
-            //options.AddArgument("--headless");
+            options.AddArgument("--headless");
             options.AddArgument("--start-maximized");
             options.AddArgument("--disable-notifications");
             options.AddArgument("--no-sandbox");

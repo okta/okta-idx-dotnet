@@ -73,6 +73,5 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         {
             _loginPageModel.FacebookIdpButton.Click();
         }
-
     }
 }

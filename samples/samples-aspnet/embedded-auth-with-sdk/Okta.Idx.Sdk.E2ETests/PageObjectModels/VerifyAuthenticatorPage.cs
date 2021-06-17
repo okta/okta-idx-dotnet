@@ -10,6 +10,7 @@ namespace embedded_auth_with_sdk.E2ETests.PageObjectModels
             : base(webDriverDriver, testConfiguration) { }
 
         public override string RelativePageUri => "Manage/VerifyAuthenticator";
+        public IWebElement ResendCodeButton => _webDriver.FindElement(By.Id("resendCodeBtn"));
         public IWebElement SubmitButton => _webDriver.FindElement(By.Id("submitBtn"));
         public IWebElement PasscodeInput => _webDriver.FindElement(By.Id("passcodeInput"));
 

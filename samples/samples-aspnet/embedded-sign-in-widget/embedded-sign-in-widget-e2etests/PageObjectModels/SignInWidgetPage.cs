@@ -17,5 +17,7 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
         public IWebElement UserNameInput => TryFindElement(By.Id("input3"));
         public IWebElement PasswordInput => TryFindElement(By.Id("input5"));
         public IWebElement NextButton => TryFindElement(By.XPath("//*[@id=\"form1\"]/div[2]/input"));
+        public IWebElement SignonWithGoogleButton => TryFindElement(By.XPath("//a[@data-se=\"social-auth-google-button\"]"));
+        public IWebElement SignonWithFacebookButton => TryFindElement(By.XPath("//a[@data-se=\"social-auth-facebook-button\"]"));
     }
 }

@@ -10,7 +10,7 @@ namespace embedded_auth_with_sdk.E2ETests.PageObjectModels
     public class ErrorPage : BasePage
     {
         public override string RelativePageUri => throw new NotImplementedException();
-        public IWebElement ErrorText => _webDriver.FindElement(By.XPath("//div[@class=\"container body-content\"]"));
+        public IWebElement ErrorText => _webDriver.FindElement(By.Id("errorDescription"));
 
         public ErrorPage(WebDriverDriver webDriverDriver, ITestConfiguration testConfiguration) : base(webDriverDriver, testConfiguration)
         { }
