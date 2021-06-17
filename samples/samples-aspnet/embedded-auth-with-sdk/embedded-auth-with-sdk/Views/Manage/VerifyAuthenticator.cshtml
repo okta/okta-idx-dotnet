@@ -3,7 +3,7 @@
     ViewBag.Title = ViewBag.Title ?? "Verify your authenticator.";
 }
 
-<br />
+<hr />
 
 <div class="row d-center">
     <div class="col-md-8">
@@ -21,7 +21,7 @@
                             @Html.LabelFor(m => m.Code, new { @class = "control-label" })
                         </div>
                         <div class="row row-no-gutters">
-                            @Html.PasswordFor(m => m.Code, new { @class = "form-control", @id="passcodeInput" })
+                            @Html.TextBoxFor(m => m.Code, new { @class = "form-control", @id="passcodeInput" })
                             @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
                         </div>
                     </div>
