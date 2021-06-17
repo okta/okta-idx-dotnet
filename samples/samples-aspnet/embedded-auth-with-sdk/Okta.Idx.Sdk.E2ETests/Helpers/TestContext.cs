@@ -201,14 +201,15 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             _disposed = true;
         }
 
-        private async Task<string> GetRecoveryCodeFromMessage(Func<Task<string>> getMessageBodyFunc, 
+        private async Task<string> GetRecoveryCodeFromMessage(Func<Task<string>> getMessageBodyFunc,
                                                             Action resendRequest = default)
         {
-            for (int retry = 0; retry < MaxRetries; retry++)
+            int retry = 0;
+            while (retry < MaxRetries)
             {
-                await Task.Delay(1000);
                 for (int seconds = 0; seconds < OneAttemptTime; seconds++)
                 {
+                    await Task.Delay(1000);
                     try
                     {
                         var messageBody = await getMessageBodyFunc();
@@ -218,12 +219,12 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                     {
                         // expected exception when a mail box is empty
                     }
-                    await Task.Delay(1000);
                 }
 
-                if (resendRequest == default)
+                if (resendRequest == default || ++retry == MaxRetries)
+                {
                     break;
-
+                }
                 resendRequest();
             }
             return string.Empty;
