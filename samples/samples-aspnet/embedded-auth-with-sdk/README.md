@@ -48,7 +48,7 @@ for Embedded Authentication](TBD)
 
 ## Running UI automation tests
 
-UI testing project `embedded-auth-with-sdk.E2ETests` uses SpecFlow and Selenium with chrome driver. In order to run the tests several configuration values need to be defined in the `settings.json` or in the system environment. Although this is not required, sensitive data should be kept as environment variables.
+UI testing project `embedded-auth-with-sdk.E2ETests` uses SpecFlow and Selenium with chrome driver. In order to run the tests, several configuration values need to be defined in the `settings.json` or in the system environment. Although this is not required, sensitive data should be kept as environment variables.
 
 ### Environment variables
  * `DirectAuthWebSitePath` - local path to embedded-auth-with-sdk project: `<...>\okta-idx-dotnet\samples\samples-aspnet\embedded-auth-with-sdk\embedded-auth-with-sdk`.
