@@ -64,7 +64,7 @@ UI testing project `embedded-sign-in-widget-e2etests` uses SpecFlow and Selenium
 
 ### Environment variables
  * `EmbeddedSIWWebSitePath` - local path to embedded-sign-in-widget project: `<...>\okta-idx-dotnet\samples\samples-aspnet\embedded-sign-in-widget\embedded-sign-in-widget`.
- * `okta_testing_FacebookUserEmail` - pre-created Facebook user's name, should not exist in Okta's People Directory.
+ * `okta_testing_FacebookUserEmail` - pre-created Facebook user's name. It should not exist in Okta's People Directory.
  * `okta_testing_FacebookUserPassword` - password for the pre-created Facebook user not existing in Okta.
  * `okta_testing_GoogleUserEmail` - pre-created Google user name, should not exist in Okta's People Directory.
  * `okta_testing_GoogleUserPassword` - password for the Google user.
