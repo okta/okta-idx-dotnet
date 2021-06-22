@@ -57,3 +57,30 @@ Sign in using the same account you created when you signed up for your Developer
 [OIDC Web Application Setup Instructions]: https://developer.okta.com/authentication-guide/implementing-authentication/auth-code#1-setting-up-your-application
 [Sign Users in to Your Web Application guide]: https://developer.okta.com/guides/sign-into-web-app/aspnet/before-you-begin/
 [Okta Developer Console]: https://login.okta.com
+
+## Running UI automation tests
+
+UI testing project `embedded-sign-in-widget-e2etests` uses SpecFlow and Selenium with chrome driver. It requires several configuration values to be defined in the `settings.json` or in the system environment. Although this is not required, sensitive data should be kept as environment variables.
+
+### Environment variables
+ * `EmbeddedSIWWebSitePath` - local path to embedded-sign-in-widget project: `<...>\okta-idx-dotnet\samples\samples-aspnet\embedded-sign-in-widget\embedded-sign-in-widget`.
+ * `okta_testing_FacebookUserEmail` - pre-created Facebook user's name, should not exist in Okta's People Directory.
+ * `okta_testing_FacebookUserPassword` - password for the pre-created Facebook user not existing in Okta.
+ * `okta_testing_GoogleUserEmail` - pre-created Google user name, should not exist in Okta's People Directory.
+ * `okta_testing_GoogleUserPassword` - password for the Google user.
+
+### Other configuration variables
+Following are non-sensitive configuration values which reside in `settings.json` file in the project's root. To set them in the system environment, add `okta_testing_` prefix to a variable name:
+* `IISPort` - sample project will be listening on this port. 
+>Note: currently sample project is started on http  using IISExpress. 
+
+Example of the settings.json:
+```json
+{
+    "okta": {
+        "testing": {
+            "IISPort": 8080
+        }
+    }
+}
+```

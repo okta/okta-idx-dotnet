@@ -45,3 +45,42 @@ To see some examples for use cases using this sample application, please take a 
 for Embedded Authentication](TBD)
 
 [OIDC Web Application Setup Instructions]: https://developer.okta.com/authentication-guide/implementing-authentication/auth-code#1-setting-up-your-application
+
+## Running UI automation tests
+
+UI testing project `embedded-auth-with-sdk.E2ETests` uses SpecFlow and Selenium with chrome driver. In order to run the tests several configuration values need to be defined in the `settings.json` or in the system environment. Although this is not required, sensitive data should be kept as environment variables.
+
+### Environment variables
+ * `DirectAuthWebSitePath` - local path to embedded-auth-with-sdk project: `<...>\okta-idx-dotnet\samples\samples-aspnet\embedded-auth-with-sdk\embedded-auth-with-sdk`.
+ * `okta_testing_A18nApiKey`- Api key for A18N service.
+ * `okta_testing_FacebookMfaUserEmail` - pre-created Facebook user's name. The should be already registered as an Okta user and added to `MFA Required` or equivalent group.
+ * `okta_testing_FacebookMfaUserPassword`- pre-created Facebook user's password.
+ * `okta_testing_FacebookUserEmail` - pre-created Facebook user's name, should not exist in Okta's People Directory.
+ * `okta_testing_FacebookUserPassword` - password for the pre-created Facebook user not existing in Okta.
+ * `okta_testing_GoogleUserEmail` - pre-created Google user name, should not exist in Okta's People Directory.
+ * `okta_testing_GoogleUserPassword` - password for the Google user.
+ * `okta_testing_UserPassword` - This value is used as a first part of a password for newly created Okta users, second part is a randomly generated value.  
+
+### Other configuration variables
+Following are non-sensitive configuration values which reside in `settings.json` file in the project's root. To set them in the system environment, add `okta_testing_` prefix to a variable name:
+* `A18nProfileTag` - value for `displayName` field for A18n profiles.
+* `IISPort` - sample project will be listening on this port. 
+>Note: currently sample project is started on http  using IISExpress. 
+* `MfaRequiredGroup` - new users will be added to this group in MFA-related scenarios.
+* `PhoneEnrollmentRequiredGroup` - new users will be added to this group in the scenarios where phone authenticator is used. 
+* `ScreenshotsFolder` - screenshot will be saved to this location when a test fails.
+
+Example of the settings.json:
+```json
+{
+  "okta": {
+    "testing": {
+      "A18nProfileTag": "okta-idx-dotnet",
+      "IISPort": 8080,
+      "MfaRequiredGroup": "MFA Required",
+      "PhoneEnrollmentRequiredGroup": "Phone Enrollment Required",
+      "ScreenshotsFolder": "c:/screenshots"
+    }
+  }
+}
+```
