@@ -44,6 +44,24 @@ namespace Okta.Idx.Sdk.Configuration
                     nameof(configuration.RedirectUri),
                     "Your Okta Application redirect URI is missing.You can find it in the Okta Developer Console in the details for the Application you created.");
             }
+
+            if (!IsValidUri(configuration.RedirectUri))
+            {
+                throw new UriFormatException($"Your Okta Application redirect URI is not a valid URI: {configuration.RedirectUri}");
+            }
+        }
+
+        private static bool IsValidUri(string value)
+        {
+            try
+            {
+                Uri uri = new Uri(value); // this will throw a UriFormatException on invalid value.
+                return true;
+            }
+            catch (UriFormatException)
+            {
+                return false;
+            }
         }
     }
 }
