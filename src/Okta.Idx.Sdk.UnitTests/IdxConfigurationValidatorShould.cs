@@ -26,7 +26,7 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
-        public void NotThrowUriFormatExceptionOnInvalidRedirectUri()
+        public void NotThrowUriFormatExceptionOnValidRedirectUri()
         {
             IdxConfiguration idxConfiguration = new IdxConfiguration
             {
