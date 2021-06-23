@@ -138,12 +138,42 @@ Type: `AwaitingPasswordReset`
 The user needs to reset their password to continue with the authentication flow and retrieve tokens.
 
 
-
 ### Revoke Tokens
 
 ```csharp
 await _idxClient.RevokeTokensAsync(TokenType.AccessToken, accessToken);
 ```
+
+### Register a user
+
+```csharp
+// UserProfile is a dynamic class that allows you set properties dinamically
+var userProfile = new UserProfile();
+userProfile.SetProperty("firstName", model.FirstName);
+userProfile.SetProperty("lastName", model.LastName);
+userProfile.SetProperty("email", model.Email);
+
+var registerResponse = await _idxClient.RegisterAsync(userProfile);
+
+if (registerResponse.AuthenticationStatus == AuthenticationStatus.Success) 
+{
+    // Retrieve tokens
+}
+
+```
+
+> Note: Check the response's [`AuthenticatonStatus` property](#Authentication-Status) to determine what the next step is.
+
+
+### Recover Password
+
+```csharp
+var recoverPasswordOptions = new RecoverPasswordOptions { Username = model.UserName, };
+var authnResponse = await _idxClient.RecoverPasswordAsync(recoverPasswordOptions);
+
+```
+
+> Note: Check the response's [`AuthenticatonStatus` property](#Authentication-Status) to determine what the next step is.
 
 ### Handling Errors
 
