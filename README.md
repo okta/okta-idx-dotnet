@@ -205,9 +205,9 @@ The full YAML configuration looks like:
 ```yaml
 okta:
   idx:
-    issuer: "https://{yourOktaDomain}/oauth2/{authorizationServerId}" // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
+    issuer: "https://{yourOktaDomain}/oauth2/{authorizationServerId}" # e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
     clientId: "{clientId}"
-    clientSecret: "{clientSecret}" // Required for confidential clients
+    clientSecret: "{clientSecret}" # Required for confidential clients
     scopes:
     - "{scope1}"
     - "{scope2}"
@@ -221,9 +221,14 @@ Each one of the configuration values above can be turned into an environment var
 * `OKTA_IDX_ISSUER`
 * `OKTA_IDX_CLIENTID`
 * `OKTA_IDX_CLIENTSECRET`
-* `OKTA_IDX_SCOPES`
 * `OKTA_IDX_REDIRECTURI`
 
+You can optionally set `OKTA_IDX_SCOPES` via env vars. Since this is an array you have to specify it in the following way:
+
+```
+OKTA_IDX_SCOPES_0 = "{scope0}"
+OKTA_IDX_SCOPES_1 = "{scope1}"
+```
 
 ## Building the SDK
 
