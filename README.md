@@ -183,7 +183,7 @@ The SDK throws an `OktaException` everytime the server responds with an invalid 
 
 `RedeemInteractionCodeException` is an `OktaException` derived class that indicates there was an error when redeeming the interaction code.
 
-`TerminalException`  is an `OktaException` derived class that indicates that the user cannot continue the current flow, possibly due to an error or required additional actions outside of the authentication flow.
+`TerminalStateException`  is an `OktaException` derived class that indicates that the user cannot continue the current flow, possibly due to an error or required additional actions outside of the authentication flow.
 
 For more usage examples check out our [ASP.NET Sample Application](samples/samples-aspnet).
 
