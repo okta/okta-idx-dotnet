@@ -17,5 +17,8 @@ namespace Okta.Idx.Sdk
         public string Text => GetStringProperty("message");
 
         public string Class => GetStringProperty("class");
+
+        public IIdxI18n I18n => GetProperty<IdxI18n>("i18n");
+
     }
 }

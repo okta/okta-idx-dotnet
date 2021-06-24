@@ -8,6 +8,9 @@ using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// An interface to represent Idx Messages type
+    /// </summary>
     public interface IIdxMessages : IResource
     {
         string Type { get; }
