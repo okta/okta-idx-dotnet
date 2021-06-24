@@ -138,12 +138,42 @@ Type: `AwaitingPasswordReset`
 The user needs to reset their password to continue with the authentication flow and retrieve tokens.
 
 
-
 ### Revoke Tokens
 
 ```csharp
 await _idxClient.RevokeTokensAsync(TokenType.AccessToken, accessToken);
 ```
+
+### Register a user
+
+```csharp
+// UserProfile is a dynamic class that allows you set properties dinamically
+var userProfile = new UserProfile();
+userProfile.SetProperty("firstName", model.FirstName);
+userProfile.SetProperty("lastName", model.LastName);
+userProfile.SetProperty("email", model.Email);
+
+var registerResponse = await _idxClient.RegisterAsync(userProfile);
+
+if (registerResponse.AuthenticationStatus == AuthenticationStatus.Success) 
+{
+    // Retrieve tokens
+}
+
+```
+
+> Note: Check the response's [`AuthenticatonStatus` property](#Authentication-Status) to determine what the next step is.
+
+
+### Recover Password
+
+```csharp
+var recoverPasswordOptions = new RecoverPasswordOptions { Username = model.UserName, };
+var authnResponse = await _idxClient.RecoverPasswordAsync(recoverPasswordOptions);
+
+```
+
+> Note: Check the response's [`AuthenticatonStatus` property](#Authentication-Status) to determine what the next step is.
 
 ### Handling Errors
 
@@ -153,7 +183,7 @@ The SDK throws an `OktaException` everytime the server responds with an invalid 
 
 `RedeemInteractionCodeException` is an `OktaException` derived class that indicates there was an error when redeeming the interaction code.
 
-`TerminalException`  is an `OktaException` derived class that indicates that the user cannot continue the current flow, possibly due to an error or required additional actions outside of the authentication flow.
+`TerminalStateException`  is an `OktaException` derived class that indicates that the user cannot continue the current flow, possibly due to an error or required additional actions outside of the authentication flow.
 
 For more usage examples check out our [ASP.NET Sample Application](samples/samples-aspnet).
 
@@ -175,9 +205,9 @@ The full YAML configuration looks like:
 ```yaml
 okta:
   idx:
-    issuer: "https://{yourOktaDomain}/oauth2/{authorizationServerId}" // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
+    issuer: "https://{yourOktaDomain}/oauth2/{authorizationServerId}" # e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
     clientId: "{clientId}"
-    clientSecret: "{clientSecret}" // Required for confidential clients
+    clientSecret: "{clientSecret}" # Required for confidential clients
     scopes:
     - "{scope1}"
     - "{scope2}"
@@ -191,9 +221,14 @@ Each one of the configuration values above can be turned into an environment var
 * `OKTA_IDX_ISSUER`
 * `OKTA_IDX_CLIENTID`
 * `OKTA_IDX_CLIENTSECRET`
-* `OKTA_IDX_SCOPES`
 * `OKTA_IDX_REDIRECTURI`
 
+You can optionally set `OKTA_IDX_SCOPES` via env vars. Since this is an array you have to specify it in the following way:
+
+```
+OKTA_IDX_SCOPES_0 = "{scope0}"
+OKTA_IDX_SCOPES_1 = "{scope1}"
+```
 
 ## Building the SDK
 
