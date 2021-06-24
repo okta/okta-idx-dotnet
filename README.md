@@ -186,7 +186,7 @@ The SDK throws an `OktaException` everytime the server responds with an invalid 
 `TerminalStateException`  is an `OktaException` derived class that indicates that the user cannot continue the current flow, possibly due to an error or required additional actions outside of the authentication flow.
 
 This exception object contains an array of messages that can be shown to the user as they are. Each message object in the array also contains a key property that can be used for internationalization. 
-Here is an example of accessing the the exception data. All the properties can be null, null checks are not shown in the example.
+Here is an example of accessing the exception data. All the properties can be null. Null checks are not shown in the example.
 
 ```csharp
 try
