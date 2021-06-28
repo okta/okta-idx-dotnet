@@ -316,8 +316,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
  testRunner.And("submits the enrollment form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 59
- testRunner.Then("she should see a message \"Unable to initiate factor enrollment: Invalid Phone Num" +
-                        "ber\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("she should see a message \"Invalid Phone Number\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -36,7 +36,7 @@ namespace embedded_sign_in_widget.Controllers
 
                 if ("interaction_required".Equals(error))
                 {
-                    return View("Error", new InteractionCodeErrorViewModel { Error = error, ErrorDescription = "Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed." });
+                    return Redirect($"/Account/SignInWidget?state={state}");
                 }
 
                 if (!string.IsNullOrEmpty(error))
