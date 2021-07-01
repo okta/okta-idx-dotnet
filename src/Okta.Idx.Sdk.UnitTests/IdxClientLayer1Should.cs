@@ -341,7 +341,7 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
-        public async Task ProcessInfoMessageResponse()
+        public void ProcessInfoMessageResponse()
         {
             #region Raw response with a message
             var rawResponse = @"{
@@ -372,7 +372,6 @@ namespace Okta.Idx.Sdk.UnitTests
             var responseWithMessage = resourceFactory.CreateNew<IdxResponse>(data);
 
             responseWithMessage.IdxMessages.Messages.Should().HaveCount(1);
-            responseWithMessage.IdxMessages.Messages.First().Class.Should().Be("INFO");
             responseWithMessage.IdxMessages.Messages.First().Text.Should().Be("To finish signing in, check your email.");
 
             // Response with no messages

@@ -14,8 +14,6 @@ namespace Okta.Idx.Sdk
     {
         string Text { get; }
 
-        string Class { get; }
-
         IIdxI18n I18n { get; }
     }
 }
