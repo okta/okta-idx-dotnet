@@ -3,9 +3,6 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
@@ -16,6 +13,7 @@ namespace Okta.Idx.Sdk
     public interface IMessage : IResource
     {
         string Text { get; }
-        string Class { get; }
+
+        IIdxI18n I18n { get; }
     }
 }
