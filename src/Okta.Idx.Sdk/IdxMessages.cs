@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// Idx Messages type
+    /// </summary>
     public class IdxMessages : Resource, IIdxMessages
     {
         public string Type => GetStringProperty("type");

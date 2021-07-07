@@ -56,7 +56,7 @@
 	And she inputs an invalid phone number
 	#And She selects "Receive a Code"
 	And submits the enrollment form
-	Then she should see a message "Unable to initiate factor enrollment: Invalid Phone Number"
+	Then she should see a message "Invalid Phone Number"
 
   Scenario: 6.2.4: Mary enters a wrong verification code on verify
 	Given Mary navigates to the Basic Login View

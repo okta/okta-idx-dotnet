@@ -13,6 +13,8 @@ namespace Okta.Idx.Sdk
     /// </summary>
     public class TerminalStateException : OktaException
     {
+        public IIdxMessages IdxMessages { get; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TerminalStateException"/> class.
         /// </summary>
@@ -20,6 +22,7 @@ namespace Okta.Idx.Sdk
         public TerminalStateException(IIdxMessages idxTerminalMessages)
             : base(GetCombinedMessages(idxTerminalMessages))
         {
+            IdxMessages = idxTerminalMessages;
         }
 
         private static string GetCombinedMessages(IIdxMessages terminalMessages)

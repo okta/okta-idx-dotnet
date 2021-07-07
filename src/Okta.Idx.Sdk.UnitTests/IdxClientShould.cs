@@ -4592,12 +4592,25 @@ namespace Okta.Idx.Sdk.UnitTests
             mockHttpMessageHandler.AddTestResponse("/oauth2/v1/interact", interactResponse);
             mockHttpMessageHandler.AddTestResponse("/idp/idx/introspect", introspectResponse);
             mockHttpMessageHandler.AddTestResponse("/idp/idx/recover", recoverResponse);
-            mockHttpMessageHandler.AddTestResponse("/idp/idx/identify", identifyResponse);            
+            mockHttpMessageHandler.AddTestResponse("/idp/idx/identify", identifyResponse);
 
             HttpClient httpClient = new HttpClient(mockHttpMessageHandler);
             IdxClient idxClient = new IdxClient(TesteableIdxClient.DefaultFakeConfiguration, httpClient, NullLogger.Instance);
             RecoverPasswordOptions recoverPasswordOptions = new RecoverPasswordOptions { Username = "non-existent-user@email.bad", };
-            await Assert.ThrowsAsync<TerminalStateException>(() => idxClient.RecoverPasswordAsync(recoverPasswordOptions));
+            await Assert.ThrowsAsync<TerminalStateException>(async () =>
+            {
+                try
+                {
+                    await idxClient.RecoverPasswordAsync(recoverPasswordOptions);
+                }
+                catch (TerminalStateException exception)
+                {
+                    exception.IdxMessages.Messages.Count.Should().Be(1);
+                    exception.IdxMessages.Messages.First().I18n.Key.Should().Be("idx.unknown.user");
+
+                    throw exception;
+                }
+            });
         }
 
         [Fact]

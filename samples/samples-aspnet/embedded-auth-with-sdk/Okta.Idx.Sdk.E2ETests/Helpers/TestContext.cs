@@ -205,7 +205,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                                                             Action resendRequest = default)
         {
             int retry = 0;
-            while (retry < MaxRetries)
+            while (true)
             {
                 for (int seconds = 0; seconds < OneAttemptTime; seconds++)
                 {
@@ -221,7 +221,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                     }
                 }
 
-                if (resendRequest == default || ++retry == MaxRetries)
+                if (resendRequest == default || ++retry >= MaxRetries)
                 {
                     break;
                 }

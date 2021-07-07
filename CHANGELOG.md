@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-beta06
+
+### Breaking changes
+
+* Remove css-related `Class` property from IMessage interface and Message class.
+
 ## 0.1.0-beta05
 
 ### Features
