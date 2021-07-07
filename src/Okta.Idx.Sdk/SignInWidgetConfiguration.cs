@@ -17,7 +17,7 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// The default version.
         /// </summary>
-        public const string DefaultVersion = "5.8.0";
+        public const string DefaultVersion = "5.8.1";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SignInWidgetConfiguration"/> class.
