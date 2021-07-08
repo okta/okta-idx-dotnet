@@ -517,21 +517,19 @@ namespace Okta.Idx.Sdk
             {
                 // We expect remediation has credentials now
                 if (!identifyResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator)
-                    && !identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate)
-                    && !identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+                    && !identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
                 {
                     throw new UnexpectedRemediationException(
                         new List<string>
                         {
                             RemediationType.ChallengeAuthenticator,
                             RemediationType.SelectAuthenticatorAuthenticate,
-                            RemediationType.SelectAuthenticatorEnroll,
                         }, identifyResponse);
                 }
 
                 var sendPasswordResponse = identifyResponse;
 
-                if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+                if (!identifyResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
                 {
                     var passwordAuthenticator = identifyResponse
                                                  .Authenticators
@@ -553,10 +551,7 @@ namespace Okta.Idx.Sdk
                         });
 
                     var selectAuthenticatorResponse = await identifyResponse
-                                                  .Remediation
-                                                  .RemediationOptions
-                                                  .FirstOrDefault(x => x.Name == RemediationType.SelectAuthenticatorAuthenticate)
-                                                  .ProceedAsync(selectAuthenticatorRequest, cancellationToken);
+                        .ProceedWithRemediationOptionAsync(RemediationType.SelectAuthenticatorAuthenticate, selectAuthenticatorRequest, cancellationToken);
 
                     sendPasswordResponse = selectAuthenticatorResponse;
                 }
@@ -569,10 +564,7 @@ namespace Okta.Idx.Sdk
                 });
 
                 var challengeResponse = await sendPasswordResponse
-                                              .Remediation
-                                              .RemediationOptions
-                                              .FirstOrDefault(x => x.Name == RemediationType.ChallengeAuthenticator)
-                                              .ProceedAsync(challengeRequest, cancellationToken);
+                    .ProceedWithRemediationOptionAsync(RemediationType.ChallengeAuthenticator, challengeRequest, cancellationToken);
 
                 if (!challengeResponse.IsLoginSuccess)
                 {
