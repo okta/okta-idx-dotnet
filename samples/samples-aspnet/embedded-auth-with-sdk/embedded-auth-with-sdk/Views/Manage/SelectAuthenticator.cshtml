@@ -1,7 +1,9 @@
 ﻿@model embedded_auth_with_sdk.Models.SelectAuthenticatorViewModel
 
 @{
-    ViewBag.Title = "Set up Authenticators";
+    var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;
+
+    ViewBag.Title = isChallengeFlow ? "Verify Authenticators": "Set up Authenticators";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -12,16 +14,32 @@
             @using (Html.BeginForm("SelectAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
-                if (Model.CanSkip)
-                 {
-                     <h4>Set up optional authenticators</h4>
-                 }
-                 else
-                {
-                     <h4>Set up required</h4>
 
+                if (isChallengeFlow)
+                {
+                    <h4>Verify it's you with an authenticator</h4>
                 }
-                <h5>Set up authenticators for Okta to ensure that only you have access to your account.</h5>
+                else
+                {
+
+                    if (Model.CanSkip)
+                    {
+                     <h4>Set up optional authenticators</h4>
+                    }
+                    else
+                    {
+                     <h4>Set up required</h4>
+                    }
+                }
+
+                if (isChallengeFlow)
+                {
+                    <h5>Select from the following options</h5>
+                }
+                else
+                {
+                    <h5>Set up authenticators for Okta to ensure that only you have access to your account.</h5>
+                }
                 <hr />
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 @Html.HiddenFor(m => m.PasswordId)
