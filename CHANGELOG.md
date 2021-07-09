@@ -2,9 +2,19 @@
 
 ## 0.1.0-beta06
 
+### Features
+
+* Add support for internationalization.
+* Update SIW version to 5.8.1.
+
 ### Breaking changes
 
-* Remove css-related `Class` property from IMessage interface and Message class.
+* Remove css-related `Class` property from `IMessage` interface and Message class.
+
+### Bug Fixes
+
+* Validate that URIs are valid. (#98)
+* Reinit SIW on interaction required. (#103)
 
 ## 0.1.0-beta05
 
