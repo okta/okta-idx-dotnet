@@ -8,6 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Features\5.1-DirectAuthSocialLoginWithSocialIdp.feature.cs" />
+    <Compile Remove="Features\7-SocialIdpLogin.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Features\5.1-DirectAuthSocialLoginWithSocialIdp.feature" />
+    <None Remove="Features\7-SocialIdpLogin.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="Okta.Sdk" Version="5.0.0" />
