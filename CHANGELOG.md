@@ -9,7 +9,7 @@
 
 ### Breaking changes
 
-* Remove css-related `Class` property from `IMessage` interface and Message class.
+* Remove css-related `Class` property from `IMessage` interface and `Message` class.
 
 ### Bug Fixes
 
@@ -100,4 +100,3 @@ New models: `AuthenticatorEnrollment`, `AuthenticatorEnrollmentValue`, `Recover`
 * `CancelAsync()`
 * `RemediationOption.ProceedAsync()`
 * `IdxResponse.SuccessWithInteractionCode.ExchangeCode()`
-
