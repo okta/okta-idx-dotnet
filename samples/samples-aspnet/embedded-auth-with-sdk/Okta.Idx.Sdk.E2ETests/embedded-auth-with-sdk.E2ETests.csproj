@@ -9,6 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Features\5.1-DirectAuthFacebookPassword.feature.cs" />
+    <Compile Remove="Features\5.2-DirectAuthSocialLoginWthMFA.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Remove="Features\5.1-DirectAuthFacebookPassword.feature" />
+    <SpecFlowFeatureFiles Remove="Features\5.2-DirectAuthSocialLoginWthMFA.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
     <PackageReference Include="FlexibleConfiguration" Version="1.2.2" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
