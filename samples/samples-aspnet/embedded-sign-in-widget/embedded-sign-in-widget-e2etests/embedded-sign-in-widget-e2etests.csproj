@@ -18,6 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Remove="Features\5.1-DirectAuthSocialLoginWithSocialIdp.feature" />
+    <SpecFlowFeatureFiles Remove="Features\7-SocialIdpLogin.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="Okta.Sdk" Version="5.0.0" />
