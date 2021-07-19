@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+
+* SDK is now GA.
+
 ## 0.1.0-beta06
 
 ### Features
