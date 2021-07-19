@@ -8,11 +8,14 @@
 This library is built for server-side projects in .NET to communicate with Okta as an OAuth 
 2.0 + OpenID Connect provider. It works with the [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/) to authenticate and register users.
 
-To see this library working in a sample, check out our [ASP.NET Samples](samples/samples-aspnet).
+To see this library working in a sample, check out our [ASP.NET Samples](samples/samples-aspnet). You can also check out our guides for step-by-step instructions:
+ 
+* [Build with the embedded SDK](https://developer.okta.com/docs/guides/oie-embedded-sdk-run-sample/aspnet/main/)
+* [Build with the embedded widget](https://developer.okta.com/docs/guides/oie-embedded-widget-use-cases/aspnet/oie-embedded-widget-use-case-overview/) 
 
 > :grey_exclamation: The use of this SDK requires usage of the Okta Identity Engine. This functionality is in general availability but is being gradually rolled out to customers. If you want to request to gain access to the Okta Identity Engine, please reach out to your account manager. If you do not have an account manager, please reach out to oie@okta.com for more information.
 
-> :warning: Beta alert! This library is in beta. See [release status](#release-status) for more information.
+> This library is currently GA. See [release status](#release-status) for more information.
 
 * [Release status](#release-status)
 * [Need help?](#need-help)
@@ -26,9 +29,11 @@ To see this library working in a sample, check out our [ASP.NET Samples](samples
 
 This library uses semantic versioning and follows Okta's [Library Version Policy][okta-library-versioning].
 
+✔️ The current stable major version series is: 1.x
+
 | Version | Status                             |
 | ------- | ---------------------------------- |
-| 0.1.0    | :warning: Beta |
+| 1.0.0    | ✔️ Stable |
 
 The latest release can always be found on the [releases page][github-releases].
 

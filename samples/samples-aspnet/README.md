@@ -16,6 +16,11 @@ Please find the sample that fits your use-case from the table below.
 | [Embedded Auth with SDK](/samples/samples-aspnet/embedded-auth-with-sdk) | An application server that uses the IDX SDK to authenticate users. Once a user is authenticated a cookie session created in the ASP.NET MVC application. | Traditional web applications with server-side rendered pages. |
 | [Embedded Sign In Widget](/samples/samples-aspnet/embedded-sign-in-widget) | An application server that uses a self-hosted login page on your ASP.NET MVC application. | Traditional web applications with server-side rendered pages. |
 
+You can also check out our guides for step-by-step instructions:
+ 
+* [Build with the embedded SDK](https://developer.okta.com/docs/guides/oie-embedded-sdk-run-sample/aspnet/main/)
+* [Build with the embedded widget](https://developer.okta.com/docs/guides/oie-embedded-widget-use-cases/aspnet/oie-embedded-widget-use-case-overview/) 
+
 ## Contributing
  
 We're happy to accept contributions and PRs! Please see the [contribution guide](CONTRIBUTING.md) to understand how to structure a contribution.
