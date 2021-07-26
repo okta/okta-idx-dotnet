@@ -19,29 +19,31 @@ namespace embedded_sign_in_widget
 
     public static class AuthenticationHelper
     {
+        public const string IdxStateKey = "IdxStateKey";
+
         public static async Task<ClaimsIdentity> GetIdentityFromTokenResponseAsync(IdxConfiguration configuration, ITokenResponse tokenResponse)
         {
             var claims = await GetClaimsFromUserInfoAsync(configuration, tokenResponse.AccessToken);
             claims = claims.Append(new Claim("access_token", tokenResponse.AccessToken));
             claims = claims.Append(new Claim("id_token", tokenResponse.IdToken));
-            if(!string.IsNullOrEmpty(tokenResponse.RefreshToken))
+            if (!string.IsNullOrEmpty(tokenResponse.RefreshToken))
             {
                 claims = claims.Append(new Claim("refresh_token", tokenResponse.RefreshToken));
-            }            
+            }
             ClaimsIdentity identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
 
             return identity;
         }
 
         public static async Task<IEnumerable<Claim>> GetClaimsFromUserInfoAsync(IdxConfiguration configuration, string accessToken)
-        { 
+        {
             Uri userInfoUri = new Uri(IdxUrlHelper.GetNormalizedUriString(configuration.Issuer, "v1/userinfo"));
             HttpClient httpClient = new HttpClient();
             var userInfoResponse = await httpClient.GetUserInfoAsync(new UserInfoRequest
-                                                                         {
-                                                                             Address = userInfoUri.ToString(),
-                                                                             Token = accessToken,
-                                                                         }).ConfigureAwait(false);
+            {
+                Address = userInfoUri.ToString(),
+                Token = accessToken,
+            }).ConfigureAwait(false);
             var nameClaim = new Claim(
                 ClaimTypes.Name,
                 userInfoResponse.Claims.FirstOrDefault(x => x.Type == "name")?.Value);
@@ -64,6 +66,7 @@ namespace embedded_sign_in_widget
                 signInWidgetConfiguration = widgetSignInResponse.SignInWidgetConfiguration;
             }
             session[idxContext.State] = idxContext;
+            session[IdxStateKey] = idxContext.State;
             return signInWidgetConfiguration;
         }
     }

@@ -22,12 +22,11 @@ namespace embedded_sign_in_widget.Controllers
         [HttpGet]
         public async Task<ActionResult> SignInWidget(string state = null)
         {
-            SignInWidgetConfiguration signInWidgetConfiguration = await AuthenticationHelper.StartWidgetSignInAsync(HttpContext, _idxClient, state);
             if (string.IsNullOrEmpty(state))
             {
-                // redirect back to current action with state to allow reload without starting a new idx interaction
-                return Redirect($"/Account/SignInWidget?state={signInWidgetConfiguration.State}");
+                state = Session[AuthenticationHelper.IdxStateKey] as string;
             }
+            SignInWidgetConfiguration signInWidgetConfiguration = await AuthenticationHelper.StartWidgetSignInAsync(HttpContext, _idxClient, state);
             return View(signInWidgetConfiguration);
         }
 
