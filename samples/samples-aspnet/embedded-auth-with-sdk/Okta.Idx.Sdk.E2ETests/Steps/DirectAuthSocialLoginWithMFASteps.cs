@@ -16,7 +16,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps
         [Given(@"a user named Mary does not have an account in the org")]
         public void GivenAUserNamedMaryDoesNotHaveAnAccountInTheOrg()
         {
-            _context.SetMfaFacebookUser();
+            _context.SetMfaOktaSocialIdpUser();
         }
     }
 }

@@ -107,26 +107,14 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 Password = _passwordToUse,
             };
         }
-
-        public void SetUnenrolledUserWithFacebookAccount(string firstName)
-        {
-            UserProfile = new UserProfile()
-            {
-                FirstName = firstName,
-                LastName = "Lastname",
-                Email = _configuration.FacebookUserEmail,
-                Password = _configuration.FacebookUserPassword,
-            };
-        }
-
         public async Task SetActiveUserWithOktaOidcIdpAccount(string firstName)
         {
             // Okta as OIDC IDP org
             var oktaClient = new OktaClient(
                 new OktaClientConfiguration
                 {
-                    OktaDomain = Environment.GetEnvironmentVariable("OKTA_OIDC_IDP_DOMAIN"),
-                    Token = Environment.GetEnvironmentVariable("OKTA_OIDC_IDP_TOKEN"),
+                    OktaDomain = _configuration.OktaOidcIdpDomain,
+                    Token = _configuration.OktaOidcIdpToken,
                 }); ;
 
             var oktaHelper = new OktaSdkHelper(oktaClient);
@@ -204,13 +192,14 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             screenShot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
         }
 
-        public void SetMfaFacebookUser()
+        public void SetMfaOktaSocialIdpUser()
         {
             UserProfile = new UserProfile()
             {
-                Email = _configuration.FacebookMfaUserEmail,
-                Password = _configuration.FacebookMfaUserPassword,
+                Email = _configuration.OktaSocialIdpMfaUserEmail,
+                Password = _configuration.OktaSocialIdpMfaUserPassword,
             };
+            // This is a predetermined user and shouln't be removed.
             _keepOktaUser = true;
         }
 

@@ -11,9 +11,9 @@
         public string MfaRequiredGroup { get; set; }
         public string PhoneEnrollmentRequiredGroup { get; set; }
         public string ScreenshotsFolder { get; set; }
-        public string FacebookUserEmail { get; set; }
-        public string FacebookUserPassword { get; set; }
-        public string FacebookMfaUserEmail { get; set; }
-        public string FacebookMfaUserPassword { get; set; }
+        public string OktaSocialIdpMfaUserEmail { get; set; }
+        public string OktaSocialIdpMfaUserPassword { get; set; }
+        public string OktaOidcIdpDomain { get; set; }
+        public string OktaOidcIdpToken { get; set; }
     }
 }
