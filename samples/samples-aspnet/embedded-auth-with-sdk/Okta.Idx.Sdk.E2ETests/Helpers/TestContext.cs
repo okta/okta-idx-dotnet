@@ -2,6 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using embedded_auth_with_sdk.E2ETests.Drivers;
+using Okta.Sdk;
+using Okta.Sdk.Configuration;
 using OpenQA.Selenium;
 
 namespace embedded_auth_with_sdk.E2ETests.Helpers
@@ -18,6 +20,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         private const int OneAttemptTime = 30; // seconds
         private const string DefaultScreenshotFolder = "./screenshots";
         private bool _keepOktaUser = false;
+        private Func<Task> OnDispose { get; set; } = () => Task.CompletedTask;
 
         private readonly string[] messageCodeMarkers = new[]
         {
@@ -116,6 +119,35 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             };
         }
 
+        public async Task SetActiveUserWithOktaOidcIdpAccount(string firstName)
+        {
+            // Okta as OIDC IDP org
+            var oktaClient = new OktaClient(
+                new OktaClientConfiguration
+                {
+                    OktaDomain = Environment.GetEnvironmentVariable("OKTA_OIDC_IDP_DOMAIN"),
+                    Token = Environment.GetEnvironmentVariable("OKTA_OIDC_IDP_TOKEN"),
+                }); ;
+
+            var oktaHelper = new OktaSdkHelper(oktaClient);
+
+            await CleanUpAsync(oktaHelper);
+
+            var a18nprofile = _ia18nHelper.GetDefaultProfile();
+            var oktaUser = await oktaHelper.CreateActiveUser(a18nprofile.EmailAddress, a18nprofile.PhoneNumber, firstName, _passwordToUse);
+
+            OnDispose = () => CleanUpOktaUserAsync(oktaHelper);
+
+            UserProfile = new UserProfile()
+            {
+                FirstName = firstName,
+                LastName = "Dotnet",
+                Email = oktaUser.Profile.Email,
+                PhoneNumber = oktaUser.Profile.PrimaryPhone,
+                Password = _passwordToUse,
+            };
+        }
+
         public async Task EnrollPhoneAuthenticator()
         {
             var a18nClient = _ia18nHelper.GetClient();
@@ -196,6 +228,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
 
             if (disposing)
             {
+                OnDispose().Wait();
                 CleanUpOktaUserAsync().Wait();
             }
             _disposed = true;
@@ -247,18 +280,21 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             return recoveryCode;
         }
 
-        private async Task CleanUpOktaUserAsync()
+        private async Task CleanUpOktaUserAsync(IOktaSdkHelper oktaHelper = null)
         {
+            var oktaSdkHelper = oktaHelper ?? _oktaHelper;
+            
             if (!string.IsNullOrEmpty(UserProfile?.Email) && !_keepOktaUser)
             {
-                await _oktaHelper.DeleteUserAsync(UserProfile.Email);
+                await oktaSdkHelper.DeleteUserAsync(UserProfile.Email);
             }
         }
 
-        private async Task CleanUpAsync()
+        private async Task CleanUpAsync(OktaSdkHelper oktaHelper = null)
         {
+            var oktaSdkHelper = oktaHelper ?? _oktaHelper;
             _ia18nHelper.CleanUpProfile();
-            await CleanUpOktaUserAsync();
+            await CleanUpOktaUserAsync(oktaSdkHelper);
         }
     }
 }

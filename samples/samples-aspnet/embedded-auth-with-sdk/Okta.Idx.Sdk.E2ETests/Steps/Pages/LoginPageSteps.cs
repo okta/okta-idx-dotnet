@@ -73,5 +73,11 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         {
             _loginPageModel.FacebookIdpButton.Click();
         }
+
+        [When(@"she clicks the Login with Okta button")]
+        public void WhenSheClicksTheOktaButton()
+        {
+            _loginPageModel.OktaIdpButton.Click();
+        }
     }
 }

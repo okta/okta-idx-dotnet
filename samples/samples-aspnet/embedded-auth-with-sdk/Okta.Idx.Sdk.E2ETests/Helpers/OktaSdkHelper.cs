@@ -7,12 +7,17 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
 {
     public class OktaSdkHelper : IOktaSdkHelper
     {
-        private OktaClient _client;
+        private IOktaClient _client;
         private string _resendUri;
 
         public OktaSdkHelper()
         {
             _client = new OktaClient();
+        }
+
+        internal OktaSdkHelper(IOktaClient oktaClient)
+        {
+            _client = oktaClient;
         }
 
         public async Task DeleteUserAsync(string email)
@@ -41,7 +46,9 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 Activate = true,
             };
 
-            return await _client.Users.CreateUserAsync(options);
+            var user = await _client.Users.CreateUserAsync(options);
+
+            return user;
         }
 
         public async Task AddUserToGroup(IUser user, string groupName)
