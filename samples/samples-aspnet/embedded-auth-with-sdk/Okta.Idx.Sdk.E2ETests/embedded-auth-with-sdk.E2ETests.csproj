@@ -29,6 +29,7 @@
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
     <PackageReference Include="Ninject" Version="3.3.4" />
+    <PackageReference Include="Okta.Idx.Sdk" Version="1.0.0" />
     <PackageReference Include="Okta.Sdk" Version="5.0.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="92.0.4515.10700" />
