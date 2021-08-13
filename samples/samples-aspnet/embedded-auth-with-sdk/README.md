@@ -53,10 +53,8 @@ UI testing project `embedded-auth-with-sdk.E2ETests` uses SpecFlow and Selenium 
 ### Environment variables
  * `DirectAuthWebSitePath` - local path to embedded-auth-with-sdk project: `<...>\okta-idx-dotnet\samples\samples-aspnet\embedded-auth-with-sdk\embedded-auth-with-sdk`.
  * `okta_testing_A18nApiKey`- Api key for A18N service.
- * `okta_testing_FacebookMfaUserEmail` - pre-created Facebook user's name. The user should be already registered as an Okta user and added to the `MFA Required` or equivalent group.
- * `okta_testing_FacebookMfaUserPassword`- pre-created Facebook user's password.
- * `okta_testing_FacebookUserEmail` - pre-created Facebook user's name. It should not exist in Okta's People Directory.
- * `okta_testing_FacebookUserPassword` - password for the pre-created Facebook user not existing in Okta.
+ * `okta_testing_OktaSocialIdpMfaUserEmail` - pre-created Okta user's name to test Okta as social IDP provider. The user should be already registered as an Okta user in the main org and added to the `MFA Required` or equivalent group.
+ * `okta_testing_OktaSocialIdpMfaUserPassword`- pre-created Okta user's password to test Okta as social IDP provider.
  * `okta_testing_GoogleUserEmail` - pre-created Google user's name. It should not exist in Okta's People Directory.
  * `okta_testing_GoogleUserPassword` - password for the Google user.
  * `okta_testing_UserPassword` - This value is used as a first part of a password for newly created Okta users, second part is a randomly generated value.  
