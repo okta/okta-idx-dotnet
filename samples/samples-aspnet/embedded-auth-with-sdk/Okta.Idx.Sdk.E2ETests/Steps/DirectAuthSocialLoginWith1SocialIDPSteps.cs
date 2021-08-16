@@ -11,18 +11,18 @@ namespace embedded_auth_with_sdk.E2ETests.Steps
         public void GivenASPAWEBAPPOrMOBILEPolicyThatDefinesPasswordAsTheOnlyFactorRequiredForAuthentication()
         { }
 
-        [Given(@"a configured IDP object for Facebook")]
-        public void GivenAConfiguredIDPObjectForFacebook()
+        [Given(@"a configured IDP object for Okta")]
+        public void GivenAConfiguredIDPObjectForOkta()
         { }
 
         [Given(@"an IDP routing rule defined to allow users in the Sample App to use the IDP")]
         public void GivenAnIDPRoutingRuleDefinedToAllowUsersInTheSampleAppToUseTheIDP()
         { }
 
-        [Given(@"a user named Mary does not have an account in the org but has a Facebook account")]
-        public void GivenMaryDoesNotHaveAnAccountInTheOrgButHasAFacebookAccount()
+        [Given(@"a user named Mary does not have an account in the org but has an Okta OIDC IDP account")]
+        public void GivenMaryDoesNotHaveAnAccountInTheOrgButHasAnOktaOIDCIDPaccount()
         {
-            _context.SetUnenrolledUserWithFacebookAccount("Mary");
+            _context.SetActiveUserWithOktaOidcIdpAccount("Mary");
         }
 
     }

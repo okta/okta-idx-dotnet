@@ -17,7 +17,8 @@ namespace embedded_auth_with_sdk.E2ETests.PageObjectModels
         public IWebElement PasswordInput => _webDriver.FindElement(By.Id("Password"));
         public IWebElement FacebookIdpButton => _webDriver.FindElement(By.XPath("//input[contains(@value, \"Facebook\")]"));
         public IWebElement GoogleIdpButton => _webDriver.FindElement(By.XPath("//input[contains(@value, \"Google\")]"));
-        
+        public IWebElement OktaIdpButton => _webDriver.FindElement(By.XPath("//input[contains(@value, \"Okta\")]"));
+
         public override void AssertPageOpenedAndValid() 
         {
             base.AssertPageOpenedAndValid();

@@ -2,6 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 using embedded_auth_with_sdk.E2ETests.Drivers;
+using Okta.Sdk;
+using Okta.Sdk.Configuration;
 using OpenQA.Selenium;
 
 namespace embedded_auth_with_sdk.E2ETests.Helpers
@@ -18,6 +20,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         private const int OneAttemptTime = 30; // seconds
         private const string DefaultScreenshotFolder = "./screenshots";
         private bool _keepOktaUser = false;
+        private Func<Task> OnDispose { get; set; } = () => Task.CompletedTask;
 
         private readonly string[] messageCodeMarkers = new[]
         {
@@ -104,15 +107,32 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                 Password = _passwordToUse,
             };
         }
-
-        public void SetUnenrolledUserWithFacebookAccount(string firstName)
+        public async Task SetActiveUserWithOktaOidcIdpAccount(string firstName)
         {
+            // Okta as OIDC IDP org
+            var oktaClient = new OktaClient(
+                new OktaClientConfiguration
+                {
+                    OktaDomain = _configuration.OktaOidcIdpDomain,
+                    Token = _configuration.OktaOidcIdpToken,
+                }); ;
+
+            var oktaHelper = new OktaSdkHelper(oktaClient);
+
+            await CleanUpAsync(oktaHelper);
+
+            var a18nprofile = _ia18nHelper.GetDefaultProfile();
+            var oktaUser = await oktaHelper.CreateActiveUser(a18nprofile.EmailAddress, a18nprofile.PhoneNumber, firstName, _passwordToUse);
+
+            OnDispose = () => CleanUpOktaUserAsync(oktaHelper);
+
             UserProfile = new UserProfile()
             {
                 FirstName = firstName,
-                LastName = "Lastname",
-                Email = _configuration.FacebookUserEmail,
-                Password = _configuration.FacebookUserPassword,
+                LastName = "Dotnet",
+                Email = oktaUser.Profile.Email,
+                PhoneNumber = oktaUser.Profile.PrimaryPhone,
+                Password = _passwordToUse,
             };
         }
 
@@ -172,13 +192,14 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             screenShot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
         }
 
-        public void SetMfaFacebookUser()
+        public void SetMfaOktaSocialIdpUser()
         {
             UserProfile = new UserProfile()
             {
-                Email = _configuration.FacebookMfaUserEmail,
-                Password = _configuration.FacebookMfaUserPassword,
+                Email = _configuration.OktaSocialIdpMfaUserEmail,
+                Password = _configuration.OktaSocialIdpMfaUserPassword,
             };
+            // This is a predetermined user and shouln't be removed.
             _keepOktaUser = true;
         }
 
@@ -196,6 +217,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
 
             if (disposing)
             {
+                OnDispose().Wait();
                 CleanUpOktaUserAsync().Wait();
             }
             _disposed = true;
@@ -247,18 +269,21 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             return recoveryCode;
         }
 
-        private async Task CleanUpOktaUserAsync()
+        private async Task CleanUpOktaUserAsync(IOktaSdkHelper oktaHelper = null)
         {
+            var oktaSdkHelper = oktaHelper ?? _oktaHelper;
+            
             if (!string.IsNullOrEmpty(UserProfile?.Email) && !_keepOktaUser)
             {
-                await _oktaHelper.DeleteUserAsync(UserProfile.Email);
+                await oktaSdkHelper.DeleteUserAsync(UserProfile.Email);
             }
         }
 
-        private async Task CleanUpAsync()
+        private async Task CleanUpAsync(OktaSdkHelper oktaHelper = null)
         {
+            var oktaSdkHelper = oktaHelper ?? _oktaHelper;
             _ia18nHelper.CleanUpProfile();
-            await CleanUpOktaUserAsync();
+            await CleanUpOktaUserAsync(oktaSdkHelper);
         }
     }
 }

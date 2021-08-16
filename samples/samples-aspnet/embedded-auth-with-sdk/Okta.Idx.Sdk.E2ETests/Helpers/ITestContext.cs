@@ -10,11 +10,12 @@ namespace embedded_auth_with_sdk.E2ETests
         Task SetUnenrolledUserAsync(string firstName);
         Task SetActivePasswordAndEmailUserAsync(string firstName);
         Task SetActivePasswordAndSmsUserAsync(string firstName);
-        void SetUnenrolledUserWithFacebookAccount(string firstName);
+        Task SetActiveUserWithOktaOidcIdpAccount(string firstName);
+
         Task<string> GetActivationCodeFromEmail(Action resendRequest = default);
         Task<string> GetActivationCodeFromSms(Action resendRequest = default);
         Task EnrollPhoneAuthenticator();
         void TakeScreenshot(string name);
-        void SetMfaFacebookUser();
+        void SetMfaOktaSocialIdpUser();
     }
 }

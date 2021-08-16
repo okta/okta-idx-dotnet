@@ -6,7 +6,22 @@
     <IsPackable>false</IsPackable>
 
     <RootNamespace>embedded_auth_with_sdk.E2ETests</RootNamespace>
+    <SpecFlow_DeleteCodeBehindFilesOnCleanRebuild>true</SpecFlow_DeleteCodeBehindFilesOnCleanRebuild>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\5.1-DirectAuthOidcIdpLoginWithPassword.feature.cs" />
+    <Compile Remove="Features\5.1-DirectAuthOktaOidcSocialLoginPassword.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Remove="Features\5.1-DirectAuthFacebookPassword.feature" />
+    <SpecFlowFeatureFiles Remove="Features\5.1-DirectAuthOidcIdpLoginWithPassword.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\5.1-DirectAuthOktaOidcSocialLoginPassword.feature.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
@@ -14,9 +29,10 @@
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
     <PackageReference Include="Ninject" Version="3.3.4" />
+    <PackageReference Include="Okta.Idx.Sdk" Version="1.0.0" />
     <PackageReference Include="Okta.Sdk" Version="5.0.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
-    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="90.0.4430.2400" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="92.0.4515.10700" />
     <PackageReference Include="SpecFlow.xUnit" Version="3.8.14" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -31,8 +47,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\5.1-OktaOidcIdpSocialLoginWithPassword.feature.cs">
+      <DesignTime>True</DesignTime>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\5.1-OktaOidcIdpSocialLoginWithPassword.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>5.1-OktaOidcIdpSocialLoginWithPassword.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 </Project>
