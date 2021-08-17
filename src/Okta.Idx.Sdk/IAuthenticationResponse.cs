@@ -3,6 +3,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using System.Collections.Generic;
 using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
@@ -13,18 +14,43 @@ namespace Okta.Idx.Sdk
     public interface IAuthenticationResponse : IResource
     {
         /// <summary>
-        /// Gets or sets the Token Info.
+        /// Gets the Token Info.
         /// </summary>
-        ITokenResponse TokenInfo { get; set; }
+        ITokenResponse TokenInfo { get; }
 
         /// <summary>
-        /// Gets or sets the authentication status.
+        /// Gets the authentication status.
         /// </summary>
-        AuthenticationStatus AuthenticationStatus { get; set; }
+        AuthenticationStatus AuthenticationStatus { get; }
 
         /// <summary>
-        /// Gets or sets the IDX context.
+        /// Gets the IDX context.
         /// </summary>
-        IIdxContext IdxContext { get; set; }
+        IIdxContext IdxContext { get; }
+
+        /// <summary>
+        /// Gets the authenticators.
+        /// </summary>
+        IList<IAuthenticator> Authenticators { get; }
+
+        /// <summary>
+        /// Gets current authenticator enrollment.
+        /// </summary>
+        IAuthenticator CurrentAuthenticatorEnrollment { get; }
+
+        /// <summary>
+        /// Gets the current authenticator.
+        /// </summary>
+        IAuthenticator CurrentAuthenticator { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether response contains 'skip' remediation option.
+        /// </summary>
+        bool CanSkip { get; }
+
+        /// <summary>
+        /// Gets a message to user
+        /// </summary>
+        string MessageToUser { get; }
     }
 }

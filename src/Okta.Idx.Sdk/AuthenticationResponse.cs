@@ -13,43 +13,43 @@ namespace Okta.Idx.Sdk
     public class AuthenticationResponse : Resource, IAuthenticationResponse
     {
         /// <summary>
-        /// Gets or sets the Token Info.
+        /// Gets the Token Info.
         /// </summary>
-        public ITokenResponse TokenInfo { get; set; }
+        public ITokenResponse TokenInfo { get; internal set; }
 
         /// <summary>
-        /// Gets or sets the authentication status.
+        /// Gets the authentication status.
         /// </summary>
-        public AuthenticationStatus AuthenticationStatus { get; set; }
+        public AuthenticationStatus AuthenticationStatus { get; internal set; }
 
         /// <summary>
-        /// Gets or sets the IDX context.
+        /// Gets the IDX context.
         /// </summary>
-        public IIdxContext IdxContext { get; set; }
+        public IIdxContext IdxContext { get; internal set; }
 
         /// <summary>
-        /// Gets or sets the authenticators.
+        /// Gets the authenticators.
         /// </summary>
-        public IList<IAuthenticator> Authenticators { get; set; }
+        public IList<IAuthenticator> Authenticators { get; internal set; }
 
         /// <summary>
-        /// Gets or sets the current authenticator enrollment.
+        /// Gets the current authenticator enrollment.
         /// </summary>
-        public IAuthenticator CurrentAuthenticatorEnrollment { get; set; }
+        public IAuthenticator CurrentAuthenticatorEnrollment { get; internal set; }
 
         /// <summary>
-        /// Gets or sets the current authenticator.
+        /// Gets the current authenticator.
         /// </summary>
-        public IAuthenticator CurrentAuthenticator { get; set; }
+        public IAuthenticator CurrentAuthenticator { get; internal set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether response contains 'skip' remediation option.
+        /// Gets a value indicating whether response contains 'skip' remediation option.
         /// </summary>
-        public bool CanSkip { get; set; }
+        public bool CanSkip { get; internal set; }
 
         /// <summary>
-        /// Gets or sets a message to user
+        /// Gets the message to user
         /// </summary>
-        public string MessageToUser { get; set; }
+        public string MessageToUser { get; internal set; }
     }
 }
