@@ -64,7 +64,7 @@ namespace embedded_sign_in_widget_e2etests.Steps.Pages
         [Then(@"the cell for the value of email is shown and contains her email")]
         public void ThenThePreferred_UsernameClaimIsShownAndMatchesMarySEmail()
         {
-            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.TestUserProfile.Email);
+            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.Configuration.OktaUserEmail);
         }
 
         [Then(@"she sees a table with her profile info")]
@@ -72,7 +72,7 @@ namespace embedded_sign_in_widget_e2etests.Steps.Pages
         {
             _homePageModel.ClaimAccessTokenLabel.Text.Should().NotBeEmpty();
             _homePageModel.ClaimIdTokenLabel.Text.Should().NotBeEmpty();
-            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.TestUserProfile.Email);
+            _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.Configuration.OktaUserEmail);
         }
     }
 }
