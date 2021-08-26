@@ -1,7 +1,7 @@
 ﻿{
     "okta": {
         "testing": {
-            "IISPort": 8080,
+            "IISPort": 8080
         }
     }
 }
