@@ -32,6 +32,16 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
             _webDriver.Url = FullPageUrl;
         }
 
+        public Uri Uri
+        {
+            get => new Uri(_webDriver.Url);
+        }
+
+        public bool IsAtPath(string path)
+        {
+            return Uri.AbsolutePath.Equals(path);
+        }
+
         protected IWebElement TryFindElement(By by)
         {
             int tryCount = 0;

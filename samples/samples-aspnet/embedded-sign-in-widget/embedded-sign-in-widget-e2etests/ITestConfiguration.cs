@@ -2,13 +2,11 @@
 {
     public interface ITestConfiguration
     {
-        string UserName { get; set; }
-        string UserPassword { get; set; }
+        public string OktaUserEmail { get; set; }
+        public string OktaUserPassword { get; set; }
+        public string OktaSocialIdpMfaUserEmail { get; set; }
+        public string OktaSocialIdpMfaUserPassword { get; set; }
         int IisPort { get; set; }
         string SiteUrl { get; set; }
-        string GoogleUserEmail { get; set; }
-        string GoogleUserPassword { get; set; }
-        string FacebookUserEmail { get; set; }
-        string FacebookUserPassword { get; set; }
     }
 }

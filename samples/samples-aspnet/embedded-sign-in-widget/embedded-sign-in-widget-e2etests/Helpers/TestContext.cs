@@ -12,55 +12,19 @@ namespace embedded_sign_in_widget_e2etests.Helpers
         private readonly ITestConfiguration _configuration;
         private readonly IOktaSdkHelper _oktaHelper;
         private bool _disposed = false;
-        public TestUserProfile TestUserProfile { get; set; }
 
         public TestContext(ITestConfiguration configuration, IOktaSdkHelper oktaHelper)
         {
             _oktaHelper = oktaHelper;
             _configuration = configuration;
 
-            TestUserProfile = new TestUserProfile();
+            Configuration = ConfigBuilder.Configuration;
         }
 
-        public async Task SetActivePasswordUserAsync()
+        public ITestConfiguration Configuration 
         {
-            // create user dynamically +Guid
-            var guid = Guid.NewGuid();
-            var username = $"mary-embedded-siw-{guid}@example.com";
-            var firstName = $"Mary";
-            var password = "P4zzw0rd1";
-            
-
-            var oktaUser = await _oktaHelper.CreateActiveUser(username, firstName, password);
-
-            TestUserProfile = new TestUserProfile()
-            {
-                FirstName = firstName,
-                LastName = "Lastname",
-                Email = oktaUser.Profile.Email,
-                Password = password
-            };
-        }
-
-        public void SetUnenrolledUserWithFacebookAccount()
-        {
-            TestUserProfile = new TestUserProfile()
-            {
-                FirstName = "User",
-                LastName = "Facebook",
-                Email = _configuration.FacebookUserEmail,
-                Password = _configuration.FacebookUserPassword
-            };
-        }
-        public void SetUnenrolledUserWithGoogleAccount()
-        {
-            TestUserProfile = new TestUserProfile()
-            {
-                FirstName = "User",
-                LastName = "Google",
-                Email = _configuration.GoogleUserEmail,
-                Password = _configuration.GoogleUserPassword
-            };
+            get;
+            set;
         }
 
         public void Dispose()
@@ -75,10 +39,6 @@ namespace embedded_sign_in_widget_e2etests.Helpers
                 return;
             }
 
-            if (disposing)
-            {
-                _oktaHelper.DeleteUserAsync(TestUserProfile.Email).Wait();
-            }
             _disposed = true;
         }
 
