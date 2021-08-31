@@ -206,6 +206,6 @@ Task("DefaultE2e")
     .IsDependentOn("TestEmbeddedAuthSampleApp")
     .IsDependentOn("Pack");
 
-var target = (BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default";
-
+var target = Argument("target", (BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default");
+Console.WriteLine("Cake target is " + target);
 RunTarget(target);
