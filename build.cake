@@ -198,13 +198,15 @@ Task("DefaultE2e")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
-    .IsDependentOn("RestoreEmbeddedWidgetSampleApp")
-    .IsDependentOn("BuildEmbeddedWidgetSampleApp")
-    .IsDependentOn("TestEmbeddedWidgetSampleApp")
     .IsDependentOn("RestoreEmbeddedAuthSampleApp")
     .IsDependentOn("BuildEmbeddedAuthSampleApp")
     .IsDependentOn("TestEmbeddedAuthSampleApp")
     .IsDependentOn("Pack");
+
+Task("EmbeddedWidgetTest")
+    .IsDependentOn("RestoreEmbeddedWidgetSampleApp")
+    .IsDependentOn("BuildEmbeddedWidgetSampleApp")
+    .IsDependentOn("TestEmbeddedWidgetSampleApp");    
 
 var target = Argument("target", (BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default");
 Console.WriteLine("Cake target is " + target);
