@@ -8,5 +8,6 @@
         public string OktaSocialIdpMfaUserPassword { get; set; }
         int IisPort { get; set; }
         string SiteUrl { get; set; }
+        string ScreenshotsFolder { get; set; }
     }
 }

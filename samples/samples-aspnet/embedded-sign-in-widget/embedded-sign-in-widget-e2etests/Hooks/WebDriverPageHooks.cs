@@ -39,6 +39,18 @@ namespace embedded_sign_in_widget_e2etests.Hooks
             webServerDriver.StartWebServer();
         }
 
+        [AfterScenario]
+        public void AfterScenario(ScenarioContext scenarioContext, ITestContext testContext)
+        {
+            if (scenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.TestError)
+            {
+                var time = DateTime.UtcNow;
+                var name = $"{scenarioContext.ScenarioInfo.Title}-{time.Day:D2}-{time.Hour:D2}-{time.Minute:D2}-{time.Second:D2}";
+
+                testContext.TakeScreenshot(name);
+            }
+        }
+
         [AfterTestRun]
         public static void AfterTestRun()
         {
