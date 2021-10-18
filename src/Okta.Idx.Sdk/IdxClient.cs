@@ -13,7 +13,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using FlexibleConfiguration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
@@ -22,6 +22,9 @@ using Okta.Idx.Sdk.Configuration;
 using Okta.Idx.Sdk.Extensions;
 using Okta.Idx.Sdk.Helpers;
 using Okta.Sdk.Abstractions;
+using Okta.Sdk.Abstractions.Configuration.Providers.EnvironmentVariables;
+using Okta.Sdk.Abstractions.Configuration.Providers.Object;
+using Okta.Sdk.Abstractions.Configuration.Providers.Yaml;
 
 namespace Okta.Idx.Sdk
 {
@@ -113,9 +116,11 @@ namespace Okta.Idx.Sdk
                 .AddObject(configuration);
 
             var compiledConfig = new IdxConfiguration();
-            configBuilder.Build().GetSection("okta").GetSection("idx").Bind(compiledConfig);
-            configBuilder.Build().GetSection("okta").GetSection("testing").Bind(compiledConfig);
+            var oktaConfigSection = configBuilder.Build().GetSection("okta");
+            oktaConfigSection.GetSection("idx").Bind(compiledConfig);
+            oktaConfigSection.GetSection("testing").Bind(compiledConfig);
 
+            compiledConfig.Scopes = compiledConfig.Scopes.Distinct().ToList();
             return compiledConfig;
         }
 
