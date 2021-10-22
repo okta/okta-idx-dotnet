@@ -1,5 +1,12 @@
 # Changelog
 
+
+## 1.0.1
+
+### Updates
+
+* Remove FlexibleConfiguration dependency, use Microsoft Configuration instead.
+
 ## 1.0.0
 
 * SDK is now GA.
