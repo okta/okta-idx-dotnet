@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Okta.Sdk.Abstractions.Configuration.Providers.EnvironmentVariables;
+using System;
 using System.IO;
-using FlexibleConfiguration;
 
 namespace embedded_auth_with_sdk.E2ETests
 {
