@@ -1,6 +1,9 @@
-﻿using Okta.Sdk;
+﻿using embedded_sign_in_widget_e2etests.Drivers;
+using Okta.Sdk;
+using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,13 +14,15 @@ namespace embedded_sign_in_widget_e2etests.Helpers
     {
         private readonly ITestConfiguration _configuration;
         private readonly IOktaSdkHelper _oktaHelper;
+        private readonly WebDriverDriver _webDriver;
         private bool _disposed = false;
+        private const string DefaultScreenshotFolder = "./screenshots";
 
-        public TestContext(ITestConfiguration configuration, IOktaSdkHelper oktaHelper)
+        public TestContext(ITestConfiguration configuration, IOktaSdkHelper oktaHelper, WebDriverDriver webDriver)
         {
             _oktaHelper = oktaHelper;
             _configuration = configuration;
-
+            _webDriver = webDriver;
             Configuration = ConfigBuilder.Configuration;
         }
 
@@ -25,6 +30,24 @@ namespace embedded_sign_in_widget_e2etests.Helpers
         {
             get;
             set;
+        }
+
+        public void TakeScreenshot(string name)
+        {
+            var screenshotDriver = (ITakesScreenshot)_webDriver.WebDriver;
+            var saveFolder = _configuration.ScreenshotsFolder;
+            if (string.IsNullOrEmpty(saveFolder))
+            {
+                saveFolder = DefaultScreenshotFolder;
+            }
+
+            Screenshot screenShot = screenshotDriver.GetScreenshot();
+            var allowedName = name.Replace(':', '-')
+                .Replace(' ', '-')
+                .Replace('"', '-');
+            var fileName = $"{saveFolder}/{allowedName}.png";
+            Directory.CreateDirectory(saveFolder);
+            screenShot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
         }
 
         public void Dispose()
