@@ -22,7 +22,7 @@ namespace embedded_sign_in_widget_e2etests.Helpers
         {
             _oktaHelper = oktaHelper;
             _configuration = configuration;
-
+            _webDriver = webDriver;
             Configuration = ConfigBuilder.Configuration;
         }
 
