@@ -38,6 +38,30 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
+        public async Task PassActivationTokenWhenCallingInteract()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var idxContext = await testClient.InteractAsync(activationToken: "myActivationToken");
+
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"activation_token\":\"myActivationToken\"");
+        }
+
+        [Fact]
+        public async Task PassActivationTokenWhenCallingAuthenticate()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var idxContext = await testClient.InteractAsync(activationToken: "myActivationToken");
+
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"activation_token\":\"myActivationToken\"");
+        }
+
+        [Fact]
         public async Task SendPkceCodeChallengeWhenExchangingTokens()
         {
             #region rawSuccessResponse

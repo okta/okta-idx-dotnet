@@ -19,5 +19,10 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the password. Optional.
         /// </summary>
         public string Password { get; set; }
+
+        /// <summary>
+        /// Gets or sets the activation token. Optional.
+        /// </summary>
+        public string ActivationToken { get; set; }
     }
 }
