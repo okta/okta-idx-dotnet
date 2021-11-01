@@ -391,6 +391,12 @@ namespace Okta.Idx.Sdk
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
             var isPasswordFlow = !string.IsNullOrEmpty(authenticationOptions.Password);
+            var isActivationTokenFlow = !string.IsNullOrEmpty(authenticationOptions.ActivationToken);
+
+            if (isActivationTokenFlow)
+            {
+                return await AuthenticateWithActivationTokenAsync(authenticationOptions, cancellationToken);
+            }
 
             if (isPasswordFlow)
             {
@@ -439,6 +445,27 @@ namespace Okta.Idx.Sdk
                         RemediationType.SelectAuthenticatorAuthenticate,
                         RemediationType.SelectAuthenticatorEnroll,
                     },
+                    introspectResponse);
+        }
+
+        private async Task<AuthenticationResponse> AuthenticateWithActivationTokenAsync(
+            AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
+        {
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+            {
+                return new AuthenticationResponse
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators.Value),
+                };
+            }
+
+            throw new UnexpectedRemediationException(
+                    RemediationType.SelectAuthenticatorEnroll,
                     introspectResponse);
         }
 

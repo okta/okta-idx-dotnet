@@ -11,7 +11,7 @@ namespace Okta.Idx.Sdk
     public class AuthenticationOptions
     {
         /// <summary>
-        /// Gets or sets the username.
+        /// Gets or sets the username. Optional when passing an activation token.
         /// </summary>
         public string Username { get; set; }
 
