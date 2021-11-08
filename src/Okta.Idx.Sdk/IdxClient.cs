@@ -205,8 +205,9 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="state">Optional value to use as the state argument when initiating the authentication flow. This is used to provide contextual information to survive redirects.</param>
         /// <param name="cancellationToken">The cancellation token. Optional.</param>
+        /// /// <param name="activationToken">The activation token. Optional.</param>
         /// <returns>The IDX context.</returns>
-        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
+        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null)
         {
             // PKCE props
             state = state ?? GenerateSecureRandomString(16);
@@ -222,6 +223,11 @@ namespace Okta.Idx.Sdk
             payload.Add("code_challenge", codeChallenge);
             payload.Add("redirect_uri", Configuration.RedirectUri);
             payload.Add("state", state);
+
+            if (!string.IsNullOrEmpty(activationToken))
+            {
+                payload.Add("activation_token", activationToken);
+            }
 
             var headers = new Dictionary<string, string>();
             headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
@@ -246,7 +252,7 @@ namespace Okta.Idx.Sdk
         /// <param name="idxContext">The IDX context that was returned by the `interact()` call</param>
         /// <param name="cancellationToken">The cancellation token</param>
         /// <returns>The IdxResponse.</returns>
-        internal async Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext, CancellationToken cancellationToken = default(CancellationToken))
+        internal async Task<IIdxResponse> IntrospectAsync(IIdxContext idxContext,  CancellationToken cancellationToken = default(CancellationToken))
         {
             var payload = new IdxRequestPayload();
             payload.SetProperty("interactionHandle", idxContext.InteractionHandle);
@@ -385,6 +391,12 @@ namespace Okta.Idx.Sdk
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
             var isPasswordFlow = !string.IsNullOrEmpty(authenticationOptions.Password);
+            var isActivationTokenFlow = !string.IsNullOrEmpty(authenticationOptions.ActivationToken);
+
+            if (isActivationTokenFlow)
+            {
+                return await AuthenticateWithActivationTokenAsync(authenticationOptions, cancellationToken);
+            }
 
             if (isPasswordFlow)
             {
@@ -393,7 +405,7 @@ namespace Okta.Idx.Sdk
 
             // assume users will log in with the authenticator they want
 
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Common request payload
@@ -436,9 +448,30 @@ namespace Okta.Idx.Sdk
                     introspectResponse);
         }
 
+        private async Task<AuthenticationResponse> AuthenticateWithActivationTokenAsync(
+            AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
+        {
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+            {
+                return new AuthenticationResponse
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators.Value),
+                };
+            }
+
+            throw new UnexpectedRemediationException(
+                    RemediationType.SelectAuthenticatorEnroll,
+                    introspectResponse);
+        }
+
         private async Task<AuthenticationResponse> AuthenticateWithPasswordAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Check if identify flow include credentials

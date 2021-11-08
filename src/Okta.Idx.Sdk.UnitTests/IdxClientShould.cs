@@ -241,6 +241,148 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
+        public async Task AuthenticateWithActivationToken()
+        {
+
+            #region mocks
+
+            var interactResponse = @"{ 'interaction_handle' : 'foo' }";
+            string enrollNewResponse = @"{
+                                        ""version"": ""1.0.0"",
+                                        ""stateHandle"": ""02To44MY4BUY8oq7zYVpOnsJfQ42bxS0b6wn488n5W"",
+                                        ""expiresAt"": ""2021-06-02T14:37:22.000Z"",
+                                        ""intent"": ""LOGIN"",
+                                        ""remediation"": {
+                                            ""type"": ""array"",
+                                            ""value"": [
+                                                {
+                                                    ""rel"": [
+                                                        ""create-form""
+                                                    ],
+                                                    ""name"": ""select-authenticator-enroll"",
+                                                    ""href"": ""https://fake.example.com/idp/idx/credential/enroll"",
+                                                    ""method"": ""POST"",
+                                                    ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                                                    ""value"": [
+                                                        {
+                                                            ""name"": ""authenticator"",
+                                                            ""type"": ""object"",
+                                                            ""options"": [
+                                                                {
+                                                                    ""label"": ""Password"",
+                                                                    ""value"": {
+                                                                        ""form"": {
+                                                                            ""value"": [
+                                                                                {
+                                                                                    ""name"": ""id"",
+                                                                                    ""required"": true,
+                                                                                    ""value"": ""auttzfsi2fKQlZVl15d6"",
+                                                                                    ""mutable"": false
+                                                                                },
+                                                                                {
+                                                                                    ""name"": ""methodType"",
+                                                                                    ""required"": false,
+                                                                                    ""value"": ""password"",
+                                                                                    ""mutable"": false
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    ""relatesTo"": ""$.authenticators.value[0]""
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            ""name"": ""stateHandle"",
+                                                            ""required"": true,
+                                                            ""value"": ""02To44MY4BUY8oq7zYVpOnsJfQ42bxS0b6wn488n5W"",
+                                                            ""visible"": false,
+                                                            ""mutable"": false
+                                                        }
+                                                    ],
+                                                    ""accepts"": ""application/json; okta-version=1.0.0""
+                                                }
+                                            ]
+                                        },
+                                        ""authenticators"": {
+                                            ""type"": ""array"",
+                                            ""value"": [
+                                                {
+                                                    ""type"": ""password"",
+                                                    ""key"": ""okta_password"",
+                                                    ""id"": ""auttzfsi2fKQlZVl15d6"",
+                                                    ""displayName"": ""Password"",
+                                                    ""methods"": [
+                                                        {
+                                                            ""type"": ""password""
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        ""authenticatorEnrollments"": {
+                                            ""type"": ""array"",
+                                            ""value"": []
+                                        },
+                                        ""user"": {
+                                            ""type"": ""object"",
+                                            ""value"": {
+                                                ""id"": ""00uuxsen4trGtQH7J5d6""
+                                            }
+                                        },
+                                        ""cancel"": {
+                                            ""rel"": [
+                                                ""create-form""
+                                            ],
+                                            ""name"": ""cancel"",
+                                            ""href"": ""https://fake.example.com/idp/idx/cancel"",
+                                            ""method"": ""POST"",
+                                            ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                                            ""value"": [
+                                                {
+                                                    ""name"": ""stateHandle"",
+                                                    ""required"": true,
+                                                    ""value"": ""02To44MY4BUY8oq7zYVpOnsJfQ42bxS0b6wn488n5W"",
+                                                    ""visible"": false,
+                                                    ""mutable"": false
+                                                }
+                                            ],
+                                            ""accepts"": ""application/json; okta-version=1.0.0""
+                                        },
+                                        ""app"": {
+                                            ""type"": ""object"",
+                                            ""value"": {
+                                                ""name"": ""oidc_client"",
+                                                ""label"": ""Dotnet IDX Web App"",
+                                                ""id"": ""xxxxxxxx""
+                                            }
+                                        }
+                                    }";
+
+        #endregion
+
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = interactResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = enrollNewResponse });
+            
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var authResponse = await testClient.AuthenticateAsync(
+                new AuthenticationOptions
+                {
+                    ActivationToken = "myActivationToken"
+
+                });
+
+            var interactInfo = mockRequestExecutor.RequestInfoQueue.Dequeue();
+            interactInfo.Href.Should().Contain("/interact");
+            interactInfo.Payload.Should().Contain($"\"activation_token\":\"myActivationToken\"");
+
+            authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingAuthenticatorEnrollment);
+        }
+
+        [Fact]
         public async Task LoginSuccessfullyWithTwoStepsLoginConfiguration()
         {
 
