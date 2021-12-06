@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "embedded-auth-with-sdk", "e
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "embedded-auth-with-sdk.E2ETests", "Okta.Idx.Sdk.E2ETests\embedded-auth-with-sdk.E2ETests.csproj", "{1E45AB5D-2869-4116-AAD6-6738E61503A8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Okta.Idx.Sdk", "..\..\..\src\Okta.Idx.Sdk\Okta.Idx.Sdk.csproj", "{CCA8BEA2-FC81-44BA-B166-028A1552B81C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{1E45AB5D-2869-4116-AAD6-6738E61503A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E45AB5D-2869-4116-AAD6-6738E61503A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E45AB5D-2869-4116-AAD6-6738E61503A8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCA8BEA2-FC81-44BA-B166-028A1552B81C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCA8BEA2-FC81-44BA-B166-028A1552B81C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCA8BEA2-FC81-44BA-B166-028A1552B81C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCA8BEA2-FC81-44BA-B166-028A1552B81C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
