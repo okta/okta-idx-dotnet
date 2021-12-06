@@ -18,7 +18,7 @@ namespace Okta.Idx.Sdk
         string Method { get; }
 
         /// <summary>
-        /// Gets the Href
+        /// Gets the Href. The value contains base64-encoded png image with the QR code.
         /// </summary>
         string Href { get; }
 
