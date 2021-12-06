@@ -47,5 +47,10 @@ namespace Okta.Idx.Sdk
         /// Gets the resend object.
         /// </summary>
         IResend Resend { get;  }
+
+        /// <summary>
+        /// Gets the ContextualData field
+        /// </summary>
+        IContextualData ContextualData { get; }
     }
 }

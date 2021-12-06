@@ -218,6 +218,27 @@
             return View(model);
         }
 
+        public ActionResult EnrollGoogleAuthenticator()
+        {
+            var QrCode = (IQrCode)Session["qrcode"];
+            var sharedSecret = (string)Session["sharedSecret"]; 
+            var model = new EnrollGoogleAuthenticatorViewModel
+            {
+                QrCodeHref=QrCode.Href,
+                SharedSecret = sharedSecret,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EnrollGoogleAuthenticatorAsync(EnrollGoogleAuthenticatorViewModel model)
+        {
+            return View("VerifyTotp");
+        }
+
         public ActionResult SelectPhoneChallengeMethod(SelectAuthenticatorMethodViewModel model)
         {
            return View(model);
@@ -273,6 +294,52 @@
                                 };
 
             return View(viewModel);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> VerifyTotpAsync(string code)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("VerifyTotp");
+            }
+
+            var verifyAuthenticatorOptions = new VerifyAuthenticatorOptions
+            {
+                Code = code,
+            };
+
+            try
+            {
+                var authnResponse = await _idxClient.VerifyAuthenticatorAsync(verifyAuthenticatorOptions, (IIdxContext)Session["idxContext"]);
+                Session["idxContext"] = authnResponse.IdxContext;
+
+                switch (authnResponse.AuthenticationStatus)
+                {
+                    case AuthenticationStatus.AwaitingPasswordReset:
+                        return RedirectToAction("ChangePassword", "Manage");
+
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        TempData["canSkip"] = authnResponse.CanSkip;
+                        Session["isChallengeFlow"] = false;
+                        return RedirectToAction("SelectAuthenticator", "Manage");
+
+                    case AuthenticationStatus.Success:
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
+                        _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                        return RedirectToAction("Index", "Home");
+                }
+
+                return View("VerifyTotp");
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return View("VerifyTotp");
+            }
         }
 
 
@@ -364,6 +431,7 @@
                                 MethodType = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.MethodTypes.FirstOrDefault(),
                             };
                             return View("SelectPhoneChallengeMethod", methodViewModel);
+
                         case AuthenticationStatus.AwaitingAuthenticatorVerification:
                             return RedirectToAction("VerifyAuthenticator", "Manage");
                         default:
@@ -390,15 +458,29 @@
                                 return RedirectToAction("ChangePassword", "Manage");
                             }
 
-                            return RedirectToAction("VerifyAuthenticator", "Manage"); 
+                            return RedirectToAction("VerifyAuthenticator", "Manage");
 
+                        case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                            {
+                                if (model.IsPasswordSelected)
+                                {
+                                    return RedirectToAction("ChangePassword", "Manage");
+                                }
+                                else
+                                    if (enrollResponse.CurrentAuthenticator?.Name == "Google Authenticator")
+                                {
+                                    Session["qrcode"] = enrollResponse.CurrentAuthenticator.QrCode;
+                                    Session["sharedSecret"] = enrollResponse.CurrentAuthenticator.SharedSecret;
+                                    return RedirectToAction("EnrollGoogleAuthenticator", "Manage");
+                                }
+                                return RedirectToAction("VerifyAuthenticator", "Manage");
+                            }
                         case AuthenticationStatus.AwaitingAuthenticatorEnrollmentData:
                             Session["methodTypes"] = enrollResponse.CurrentAuthenticator.MethodTypes;
-                            return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
-                            
+                            return RedirectToAction("EnrollPhoneAuthenticator", "Manage");          
 
                         default:
-                            return View("SelectAuthenticator", model);
+                                return View("SelectAuthenticator", model);
                     }
                 }
             }

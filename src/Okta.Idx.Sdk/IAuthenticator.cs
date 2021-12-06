@@ -36,5 +36,15 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the authenticator method types if applicable.
         /// </summary>
         IList<AuthenticatorMethodType> MethodTypes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the QrCode
+        /// </summary>
+        IQrCode QrCode { get; set; }
+
+        /// <summary>
+        /// Get or Sets the Shared Secret
+        /// </summary>
+        string SharedSecret { get; set; }
     }
 }
