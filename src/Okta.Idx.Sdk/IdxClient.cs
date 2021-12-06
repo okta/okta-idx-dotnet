@@ -1204,7 +1204,6 @@ namespace Okta.Idx.Sdk
             else if (selectAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.EnrollAuthenticator))
             {
                 currentRemediationType = RemediationType.EnrollAuthenticator;
-                status = AuthenticationStatus.AwaitingAuthenticatorEnrollment;
             }
 
             if (currentRemediationType != RemediationType.EnrollAuthenticator &&
