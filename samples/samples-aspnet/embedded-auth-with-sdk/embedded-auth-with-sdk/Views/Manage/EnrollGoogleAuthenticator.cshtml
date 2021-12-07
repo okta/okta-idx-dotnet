@@ -1,0 +1,42 @@
+﻿@model embedded_auth_with_sdk.Models.EnrollGoogleAuthenticatorViewModel
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Enroll Google Authenticator";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+        @using (Html.BeginForm("EnrollGoogleAuthenticatorAsync", "Manage", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <h4>Set up Google Authenticator</h4>
+
+            <hr />
+            <div class="form-group">
+                <div class="col-md-10">
+                    
+                    <img src = @Model.QrCodeHref />
+                </div >
+            </div >
+            <div class="form-group">
+                <div class="col-md-10">
+                    <div>
+                        @Html.LabelFor(m => m.SharedSecret, new { @class = "control-label" })
+                    </div>
+                    <div>
+                        @Html.EditorFor(m => m.SharedSecret, new { htmlAttributes = new { @class = "form-control" }})
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Next" class="btn btn-primary btn-stretch-wide" />
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
