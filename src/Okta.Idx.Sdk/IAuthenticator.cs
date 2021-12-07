@@ -38,12 +38,14 @@ namespace Okta.Idx.Sdk
         IList<AuthenticatorMethodType> MethodTypes { get; set; }
 
         /// <summary>
-        /// Gets or sets the QrCode
+        /// Gets or sets the QrCode.
+        /// This is applicable to TOTP authenticators such as Google Authenticator.
         /// </summary>
         IQrCode QrCode { get; set; }
 
         /// <summary>
-        /// Get or Sets the Shared Secret
+        /// Gets or sets the Shared Secret.
+        /// This is the value encoded into the QrCode and can be used to compute a TOTP.
         /// </summary>
         string SharedSecret { get; set; }
     }

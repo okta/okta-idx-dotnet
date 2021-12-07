@@ -49,7 +49,8 @@ namespace Okta.Idx.Sdk
         IResend Resend { get;  }
 
         /// <summary>
-        /// Gets the ContextualData field
+        /// Gets the ContextualData object.
+        /// It is used to enroll a TOTP Authenticator such as Google Authenticator.
         /// </summary>
         IContextualData ContextualData { get; }
     }
