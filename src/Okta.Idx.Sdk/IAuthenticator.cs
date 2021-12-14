@@ -39,14 +39,19 @@ namespace Okta.Idx.Sdk
 
         /// <summary>
         /// Gets or sets the QrCode.
-        /// This is applicable to TOTP authenticators such as Google Authenticator.
+        /// This is applicable to TOTP authenticators such as Google Authenticator or Okta Verify.
         /// </summary>
         IQrCode QrCode { get; set; }
 
         /// <summary>
-        /// Gets or sets the Shared Secret.
+        /// Gets or sets the Shared Secret for Google Authenticator.
         /// This is the value encoded into the QrCode and can be used to compute a TOTP.
         /// </summary>
         string SharedSecret { get; set; }
+
+        /// <summary>
+        /// Gets or sets the selected channel for Okta Verify.
+        /// </summary>
+        string SelectedChannel { get; set; }
     }
 }

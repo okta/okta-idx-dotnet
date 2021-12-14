@@ -51,5 +51,10 @@ namespace Okta.Idx.Sdk
         /// Gets the message to user
         /// </summary>
         public string MessageToUser { get; internal set; }
+
+        /// <summary>
+        /// Gets the options required for polling; includes the remediation option and state handle.
+        /// </summary>
+        public EnrollPollOptions EnrollPollOptions { get; internal set; }
     }
 }

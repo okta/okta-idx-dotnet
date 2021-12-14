@@ -174,5 +174,13 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The identity providers response.</returns>
         Task<IdentityProvidersResponse> GetIdentityProvidersAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Sends a request to the endpoint specified by the enroll-poll remediation option.
+        /// </summary>
+        /// <param name="enrollPollRemediationOption">The remediation option.</param>
+        /// <param name="stateHandle">The state handle.</param>
+        /// <returns>A poll response indicating whether to continue polling and how long to wait until the next request.</returns>
+        Task<PollResponse> PollOnceAsync(IRemediationOption enrollPollRemediationOption, string stateHandle);
     }
 }

@@ -21,5 +21,10 @@ namespace Okta.Idx.Sdk
         /// Gets the Shared Secret.
         /// </summary>
         string SharedSecret { get; }
+
+        /// <summary>
+        /// Gets the Okta Verify selected channel.
+        /// </summary>
+        string SelectedChannel { get; }
     }
 }

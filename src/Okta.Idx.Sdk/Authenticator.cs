@@ -30,5 +30,8 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public string SharedSecret { get; set; }
+
+        /// <inheritdoc/>
+        public string SelectedChannel { get; set; }
     }
 }

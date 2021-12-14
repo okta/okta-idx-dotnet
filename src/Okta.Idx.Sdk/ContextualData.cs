@@ -15,5 +15,8 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public string SharedSecret => GetStringProperty("sharedSecret");
+
+        /// <inheritdoc/>
+        public string SelectedChannel => GetStringProperty("selectedChannel");
     }
 }

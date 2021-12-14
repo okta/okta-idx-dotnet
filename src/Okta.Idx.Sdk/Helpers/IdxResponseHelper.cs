@@ -26,6 +26,7 @@ namespace Okta.Idx.Sdk.Helpers
                     Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
                     SharedSecret = enrollment?.ContextualData?.SharedSecret,
                     QrCode = enrollment?.ContextualData?.QrCode,
+                    SelectedChannel = enrollment?.ContextualData?.SelectedChannel,
                 });
             }
 
@@ -42,6 +43,7 @@ namespace Okta.Idx.Sdk.Helpers
             Profile = GetAuthenticatorProfile(authenticatorEnrollment),
             SharedSecret = authenticatorEnrollment.ContextualData?.SharedSecret,
             QrCode = authenticatorEnrollment.ContextualData?.QrCode,
+            SelectedChannel = authenticatorEnrollment.ContextualData?.SelectedChannel,
         };
 
         internal static string GetAuthenticatorProfile(IAuthenticatorEnrollment authenticatorEnrollment)

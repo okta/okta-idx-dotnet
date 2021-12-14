@@ -1,5 +1,6 @@
 ﻿namespace embedded_auth_with_sdk.Controllers
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Security.Claims;
@@ -231,6 +232,12 @@
             return View(model);
         }
 
+        public ActionResult EnrollOktaVerifyAuthenticator()
+        {
+            var pollConfig = (PollConfig)Session["OktaVerifyPollConfig"];
+            return View(pollConfig.ViewModel);
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -458,12 +465,30 @@
                                 {
                                     return RedirectToAction("ChangePassword", "Manage");
                                 }
-                                else
-                                    if (enrollResponse.CurrentAuthenticator?.Name == "Google Authenticator")
+                                else if (enrollResponse.CurrentAuthenticator?.Name == "Google Authenticator")
                                 {
                                     Session["qrcode"] = enrollResponse.CurrentAuthenticator.QrCode;
                                     Session["sharedSecret"] = enrollResponse.CurrentAuthenticator.SharedSecret;
                                     return RedirectToAction("EnrollGoogleAuthenticator", "Manage");
+                                }
+                                else if (enrollResponse.CurrentAuthenticator?.Name == "Okta Verify")
+                                {
+                                    var enrollPollOptions = enrollResponse.EnrollPollOptions;
+                                    Session["OktaVerifyPollConfig"] = new PollConfig
+                                    {
+                                        RemediationOption = enrollPollOptions.RemediationOption,
+                                        RefreshInterval = (int)enrollPollOptions.RemediationOption.Refresh,
+                                        StateHandle = enrollPollOptions.StateHandle,
+                                        ViewModel = new EnrollOktaVerifyAuthenticatorViewModel
+                                        {
+                                            QrCodeHref = enrollResponse.CurrentAuthenticator.QrCode.Href,
+                                            SelectedChannel = enrollResponse.CurrentAuthenticator.SelectedChannel,
+                                            RefreshInterval = (int)enrollPollOptions.RemediationOption.Refresh,
+                                            PollEndpoint = "/Manage/Poll",
+                                        }
+                                    };
+                                    
+                                    return RedirectToAction("EnrollOktaVerifyAuthenticator", "Manage");
                                 }
                                 return RedirectToAction("VerifyAuthenticator", "Manage");
                             }
@@ -481,6 +506,22 @@
                 ModelState.AddModelError(string.Empty, exception.Message);
                 return View("SelectAuthenticator", model);
             }
+        }
+
+        public async Task<ActionResult> Poll()
+        {
+            var pollConfig = (PollConfig)Session["OktaVerifyPollConfig"];
+
+            var pollResponse = await _idxClient.PollOnceAsync(pollConfig.RemediationOption, pollConfig.StateHandle);            
+            if (!pollResponse.ContinuePolling)
+            {
+                var authenticators = (List<AuthenticatorViewModel>)Session["authenticators"];
+                var oktaVerifyAuthenticator = authenticators.Where(authenticatorViewModel => authenticatorViewModel.Name == "Okta Verify").First();
+                authenticators.Remove(oktaVerifyAuthenticator);
+                pollResponse.Next = "/Manage/SelectAuthenticator";
+            }
+
+            return Json(pollResponse, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult SelectRecoveryAuthenticator()

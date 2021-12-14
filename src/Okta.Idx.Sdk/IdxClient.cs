@@ -1001,6 +1001,10 @@ namespace Okta.Idx.Sdk
             {
                 currentRemediationType = RemediationType.EnrollAuthenticator;
             }
+            else if (introspectResponse.ContainsRemediationOption(RemediationType.EnrollPoll))
+            {
+                currentRemediationType = RemediationType.EnrollPoll;
+            }
             else
             {
                 if (currentRemediationType == RemediationType.EnrollAuthenticator &&
@@ -1174,6 +1178,12 @@ namespace Okta.Idx.Sdk
             return await EnrollAuthenticatorAsync(selectAuthenticatorRequest, idxContext, cancellationToken);
         }
 
+        /// <inheritdoc/>
+        public async Task<PollResponse> PollOnceAsync(IRemediationOption enrollPollRemediationOption, string stateHandle)
+        {
+            return await enrollPollRemediationOption.PollOnceAsync(stateHandle);
+        }
+
         private async Task<AuthenticationResponse> EnrollAuthenticatorAsync(IdxRequestPayload selectAuthenticatorRequest, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
@@ -1194,6 +1204,7 @@ namespace Okta.Idx.Sdk
             var selectAuthenticatorResponse = await selectAuthenticatorEnrollRemediationOption.ProceedAsync(selectAuthenticatorRequest, cancellationToken);
             var currentRemediationType = RemediationType.Unknown;
             var status = AuthenticationStatus.AwaitingAuthenticatorVerification;
+            IRemediationOption enrollPollRemediationOption = null;
 
             // Check if flow is challenge authenticator or enroll authenticator, otherwise throw
             if (selectAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.AuthenticatorEnrollmentData))
@@ -1205,15 +1216,21 @@ namespace Okta.Idx.Sdk
             {
                 currentRemediationType = RemediationType.EnrollAuthenticator;
             }
+            else if (selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.EnrollPoll, out enrollPollRemediationOption))
+            {
+                currentRemediationType = RemediationType.EnrollPoll;
+            }
 
-            if (currentRemediationType != RemediationType.EnrollAuthenticator &&
-                    currentRemediationType != RemediationType.AuthenticatorEnrollmentData)
+            if (currentRemediationType != RemediationType.EnrollPoll &&
+            currentRemediationType != RemediationType.EnrollAuthenticator &&
+            currentRemediationType != RemediationType.AuthenticatorEnrollmentData)
             {
                 throw new UnexpectedRemediationException(
                     new List<string>
                     {
                             RemediationType.AuthenticatorEnrollmentData,
                             RemediationType.EnrollAuthenticator,
+                            RemediationType.EnrollPoll,
                     },
                     selectAuthenticatorResponse);
             }
@@ -1222,6 +1239,11 @@ namespace Okta.Idx.Sdk
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = status,
+                EnrollPollOptions = new EnrollPollOptions
+                {
+                    RemediationOption = enrollPollRemediationOption,
+                    StateHandle = selectAuthenticatorResponse.StateHandle,
+                },
                 CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value),
             };
         }

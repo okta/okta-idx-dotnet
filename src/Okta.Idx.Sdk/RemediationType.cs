@@ -61,6 +61,11 @@ namespace Okta.Idx.Sdk
         public static readonly string EnrollAuthenticator = "enroll-authenticator";
 
         /// <summary>
+        /// enroll-poll
+        /// </summary>
+        public static readonly string EnrollPoll = "enroll-poll";
+
+        /// <summary>
         /// skip
         /// </summary>
         public static readonly string Skip = "skip";

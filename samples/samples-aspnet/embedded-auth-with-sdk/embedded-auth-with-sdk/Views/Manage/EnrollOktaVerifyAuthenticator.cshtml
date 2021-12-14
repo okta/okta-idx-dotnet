@@ -1,0 +1,40 @@
+﻿@model embedded_auth_with_sdk.Models.EnrollOktaVerifyAuthenticatorViewModel
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Enroll Okta Verify";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+
+            <h4>Set up Okta Verify</h4>
+
+            <hr />
+            <div class="form-group">
+                <div class="col-md-10">
+
+                    <img src=@Model.QrCodeHref />
+                </div>
+            </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+    function poll() {
+        fetch('@Model.PollEndpoint')
+            .then(response => response.json())
+            .then(data => {
+                if (data.ContinuePolling) {
+                    setTimeout(poll, data.Refresh);
+                } else {
+                    window.location.href = data.Next;
+                }
+            });
+    }
+
+    setTimeout(poll, @Model.RefreshInterval);
+</script>
