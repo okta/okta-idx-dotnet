@@ -1,6 +1,12 @@
 # Changelog
 
 
+## 1.1.1
+
+### Features
+
+* Add support for Google Authenticator TOTP.
+
 ## 1.0.1
 
 ### Updates

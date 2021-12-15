@@ -24,5 +24,11 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public string Profile { get; set; }
+
+        /// <inheritdoc/>
+        public IQrCode QrCode { get; set; }
+
+        /// <inheritdoc/>
+        public string SharedSecret { get; set; }
     }
 }
