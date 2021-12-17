@@ -51,6 +51,8 @@ namespace Okta.Idx.Sdk
         /// </summary>
         IFormValue Form { get; }
 
+        IList<IFormValue> Value { get; }
+
         /// <summary>
         /// Gets the value that indicates if this form value should be secret
         /// </summary>

@@ -12,8 +12,9 @@ namespace Okta.Idx.Sdk
 {
     internal static class IdxClientExtensions
     {
-        internal static async Task<PollResponse> PollOnceAsync(this IRemediationOption remediationOption, string stateHandle)
+        internal static async Task<PollResponse> PollOnceAsync(this EnrollPollOptions enrollPollOptions, string stateHandle)
         {
+            IRemediationOption remediationOption = enrollPollOptions.EnrollPollRemediationOption;
             if (remediationOption.Name != RemediationType.EnrollPoll)
             {
                 throw new ArgumentException(string.Format("Expected remediation option of type '{0}', the specified remediation option is of type {1}", RemediationType.EnrollPoll, remediationOption.Name));

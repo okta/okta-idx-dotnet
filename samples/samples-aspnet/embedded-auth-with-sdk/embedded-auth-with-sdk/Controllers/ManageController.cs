@@ -234,7 +234,7 @@
 
         public ActionResult EnrollOktaVerifyAuthenticator()
         {
-            var pollConfig = (PollConfig)Session["OktaVerifyPollConfig"];
+            var pollConfig = (OktaVerifyPollConfig)Session["OktaVerifyPollConfig"];
             return View(pollConfig.ViewModel);
         }
 
@@ -473,20 +473,7 @@
                                 }
                                 else if (enrollResponse.CurrentAuthenticator?.Name == "Okta Verify")
                                 {
-                                    var enrollPollOptions = enrollResponse.EnrollPollOptions;
-                                    Session["OktaVerifyPollConfig"] = new PollConfig
-                                    {
-                                        RemediationOption = enrollPollOptions.RemediationOption,
-                                        RefreshInterval = (int)enrollPollOptions.RemediationOption.Refresh,
-                                        StateHandle = enrollPollOptions.StateHandle,
-                                        ViewModel = new EnrollOktaVerifyAuthenticatorViewModel
-                                        {
-                                            QrCodeHref = enrollResponse.CurrentAuthenticator.QrCode.Href,
-                                            SelectedChannel = enrollResponse.CurrentAuthenticator.SelectedChannel,
-                                            RefreshInterval = (int)enrollPollOptions.RemediationOption.Refresh,
-                                            PollEndpoint = "/Manage/Poll",
-                                        }
-                                    };
+                                    Session["OktaVerifyPollConfig"] = new OktaVerifyPollConfig(enrollResponse);
                                     
                                     return RedirectToAction("EnrollOktaVerifyAuthenticator", "Manage");
                                 }
@@ -510,9 +497,9 @@
 
         public async Task<ActionResult> Poll()
         {
-            var pollConfig = (PollConfig)Session["OktaVerifyPollConfig"];
+            var pollConfig = (OktaVerifyPollConfig)Session["OktaVerifyPollConfig"];
 
-            var pollResponse = await _idxClient.PollOnceAsync(pollConfig.RemediationOption, pollConfig.StateHandle);            
+            var pollResponse = await _idxClient.PollOnceAsync(pollConfig.EnrollPollOptions, pollConfig.StateHandle);            
             if (!pollResponse.ContinuePolling)
             {
                 var authenticators = (List<AuthenticatorViewModel>)Session["authenticators"];

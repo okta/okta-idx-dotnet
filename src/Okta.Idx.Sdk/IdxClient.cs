@@ -1179,10 +1179,12 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<PollResponse> PollOnceAsync(IRemediationOption enrollPollRemediationOption, string stateHandle)
+        public async Task<PollResponse> PollOnceAsync(EnrollPollOptions enrollPollRemediationOption, string stateHandle)
         {
             return await enrollPollRemediationOption.PollOnceAsync(stateHandle);
         }
+
+        
 
         private async Task<AuthenticationResponse> EnrollAuthenticatorAsync(IdxRequestPayload selectAuthenticatorRequest, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
@@ -1205,6 +1207,7 @@ namespace Okta.Idx.Sdk
             var currentRemediationType = RemediationType.Unknown;
             var status = AuthenticationStatus.AwaitingAuthenticatorVerification;
             IRemediationOption enrollPollRemediationOption = null;
+            IRemediationOption selectEnrollmentChannelRemedationOption = null;
 
             // Check if flow is challenge authenticator or enroll authenticator, otherwise throw
             if (selectAuthenticatorResponse.Remediation.RemediationOptions.Any(x => x.Name == RemediationType.AuthenticatorEnrollmentData))
@@ -1219,6 +1222,7 @@ namespace Okta.Idx.Sdk
             else if (selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.EnrollPoll, out enrollPollRemediationOption))
             {
                 currentRemediationType = RemediationType.EnrollPoll;
+                selectEnrollmentChannelRemedationOption = selectAuthenticatorResponse.FindRemediationOption(RemediationType.SelectEnrollmentChannel);
             }
 
             if (currentRemediationType != RemediationType.EnrollPoll &&
@@ -1241,7 +1245,8 @@ namespace Okta.Idx.Sdk
                 AuthenticationStatus = status,
                 EnrollPollOptions = new EnrollPollOptions
                 {
-                    RemediationOption = enrollPollRemediationOption,
+                    EnrollPollRemediationOption = enrollPollRemediationOption,
+                    SelectEnrollmentChannelRemediationOption = selectEnrollmentChannelRemedationOption,
                     StateHandle = selectAuthenticatorResponse.StateHandle,
                 },
                 CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value),

@@ -37,6 +37,8 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public IFormValue Form => GetResourceProperty<FormValue>("form");
 
+        public IList<IFormValue> Value => GetArrayProperty<IFormValue>("value");
+
         /// <inheritdoc/>
         public IList<IFormValue> Options => GetArrayProperty<IFormValue>("options");
     }

@@ -334,7 +334,7 @@
     <Compile Include="Models\ForgotPasswordViewModel.cs" />
     <Compile Include="Models\InteractionCodeErrorViewModel.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
-    <Compile Include="Models\PollConfig.cs" />
+    <Compile Include="Models\OktaVerifyPollConfig.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Models\SelectAuthenticatorMethodViewModel.cs" />
     <Compile Include="Models\SelectAuthenticatorViewModel.cs" />

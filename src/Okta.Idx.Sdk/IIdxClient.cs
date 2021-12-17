@@ -181,6 +181,6 @@ namespace Okta.Idx.Sdk
         /// <param name="enrollPollRemediationOption">The remediation option.</param>
         /// <param name="stateHandle">The state handle.</param>
         /// <returns>A poll response indicating whether to continue polling and how long to wait until the next request.</returns>
-        Task<PollResponse> PollOnceAsync(IRemediationOption enrollPollRemediationOption, string stateHandle);
+        Task<PollResponse> PollOnceAsync(EnrollPollOptions enrollPollOptions, string stateHandle);
     }
 }

@@ -14,6 +14,6 @@ namespace embedded_auth_with_sdk.Models
 
         public string PollEndpoint { get; set; }
 
-        public int RefreshInterval { get; set; }
+        public int? RefreshInterval { get; set; }
     }
 }
