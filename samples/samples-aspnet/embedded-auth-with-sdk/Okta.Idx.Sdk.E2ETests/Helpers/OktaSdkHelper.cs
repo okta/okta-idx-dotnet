@@ -1,4 +1,5 @@
 ﻿using Okta.Sdk;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -77,6 +78,30 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             }
             return default;
         }
+
+        public async Task AddGoogleAuthenticator(string emailAddress, Func<string, string> sharedSecretToTotpFunc)
+        {
+            var user = await _client.Users.FirstOrDefaultAsync(u => u.Profile.Email.Equals(emailAddress));
+            if (user != default)
+            {
+                var factor = await user.AddFactorAsync(new AddTotpFactorOptions
+                {
+                    Provider = FactorProvider.Google,
+                });
+
+                var sharedSecret = factor.GetProperty<Resource>("_embedded")
+                                        .GetProperty<Resource>("activation")
+                                        .GetProperty<string>("sharedSecret");
+
+                await _client.UserFactors.ActivateFactorAsync(
+                               new ActivateFactorRequest
+                               {
+                                   PassCode = sharedSecretToTotpFunc(sharedSecret),
+                               },
+                               user.Id,
+                               factor.Id);
+            }
+        } 
 
         public async Task ResendEnrollCode()
         {
