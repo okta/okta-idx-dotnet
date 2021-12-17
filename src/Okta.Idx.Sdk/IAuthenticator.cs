@@ -36,5 +36,10 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the authenticator method types if applicable.
         /// </summary>
         IList<AuthenticatorMethodType> MethodTypes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the authenticator contextual data
+        /// </summary>
+        IAuthenticatorContextualData ContextualData { get; set; }
     }
 }

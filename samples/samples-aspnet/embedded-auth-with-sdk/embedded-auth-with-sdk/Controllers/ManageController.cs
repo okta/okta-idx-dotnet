@@ -93,6 +93,52 @@
             return View();
         }
 
+        public ActionResult VerifyWebAuthnAuthenticator()
+        {
+            var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
+
+            var viewModel = new VerifyWebAuthnViewModel
+            {
+                DisplayName = currentAuthenticator.Name,
+                UserId = currentAuthenticator.ContextualData.ActivationData.User.Id,
+                Username = currentAuthenticator.ContextualData.ActivationData.User.Name,
+                Challenge = currentAuthenticator.ContextualData.ActivationData.Challenge,
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> VerifyWebAuthnAuthenticatorAsync(VerifyWebAuthnViewModel viewModel)
+        {
+            try
+            {
+                var authnResponse = await _idxClient.VerifyAuthenticatorAsync(new VerifyWebAuthnAuthenticatorOptions
+                {
+                    Attestation = viewModel.Attestation,
+                    ClientData = viewModel.ClientData,
+                }, (IIdxContext)Session["idxContext"]);
+
+                authnResponse = await _idxClient.SkipAuthenticatorSelectionAsync((IIdxContext)Session["idxContext"]);
+
+                if (authnResponse.AuthenticationStatus == AuthenticationStatus.Success)
+                {
+                    ClaimsIdentity identity =
+                        await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration,
+                            authnResponse.TokenInfo);
+                    _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                    return RedirectToAction("Index", "Home");
+                }
+
+                return RedirectToAction("Index", "Home");
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return View("VerifyWebAuthnAuthenticator");
+            }
+        }
+
 
         private async Task<ActionResult> VerifyAuthenticatorAsync(string code, string view, BaseViewModel model)
         {
@@ -269,6 +315,7 @@
                                     AuthenticatorId = authenticators.FirstOrDefault()?.AuthenticatorId,
                                     PasswordId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId,
                                     PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
+                                    WebAuthnId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security key or biometric")?.AuthenticatorId,
                                     CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
                                 };
 
@@ -323,6 +370,7 @@
                 var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;
                 Session["isPhoneSelected"] = model.IsPhoneSelected;
                 Session["phoneId"] = model.PhoneId;
+                Session["isWebAuthnSelected"] = model.IsWebAuthnSelected;
 
                 if (isChallengeFlow)
                 {
@@ -388,6 +436,11 @@
                             if (model.IsPasswordSelected)
                             {
                                 return RedirectToAction("ChangePassword", "Manage");
+                            }
+                            else if (model.IsWebAuthnSelected)
+                            {
+                                Session["currentWebAuthnAuthenticator"] = enrollResponse.CurrentAuthenticator;
+                                return RedirectToAction("VerifyWebAuthnAuthenticator", "Manage");
                             }
 
                             return RedirectToAction("VerifyAuthenticator", "Manage"); 

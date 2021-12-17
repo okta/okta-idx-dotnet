@@ -985,6 +985,69 @@ namespace Okta.Idx.Sdk
             };
         }
 
+        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(
+            VerifyWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext,
+            CancellationToken cancellationToken = default)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            var currentRemediationType = RemediationType.Unknown;
+
+            if (introspectResponse.ContainsRemediationOption(RemediationType.EnrollAuthenticator))
+            {
+                currentRemediationType = RemediationType.EnrollAuthenticator;
+            }
+            else
+            {
+                throw new UnexpectedRemediationException(RemediationType.EnrollAuthenticator, introspectResponse);
+            }
+
+            var verifyAuthenticatorRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            verifyAuthenticatorRequest.SetProperty("credentials", new
+            {
+                attestation = verifyAuthenticatorOptions.Attestation,
+                clientData = verifyAuthenticatorOptions.ClientData,
+            });
+
+            var challengeAuthenticatorResponse = await introspectResponse
+                .ProceedWithRemediationOptionAsync(currentRemediationType, verifyAuthenticatorRequest, cancellationToken);
+
+            var isAuthenticatorEnroll = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll);
+
+            if (challengeAuthenticatorResponse.IsLoginSuccess)
+            {
+                var tokenResponse = await challengeAuthenticatorResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+
+            if (isAuthenticatorEnroll)
+            {
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(challengeAuthenticatorResponse.Authenticators.Value),
+                    IdxContext = idxContext,
+                    CanSkip = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.Skip),
+                };
+            }
+
+            throw new UnexpectedRemediationException(
+                new List<string>
+                {
+                    RemediationType.SelectAuthenticatorEnroll,
+                },
+                challengeAuthenticatorResponse);
+        }
+
         /// <inheritdoc/>
         public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
@@ -1405,6 +1468,5 @@ namespace Okta.Idx.Sdk
                     return await GetAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
             }
         }
-
     }
 }

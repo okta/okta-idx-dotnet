@@ -38,6 +38,7 @@ namespace Okta.Idx.Sdk.Helpers
             MethodTypes = authenticatorEnrollment.Methods?.Select(x => x.Type).ToList(),
             EnrollmentId = authenticatorEnrollment.Id,
             Profile = GetAuthenticatorProfile(authenticatorEnrollment),
+            ContextualData = authenticatorEnrollment.AuthenticatorContextualData,
         };
 
         internal static string GetAuthenticatorProfile(IAuthenticatorEnrollment authenticatorEnrollment)

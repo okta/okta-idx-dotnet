@@ -62,6 +62,7 @@ namespace embedded_auth_with_sdk.Controllers
                                    {
                                        Username = model.UserName,
                                        Password = model.Password,
+                                       //ActivationToken = model.ActivationToken,
                                    };
 
             try

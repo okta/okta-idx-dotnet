@@ -24,11 +24,11 @@
 
                     if (Model.CanSkip)
                     {
-                     <h4>Set up optional authenticators</h4>
+                        <h4>Set up optional authenticators</h4>
                     }
                     else
                     {
-                     <h4>Set up required</h4>
+                        <h4>Set up required</h4>
                     }
                 }
 
@@ -44,6 +44,7 @@
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 @Html.HiddenFor(m => m.PasswordId)
                 @Html.HiddenFor(m => m.PhoneId)
+                @Html.HiddenFor(m => m.WebAuthnId)
                 <ul class="no-padding-left">
                     @foreach (var authenticator in Model.Authenticators)
                     {
@@ -68,13 +69,13 @@
                 {
                     <div class="form-group">
                         <div class="col-md-offset-0 col-md-10">
-                        <input type="submit" name="skip" value="Skip this step" class="btn btn-info btn-stretch-wide" />
+                            <input type="submit" name="skip" value="Skip this step" class="btn btn-info btn-stretch-wide" />
                         </div>
                     </div>
                 }
 
             }
-            
+
         </section>
     </div>
 </div>

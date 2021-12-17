@@ -1,0 +1,92 @@
+﻿@model embedded_auth_with_sdk.Models.VerifyWebAuthnViewModel
+@{
+    ViewBag.Title = ViewBag.Title ?? "Verify your Web Authn authenticator.";
+}
+
+<hr />
+
+<div class="row d-center">
+    <div class="col-md-8">
+        <section id="forgotPasswordForm">
+            @using (Html.BeginForm("VerifyAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <h4>Verify your Web Authn authenticator.</h4>
+                <hr />
+            }
+        </section>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    const challenge = '@Model.Challenge';
+    const userId = '@Model.UserId';
+    const username = '@Model.Username';
+    const displayName = '@Model.DisplayName';
+
+    const publicKeyCredentialCreationOptions = {
+        rp: {
+            name: "localhost",
+            //id: "localhost",
+        },
+        challenge: strToBin(challenge),
+        user: {
+            id: strToBin(userId),
+            name: name,
+            displayName: displayName,
+        },
+        pubKeyCredParams: [{alg: -7, type: "public-key"}],
+    };
+    debugger;
+    navigator.credentials.create({
+        publicKey: publicKeyCredentialCreationOptions
+    }).then((newCredential) => {
+        debugger;
+        const clientDataJSON = binToStr(newCredential.response.clientDataJSON);
+        const attestationObject = binToStr(newCredential.response.attestationObject);
+
+        const params = {
+            "clientData": clientDataJSON,
+            "attestation": attestationObject
+        };
+
+        const options = {
+            method: 'POST',
+            body: JSON.stringify(params),
+            headers: { "Content-type": "application/json; charset=UTF-8" }
+        };
+
+        fetch("https://localhost:44314/Manage/VerifyWebAuthnAuthenticatorAsync", options)
+            .then(res => {
+                console.log("Request successful! Response:", res);
+                debugger;
+                //location.href = '/select-authenticator?completed=Security%20Key%20or%20Biometric';
+            }).catch(function(err) {
+                console.error(err);
+                debugger;
+                }
+            );
+    }).catch(function(err) {
+        console.error(err);
+    });
+    /*]]>*/
+
+    // original source: https://github.com/okta/okta-signin-widget/blob/master/src/util/CryptoUtil.js
+    function binToStr(bin) {
+        return btoa(new Uint8Array(bin).reduce((s, byte) => s + String.fromCharCode(byte), ''));
+    }
+
+    function strToBin(str) {
+        return Uint8Array.from(atob(base64UrlSafeToBase64(str)), c => c.charCodeAt(0));
+    }
+
+    function base64UrlSafeToBase64(str) {
+        return str.replace(new RegExp('_', 'g'), '/').replace(new RegExp('-', 'g'), '+');
+    }
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+}

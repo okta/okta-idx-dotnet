@@ -16,7 +16,9 @@ namespace embedded_auth_with_sdk.Models
         public string PasswordId { get; set; }
 
         public string PhoneId { get; set; }
-        
+
+        public string WebAuthnId { get; set; }
+
         public bool CanSkip { get; set; }
 
         public IList<AuthenticatorViewModel> Authenticators { get; set; }
@@ -34,6 +36,14 @@ namespace embedded_auth_with_sdk.Models
             get
             {
                 return (PhoneId != null && PhoneId == AuthenticatorId);
+            }
+        }
+
+        public bool IsWebAuthnSelected
+        {
+            get
+            {
+                return (WebAuthnId != null && WebAuthnId == AuthenticatorId);
             }
         }
     }

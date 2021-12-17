@@ -73,6 +73,15 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Verify a Web Authn authenticator
+        /// </summary>
+        /// <param name="verifyAuthenticatorOptions">The options to verify an authenticator.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Revoke tokens. Revoking an access token doesn't revoke the associated refresh token. However, revoking a refresh token does revoke the associated access token.
         /// </summary>
         /// <see href="https://developer.okta.com/docs/guides/revoke-tokens/revokeatrt/"/>

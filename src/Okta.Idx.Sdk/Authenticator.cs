@@ -24,5 +24,8 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public string Profile { get; set; }
+
+        /// <inheritdoc/>
+        public IAuthenticatorContextualData ContextualData { get; set; }
     }
 }
