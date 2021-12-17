@@ -26,6 +26,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         }
 
         [Then(@"She enters the shared Secret Key into the Google Authenticator App")]
+        [When(@"She enters the shared Secret Key into the Google Authenticator App")]
         public void ThenSheEntersTheSharedSecretKeyIntoTheGoogleAuthenticatorApp()
         {
             _context.TotpSharedSecret = _googleAuthenticatorPageModel.SharedSecretInput.GetProperty("value");
