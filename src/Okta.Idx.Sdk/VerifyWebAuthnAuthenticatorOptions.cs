@@ -3,16 +3,26 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// The options to verify a Web Authn authenticator
+    /// </summary>
     public class VerifyWebAuthnAuthenticatorOptions
     {
-        public string Attestation { get; set; }
+        /// <summary>
+        /// Gets or sets the authenticator data
+        /// </summary>
+        public string AuthenticatorData { get; set; }
 
+        /// <summary>
+        /// Gets or sets the client data
+        /// </summary>
         public string ClientData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the signature data
+        /// </summary>
+        public string SignatureData { get; set; }
     }
 }

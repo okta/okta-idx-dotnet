@@ -9,8 +9,10 @@ using System.Text;
 
 namespace Okta.Idx.Sdk
 {
+    /// <inheritdoc cref="IAuthenticatorContextualData"/>
     public class AuthenticatorContextualData : Resource, IAuthenticatorContextualData
     {
+        /// <inheritdoc />
         public IActivationData ActivationData => GetResourceProperty<ActivationData>("activationData");
     }
 }

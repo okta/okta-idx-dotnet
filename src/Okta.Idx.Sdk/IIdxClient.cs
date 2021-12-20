@@ -73,7 +73,7 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Verify a Web Authn authenticator
+        /// Verify a  web authn authenticator
         /// </summary>
         /// <param name="verifyAuthenticatorOptions">The options to verify an authenticator.</param>
         /// <param name="idxContext">The IDX context.</param>
@@ -125,6 +125,15 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollPhoneAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Enroll a Web Authn authenticator
+        /// </summary>
+        /// <param name="verifyAuthenticatorOptions">The options to enroll an authenticator.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Select an authenticator to continue with the challenge process.

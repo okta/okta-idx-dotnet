@@ -879,7 +879,6 @@ namespace Okta.Idx.Sdk
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorSelection,
                 Authenticators = authenticators,
             };
-
         }
 
         public async Task<AuthenticationResponse> ResendCodeAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
@@ -892,7 +891,7 @@ namespace Okta.Idx.Sdk
                 StateHandle = introspectResponse.StateHandle,
             };
 
-            if (introspectResponse?.CurrentAuthenticatorEnrollment != null 
+            if (introspectResponse?.CurrentAuthenticatorEnrollment != null
                 && introspectResponse?.CurrentAuthenticatorEnrollment.Value?.Resend != null)
             {
                 var resendResponse = await introspectResponse.CurrentAuthenticatorEnrollment.Value.Resend.ProceedAsync(resendRequest, cancellationToken);
@@ -985,9 +984,9 @@ namespace Okta.Idx.Sdk
             };
         }
 
-        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(
-            VerifyWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext,
-            CancellationToken cancellationToken = default)
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(
+            EnrollWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
@@ -1013,14 +1012,14 @@ namespace Okta.Idx.Sdk
                 clientData = verifyAuthenticatorOptions.ClientData,
             });
 
-            var challengeAuthenticatorResponse = await introspectResponse
+            var enrollAuthenticatorResponse = await introspectResponse
                 .ProceedWithRemediationOptionAsync(currentRemediationType, verifyAuthenticatorRequest, cancellationToken);
 
-            var isAuthenticatorEnroll = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll);
+            var isAuthenticatorEnroll = enrollAuthenticatorResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll);
 
-            if (challengeAuthenticatorResponse.IsLoginSuccess)
+            if (enrollAuthenticatorResponse.IsLoginSuccess)
             {
-                var tokenResponse = await challengeAuthenticatorResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+                var tokenResponse = await enrollAuthenticatorResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
 
                 return new AuthenticationResponse
                 {
@@ -1034,9 +1033,9 @@ namespace Okta.Idx.Sdk
                 return new AuthenticationResponse
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(challengeAuthenticatorResponse.Authenticators.Value),
+                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(enrollAuthenticatorResponse.Authenticators.Value),
                     IdxContext = idxContext,
-                    CanSkip = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.Skip),
+                    CanSkip = enrollAuthenticatorResponse.ContainsRemediationOption(RemediationType.Skip),
                 };
             }
 
@@ -1045,7 +1044,7 @@ namespace Okta.Idx.Sdk
                 {
                     RemediationType.SelectAuthenticatorEnroll,
                 },
-                challengeAuthenticatorResponse);
+                enrollAuthenticatorResponse);
         }
 
         /// <inheritdoc/>
@@ -1097,8 +1096,45 @@ namespace Okta.Idx.Sdk
                 passcode = verifyAuthenticatorOptions.Code,
             });
 
-            var challengeAuthenticatorResponse = await introspectResponse
-                .ProceedWithRemediationOptionAsync(currentRemediationType, challengeAuthenticatorRequest, cancellationToken);
+            return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, introspectResponse, currentRemediationType, idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            var currentRemediationType = RemediationType.Unknown;
+
+            // Check if flow is challenge authenticator or enroll authenticator, otherwise throw
+            if (introspectResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
+            {
+                currentRemediationType = RemediationType.ChallengeAuthenticator;
+            }
+            else
+            {
+                throw new UnexpectedRemediationException(RemediationType.ChallengeAuthenticator, introspectResponse);
+            }
+
+            var challengeAuthenticatorRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            challengeAuthenticatorRequest.SetProperty("credentials", new
+            {
+                authenticatorData = verifyAuthenticatorOptions.AuthenticatorData,
+                clientData = verifyAuthenticatorOptions.ClientData,
+                signatureData = verifyAuthenticatorOptions.SignatureData,
+            });
+
+            return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, introspectResponse, currentRemediationType, idxContext, cancellationToken);
+        }
+
+        private async Task<AuthenticationResponse> VerifyAuthenticatorAsync(IdxRequestPayload payload, IIdxResponse proceedResponse, string remediationType, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var challengeAuthenticatorResponse = await proceedResponse
+                .ProceedWithRemediationOptionAsync(remediationType, payload, cancellationToken);
 
             var isResetAuthenticator = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.ResetAuthenticator);
             var isAuthenticatorEnroll = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll);

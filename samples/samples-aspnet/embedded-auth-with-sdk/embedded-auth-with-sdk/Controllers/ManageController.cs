@@ -140,7 +140,7 @@ namespace embedded_auth_with_sdk.Controllers
         [HttpPost]
         public async Task<IAuthenticationResponse> VerifyWebAuthnAuthenticatorAsync(VerifyWebAuthnViewModel viewModel)
         {
-            var authnResponse = await _idxClient.VerifyAuthenticatorAsync(new VerifyWebAuthnAuthenticatorOptions
+            var authnResponse = await _idxClient.EnrollAuthenticatorAsync(new EnrollWebAuthnAuthenticatorOptions
             {
                 Attestation = viewModel.Attestation,
                 ClientData = viewModel.ClientData,

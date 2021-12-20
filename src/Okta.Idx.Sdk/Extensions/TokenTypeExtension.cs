@@ -13,10 +13,8 @@ namespace Okta.Idx.Sdk.Extensions
             {
                 case TokenType.AccessToken:
                     return "access_token";
-                    break;
                 case TokenType.RefreshToken:
                     return "refresh_token";
-                    break;
                 default:
                     return string.Empty;
             }
