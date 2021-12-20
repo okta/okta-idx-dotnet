@@ -12,7 +12,6 @@
             {
                 @Html.AntiForgeryToken()
                 <h4>Verify your Web Authn authenticator.</h4>
-                <hr />
             }
         </section>
     </div>
@@ -28,7 +27,7 @@
     const publicKeyCredentialCreationOptions = {
         rp: {
             name: "localhost",
-            //id: "localhost",
+            id: "localhost",
         },
         challenge: strToBin(challenge),
         user: {
@@ -38,17 +37,21 @@
         },
         pubKeyCredParams: [{alg: -7, type: "public-key"}],
     };
-    debugger;
+
     navigator.credentials.create({
         publicKey: publicKeyCredentialCreationOptions
     }).then((newCredential) => {
-        debugger;
+        
         const clientDataJSON = binToStr(newCredential.response.clientDataJSON);
         const attestationObject = binToStr(newCredential.response.attestationObject);
 
         const params = {
             "clientData": clientDataJSON,
-            "attestation": attestationObject
+            "attestation": attestationObject,
+            "challenge": challenge,
+            "userId": userId,
+            "username": username,
+            "displayName": displayName
         };
 
         const options = {
@@ -57,20 +60,17 @@
             headers: { "Content-type": "application/json; charset=UTF-8" }
         };
 
-        fetch("https://localhost:44314/Manage/VerifyWebAuthnAuthenticatorAsync", options)
+        fetch("@Url.Action("VerifyWebAuthnAuthenticatorAsync", "Manage")", options)
             .then(res => {
                 console.log("Request successful! Response:", res);
-                debugger;
-                //location.href = '/select-authenticator?completed=Security%20Key%20or%20Biometric';
+                location.href = '@Url.Action("VerifyWebAuthnAuthenticator", "Manage", new { verificationCompleted = true})';
             }).catch(function(err) {
                 console.error(err);
-                debugger;
                 }
             );
     }).catch(function(err) {
         console.error(err);
     });
-    /*]]>*/
 
     // original source: https://github.com/okta/okta-signin-widget/blob/master/src/util/CryptoUtil.js
     function binToStr(bin) {
@@ -88,5 +88,4 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-
 }

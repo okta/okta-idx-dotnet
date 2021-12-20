@@ -1,4 +1,6 @@
-﻿namespace embedded_auth_with_sdk.Controllers
+﻿using System;
+
+namespace embedded_auth_with_sdk.Controllers
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -93,50 +95,60 @@
             return View();
         }
 
-        public ActionResult VerifyWebAuthnAuthenticator()
+        public async Task<ActionResult> VerifyWebAuthnAuthenticator()
         {
-            var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
+            var isVerificationCompleted = false;
+            Boolean.TryParse(Request.Params["verificationCompleted"], out isVerificationCompleted);
 
-            var viewModel = new VerifyWebAuthnViewModel
+            if (isVerificationCompleted)
             {
-                DisplayName = currentAuthenticator.Name,
-                UserId = currentAuthenticator.ContextualData.ActivationData.User.Id,
-                Username = currentAuthenticator.ContextualData.ActivationData.User.Name,
-                Challenge = currentAuthenticator.ContextualData.ActivationData.Challenge,
-            };
+                var authnResponse = (IAuthenticationResponse)Session["webAuthnResponse"];
 
-            return View(viewModel);
+                switch (authnResponse?.AuthenticationStatus)
+                {
+                    case AuthenticationStatus.Success:
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
+                        _authenticationManager.SignIn(identity);
+                        return RedirectToAction("Index", "Home");
+
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["isChallengeFlow"] = false;
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        TempData["canSkip"] = authnResponse.CanSkip;
+                        return RedirectToAction("SelectAuthenticator", "Manage");
+
+                    default:
+                        return RedirectToAction("Index", "Home");
+                }
+            }
+            else
+            {
+                var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
+
+                var viewModel = new VerifyWebAuthnViewModel
+                {
+                    DisplayName = currentAuthenticator.Name,
+                    UserId = currentAuthenticator.ContextualData.ActivationData.User.Id,
+                    Username = currentAuthenticator.ContextualData.ActivationData.User.Name,
+                    Challenge = currentAuthenticator.ContextualData.ActivationData.Challenge,
+                };
+
+                return View(viewModel);
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult> VerifyWebAuthnAuthenticatorAsync(VerifyWebAuthnViewModel viewModel)
+        public async Task<IAuthenticationResponse> VerifyWebAuthnAuthenticatorAsync(VerifyWebAuthnViewModel viewModel)
         {
-            try
+            var authnResponse = await _idxClient.VerifyAuthenticatorAsync(new VerifyWebAuthnAuthenticatorOptions
             {
-                var authnResponse = await _idxClient.VerifyAuthenticatorAsync(new VerifyWebAuthnAuthenticatorOptions
-                {
-                    Attestation = viewModel.Attestation,
-                    ClientData = viewModel.ClientData,
-                }, (IIdxContext)Session["idxContext"]);
+                Attestation = viewModel.Attestation,
+                ClientData = viewModel.ClientData,
+            }, (IIdxContext)Session["idxContext"]);
 
-                authnResponse = await _idxClient.SkipAuthenticatorSelectionAsync((IIdxContext)Session["idxContext"]);
+            Session["webAuthnResponse"] = authnResponse;
 
-                if (authnResponse.AuthenticationStatus == AuthenticationStatus.Success)
-                {
-                    ClaimsIdentity identity =
-                        await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration,
-                            authnResponse.TokenInfo);
-                    _authenticationManager.SignIn(new AuthenticationProperties(), identity);
-                    return RedirectToAction("Index", "Home");
-                }
-
-                return RedirectToAction("Index", "Home");
-            }
-            catch (OktaException exception)
-            {
-                ModelState.AddModelError(string.Empty, exception.Message);
-                return View("VerifyWebAuthnAuthenticator");
-            }
+            return authnResponse;
         }
 
 

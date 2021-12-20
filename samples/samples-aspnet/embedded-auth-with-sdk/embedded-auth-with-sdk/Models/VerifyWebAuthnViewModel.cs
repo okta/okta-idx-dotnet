@@ -18,5 +18,6 @@ namespace embedded_auth_with_sdk.Models
         public string Username { get; set; }
 
         public string DisplayName { get; set; }
+
     }
 }
