@@ -9118,6 +9118,8 @@ namespace Okta.Idx.Sdk.UnitTests
             authResponse.CurrentAuthenticator.ContextualData.ActivationData.AuthenticatorSelection.UserVerification.Should().Be("discouraged");
             authResponse.CurrentAuthenticator.ContextualData.ActivationData.PublicKeyCredParams.Should().HaveCount(2);
             // TODO:// check RP and u2fParams
+            authResponse.CurrentAuthenticator.ContextualData.ActivationData.U2fParams.ApplicationId.Should()
+                .Be("https://testorg.com");
             authResponse.CurrentAuthenticator.ContextualData.ActivationData.User.Name.Should().Be("testuser@test.com");
             authResponse.CurrentAuthenticator.ContextualData.ActivationData.User.DisplayName.Should().Be("Laura T");
             authResponse.CurrentAuthenticator.ContextualData.ActivationData.User.Id.Should().Be("00u3epqr99CQeA3mW5d7");
@@ -9792,6 +9794,606 @@ namespace Okta.Idx.Sdk.UnitTests
 
             authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingAuthenticatorEnrollment);
             authResponse.Authenticators.FirstOrDefault(x => x.Id == "aut2xoroxctf7gf5i5d7").Should().BeNull();
+        }
+
+        [Fact]
+        public async Task SelectWebAuthnForChallenge()
+        {
+            var identifyResponse = @"{
+                                        ""version"": ""1.0.0"",
+                                        ""stateHandle"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                        ""expiresAt"": ""2021-12-22T18:06:28.000Z"",
+                                        ""intent"": ""LOGIN"",
+                                        ""remediation"": {
+                                          ""type"": ""array"",
+                                          ""value"": [
+                                            {
+                                              ""rel"": [
+                                                ""create-form""
+                                              ],
+                                              ""name"": ""challenge-authenticator"",
+                                              ""relatesTo"": [
+                                                ""$.currentAuthenticator""
+                                              ],
+                                              ""href"": ""https://testorg.com/idp/idx/challenge/answer"",
+                                              ""method"": ""POST"",
+                                              ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                                              ""value"": [
+                                                {
+                                                  ""name"": ""credentials"",
+                                                  ""type"": ""object"",
+                                                  ""form"": {
+                                                    ""value"": [
+                                                      {
+                                                        ""name"": ""authenticatorData"",
+                                                        ""label"": ""Authenticator Data"",
+                                                        ""required"": true,
+                                                        ""visible"": false
+                                                      },
+                                                      {
+                                                        ""name"": ""clientData"",
+                                                        ""label"": ""Client Data"",
+                                                        ""required"": true,
+                                                        ""visible"": false
+                                                      },
+                                                      {
+                                                        ""name"": ""signatureData"",
+                                                        ""label"": ""Signature Data"",
+                                                        ""required"": true,
+                                                        ""visible"": false
+                                                      }
+                                                    ]
+                                                  },
+                                                  ""required"": true
+                                                },
+                                                {
+                                                  ""name"": ""stateHandle"",
+                                                  ""required"": true,
+                                                  ""value"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                                  ""visible"": false,
+                                                  ""mutable"": false
+                                                }
+                                              ],
+                                              ""accepts"": ""application/json; okta-version=1.0.0""
+                                            },
+                                            {
+                                              ""rel"": [
+                                                ""create-form""
+                                              ],
+                                              ""name"": ""select-authenticator-authenticate"",
+                                              ""href"": ""https://testorg.com/idp/idx/challenge"",
+                                              ""method"": ""POST"",
+                                              ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                                              ""value"": [
+                                                {
+                                                  ""name"": ""authenticator"",
+                                                  ""type"": ""object"",
+                                                  ""options"": [
+                                                    {
+                                                      ""label"": ""Security Key or Biometric"",
+                                                      ""value"": {
+                                                        ""form"": {
+                                                          ""value"": [
+                                                            {
+                                                              ""name"": ""id"",
+                                                              ""required"": true,
+                                                              ""value"": ""aut2xoroxctf7gf5i5d7"",
+                                                              ""mutable"": false
+                                                            },
+                                                            {
+                                                              ""name"": ""methodType"",
+                                                              ""required"": false,
+                                                              ""value"": ""webauthn"",
+                                                              ""mutable"": false
+                                                            }
+                                                          ]
+                                                        }
+                                                      },
+                                                      ""relatesTo"": ""$.authenticators.value[0]""
+                                                    }
+                                                  ]
+                                                },
+                                                {
+                                                  ""name"": ""stateHandle"",
+                                                  ""required"": true,
+                                                  ""value"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                                  ""visible"": false,
+                                                  ""mutable"": false
+                                                }
+                                              ],
+                                              ""accepts"": ""application/json; okta-version=1.0.0""
+                                            }
+                                          ]
+                                        },
+                                        ""currentAuthenticator"": {
+                                          ""type"": ""object"",
+                                          ""value"": {
+                                            ""contextualData"": {
+                                              ""challengeData"": {
+                                                ""challenge"": ""FTiZR_W3xIsjcGcKy1ujy7lFYtg"",
+                                                ""userVerification"": ""preferred"",
+                                                ""extensions"": {
+                                                  ""appid"": ""https://testorg.com""
+                                                }
+                                              }
+                                            },
+                                            ""type"": ""security_key"",
+                                            ""key"": ""webauthn"",
+                                            ""id"": ""aut2xoroxctf7gf5i5d7"",
+                                            ""displayName"": ""Security Key or Biometric"",
+                                            ""methods"": [
+                                              {
+                                                ""type"": ""webauthn""
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        ""authenticators"": {
+                                          ""type"": ""array"",
+                                          ""value"": [
+                                            {
+                                              ""type"": ""security_key"",
+                                              ""key"": ""webauthn"",
+                                              ""id"": ""aut2xoroxctf7gf5i5d7"",
+                                              ""displayName"": ""Security Key or Biometric"",
+                                              ""methods"": [
+                                                {
+                                                  ""type"": ""webauthn""
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        ""authenticatorEnrollments"": {
+                                          ""type"": ""array"",
+                                          ""value"": [
+                                            {
+                                              ""type"": ""security_key"",
+                                              ""key"": ""webauthn"",
+                                              ""id"": ""fwf3eppyt3VYqlQel5d7"",
+                                              ""displayName"": ""Authenticator"",
+                                              ""credentialId"": ""EXnmDuGgj22Wb1-oiv5KizXuhzzDhrqp3mrX_3gdu34"",
+                                              ""methods"": [
+                                                {
+                                                  ""type"": ""webauthn""
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        ""user"": {
+                                          ""type"": ""object"",
+                                          ""value"": {
+                                            ""id"": ""00u3epqr99CQeA3mW5d7"",
+                                            ""identifier"": ""foo"",
+                                            ""profile"": {
+                                              ""firstName"": ""Laura"",
+                                              ""lastName"": ""T"",
+                                              ""timeZone"": ""America/Los_Angeles"",
+                                              ""locale"": ""en_US""
+                                            }
+                                          }
+                                        }
+                                      }";
+            var selectWebAuthnResponse = @"{
+                                          ""version"": ""1.0.0"",
+                                          ""stateHandle"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                          ""expiresAt"": ""2021-12-22T18:06:35.000Z"",
+                                          ""intent"": ""LOGIN"",
+                                          ""remediation"": {
+                                            ""type"": ""array"",
+                                            ""value"": [
+                                              {
+                                                ""rel"": [
+                                                  ""create-form""
+                                                ],
+                                                ""name"": ""challenge-authenticator"",
+                                                ""relatesTo"": [
+                                                  ""$.currentAuthenticator""
+                                                ],
+                                                ""href"": ""https://testorg.com/idp/idx/challenge/answer"",
+                                                ""method"": ""POST"",
+                                                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                                                ""value"": [
+                                                  {
+                                                    ""name"": ""credentials"",
+                                                    ""type"": ""object"",
+                                                    ""form"": {
+                                                      ""value"": [
+                                                        {
+                                                          ""name"": ""authenticatorData"",
+                                                          ""label"": ""Authenticator Data"",
+                                                          ""required"": true,
+                                                          ""visible"": false
+                                                        },
+                                                        {
+                                                          ""name"": ""clientData"",
+                                                          ""label"": ""Client Data"",
+                                                          ""required"": true,
+                                                          ""visible"": false
+                                                        },
+                                                        {
+                                                          ""name"": ""signatureData"",
+                                                          ""label"": ""Signature Data"",
+                                                          ""required"": true,
+                                                          ""visible"": false
+                                                        }
+                                                      ]
+                                                    },
+                                                    ""required"": true
+                                                  },
+                                                  {
+                                                    ""name"": ""stateHandle"",
+                                                    ""required"": true,
+                                                    ""value"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                                    ""visible"": false,
+                                                    ""mutable"": false
+                                                  }
+                                                ],
+                                                ""accepts"": ""application/json; okta-version=1.0.0""
+                                              },
+                                              {
+                                                ""rel"": [
+                                                  ""create-form""
+                                                ],
+                                                ""name"": ""select-authenticator-authenticate"",
+                                                ""href"": ""https://testorg.com/idp/idx/challenge"",
+                                                ""method"": ""POST"",
+                                                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                                                ""value"": [
+                                                  {
+                                                    ""name"": ""authenticator"",
+                                                    ""type"": ""object"",
+                                                    ""options"": [
+                                                      {
+                                                        ""label"": ""Security Key or Biometric"",
+                                                        ""value"": {
+                                                          ""form"": {
+                                                            ""value"": [
+                                                              {
+                                                                ""name"": ""id"",
+                                                                ""required"": true,
+                                                                ""value"": ""aut2xoroxctf7gf5i5d7"",
+                                                                ""mutable"": false
+                                                              },
+                                                              {
+                                                                ""name"": ""methodType"",
+                                                                ""required"": false,
+                                                                ""value"": ""webauthn"",
+                                                                ""mutable"": false
+                                                              }
+                                                            ]
+                                                          }
+                                                        },
+                                                        ""relatesTo"": ""$.authenticators.value[0]""
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    ""name"": ""stateHandle"",
+                                                    ""required"": true,
+                                                    ""value"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                                    ""visible"": false,
+                                                    ""mutable"": false
+                                                  }
+                                                ],
+                                                ""accepts"": ""application/json; okta-version=1.0.0""
+                                              }
+                                            ]
+                                          },
+                                          ""currentAuthenticator"": {
+                                            ""type"": ""object"",
+                                            ""value"": {
+                                              ""contextualData"": {
+                                                ""challengeData"": {
+                                                  ""challenge"": ""VneRVBrd9y352V66ZyztVmfo6oA"",
+                                                  ""userVerification"": ""preferred"",
+                                                  ""extensions"": {
+                                                    ""appid"": ""https://testorg.com""
+                                                  }
+                                                }
+                                              },
+                                              ""type"": ""security_key"",
+                                              ""key"": ""webauthn"",
+                                              ""id"": ""aut2xoroxctf7gf5i5d7"",
+                                              ""displayName"": ""Security Key or Biometric"",
+                                              ""methods"": [
+                                                {
+                                                  ""type"": ""webauthn""
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          ""authenticators"": {
+                                            ""type"": ""array"",
+                                            ""value"": [
+                                              {
+                                                ""type"": ""security_key"",
+                                                ""key"": ""webauthn"",
+                                                ""id"": ""aut2xoroxctf7gf5i5d7"",
+                                                ""displayName"": ""Security Key or Biometric"",
+                                                ""methods"": [
+                                                  {
+                                                    ""type"": ""webauthn""
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          ""authenticatorEnrollments"": {
+                                            ""type"": ""array"",
+                                            ""value"": [
+                                              {
+                                                ""type"": ""security_key"",
+                                                ""key"": ""webauthn"",
+                                                ""id"": ""fwf3eppyt3VYqlQel5d7"",
+                                                ""displayName"": ""Authenticator"",
+                                                ""credentialId"": ""EXnmDuGgj22Wb1-oiv5KizXuhzzDhrqp3mrX_3gdu34"",
+                                                ""methods"": [
+                                                  {
+                                                    ""type"": ""webauthn""
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        }";
+
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = identifyResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = selectWebAuthnResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var authResponse = await testClient.SelectChallengeAuthenticatorAsync(
+                                   new SelectAuthenticatorOptions
+                                   {
+                                       AuthenticatorId = "aut2xoroxctf7gf5i5d7",
+
+                                   }, Substitute.For<IIdxContext>());
+
+            authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingAuthenticatorVerification);
+            authResponse.CurrentAuthenticatorEnrollment.Name.ToLower().Should().Be("security key or biometric");
+            authResponse.CurrentAuthenticatorEnrollment.MethodTypes.Should().Contain("webauthn");
+            authResponse.CurrentAuthenticatorEnrollment.ContextualData.ChallengeData.Challenge.Should().Be("VneRVBrd9y352V66ZyztVmfo6oA");
+            authResponse.CurrentAuthenticatorEnrollment.ContextualData.ChallengeData.UserVerification.Should().Be("preferred");
+            authResponse.CurrentAuthenticatorEnrollment.ContextualData.ChallengeData.Extensions.GetProperty<string>("appid")
+                .Should().Be("https://testorg.com");
+        }
+
+        [Fact]
+        public async Task ChallengeWebAuthn()
+        {
+            var identifyResponse = @"{
+                                          ""version"": ""1.0.0"",
+                                          ""stateHandle"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                          ""expiresAt"": ""2021-12-22T18:06:35.000Z"",
+                                          ""intent"": ""LOGIN"",
+                                          ""remediation"": {
+                                            ""type"": ""array"",
+                                            ""value"": [
+                                              {
+                                                ""rel"": [
+                                                  ""create-form""
+                                                ],
+                                                ""name"": ""challenge-authenticator"",
+                                                ""relatesTo"": [
+                                                  ""$.currentAuthenticator""
+                                                ],
+                                                ""href"": ""https://testorg.com/idp/idx/challenge/answer"",
+                                                ""method"": ""POST"",
+                                                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                                                ""value"": [
+                                                  {
+                                                    ""name"": ""credentials"",
+                                                    ""type"": ""object"",
+                                                    ""form"": {
+                                                      ""value"": [
+                                                        {
+                                                          ""name"": ""authenticatorData"",
+                                                          ""label"": ""Authenticator Data"",
+                                                          ""required"": true,
+                                                          ""visible"": false
+                                                        },
+                                                        {
+                                                          ""name"": ""clientData"",
+                                                          ""label"": ""Client Data"",
+                                                          ""required"": true,
+                                                          ""visible"": false
+                                                        },
+                                                        {
+                                                          ""name"": ""signatureData"",
+                                                          ""label"": ""Signature Data"",
+                                                          ""required"": true,
+                                                          ""visible"": false
+                                                        }
+                                                      ]
+                                                    },
+                                                    ""required"": true
+                                                  },
+                                                  {
+                                                    ""name"": ""stateHandle"",
+                                                    ""required"": true,
+                                                    ""value"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                                    ""visible"": false,
+                                                    ""mutable"": false
+                                                  }
+                                                ],
+                                                ""accepts"": ""application/json; okta-version=1.0.0""
+                                              },
+                                              {
+                                                ""rel"": [
+                                                  ""create-form""
+                                                ],
+                                                ""name"": ""select-authenticator-authenticate"",
+                                                ""href"": ""https://testorg.com/idp/idx/challenge"",
+                                                ""method"": ""POST"",
+                                                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                                                ""value"": [
+                                                  {
+                                                    ""name"": ""authenticator"",
+                                                    ""type"": ""object"",
+                                                    ""options"": [
+                                                      {
+                                                        ""label"": ""Security Key or Biometric"",
+                                                        ""value"": {
+                                                          ""form"": {
+                                                            ""value"": [
+                                                              {
+                                                                ""name"": ""id"",
+                                                                ""required"": true,
+                                                                ""value"": ""aut2xoroxctf7gf5i5d7"",
+                                                                ""mutable"": false
+                                                              },
+                                                              {
+                                                                ""name"": ""methodType"",
+                                                                ""required"": false,
+                                                                ""value"": ""webauthn"",
+                                                                ""mutable"": false
+                                                              }
+                                                            ]
+                                                          }
+                                                        },
+                                                        ""relatesTo"": ""$.authenticators.value[0]""
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    ""name"": ""stateHandle"",
+                                                    ""required"": true,
+                                                    ""value"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                                    ""visible"": false,
+                                                    ""mutable"": false
+                                                  }
+                                                ],
+                                                ""accepts"": ""application/json; okta-version=1.0.0""
+                                              }
+                                            ]
+                                          },
+                                          ""currentAuthenticator"": {
+                                            ""type"": ""object"",
+                                            ""value"": {
+                                              ""contextualData"": {
+                                                ""challengeData"": {
+                                                  ""challenge"": ""VneRVBrd9y352V66ZyztVmfo6oA"",
+                                                  ""userVerification"": ""preferred"",
+                                                  ""extensions"": {
+                                                    ""appid"": ""https://testorg.com""
+                                                  }
+                                                }
+                                              },
+                                              ""type"": ""security_key"",
+                                              ""key"": ""webauthn"",
+                                              ""id"": ""aut2xoroxctf7gf5i5d7"",
+                                              ""displayName"": ""Security Key or Biometric"",
+                                              ""methods"": [
+                                                {
+                                                  ""type"": ""webauthn""
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          ""authenticators"": {
+                                            ""type"": ""array"",
+                                            ""value"": [
+                                              {
+                                                ""type"": ""security_key"",
+                                                ""key"": ""webauthn"",
+                                                ""id"": ""aut2xoroxctf7gf5i5d7"",
+                                                ""displayName"": ""Security Key or Biometric"",
+                                                ""methods"": [
+                                                  {
+                                                    ""type"": ""webauthn""
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          },
+                                          ""authenticatorEnrollments"": {
+                                            ""type"": ""array"",
+                                            ""value"": [
+                                              {
+                                                ""type"": ""security_key"",
+                                                ""key"": ""webauthn"",
+                                                ""id"": ""fwf3eppyt3VYqlQel5d7"",
+                                                ""displayName"": ""Authenticator"",
+                                                ""credentialId"": ""EXnmDuGgj22Wb1-oiv5KizXuhzzDhrqp3mrX_3gdu34"",
+                                                ""methods"": [
+                                                  {
+                                                    ""type"": ""webauthn""
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        }";
+            var challengeWebAuthnResponse = @"{
+                                                  ""version"": ""1.0.0"",
+                                                  ""stateHandle"": ""02s3_8lt_h2VAymqcwHrxZa7xtfuiUS6fHrMQksX3a"",
+                                                  ""expiresAt"": ""2021-12-22T18:02:38.000Z"",
+                                                  ""intent"": ""LOGIN"",
+                                                  ""successWithInteractionCode"": {
+                                                    ""rel"": [
+                                                      ""create-form""
+                                                    ],
+                                                    ""name"": ""issue"",
+                                                    ""href"": ""https://testorg.com/oauth2/aus2xo0xe0oJtPzIS5d7/v1/token"",
+                                                    ""method"": ""POST"",
+                                                    ""value"": [
+                                                      {
+                                                        ""name"": ""grant_type"",
+                                                        ""required"": true,
+                                                        ""value"": ""interaction_code""
+                                                      },
+                                                      {
+                                                        ""name"": ""interaction_code"",
+                                                        ""required"": true,
+                                                        ""value"": ""bar""
+                                                      },
+                                                      {
+                                                        ""name"": ""client_id"",
+                                                        ""required"": true,
+                                                        ""value"": ""foo""
+                                                      },
+                                                      {
+                                                        ""name"": ""client_secret"",
+                                                        ""required"": true
+                                                      },
+                                                      {
+                                                        ""name"": ""code_verifier"",
+                                                        ""required"": true
+                                                      }
+                                                    ],
+                                                    ""accepts"": ""application/x-www-form-urlencoded""
+                                                  }
+                                                }";
+            string tokenResponse = @"{
+                                        ""token_type"": ""Bearer"",
+                                        ""expires_in"": 3600,
+                                        ""access_token"": ""test access token"",
+                                        ""scope"": ""openid profile"",
+                                        ""id_token"": ""test id token""
+                                    }";
+
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = identifyResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = challengeWebAuthnResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = tokenResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var authResponse = await testClient.ChallengeAuthenticatorAsync(
+                                   new ChallengeWebAuthnAuthenticatorOptions
+                                   {
+                                       ClientData = "foo",
+                                       AuthenticatorData = "bar",
+                                       SignatureData = "baz",
+                                   }, Substitute.For<IIdxContext>());
+
+            authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.Success);
+            authResponse.TokenInfo.Should().NotBeNull();
         }
 
         [Fact]

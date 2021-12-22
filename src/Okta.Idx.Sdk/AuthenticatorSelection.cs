@@ -9,10 +9,13 @@ using System.Text;
 
 namespace Okta.Idx.Sdk
 {
+    /// <inheritdoc cref="IAuthenticatorSelection"/>
     public class AuthenticatorSelection : Resource, IAuthenticatorSelection
     {
+        /// <inheritdoc/>
         public bool? RequireResidentKey => GetBooleanProperty("requireResidentKey");
 
+        /// <inheritdoc/>
         public string UserVerification => GetStringProperty("userVerification");
     }
 }

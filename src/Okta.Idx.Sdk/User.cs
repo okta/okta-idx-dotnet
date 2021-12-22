@@ -9,12 +9,16 @@ using System.Text;
 
 namespace Okta.Idx.Sdk
 {
+    /// <inheritdoc cref="IUser"/>
     public class User : Resource, IUser
     {
+        /// <inheritdoc/>
         public string DisplayName => GetStringProperty("displayName");
 
+        /// <inheritdoc/>
         public string Name => GetStringProperty("name");
 
+        /// <inheritdoc/>
         public string Id => GetStringProperty("id");
     }
 }

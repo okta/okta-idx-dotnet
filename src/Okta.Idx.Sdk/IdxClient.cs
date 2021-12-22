@@ -785,7 +785,6 @@ namespace Okta.Idx.Sdk
 
             if (authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.AuthenticatorVerificationData))
             {
-
                 return new AuthenticationResponse
                 {
                     IdxContext = idxContext,
@@ -887,6 +886,7 @@ namespace Okta.Idx.Sdk
             };
         }
 
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> ResendCodeAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
@@ -1106,7 +1106,7 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        public async Task<AuthenticationResponse> ChallengeAuthenticatorAsync(ChallengeWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);

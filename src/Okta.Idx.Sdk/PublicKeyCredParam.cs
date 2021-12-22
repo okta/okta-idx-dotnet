@@ -9,10 +9,13 @@ using System.Text;
 
 namespace Okta.Idx.Sdk
 {
+    /// <inheritdoc cref="IPublicKeyCredParam"/>
     public class PublicKeyCredParam : Resource, IPublicKeyCredParam
     {
+        /// <inheritdoc/>
         public string Alg => GetStringProperty("alg");
 
+        /// <inheritdoc/>
         public string Type => GetStringProperty("type");
     }
 }

@@ -9,10 +9,19 @@ using System.Text;
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// Options to enroll a WebAuthN authenticator.
+    /// </summary>
     public class EnrollWebAuthnAuthenticatorOptions
     {
+        /// <summary>
+        /// Gets or sets the attestation
+        /// </summary>
         public string Attestation { get; set; }
 
+        /// <summary>
+        /// Gets or sets the client data.
+        /// </summary>
         public string ClientData { get; set; }
     }
 }

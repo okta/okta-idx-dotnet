@@ -198,12 +198,13 @@ namespace embedded_auth_with_sdk.Controllers
         [HttpPost]
         public async Task<IAuthenticationResponse> VerifyWebAuthnAuthenticatorAsync(VerifyWebAuthnViewModel viewModel)
         {
-            var authnResponse = await _idxClient.VerifyAuthenticatorAsync(new VerifyWebAuthnAuthenticatorOptions
-            {
-                AuthenticatorData = viewModel.AuthenticatorData,
-                ClientData = viewModel.ClientData,
-                SignatureData = viewModel.SignatureData,
-            }, (IIdxContext)Session["idxContext"]);
+            var authnResponse = await _idxClient.ChallengeAuthenticatorAsync(
+                new ChallengeWebAuthnAuthenticatorOptions
+                {
+                    AuthenticatorData = viewModel.AuthenticatorData,
+                    ClientData = viewModel.ClientData,
+                    SignatureData = viewModel.SignatureData,
+                }, (IIdxContext)Session["idxContext"]);
 
             Session["webAuthnResponse"] = authnResponse;
 

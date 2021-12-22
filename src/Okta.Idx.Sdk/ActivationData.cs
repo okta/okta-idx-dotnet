@@ -9,18 +9,27 @@ using System.Text;
 
 namespace Okta.Idx.Sdk
 {
+    /// <inheritdoc cref="IActivationData"/>
     public class ActivationData : Resource, IActivationData
     {
+        /// <inheritdoc/>
         public string Attestation => GetStringProperty("attestation");
 
+        /// <inheritdoc/>
         public IAuthenticatorSelection AuthenticatorSelection =>
             GetResourceProperty<AuthenticatorSelection>("authenticatorSelection");
 
+        /// <inheritdoc/>
         public string Challenge => GetStringProperty("challenge");
 
+        /// <inheritdoc/>
         public IList<IPublicKeyCredParam> PublicKeyCredParams =>
             GetArrayProperty<IPublicKeyCredParam>("pubKeyCredParams");
 
+        /// <inheritdoc/>
         public IUser User => GetResourceProperty<User>("user");
+
+        /// <inheritdoc/>
+        public IU2fParams U2fParams => GetResourceProperty<U2fParams>("u2fParams");
     }
 }

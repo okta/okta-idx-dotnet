@@ -32,15 +32,15 @@ namespace Okta.Idx.Sdk.Helpers
             return authenticatorOptions;
         }
 
-        internal static IAuthenticator ConvertToAuthenticator(IList<IAuthenticatorValue> authenticators,
+        internal static IAuthenticator ConvertToAuthenticator(
+            IList<IAuthenticatorValue> authenticators,
             IAuthenticatorEnrollment authenticatorEnrollment,
             IList<IAuthenticatorEnrollment> authenticatorEnrollments)
         {
             var credentialId = string.Empty;
 
             // currentAuthenticatorEnrollment not present with webAuthn
-            if (string.Equals(authenticatorEnrollment.Key, AuthenticatorType.WebAuthn.ToString(),
-                StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(authenticatorEnrollment.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 credentialId = authenticatorEnrollments?.FirstOrDefault(x =>
                     string.Equals(x.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase))?.CredentialId;
