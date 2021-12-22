@@ -19,7 +19,7 @@ namespace Okta.Idx.Sdk
         public string Challenge => GetStringProperty("challenge");
 
         public IList<IPublicKeyCredParam> PublicKeyCredParams =>
-            GetArrayProperty<IPublicKeyCredParam>("publicKeyCredParams");
+            GetArrayProperty<IPublicKeyCredParam>("pubKeyCredParams");
 
         public IUser User => GetResourceProperty<User>("user");
     }
