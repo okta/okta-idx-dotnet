@@ -5,19 +5,16 @@ using System.Web;
 
 namespace embedded_auth_with_sdk.Models
 {
-    public class VerifyWebAuthnViewModel : BaseViewModel
+    public class VerifyWebAuthnViewModel
     {
-        public string Attestation { get; set; }
+        public string Challenge { get; set; }
+
+        public string WebAuthnCredentialId { get; set; }
 
         public string ClientData { get; set; }
 
-        public string Challenge { get; set; }
+        public string AuthenticatorData { get; set; }
 
-        public string UserId { get; set; }
-
-        public string Username { get; set; }
-
-        public string DisplayName { get; set; }
-
+        public string SignatureData { get; set; }
     }
 }

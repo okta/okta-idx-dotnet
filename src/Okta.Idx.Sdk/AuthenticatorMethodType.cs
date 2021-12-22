@@ -26,9 +26,14 @@ namespace Okta.Idx.Sdk
         public static AuthenticatorMethodType Email = new AuthenticatorMethodType("email");
 
         /// <summary>
-        /// Voice
+        /// Password
         /// </summary>
         public static AuthenticatorMethodType Password = new AuthenticatorMethodType("password");
+
+        /// <summary>
+        /// WebAuthn
+        /// </summary>
+        public static AuthenticatorMethodType WebAuthn = new AuthenticatorMethodType("webauthn");
 
         /// <summary>
         /// Implicit operator declaration to accept and convert a string value as a <see cref="AuthenticatorMethodType"/>

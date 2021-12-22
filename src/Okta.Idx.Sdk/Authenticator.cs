@@ -27,5 +27,8 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public IAuthenticatorContextualData ContextualData { get; set; }
+
+        /// <inheritdoc/>
+        public string CredentialId { get; set; }
     }
 }

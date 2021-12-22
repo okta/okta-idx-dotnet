@@ -49,8 +49,13 @@ namespace Okta.Idx.Sdk
         IResend Resend { get;  }
 
         /// <summary>
-        /// Gets the authenticator contextual data
+        /// Gets the authenticator contextual data. This is only applicable for Web Authn.
         /// </summary>
         IAuthenticatorContextualData AuthenticatorContextualData { get; }
+
+        /// <summary>
+        /// Gets the credential Id. This is only applicable for Web Authn.
+        /// </summary>
+        string CredentialId { get; }
     }
 }

@@ -3,6 +3,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
@@ -38,8 +39,13 @@ namespace Okta.Idx.Sdk
         IList<AuthenticatorMethodType> MethodTypes { get; set; }
 
         /// <summary>
-        /// Gets or sets the authenticator contextual data
+        /// Gets or sets the authenticator contextual data. This is only applicable for Web Authn authenticators.
         /// </summary>
         IAuthenticatorContextualData ContextualData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the credential Id. This is only applicable for Web Authn authenticators.
+        /// </summary>
+        string CredentialId { get; set; }
     }
 }

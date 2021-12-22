@@ -337,6 +337,7 @@
     <Compile Include="Models\SelectAuthenticatorViewModel.cs" />
     <Compile Include="Models\SelectRecoveryAuthenticatorViewModel.cs" />
     <Compile Include="Models\VerifyAuthenticatorViewModel.cs" />
+    <Compile Include="Models\EnrollWebAuthnViewModel.cs" />
     <Compile Include="Models\VerifyWebAuthnViewModel.cs" />
     <Compile Include="Models\ViewModelHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -354,6 +355,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
+    <Content Include="Scripts\idx-utils.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
@@ -395,6 +397,7 @@
     <Content Include="Views\Shared\Idps.cshtml" />
     <Content Include="Views\InteractionCode\Error.cshtml" />
     <Content Include="Views\Manage\VerifyWebAuthnAuthenticator.cshtml" />
+    <Content Include="Views\Manage\EnrollWebAuthnAuthenticator.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

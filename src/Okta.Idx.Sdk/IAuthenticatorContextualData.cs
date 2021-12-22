@@ -16,5 +16,10 @@ namespace Okta.Idx.Sdk
         /// Gets the activation data.
         /// </summary>
         IActivationData ActivationData { get; }
+
+        /// <summary>
+        /// Gets the challenge data.
+        /// </summary>
+        IChallengeData ChallengeData { get; }
     }
 }

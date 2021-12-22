@@ -107,6 +107,49 @@ namespace embedded_auth_with_sdk.Controllers
                 switch (authnResponse?.AuthenticationStatus)
                 {
                     case AuthenticationStatus.Success:
+                        ClaimsIdentity identity =
+                            await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration,
+                                authnResponse.TokenInfo);
+                        _authenticationManager.SignIn(identity);
+                        return RedirectToAction("Index", "Home");
+
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["isChallengeFlow"] = false;
+                        Session["authenticators"] =
+                            ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        TempData["canSkip"] = authnResponse.CanSkip;
+                        return RedirectToAction("SelectAuthenticator", "Manage");
+
+                    default:
+                        return RedirectToAction("Index", "Home");
+                }
+            }
+            else
+            {
+                var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
+
+                var viewModel = new VerifyWebAuthnViewModel
+                {
+                    WebAuthnCredentialId = currentAuthenticator.CredentialId,
+                    Challenge = currentAuthenticator.ContextualData.ChallengeData.Challenge,
+                };
+
+                return View(viewModel);
+            }
+        }
+
+        public async Task<ActionResult> EnrollWebAuthnAuthenticator()
+        {
+            var isVerificationCompleted = false;
+            Boolean.TryParse(Request.Params["verificationCompleted"], out isVerificationCompleted);
+
+            if (isVerificationCompleted)
+            {
+                var authnResponse = (IAuthenticationResponse)Session["webAuthnResponse"];
+
+                switch (authnResponse?.AuthenticationStatus)
+                {
+                    case AuthenticationStatus.Success:
                         ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
                         _authenticationManager.SignIn(identity);
                         return RedirectToAction("Index", "Home");
@@ -125,7 +168,7 @@ namespace embedded_auth_with_sdk.Controllers
             {
                 var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
 
-                var viewModel = new VerifyWebAuthnViewModel
+                var viewModel = new EnrollWebAuthnViewModel
                 {
                     DisplayName = currentAuthenticator.Name,
                     UserId = currentAuthenticator.ContextualData.ActivationData.User.Id,
@@ -138,19 +181,34 @@ namespace embedded_auth_with_sdk.Controllers
         }
 
         [HttpPost]
-        public async Task<IAuthenticationResponse> VerifyWebAuthnAuthenticatorAsync(VerifyWebAuthnViewModel viewModel)
+        public async Task<IAuthenticationResponse> EnrollWebAuthnAuthenticatorAsync(EnrollWebAuthnViewModel viewModel)
         {
-            var authnResponse = await _idxClient.EnrollAuthenticatorAsync(new EnrollWebAuthnAuthenticatorOptions
-            {
-                Attestation = viewModel.Attestation,
-                ClientData = viewModel.ClientData,
-            }, (IIdxContext)Session["idxContext"]);
+            var authnResponse = await _idxClient.EnrollAuthenticatorAsync(
+                new EnrollWebAuthnAuthenticatorOptions
+                {
+                    Attestation = viewModel.Attestation,
+                    ClientData = viewModel.ClientData,
+                }, (IIdxContext)Session["idxContext"]);
 
             Session["webAuthnResponse"] = authnResponse;
 
             return authnResponse;
         }
 
+        [HttpPost]
+        public async Task<IAuthenticationResponse> VerifyWebAuthnAuthenticatorAsync(VerifyWebAuthnViewModel viewModel)
+        {
+            var authnResponse = await _idxClient.VerifyAuthenticatorAsync(new VerifyWebAuthnAuthenticatorOptions
+            {
+                AuthenticatorData = viewModel.AuthenticatorData,
+                ClientData = viewModel.ClientData,
+                SignatureData = viewModel.SignatureData,
+            }, (IIdxContext)Session["idxContext"]);
+
+            Session["webAuthnResponse"] = authnResponse;
+
+            return authnResponse;
+        }
 
         private async Task<ActionResult> VerifyAuthenticatorAsync(string code, string view, BaseViewModel model)
         {
@@ -425,7 +483,15 @@ namespace embedded_auth_with_sdk.Controllers
                             };
                             return View("SelectPhoneChallengeMethod", methodViewModel);
                         case AuthenticationStatus.AwaitingAuthenticatorVerification:
-                            return RedirectToAction("VerifyAuthenticator", "Manage");
+                            var action = (model.IsWebAuthnSelected)
+                                ? "VerifyWebAuthnAuthenticator"
+                                : "VerifyAuthenticator";
+                            if (model.IsWebAuthnSelected)
+                            {
+                                Session["currentWebAuthnAuthenticator"] =
+                                    selectAuthenticatorResponse.CurrentAuthenticatorEnrollment;
+                            }
+                            return RedirectToAction(action, "Manage");
                         default:
                             return View("SelectAuthenticator", model);
                     }
@@ -452,7 +518,7 @@ namespace embedded_auth_with_sdk.Controllers
                             else if (model.IsWebAuthnSelected)
                             {
                                 Session["currentWebAuthnAuthenticator"] = enrollResponse.CurrentAuthenticator;
-                                return RedirectToAction("VerifyWebAuthnAuthenticator", "Manage");
+                                return RedirectToAction("EnrollWebAuthnAuthenticator", "Manage");
                             }
 
                             return RedirectToAction("VerifyAuthenticator", "Manage"); 

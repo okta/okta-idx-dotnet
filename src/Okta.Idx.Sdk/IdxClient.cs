@@ -778,13 +778,19 @@ namespace Okta.Idx.Sdk
                 idxRequestPayload,
                 cancellationToken);
 
+            // WebAuthN enrollment data is available in authenticatorSelectionResponse.CurrentAuthenticator instead of authenticatorSelectionResponse.CurrentAuthenticatorEnrollment unlike other authenticators
+            var currentAuthenticatorEnrollment =
+                authenticatorSelectionResponse.CurrentAuthenticatorEnrollment?.Value ??
+                authenticatorSelectionResponse.CurrentAuthenticator?.Value;
+
             if (authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.AuthenticatorVerificationData))
             {
+
                 return new AuthenticationResponse
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorData,
-                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, authenticatorSelectionResponse.CurrentAuthenticatorEnrollment.Value),
+                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, currentAuthenticatorEnrollment, authenticatorSelectionResponse.AuthenticatorEnrollments.Value),
                 };
             }
             else //(authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
@@ -793,7 +799,7 @@ namespace Okta.Idx.Sdk
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
-                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, authenticatorSelectionResponse.CurrentAuthenticatorEnrollment.Value),
+                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, currentAuthenticatorEnrollment, authenticatorSelectionResponse.AuthenticatorEnrollments?.Value),
                 };
             }
         }
@@ -904,7 +910,7 @@ namespace Okta.Idx.Sdk
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
                     IdxContext = idxContext,
-                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(resendResponse.Authenticators.Value, resendResponse.CurrentAuthenticatorEnrollment.Value),
+                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(resendResponse.Authenticators.Value, resendResponse.CurrentAuthenticatorEnrollment.Value, resendResponse.AuthenticatorEnrollments.Value),
                 };
             }
             else if (introspectResponse?.CurrentAuthenticator != null
@@ -921,7 +927,7 @@ namespace Okta.Idx.Sdk
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
-                    CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(resendResponse.Authenticators.Value, resendResponse.CurrentAuthenticator.Value),
+                    CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(resendResponse.Authenticators.Value, resendResponse.CurrentAuthenticator.Value, resendResponse.AuthenticatorEnrollments.Value),
                 };
             }
             else
@@ -1321,7 +1327,7 @@ namespace Okta.Idx.Sdk
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = status,
-                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value),
+                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value, selectAuthenticatorResponse.AuthenticatorEnrollments.Value),
             };
         }
 

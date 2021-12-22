@@ -14,5 +14,8 @@ namespace Okta.Idx.Sdk
     {
         /// <inheritdoc />
         public IActivationData ActivationData => GetResourceProperty<ActivationData>("activationData");
+
+        /// <inheritdoc />
+        public IChallengeData ChallengeData => GetResourceProperty<ChallengeData>("challengeData");
     }
 }
