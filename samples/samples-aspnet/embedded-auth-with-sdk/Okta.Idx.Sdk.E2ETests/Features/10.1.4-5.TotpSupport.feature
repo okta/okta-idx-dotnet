@@ -27,8 +27,8 @@
     And She selects Verify
     Then she sees the list of optional factors
     When She selects Email from the list
-	Then she sees a page to input a code
-	When she inputs the correct code from her email
+    Then she sees a page to input a code
+    When she inputs the correct code from her email
     Then she sees the list of optional factors
     When she selects Skip
     Then she is redirected to the Root View
