@@ -5,12 +5,11 @@
     And a user named "Mary"
     And Mary does not have an account in the org
 
-  Scenario: 10.1.4: Mary signs up for an account with Password, setups up required Google AuThenticator by scanning a QR Code
+  Scenario: 10.1.4: Mary signs up for an account with Password, setups up required Google Authenticator by scanning a QR Code
     Given Mary navigates to the Self Service Registration View
     When she fills out her First Name
     And she fills out her Last Name
     And she fills out her Email
-#    And she fills out her Age
     And she submits the registration form
     Then she sees the Select Authenticator page with password as the only option
     When she chooses password factor option
@@ -26,25 +25,22 @@
     Then the screen changes to receive an input for a TOTP code
     When She inputs the correct code from her Google Authenticator App
     And She selects Verify
-#
     Then she sees the list of optional factors
     When She selects Email from the list
 	Then she sees a page to input a code
 	When she inputs the correct code from her email
     Then she sees the list of optional factors
     When she selects Skip
-#
     Then she is redirected to the Root View
     And she sees a table with her profile info
     And the cell for the value of email is shown and contains her email
     And the cell for the value of name is shown and contains her first name and last name
 
-  Scenario: 10.1.5: Mary signs up for an account with Password, setups up required Google AuThenticator by entering a shared secret
+  Scenario: 10.1.5: Mary signs up for an account with Password, setups up required Google Authenticator by entering a shared secret
     Given Mary navigates to the Self Service Registration View
     When she fills out her First Name
     And she fills out her Last Name
     And she fills out her Email
-#    And she fills out her Age
     And she submits the registration form
     Then she sees the Select Authenticator page with password as the only option
     When she chooses password factor option
@@ -60,14 +56,12 @@
     Then the screen changes to receive an input for a TOTP code
     When She inputs the correct code from her Google Authenticator App
     And She selects Verify
-#
     Then she sees the list of optional factors
     When She selects Email from the list
-	Then she sees a page to input a code
-	When she inputs the correct code from her email
+    Then she sees a page to input a code
+    When she inputs the correct code from her email
     Then she sees the list of optional factors
     When she selects Skip
-#
     Then she is redirected to the Root View
     And she sees a table with her profile info
     And the cell for the value of email is shown and contains her email

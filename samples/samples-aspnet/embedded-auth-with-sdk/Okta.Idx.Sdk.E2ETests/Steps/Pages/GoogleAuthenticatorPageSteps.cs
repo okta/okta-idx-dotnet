@@ -4,12 +4,12 @@ using TechTalk.SpecFlow;
 namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
 {
     [Binding]
-    public class GoogleAuthenticator : BaseTestSteps
+    public class GoogleAuthenticatorPageSteps : BaseTestSteps
     {
         private GoogleAuthenticatorPage _googleAuthenticatorPageModel;
         private GoogleAuthenticatorAsyncPage _googleAuthenticatorAsyncPageModel;
 
-        public GoogleAuthenticator(ITestContext context,
+        public GoogleAuthenticatorPageSteps(ITestContext context,
                 GoogleAuthenticatorPage googleAuthenticatorPageModel,
                 GoogleAuthenticatorAsyncPage googleAuthenticatorAsyncPageModel)
                 : base(context)

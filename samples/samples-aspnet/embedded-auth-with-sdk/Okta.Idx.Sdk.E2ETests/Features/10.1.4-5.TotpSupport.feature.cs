@@ -101,7 +101,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
         [Xunit.TraitAttribute("FeatureTitle", "10.1: TOTP Support (Google Authenticator) part 2")]
         [Xunit.TraitAttribute("Description", "10.1.4: Mary signs up for an account with Password, setups up required Google AuT" +
             "henticator by scanning a QR Code")]
-        public virtual void _10_1_4MarySignsUpForAnAccountWithPasswordSetupsUpRequiredGoogleAuThenticatorByScanningAQRCode()
+        public virtual void _10_1_4MarySignsUpForAnAccountWithPasswordSetupsUpRequiredGoogleAuthenticatorByScanningAQRCode()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
@@ -227,7 +227,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
         [Xunit.TraitAttribute("FeatureTitle", "10.1: TOTP Support (Google Authenticator) part 2")]
         [Xunit.TraitAttribute("Description", "10.1.5: Mary signs up for an account with Password, setups up required Google AuT" +
             "henticator by entering a shared secret")]
-        public virtual void _10_1_5MarySignsUpForAnAccountWithPasswordSetupsUpRequiredGoogleAuThenticatorByEnteringASharedSecret()
+        public virtual void _10_1_5MarySignsUpForAnAccountWithPasswordSetupsUpRequiredGoogleAuthenticatorByEnteringASharedSecret()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
