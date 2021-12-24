@@ -11,6 +11,5 @@ namespace embedded_auth_with_sdk.Models
         [Required]
         [Display(Name = "Passcode")]
         public string Code { get; set; }
-
     }
 }

@@ -25,7 +25,7 @@
 	Then she sees a page to input a code
 	When she inputs the correct code from her email
 	Then she sees the list of optional factors (SMS)
-	When she selects "Skip" on SMS
+	When she selects Skip
 	Then she is redirected to the Root View
     And an application session is created
 

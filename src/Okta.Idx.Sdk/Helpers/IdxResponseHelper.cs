@@ -24,6 +24,8 @@ namespace Okta.Idx.Sdk.Helpers
                     MethodTypes = authenticator.Methods?.Select(x => x.Type).ToList(),
                     EnrollmentId = enrollment?.Id,
                     Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
+                    SharedSecret = enrollment?.ContextualData?.SharedSecret,
+                    QrCode = enrollment?.ContextualData?.QrCode,
                 });
             }
 
@@ -38,6 +40,8 @@ namespace Okta.Idx.Sdk.Helpers
             MethodTypes = authenticatorEnrollment.Methods?.Select(x => x.Type).ToList(),
             EnrollmentId = authenticatorEnrollment.Id,
             Profile = GetAuthenticatorProfile(authenticatorEnrollment),
+            SharedSecret = authenticatorEnrollment.ContextualData?.SharedSecret,
+            QrCode = authenticatorEnrollment.ContextualData?.QrCode,
         };
 
         internal static string GetAuthenticatorProfile(IAuthenticatorEnrollment authenticatorEnrollment)
