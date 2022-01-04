@@ -13,7 +13,7 @@ namespace embedded_auth_with_sdk.Models
         [Display(Name = "Username")]
         public string UserName { get; set; }
 
-        //[Required]
+        [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
