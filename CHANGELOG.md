@@ -1,6 +1,12 @@
 # Changelog
 
 
+## vNext
+
+### Features
+
+* Add support for Google Authenticator TOTP.
+
 ## 1.0.1
 
 ### Updates

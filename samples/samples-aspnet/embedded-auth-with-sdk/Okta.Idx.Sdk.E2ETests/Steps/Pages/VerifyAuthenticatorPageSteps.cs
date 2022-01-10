@@ -45,6 +45,13 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
             _verifyAuthenticatorPageModel.SubmitButton.Click();
         }
 
+        [When(@"She inputs the correct code from the Google Authenticator")]
+        public void WhenSheInputsTheCorrectCodeFromHerGoogleAuthenticatorApp()
+        {
+            var code = _context.GetTOTP();
+            _verifyAuthenticatorPageModel.PasscodeInput.SendKeys(code);
+        }
+
         [Then(@"she sees a page to input a code")]
         [Then(@"the screen changes to receive an input for a code")]
         public void ThenSheSeesAPageToInputACode()

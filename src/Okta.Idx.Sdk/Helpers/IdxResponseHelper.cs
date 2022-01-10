@@ -26,6 +26,9 @@ namespace Okta.Idx.Sdk.Helpers
                     EnrollmentId = enrollment?.Id,
                     Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
                     CredentialId = string.Equals(authenticator.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase) ? enrollment?.CredentialId : null,
+                    // TODO: Andrii do we need this or should be part of ContextualData?
+                    //SharedSecret = enrollment?.ContextualData?.SharedSecret,
+                    //QrCode = enrollment?.ContextualData?.QrCode,
                 });
             }
 
@@ -55,6 +58,9 @@ namespace Okta.Idx.Sdk.Helpers
                 Profile = (authenticatorEnrollment != null) ? GetAuthenticatorProfile(authenticatorEnrollment) : string.Empty,
                 ContextualData = authenticatorEnrollment?.AuthenticatorContextualData,
                 CredentialId = credentialId,
+                // TODO: ANdrii Do we need this or is it covered by ContextualData?
+                //SharedSecret = authenticatorEnrollment.ContextualData?.SharedSecret,
+                //QrCode = authenticatorEnrollment.ContextualData?.QrCode,
             };
         }
 

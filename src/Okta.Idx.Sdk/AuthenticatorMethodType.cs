@@ -31,6 +31,11 @@ namespace Okta.Idx.Sdk
         public static AuthenticatorMethodType Password = new AuthenticatorMethodType("password");
 
         /// <summary>
+        /// OTP
+        /// </summary>
+        public static AuthenticatorMethodType Otp = new AuthenticatorMethodType("otp");
+
+        /// <summary>
         /// WebAuthn
         /// </summary>
         public static AuthenticatorMethodType WebAuthn = new AuthenticatorMethodType("webauthn");

@@ -30,5 +30,11 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public string CredentialId { get; set; }
+        // TODO: DO we need this or are these props part of conextualData?
+        /// <inheritdoc/>
+        public IQrCode QrCode { get; set; }
+
+        /// <inheritdoc/>
+        public string SharedSecret { get; set; }
     }
 }

@@ -5545,6 +5545,481 @@ namespace Okta.Idx.Sdk.UnitTests
 
         }
 
+
+        [Fact]
+        public async Task SelectGoogleAuthenticatorAsSecondFactor()
+        {
+            var identifyResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02IlXiHkcgtacn3hIkIEVlW5PIHLu5l384952R6F9e"",
+    ""expiresAt"": ""2021-12-07T12:22:06.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [{
+                ""rel"": [""create-form""],
+                ""name"": ""select-authenticator-enroll"",
+                ""href"": ""https://super-idx.okta.com/idp/idx/credential/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [{
+                        ""name"": ""authenticator"",
+                        ""type"": ""object"",
+                        ""options"": [{
+                                ""label"": ""Email"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [{
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""auttzfsi3IuMuCpwD5d6"",
+                                                ""mutable"": false
+                                            }, {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""email"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[0]""
+                            }, {
+                                ""label"": ""Google Authenticator"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [{
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut1i38ba5xfcX4cH5d7"",
+                                                ""mutable"": false
+                                            }, {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""otp"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[1]""
+                            }, {
+                                ""label"": ""Phone"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [{
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""auttzfsi4eiZIdLK85d6"",
+                                                ""mutable"": false
+                                            }, {
+                                                ""name"": ""methodType"",
+                                                ""type"": ""string"",
+                                                ""required"": false,
+                                                ""options"": [{
+                                                        ""label"": ""SMS"",
+                                                        ""value"": ""sms""
+                                                    }
+                                                ]
+                                            }, {
+                                                ""name"": ""phoneNumber"",
+                                                ""label"": ""Phone number"",
+                                                ""required"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[2]""
+                            }
+                        ]
+                    }, {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02IlXiHkcgtacn3hIkIEVlW5PIHLu5l384952R6F9e"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }, {
+                ""rel"": [""create-form""],
+                ""name"": ""skip"",
+                ""href"": ""https://super-idx.okta.com/idp/idx/skip"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [{
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02IlXiHkcgtacn3hIkIEVlW5PIHLu5l384952R6F9e"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""authenticators"": {
+        ""type"": ""array"",
+        ""value"": [{
+                ""type"": ""email"",
+                ""key"": ""okta_email"",
+                ""id"": ""auttzfsi3IuMuCpwD5d6"",
+                ""displayName"": ""Email"",
+                ""methods"": [{
+                        ""type"": ""email""
+                    }
+                ]
+            }, {
+                ""type"": ""app"",
+                ""key"": ""google_otp"",
+                ""id"": ""aut1i38ba5xfcX4cH5d7"",
+                ""displayName"": ""Google Authenticator"",
+                ""methods"": [{
+                        ""type"": ""otp""
+                    }
+                ]
+            }, {
+                ""type"": ""phone"",
+                ""key"": ""phone_number"",
+                ""id"": ""auttzfsi4eiZIdLK85d6"",
+                ""displayName"": ""Phone"",
+                ""methods"": [{
+                        ""type"": ""sms""
+                    }
+                ]
+            }
+        ]
+    },
+    ""authenticatorEnrollments"": {
+        ""type"": ""array"",
+        ""value"": [{
+                ""type"": ""password"",
+                ""key"": ""okta_password"",
+                ""id"": ""lae93xvunvfTAeUQZ5d6"",
+                ""displayName"": ""Password"",
+                ""methods"": [{
+                        ""type"": ""password""
+                    }
+                ]
+            }
+        ]
+    },
+    ""user"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""id"": ""00u2zf16p1pxeHZpY5d7"",
+            ""identifier"": ""a@bb.ce"",
+            ""profile"": {
+                ""firstName"": ""first"",
+                ""lastName"": ""last"",
+                ""timeZone"": ""America/Los_Angeles"",
+                ""locale"": ""en_US""
+            }
+        }
+    },
+    ""cancel"": {
+        ""rel"": [""create-form""],
+        ""name"": ""cancel"",
+        ""href"": ""https://dotnet-idx-sdk.okta.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [{
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02IlXiHkcgtacn3hIkIEVlW5PIHLu5l384952R6F9e"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Dotnet IDX Web App"",
+            ""id"": ""0oatzfskmLm4faAaQ5d6""
+        }
+    }
+}";
+            var selectGAResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02IlXiHkcgtacn3hIkIEVlW5PIHLu5l384952R6F9e"",
+    ""expiresAt"": ""2021-12-07T12:22:14.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [{
+                ""rel"": [""create-form""],
+                ""name"": ""enroll-authenticator"",
+                ""relatesTo"": [""$.currentAuthenticator""],
+                ""href"": ""https://super-idx.okta.com/idp/idx/challenge/answer"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [{
+                        ""name"": ""credentials"",
+                        ""type"": ""object"",
+                        ""form"": {
+                            ""value"": [{
+                                    ""name"": ""passcode"",
+                                    ""label"": ""Enter code"",
+                                    ""required"": true
+                                }
+                            ]
+                        },
+                        ""required"": true
+                    }, {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02IlXiHkcgtacn3hIkIEVlW5PIHLu5l384952R6F9e"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }, {
+                ""rel"": [""create-form""],
+                ""name"": ""select-authenticator-enroll"",
+                ""href"": ""https://super-idx.okta.com/idp/idx/credential/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [{
+                        ""name"": ""authenticator"",
+                        ""type"": ""object"",
+                        ""options"": [{
+                                ""label"": ""Email"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [{
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""auttzfsi3IuMuCpwD5d6"",
+                                                ""mutable"": false
+                                            }, {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""email"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[0]""
+                            }, {
+                                ""label"": ""Google Authenticator"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [{
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut1i38ba5xfcX4cH5d7"",
+                                                ""mutable"": false
+                                            }, {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""otp"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[1]""
+                            }, {
+                                ""label"": ""Phone"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [{
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""auttzfsi4eiZIdLK85d6"",
+                                                ""mutable"": false
+                                            }, {
+                                                ""name"": ""methodType"",
+                                                ""type"": ""string"",
+                                                ""required"": false,
+                                                ""options"": [{
+                                                        ""label"": ""SMS"",
+                                                        ""value"": ""sms""
+                                                    }
+                                                ]
+                                            }, {
+                                                ""name"": ""phoneNumber"",
+                                                ""label"": ""Phone number"",
+                                                ""required"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[2]""
+                            }
+                        ]
+                    }, {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02IlXiHkcgtacn3hIkIEVlW5PIHLu5l384952R6F9e"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }, {
+                ""rel"": [""create-form""],
+                ""name"": ""skip"",
+                ""href"": ""https://super-idx.okta.com/idp/idx/skip"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [{
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02IlXiHkcgtacn3hIkIEVlW5PIHLu5l384952R6F9e"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""currentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""contextualData"": {
+                ""qrcode"": {
+                    ""method"": ""embedded"",
+                    ""href"": ""data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWggg=="",
+                    ""type"": ""image/png""
+                },
+                ""sharedSecret"": ""KAUWFBHWMDFO75AG""
+            },
+            ""type"": ""app"",
+            ""key"": ""google_otp"",
+            ""id"": ""aut1i38ba5xfcX4cH5d7"",
+            ""displayName"": ""Google Authenticator"",
+            ""methods"": [{
+                    ""type"": ""otp""
+                }
+            ]
+        }
+    },
+    ""authenticators"": {
+        ""type"": ""array"",
+        ""value"": [{
+                ""type"": ""email"",
+                ""key"": ""okta_email"",
+                ""id"": ""auttzfsi3IuMuCpwD5d6"",
+                ""displayName"": ""Email"",
+                ""methods"": [{
+                        ""type"": ""email""
+                    }
+                ]
+            }, {
+                ""type"": ""app"",
+                ""key"": ""google_otp"",
+                ""id"": ""aut1i38ba5xfcX4cH5d7"",
+                ""displayName"": ""Google Authenticator"",
+                ""methods"": [{
+                        ""type"": ""otp""
+                    }
+                ]
+            }, {
+                ""type"": ""phone"",
+                ""key"": ""phone_number"",
+                ""id"": ""auttzfsi4eiZIdLK85d6"",
+                ""displayName"": ""Phone"",
+                ""methods"": [{
+                        ""type"": ""sms""
+                    }
+                ]
+            }
+        ]
+    },
+    ""authenticatorEnrollments"": {
+        ""type"": ""array"",
+        ""value"": [{
+                ""type"": ""password"",
+                ""key"": ""okta_password"",
+                ""id"": ""lae93xvunvfTAeUQZ5d6"",
+                ""displayName"": ""Password"",
+                ""methods"": [{
+                        ""type"": ""password""
+                    }
+                ]
+            }
+        ]
+    },
+    ""enrollmentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""type"": ""app"",
+            ""key"": ""google_otp"",
+            ""id"": ""aut1i38ba5xfcX4cH5d7"",
+            ""displayName"": ""Google Authenticator"",
+            ""methods"": [{
+                    ""type"": ""otp""
+                }
+            ]
+        }
+    },
+    ""user"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""id"": ""00u2zf16p1pxeHZpY5d7"",
+            ""identifier"": ""a@bb.ce"",
+            ""profile"": {
+                ""firstName"": ""first"",
+                ""lastName"": ""last"",
+                ""timeZone"": ""America/Los_Angeles"",
+                ""locale"": ""en_US""
+            }
+        }
+    },
+    ""cancel"": {
+        ""rel"": [""create-form""],
+        ""name"": ""cancel"",
+        ""href"": ""https://super-idx.okta.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [{
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02IlXiHkcgtacn3hIkIEVlW5PIHLu5l384952R6F9e"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Dotnet IDX Web App"",
+            ""id"": ""0oatzfskmLm4faAaQ5d6""
+        }
+    }
+}";
+            
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = identifyResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = selectGAResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var authResponse = await testClient.SelectEnrollAuthenticatorAsync(
+                                   new SelectEnrollAuthenticatorOptions
+                                   {
+                                       AuthenticatorId = "aut1i38ba5xfcX4cH5d7"
+                                   }, Substitute.For<IIdxContext>());
+
+            authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingAuthenticatorVerification);
+            authResponse.CurrentAuthenticator.Id.Should().Be("aut1i38ba5xfcX4cH5d7");
+            authResponse.CurrentAuthenticator.QrCode.Should().NotBeNull();
+            authResponse.CurrentAuthenticator.QrCode.Href.Should().NotBeNull();
+            authResponse.CurrentAuthenticator.SharedSecret.Should().Be("KAUWFBHWMDFO75AG");
+        }
+
         [Fact]
         public async Task VerifyEmailAsSecondFactor()
         {
@@ -14449,6 +14924,7 @@ namespace Okta.Idx.Sdk.UnitTests
 
             Assert.Equal(AuthenticationStatus.AwaitingAuthenticatorEnrollmentData, enrollResponse.AuthenticationStatus);
         }
+
 
         [Fact]
         public async Task ThrowForInvalidEmailRegistration()

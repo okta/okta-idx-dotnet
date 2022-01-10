@@ -47,5 +47,17 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the credential Id. This is only applicable for Web Authn authenticators.
         /// </summary>
         string CredentialId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the QrCode.
+        /// This is applicable to TOTP authenticators such as Google Authenticator.
+        /// </summary>
+        IQrCode QrCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Shared Secret.
+        /// This is the value encoded into the QrCode and can be used to compute a TOTP.
+        /// </summary>
+        string SharedSecret { get; set; }
     }
 }

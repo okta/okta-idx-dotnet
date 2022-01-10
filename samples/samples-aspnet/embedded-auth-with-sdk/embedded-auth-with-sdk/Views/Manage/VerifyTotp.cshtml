@@ -1,6 +1,6 @@
 ﻿@model embedded_auth_with_sdk.Models.VerifyAuthenticatorViewModel
 @{
-    ViewBag.Title = ViewBag.Title ?? "Verify your authenticator.";
+    ViewBag.Title = ViewBag.Title ?? "Verify TOTP.";
 }
 
 <hr />
@@ -8,7 +8,7 @@
 <div class="row d-center">
     <div class="col-md-8">
         <section id="forgotPasswordForm">
-            @using (Html.BeginForm("VerifyAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            @using (Html.BeginForm("VerifyTotpAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
                 <h4>Verify authenticator.</h4>
@@ -30,17 +30,6 @@
                 <div class="form-group">
                     <div class="col-md-10">
                         <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide"  id="submitBtn" />
-                    </div>
-                </div>
-            }
-        </section>
-        <section id="resendCodeForm">
-@using (Html.BeginForm("ResendAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-            {
-                @Html.AntiForgeryToken()
-                <div class="form-group">
-                    <div class="col-md-10">
-                        <input type="submit" value="Resend Code" class="btn btn-primary btn-stretch-wide" id="resendCodeBtn" />
                     </div>
                 </div>
             }

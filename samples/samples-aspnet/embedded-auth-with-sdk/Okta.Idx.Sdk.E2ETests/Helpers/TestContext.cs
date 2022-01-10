@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using embedded_auth_with_sdk.E2ETests.Drivers;
 using Okta.Sdk;
 using Okta.Sdk.Configuration;
 using OpenQA.Selenium;
+using OtpNet;
+using ZXing;
 
 namespace embedded_auth_with_sdk.E2ETests.Helpers
 {
@@ -20,6 +24,8 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         private const int OneAttemptTime = 30; // seconds
         private const string DefaultScreenshotFolder = "./screenshots";
         private bool _keepOktaUser = false;
+        private string _lastPassCode;
+        private string _totpSharedSecret;
         private Func<Task> OnDispose { get; set; } = () => Task.CompletedTask;
 
         private readonly string[] messageCodeMarkers = new[]
@@ -30,6 +36,15 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
         };
 
         public UserProfile UserProfile { get; private set; }
+        public string TotpSharedSecret
+        {
+            get => _totpSharedSecret;
+            set
+            {
+                _lastPassCode = string.Empty;
+                _totpSharedSecret = value;
+            }
+        }
 
         public TestContext(ITestConfiguration configuration, IA18nClientHelper ia18nHelper, IOktaSdkHelper oktaHelper, WebDriverDriver webDriver)
         {
@@ -46,6 +61,23 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             var a18nprofile = _ia18nHelper.GetDefaultProfile();
             var oktaUser = await _oktaHelper.CreateActiveUser(a18nprofile.EmailAddress, a18nprofile.PhoneNumber, firstName, _passwordToUse);
             
+            UserProfile = new UserProfile()
+            {
+                FirstName = firstName,
+                LastName = "Lastname",
+                Email = oktaUser.Profile.Email,
+                PhoneNumber = oktaUser.Profile.PrimaryPhone,
+                Password = _passwordToUse,
+            };
+        }
+
+        public async Task SetActiveUserRequiresTotpAsync(string firstName)
+        {
+            await CleanUpAsync();
+            var a18nprofile = _ia18nHelper.GetDefaultProfile();
+            var oktaUser = await _oktaHelper.CreateActiveUser(a18nprofile.EmailAddress, a18nprofile.PhoneNumber, firstName, _passwordToUse);
+            await _oktaHelper.AddUserToGroup(oktaUser, "TOTP required");
+
             UserProfile = new UserProfile()
             {
                 FirstName = firstName,
@@ -203,6 +235,68 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             _keepOktaUser = true;
         }
 
+        public string GetTOTP()
+        {
+            var totp = new Totp(Base32Encoding.ToBytes(TotpSharedSecret));
+            var counter = 0;
+            while (true)
+            {
+                var theCode = totp.ComputeTotp();
+                if (!theCode.Equals(_lastPassCode))
+                {
+                    _lastPassCode = theCode;
+                    return theCode;
+                }
+                else
+                {
+                    if (++counter > 10)
+                    {
+                        throw new Exception("Can't generate a new unique PassCode.");
+                    }
+                }
+                System.Threading.Thread.Sleep(3000);
+            }
+        }
+
+        public void GetGoogleSharedSecretFromQrCodeImage(string base64Image)
+        {
+            Result qrCodeContents = QrDecode(base64Image);
+
+            var segments = qrCodeContents.Text.Split(new[] { '&', '?' });
+            TotpSharedSecret = segments.FirstOrDefault(x => x.StartsWith("secret="))?.Split("=").LastOrDefault();
+        }
+
+        public async Task EnrollGoogleAuthenticator()
+        {
+            await _oktaHelper.AddGoogleAuthenticator(UserProfile.Email,
+                                                    (sharedSecret) =>
+                                                            {
+                                                                TotpSharedSecret = sharedSecret;
+                                                                return GetTOTP();
+                                                            });
+        }
+
+        private static Result QrDecode(string base64Image)
+        {
+            var barcodeBitmap = GetBitmapFromBase64(base64Image);
+
+            IBarcodeReader reader = new BarcodeReader();
+            var qrCodeContents = reader.Decode(new BitmapLuminanceSource(barcodeBitmap));
+            return qrCodeContents;
+        }
+
+        private static Bitmap GetBitmapFromBase64(string qrcodeContents)
+        {
+            var rawBase64 = qrcodeContents.Split("base64,").Last();
+            byte[] bitmapData = Convert.FromBase64String(rawBase64);
+
+            using var streamBitmap = new MemoryStream(bitmapData);
+#pragma warning disable CA1416 // Validate platform compatibility
+            var img = Image.FromStream(streamBitmap);
+            return new Bitmap(img);
+#pragma warning restore CA1416 // Validate platform compatibility
+        }
+
         public void Dispose()
         {
             Dispose(true);
@@ -285,5 +379,6 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             _ia18nHelper.CleanUpProfile();
             await CleanUpOktaUserAsync(oktaSdkHelper);
         }
+
     }
 }
