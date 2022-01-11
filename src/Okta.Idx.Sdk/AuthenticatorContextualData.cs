@@ -3,10 +3,6 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Okta.Idx.Sdk
 {
     /// <inheritdoc cref="IAuthenticatorContextualData"/>
@@ -17,5 +13,11 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc />
         public IChallengeData ChallengeData => GetResourceProperty<ChallengeData>("challengeData");
+
+        /// <inheritdoc/>
+        public IQrCode QrCode => GetResourceProperty<QrCode>("qrcode");
+
+        /// <inheritdoc/>
+        public string SharedSecret => GetStringProperty("sharedSecret");
     }
 }

@@ -21,5 +21,17 @@ namespace Okta.Idx.Sdk
         /// Gets the challenge data.
         /// </summary>
         IChallengeData ChallengeData { get; }
+
+        /// <summary>
+        /// Gets the QrCode.
+        /// This is applicable to TOTP authenticators such as Google Authenticator.
+        /// </summary>
+        IQrCode QrCode { get; }
+
+        /// <summary>
+        /// Gets the Shared Secret.
+        /// This is the value encoded into the QrCode and can be used to compute a TOTP.
+        /// </summary>
+        string SharedSecret { get; }
     }
 }

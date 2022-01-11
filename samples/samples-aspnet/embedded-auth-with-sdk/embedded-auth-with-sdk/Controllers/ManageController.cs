@@ -337,12 +337,11 @@ namespace embedded_auth_with_sdk.Controllers
 
         public ActionResult EnrollGoogleAuthenticator()
         {
-            var QrCode = (IQrCode)Session["qrcode"];
-            var sharedSecret = (string)Session["sharedSecret"];
+            var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
             var model = new EnrollGoogleAuthenticatorViewModel
             {
-                QrCodeHref = QrCode.Href,
-                SharedSecret = sharedSecret,
+                QrCodeHref = currentAuthenticator.ContextualData.QrCode.Href,
+                SharedSecret = currentAuthenticator.ContextualData.SharedSecret,
             };
 
             return View(model);
@@ -408,6 +407,7 @@ namespace embedded_auth_with_sdk.Controllers
                 PasswordId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId,
                 PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
                 WebAuthnId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security key or biometric")?.AuthenticatorId,
+                TotpId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "google authenticator")?.AuthenticatorId,
                 CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
             };
 
@@ -585,11 +585,9 @@ namespace embedded_auth_with_sdk.Controllers
                                 {
                                     return RedirectToAction("ChangePassword", "Manage");
                                 }
-                                // Just for consistency, can we use model.IsTotpSelected - Andrii do we need ....
-                                else if (enrollResponse.CurrentAuthenticator?.Name == "Google Authenticator")
+                                else if (model.IsTotpSelected)
                                 {
-                                    Session["qrcode"] = enrollResponse.CurrentAuthenticator.QrCode;
-                                    Session["sharedSecret"] = enrollResponse.CurrentAuthenticator.SharedSecret;
+                                    Session["currentWebAuthnAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("EnrollGoogleAuthenticator", "Manage");
                                 }
                                 else if (model.IsWebAuthnSelected)
