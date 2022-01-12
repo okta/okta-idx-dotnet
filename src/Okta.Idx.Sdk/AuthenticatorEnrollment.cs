@@ -32,6 +32,10 @@ namespace Okta.Idx.Sdk
         public Resource Profile => GetResourceProperty<Resource>("profile");
 
         /// <inheritdoc/>
-        public IContextualData ContextualData => GetResourceProperty<ContextualData>("contextualData");
+        public IAuthenticatorContextualData AuthenticatorContextualData =>
+            GetResourceProperty<AuthenticatorContextualData>("contextualData");
+
+        /// <inheritdoc/>
+        public string CredentialId => GetStringProperty("credentialId");
     }
 }

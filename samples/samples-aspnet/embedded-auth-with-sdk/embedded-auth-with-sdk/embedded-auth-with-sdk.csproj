@@ -72,6 +72,7 @@
     </Reference>
     <Reference Include="Microsoft.Extensions.Configuration.Binder, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Configuration.Binder.5.0.0\lib\net461\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Extensions.Configuration.EnvironmentVariables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Configuration.EnvironmentVariables.5.0.0\lib\net461\Microsoft.Extensions.Configuration.EnvironmentVariables.dll</HintPath>
@@ -338,6 +339,8 @@
     <Compile Include="Models\SelectAuthenticatorViewModel.cs" />
     <Compile Include="Models\SelectRecoveryAuthenticatorViewModel.cs" />
     <Compile Include="Models\VerifyAuthenticatorViewModel.cs" />
+    <Compile Include="Models\EnrollWebAuthnViewModel.cs" />
+    <Compile Include="Models\VerifyWebAuthnViewModel.cs" />
     <Compile Include="Models\ViewModelHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -354,6 +357,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
+    <Content Include="Scripts\idx-utils.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
@@ -394,6 +398,8 @@
     <Content Include="Views\Shared\_LogoutPartial.cshtml" />
     <Content Include="Views\Shared\Idps.cshtml" />
     <Content Include="Views\InteractionCode\Error.cshtml" />
+    <Content Include="Views\Manage\VerifyWebAuthnAuthenticator.cshtml" />
+    <Content Include="Views\Manage\EnrollWebAuthnAuthenticator.cshtml" />
     <Content Include="Views\Manage\EnrollGoogleAuthenticator.cshtml" />
     <Content Include="Views\Manage\VerifyTotp.cshtml" />
   </ItemGroup>
@@ -415,7 +421,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Okta.Idx.Sdk\Okta.Idx.Sdk.csproj">
-      <Project>{cca8bea2-fc81-44ba-b166-028a1552b81c}</Project>
+      <Project>{ae21d73c-db1c-438b-baf2-a94aa39ea04c}</Project>
       <Name>Okta.Idx.Sdk</Name>
     </ProjectReference>
   </ItemGroup>

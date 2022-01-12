@@ -1,33 +1,30 @@
-﻿// <copyright file="AuthenticatorType.cs" company="Okta, Inc">
+﻿// <copyright file="IUser.cs" company="Okta, Inc">
 // Copyright (c) 2020 - present Okta, Inc. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using Okta.Sdk.Abstractions;
+
 namespace Okta.Idx.Sdk
 {
     /// <summary>
-    /// Authenticator types.
+    /// User's information.
     /// </summary>
-    public enum AuthenticatorType
+    public interface IUser : IResource
     {
         /// <summary>
-        /// Email
+        /// Gets the display name
         /// </summary>
-        Email,
+        string DisplayName { get; }
 
         /// <summary>
-        /// Phone
+        /// Gets the name
         /// </summary>
-        Phone,
+        string Name { get; }
 
         /// <summary>
-        /// Password
+        /// Gets the ID
         /// </summary>
-        Password,
-
-        /// <summary>
-        /// WebAuthn
-        /// </summary>
-        WebAuthn,
+        string Id { get; }
     }
 }

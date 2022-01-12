@@ -17,6 +17,8 @@ namespace Okta.Idx.Sdk
                     return "phone_number";
                 case AuthenticatorType.Password:
                     return "okta_password";
+                case AuthenticatorType.WebAuthn:
+                    return "security_key";
                 default:
                     return string.Empty;
             }

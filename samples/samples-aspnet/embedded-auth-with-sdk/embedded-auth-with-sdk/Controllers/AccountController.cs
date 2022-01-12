@@ -58,7 +58,7 @@ namespace embedded_auth_with_sdk.Controllers
                 return View("Login");
             }
 
-            var authnOptions = new AuthenticationOptions()
+            var authnOptions = new AuthenticationOptions
                                    {
                                        Username = model.UserName,
                                        Password = model.Password,

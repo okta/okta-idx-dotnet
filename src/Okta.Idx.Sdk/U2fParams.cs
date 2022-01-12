@@ -1,20 +1,18 @@
-﻿// <copyright file="IAuthenticatorMethod.cs" company="Okta, Inc">
+﻿// <copyright file="U2fParams.cs" company="Okta, Inc">
 // Copyright (c) 2020 - present Okta, Inc. All rights reserved.
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
-using Okta.Sdk.Abstractions;
-
 namespace Okta.Idx.Sdk
 {
     /// <summary>
-    /// Represents an authenticator's method type.
+    /// The U2F Params.
     /// </summary>
-    public interface IAuthenticatorMethod : IResource
+    public class U2fParams : Resource, IU2fParams
     {
         /// <summary>
-        /// Gets the type
+        /// Gets or sets the application ID
         /// </summary>
-        AuthenticatorMethodType Type { get; }
+        public string ApplicationId => GetProperty<string>("appid");
     }
 }

@@ -26,9 +26,9 @@ namespace Okta.Idx.Sdk
         public string Profile { get; set; }
 
         /// <inheritdoc/>
-        public IQrCode QrCode { get; set; }
+        public IAuthenticatorContextualData ContextualData { get; set; }
 
         /// <inheritdoc/>
-        public string SharedSecret { get; set; }
+        public string CredentialId { get; set; }
     }
 }

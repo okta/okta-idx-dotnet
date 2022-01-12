@@ -1,4 +1,6 @@
-﻿namespace embedded_auth_with_sdk.Controllers
+﻿using System;
+
+namespace embedded_auth_with_sdk.Controllers
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -93,6 +95,121 @@
             return View();
         }
 
+        public async Task<ActionResult> VerifyWebAuthnAuthenticator()
+        {
+            var isVerificationCompleted = false;
+            Boolean.TryParse(Request.Params["verificationCompleted"], out isVerificationCompleted);
+
+            if (isVerificationCompleted)
+            {
+                var authnResponse = (IAuthenticationResponse)Session["webAuthnResponse"];
+
+                switch (authnResponse?.AuthenticationStatus)
+                {
+                    case AuthenticationStatus.Success:
+                        ClaimsIdentity identity =
+                            await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration,
+                                authnResponse.TokenInfo);
+                        _authenticationManager.SignIn(identity);
+                        return RedirectToAction("Index", "Home");
+
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["isChallengeFlow"] = false;
+                        Session["authenticators"] =
+                            ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        TempData["canSkip"] = authnResponse.CanSkip;
+                        return RedirectToAction("SelectAuthenticator", "Manage");
+
+                    default:
+                        return RedirectToAction("Index", "Home");
+                }
+            }
+            else
+            {
+                var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
+
+                var viewModel = new VerifyWebAuthnViewModel
+                {
+                    WebAuthnCredentialId = currentAuthenticator.CredentialId,
+                    Challenge = currentAuthenticator.ContextualData.ChallengeData.Challenge,
+                };
+
+                return View(viewModel);
+            }
+        }
+
+        public async Task<ActionResult> EnrollWebAuthnAuthenticator()
+        {
+            var isVerificationCompleted = false;
+            Boolean.TryParse(Request.Params["verificationCompleted"], out isVerificationCompleted);
+
+            if (isVerificationCompleted)
+            {
+                var authnResponse = (IAuthenticationResponse)Session["webAuthnResponse"];
+
+                switch (authnResponse?.AuthenticationStatus)
+                {
+                    case AuthenticationStatus.Success:
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
+                        _authenticationManager.SignIn(identity);
+                        return RedirectToAction("Index", "Home");
+
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["isChallengeFlow"] = false;
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        TempData["canSkip"] = authnResponse.CanSkip;
+                        return RedirectToAction("SelectAuthenticator", "Manage");
+
+                    default:
+                        return RedirectToAction("Index", "Home");
+                }
+            }
+            else
+            {
+                var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
+
+                var viewModel = new EnrollWebAuthnViewModel
+                {
+                    DisplayName = currentAuthenticator.Name,
+                    UserId = currentAuthenticator.ContextualData.ActivationData.User.Id,
+                    Username = currentAuthenticator.ContextualData.ActivationData.User.Name,
+                    Challenge = currentAuthenticator.ContextualData.ActivationData.Challenge,
+                };
+
+                return View(viewModel);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IAuthenticationResponse> EnrollWebAuthnAuthenticatorAsync(EnrollWebAuthnViewModel viewModel)
+        {
+            var authnResponse = await _idxClient.EnrollAuthenticatorAsync(
+                new EnrollWebAuthnAuthenticatorOptions
+                {
+                    Attestation = viewModel.Attestation,
+                    ClientData = viewModel.ClientData,
+                }, (IIdxContext)Session["idxContext"]);
+
+            Session["webAuthnResponse"] = authnResponse;
+
+            return authnResponse;
+        }
+
+        [HttpPost]
+        public async Task<IAuthenticationResponse> VerifyWebAuthnAuthenticatorAsync(VerifyWebAuthnViewModel viewModel)
+        {
+            var authnResponse = await _idxClient.ChallengeAuthenticatorAsync(
+                new ChallengeWebAuthnAuthenticatorOptions
+                {
+                    AuthenticatorData = viewModel.AuthenticatorData,
+                    ClientData = viewModel.ClientData,
+                    SignatureData = viewModel.SignatureData,
+                }, (IIdxContext)Session["idxContext"]);
+
+            Session["webAuthnResponse"] = authnResponse;
+
+            return authnResponse;
+        }
 
         private async Task<ActionResult> VerifyAuthenticatorAsync(string code, string view, BaseViewModel model)
         {
@@ -220,12 +337,11 @@
 
         public ActionResult EnrollGoogleAuthenticator()
         {
-            var QrCode = (IQrCode)Session["qrcode"];
-            var sharedSecret = (string)Session["sharedSecret"];
+            var currentAuthenticator = (IAuthenticator)Session["currentWebAuthnAuthenticator"];
             var model = new EnrollGoogleAuthenticatorViewModel
             {
-                QrCodeHref = QrCode.Href,
-                SharedSecret = sharedSecret,
+                QrCodeHref = currentAuthenticator.ContextualData.QrCode.Href,
+                SharedSecret = currentAuthenticator.ContextualData.SharedSecret,
             };
 
             return View(model);
@@ -290,6 +406,8 @@
                 AuthenticatorId = authenticators.FirstOrDefault()?.AuthenticatorId,
                 PasswordId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId,
                 PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
+                WebAuthnId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security key or biometric")?.AuthenticatorId,
+                TotpId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "google authenticator")?.AuthenticatorId,
                 CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
             };
 
@@ -390,6 +508,7 @@
                 var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;
                 Session["isPhoneSelected"] = model.IsPhoneSelected;
                 Session["phoneId"] = model.PhoneId;
+                Session["isWebAuthnSelected"] = model.IsWebAuthnSelected;
 
                 if (isChallengeFlow)
                 {
@@ -433,7 +552,15 @@
                             return View("SelectPhoneChallengeMethod", methodViewModel);
 
                         case AuthenticationStatus.AwaitingAuthenticatorVerification:
-                            return RedirectToAction("VerifyAuthenticator", "Manage");
+                            var action = (model.IsWebAuthnSelected)
+                                ? "VerifyWebAuthnAuthenticator"
+                                : "VerifyAuthenticator";
+                            if (model.IsWebAuthnSelected)
+                            {
+                                Session["currentWebAuthnAuthenticator"] =
+                                    selectAuthenticatorResponse.CurrentAuthenticatorEnrollment;
+                            }
+                            return RedirectToAction(action, "Manage");
                         default:
                             return View("SelectAuthenticator", model);
                     }
@@ -458,15 +585,20 @@
                                 {
                                     return RedirectToAction("ChangePassword", "Manage");
                                 }
-                                else
-                                    if (enrollResponse.CurrentAuthenticator?.Name == "Google Authenticator")
+                                else if (model.IsTotpSelected)
                                 {
-                                    Session["qrcode"] = enrollResponse.CurrentAuthenticator.QrCode;
-                                    Session["sharedSecret"] = enrollResponse.CurrentAuthenticator.SharedSecret;
+                                    Session["currentWebAuthnAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("EnrollGoogleAuthenticator", "Manage");
                                 }
+                                else if (model.IsWebAuthnSelected)
+                                {
+                                    Session["currentWebAuthnAuthenticator"] = enrollResponse.CurrentAuthenticator;
+                                    return RedirectToAction("EnrollWebAuthnAuthenticator", "Manage");
+                                }
+
                                 return RedirectToAction("VerifyAuthenticator", "Manage");
                             }
+
                         case AuthenticationStatus.AwaitingAuthenticatorEnrollmentData:
                             Session["methodTypes"] = enrollResponse.CurrentAuthenticator.MethodTypes;
                             return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
