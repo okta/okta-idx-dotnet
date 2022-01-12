@@ -6015,9 +6015,9 @@ namespace Okta.Idx.Sdk.UnitTests
 
             authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingAuthenticatorVerification);
             authResponse.CurrentAuthenticator.Id.Should().Be("aut1i38ba5xfcX4cH5d7");
-            authResponse.CurrentAuthenticator.QrCode.Should().NotBeNull();
-            authResponse.CurrentAuthenticator.QrCode.Href.Should().NotBeNull();
-            authResponse.CurrentAuthenticator.SharedSecret.Should().Be("KAUWFBHWMDFO75AG");
+            authResponse.CurrentAuthenticator.ContextualData.QrCode.Should().NotBeNull();
+            authResponse.CurrentAuthenticator.ContextualData.QrCode.Href.Should().NotBeNull();
+            authResponse.CurrentAuthenticator.ContextualData.SharedSecret.Should().Be("KAUWFBHWMDFO75AG");
         }
 
         [Fact]
