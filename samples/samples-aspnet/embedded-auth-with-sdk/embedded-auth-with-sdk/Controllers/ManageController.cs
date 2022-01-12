@@ -13,6 +13,7 @@ namespace embedded_auth_with_sdk.Controllers
     using Microsoft.Owin.Security;
 
     using Okta.Idx.Sdk;
+    using Okta.Idx.Sdk.OktaVerify;
     using Okta.Sdk.Abstractions;
 
     public class ManageController : Controller
@@ -408,6 +409,7 @@ namespace embedded_auth_with_sdk.Controllers
                 PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
                 WebAuthnId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security key or biometric")?.AuthenticatorId,
                 TotpId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "google authenticator")?.AuthenticatorId,
+                OktaVerifyId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "okta verify")?.AuthenticatorId,
                 CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
             };
 
@@ -594,6 +596,11 @@ namespace embedded_auth_with_sdk.Controllers
                                 {
                                     Session["currentWebAuthnAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("EnrollWebAuthnAuthenticator", "Manage");
+                                }
+                                else if(model.IsOktaVerifySelected)
+                                {
+                                    Session[nameof(OktaVerifyEnrollOptions)] = enrollResponse.OktaVerifyEnrollOptions;
+                                    return RedirectToAction("Enroll", "OktaVerify");
                                 }
 
                                 return RedirectToAction("VerifyAuthenticator", "Manage");

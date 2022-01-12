@@ -32,6 +32,18 @@ namespace Okta.Idx.Sdk.Helpers
             return authenticatorOptions;
         }
 
+        internal static IAuthenticator ConvertToAuthenticator(IList<IAuthenticatorValue> authenticators, IAuthenticatorEnrollment authenticatorEnrollment)
+=> new Authenticator
+{
+    Id = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment.Key)?.Id,
+    Name = authenticatorEnrollment.DisplayName,
+    MethodTypes = authenticatorEnrollment.Methods?.Select(x => x.Type).ToList(),
+    EnrollmentId = authenticatorEnrollment.Id,
+    Profile = GetAuthenticatorProfile(authenticatorEnrollment),
+    QrCode = authenticatorEnrollment.OktaVerifyContextualData?.QrCode,
+    SelectedChannel = authenticatorEnrollment.OktaVerifyContextualData?.SelectedChannel,
+};
+
         internal static IAuthenticator ConvertToAuthenticator(
             IList<IAuthenticatorValue> authenticators,
             IAuthenticatorEnrollment authenticatorEnrollment,

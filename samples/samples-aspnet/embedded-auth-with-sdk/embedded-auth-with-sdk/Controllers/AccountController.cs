@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using embedded_auth_with_sdk.Models;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
+using Okta.Idx.Sdk.OktaVerify;
 using Okta.Sdk.Abstractions;
 
 namespace embedded_auth_with_sdk.Controllers
@@ -80,6 +81,11 @@ namespace embedded_auth_with_sdk.Controllers
                         return RedirectToAction("ChangePassword", "Manage");
 
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
+                        if (authnResponse.IsOktaVerifyCurrentAuthenticator == true)
+                        {
+                            Session[nameof(OktaVerifyAuthenticationOptions)] = authnResponse.OktaVerifyAuthenticationOptions;
+                            return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
+                        }
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
                         return RedirectToAction("SelectAuthenticator", "Manage");

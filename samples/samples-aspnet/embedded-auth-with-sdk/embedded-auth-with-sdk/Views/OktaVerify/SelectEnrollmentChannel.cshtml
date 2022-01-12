@@ -1,0 +1,42 @@
+@model embedded_auth_with_sdk.Models.OktaVerifySelectEnrollmentChannelModel
+@using embedded_auth_with_sdk.Models;
+@using Okta.Idx.Sdk;
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Enroll Okta Verify";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+        @using (Html.BeginForm("SelectEnrollmentChannel", "OktaVerify", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <h4>More options</h4>
+            <div>Which option do you want to try?</div>
+
+            <div class="form-group">
+                <div class="col-md-10">
+                    @foreach (OktaVerifySelectEnrollmentChannelOptionModel option in Model.EnrollmentChannelOptions)
+                    {
+                    <div>
+                        <label>
+                            @Html.RadioButton(option.Name, option.Value, new { id = $"{option.Value}_Id" })
+                            @option.LabelText
+                        </label>
+                    </div>
+                    }
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Next" class="btn btn-primary btn-stretch-wide" />
+                </div>
+            </div>
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

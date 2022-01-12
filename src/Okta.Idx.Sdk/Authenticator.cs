@@ -30,5 +30,11 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public string CredentialId { get; set; }
+
+        /// <inheritdoc/>
+        public IQrCode QrCode { get; set; }
+
+        /// <inheritdoc/>
+        public string SelectedChannel { get; set; }
     }
 }

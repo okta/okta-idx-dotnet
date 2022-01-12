@@ -4,6 +4,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using Okta.Idx.Sdk.OktaVerify;
 using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
@@ -57,5 +58,10 @@ namespace Okta.Idx.Sdk
         /// Gets the credential Id. This is only applicable for Web Authn.
         /// </summary>
         string CredentialId { get; }
+
+        /// <summary>
+        /// Gets the contextual data used by Okta Verify enrollment.
+        /// </summary>
+        IOktaVerifyContextualData OktaVerifyContextualData { get; }
     }
 }

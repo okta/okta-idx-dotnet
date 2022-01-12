@@ -47,5 +47,16 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the credential Id. This is only applicable for Web Authn authenticators.
         /// </summary>
         string CredentialId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the QrCode.
+        /// This is applicable to TOTP authenticators such as Google Authenticator or Okta Verify.
+        /// </summary>
+        IQrCode QrCode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the selected channel for Okta Verify.
+        /// </summary>
+        string SelectedChannel { get; set; }
     }
 }

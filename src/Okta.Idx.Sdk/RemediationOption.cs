@@ -30,6 +30,9 @@ namespace Okta.Idx.Sdk
         public string Href => GetStringProperty("href");
 
         /// <inheritdoc/>
+        public int? Refresh => GetIntegerProperty("refresh");
+
+        /// <inheritdoc/>
         public IIdp Idp => GetProperty<IIdp>("idp");
 
         /// <inheritdoc/>

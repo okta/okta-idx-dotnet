@@ -321,6 +321,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\InteractionCodeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\OktaVerifyController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -334,6 +335,13 @@
     <Compile Include="Models\ForgotPasswordViewModel.cs" />
     <Compile Include="Models\InteractionCodeErrorViewModel.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
+    <Compile Include="Models\OktaVerifyEnrollPollModel.cs" />
+    <Compile Include="Models\OktaVerifyEnrollWithEmailModel.cs" />
+    <Compile Include="Models\OktaVerifyEnrollWithPhoneNumberModel.cs" />
+    <Compile Include="Models\OktaVerifyEnterCodeModel.cs" />
+    <Compile Include="Models\OktaVerifySelectAuthenticatorMethodModel.cs" />
+    <Compile Include="Models\OktaVerifySelectEnrollmentChannelModel.cs" />
+    <Compile Include="Models\OktaVerifySelectEnrollmentChannelOptionModel.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Models\SelectAuthenticatorMethodViewModel.cs" />
     <Compile Include="Models\SelectAuthenticatorViewModel.cs" />
@@ -402,6 +410,14 @@
     <Content Include="Views\Manage\EnrollWebAuthnAuthenticator.cshtml" />
     <Content Include="Views\Manage\EnrollGoogleAuthenticator.cshtml" />
     <Content Include="Views\Manage\VerifyTotp.cshtml" />
+    <Content Include="Views\OktaVerify\EnrollPoll.cshtml" />
+    <Content Include="Views\OktaVerify\EnrollWithEmail.cshtml" />
+    <Content Include="Views\OktaVerify\EnrollWithPhoneNumber.cshtml" />
+    <Content Include="Views\OktaVerify\EnrollWithQrCode.cshtml" />
+    <Content Include="Views\OktaVerify\EnterCode.cshtml" />
+    <Content Include="Views\OktaVerify\PushSent.cshtml" />
+    <Content Include="Views\OktaVerify\SelectAuthenticatorMethod.cshtml" />
+    <Content Include="Views\OktaVerify\SelectEnrollmentChannel.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

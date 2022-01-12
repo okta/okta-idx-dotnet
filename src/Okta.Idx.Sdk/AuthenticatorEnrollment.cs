@@ -3,6 +3,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using Okta.Idx.Sdk.OktaVerify;
 using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
@@ -37,5 +38,8 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public string CredentialId => GetStringProperty("credentialId");
+
+        /// <inheritdoc/>
+        public IOktaVerifyContextualData OktaVerifyContextualData => GetResourceProperty<OktaVerifyContextualData>("contextualData");
     }
 }

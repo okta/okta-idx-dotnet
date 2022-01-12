@@ -1,0 +1,40 @@
+@model embedded_auth_with_sdk.Models.OktaVerifySelectAuthenticatorMethodModel
+@using embedded_auth_with_sdk.Models;
+@using Okta.Idx.Sdk;
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Authenticate with Okta Verify";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+        <h3>Verify it's you with a security method</h3>
+        <div>Select from the following options</div>
+        @using (Html.BeginForm("SelectAuthenticatorMethod", "OktaVerify", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <div class="col-md-10">
+
+                    <h4>Enter a code <input type="submit" value="Select" class="btn btn-primary" /></h4>
+                    <input type="hidden" name="methodType" value="totp" />
+                </div>
+            </div>
+        }
+        @using (Html.BeginForm("SelectAuthenticatorMethod", "OktaVerify", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <div class="col-md-10">
+
+                    <h4>Get a push notification <input type="submit" value="Select" class="btn btn-primary" /></h4>
+                    <input type="hidden" name="methodType" value="push" />                    
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

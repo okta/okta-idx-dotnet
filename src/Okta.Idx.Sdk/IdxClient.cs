@@ -21,6 +21,7 @@ using Newtonsoft.Json.Linq;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Idx.Sdk.Extensions;
 using Okta.Idx.Sdk.Helpers;
+using Okta.Idx.Sdk.OktaVerify;
 using Okta.Sdk.Abstractions;
 using Okta.Sdk.Abstractions.Configuration.Providers.EnvironmentVariables;
 using Okta.Sdk.Abstractions.Configuration.Providers.Object;
@@ -594,12 +595,15 @@ namespace Okta.Idx.Sdk
                     }
                     else if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
                     {
-                        return new AuthenticationResponse
+                        var authenticationResponse = new AuthenticationResponse
                         {
                             IdxContext = idxContext,
                             AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
                             Authenticators = IdxResponseHelper.ConvertToAuthenticators(challengeResponse.Authenticators.Value, challengeResponse.AuthenticatorEnrollments.Value),
                         };
+
+                        authenticationResponse.OktaVerifyAuthenticationOptions = new OktaVerifyAuthenticationOptions(authenticationResponse, challengeResponse);
+                        return authenticationResponse;
                     }
                     else
                     {
@@ -1069,6 +1073,10 @@ namespace Okta.Idx.Sdk
             {
                 currentRemediationType = RemediationType.EnrollAuthenticator;
             }
+            else if (introspectResponse.ContainsRemediationOption(RemediationType.EnrollPoll))
+            {
+                currentRemediationType = RemediationType.EnrollPoll;
+            }
             else
             {
                 if (currentRemediationType == RemediationType.EnrollAuthenticator &&
@@ -1310,9 +1318,14 @@ namespace Okta.Idx.Sdk
             {
                 currentRemediationType = RemediationType.EnrollAuthenticator;
             }
+            else if (selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.EnrollPoll))
+            {
+                currentRemediationType = RemediationType.EnrollPoll;
+            }
 
-            if (currentRemediationType != RemediationType.EnrollAuthenticator &&
-                    currentRemediationType != RemediationType.AuthenticatorEnrollmentData)
+            if (currentRemediationType != RemediationType.EnrollPoll &&
+            currentRemediationType != RemediationType.EnrollAuthenticator &&
+            currentRemediationType != RemediationType.AuthenticatorEnrollmentData)
             {
                 throw new UnexpectedRemediationException(
                     new List<string>
@@ -1323,12 +1336,16 @@ namespace Okta.Idx.Sdk
                     selectAuthenticatorResponse);
             }
 
-            return new AuthenticationResponse
+            var authenticationResponse = new AuthenticationResponse
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = status,
                 CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value, selectAuthenticatorResponse.AuthenticatorEnrollments.Value),
             };
+
+            authenticationResponse.OktaVerifyEnrollOptions = new OktaVerifyEnrollOptions(authenticationResponse, selectAuthenticatorResponse);
+
+            return authenticationResponse;
         }
 
         private static bool IsRemediationRequireCredentials(string remediationOptionName, IIdxResponse idxResponse)

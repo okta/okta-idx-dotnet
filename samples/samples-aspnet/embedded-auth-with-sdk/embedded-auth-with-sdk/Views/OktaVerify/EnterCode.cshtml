@@ -1,0 +1,33 @@
+@model embedded_auth_with_sdk.Models.OktaVerifyEnterCodeModel
+@using embedded_auth_with_sdk.Models;
+@using Okta.Idx.Sdk;
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Authenticate with Okta Verify";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+        @using (Html.BeginForm("EnterCode", "OktaVerify", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <h4>Enter a code</h4>
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="form-group">
+                <div class="col-md-10">
+                    @Html.LabelFor(m => m.Code, new { @class = "control-label" })
+                    @Html.EditorFor(m => m.Code, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
