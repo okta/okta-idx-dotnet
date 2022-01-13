@@ -61,7 +61,7 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// <summary>
         /// Gets the select-enrollment-channel remediation option.
         /// </summary>
-        protected internal IRemediationOption SelectEnrollmentChannelRemediationOption { get; }
+        protected internal IRemediationOption SelectEnrollmentChannelRemediationOption { get; internal set; }
 
         /// <summary>
         /// Gets the enrollment-channel-data remediation option.

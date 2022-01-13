@@ -198,18 +198,56 @@ namespace Okta.Idx.Sdk.OktaVerify
                 StateHandle = StateHandle,
             };
 
-            var challengeResponse = await ChallengePollRemediationOption.ProceedAsync(requestPayload);
-            bool continuePolling = challengeResponse.ContainsRemediationOption(RemediationType.ChallengePoll, out IRemediationOption challengePollRemediationOption);
-            if (continuePolling == false)
+            try
             {
-                this.TokenInfo = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(IdxContext);
-            }
+                var challengeResponse = await ChallengePollRemediationOption.ProceedAsync(requestPayload);
+                bool continuePolling = challengeResponse.ContainsRemediationOption(RemediationType.ChallengePoll, out IRemediationOption challengePollRemediationOption);
 
-            return new OktaVerifyPollResponse
+                if (challengeResponse.SuccessWithInteractionCode != null)
+                {
+                    TokenInfo = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(IdxContext);
+                    return new OktaVerifyPollResponse
+                    {
+                        AuthenticationStatus = AuthenticationStatus.Success,
+                        TokenInfo = TokenInfo,
+                        ContinuePolling = continuePolling,
+                    };
+                }
+
+                if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+                {
+                    return new OktaVerifyPollResponse
+                    {
+                        AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
+                        ContinuePolling = continuePolling,
+                    };
+                }
+
+                if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+                {
+                    return new OktaVerifyPollResponse
+                    {
+                        AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                        ContinuePolling = continuePolling,
+                    };
+                }
+
+                throw new UnexpectedRemediationException(
+                    new List<string>
+                    {
+                                    RemediationType.SelectAuthenticatorAuthenticate,
+                                    RemediationType.SelectAuthenticatorEnroll,
+                    },
+                    challengeResponse);
+            }
+            catch (Exception ex)
             {
-                Refresh = challengePollRemediationOption?.Refresh,
-                ContinuePolling = continuePolling,
-            };
+                return new OktaVerifyPollResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Exception,
+                    MessageToUser = ex.Message,
+                };
+            }
         }
     }
 }

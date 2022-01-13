@@ -23,5 +23,14 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// Gets or sets a path value indicating where to direct the client when polling is complete.
         /// </summary>
         public string Next { get; set; }
+
+        public AuthenticationStatus AuthenticationStatus { get; internal set; }
+
+        public ITokenResponse TokenInfo { get; internal set; }
+
+        /// <summary>
+        /// Gets the message to user
+        /// </summary>
+        public string MessageToUser { get; internal set; }
     }
 }
