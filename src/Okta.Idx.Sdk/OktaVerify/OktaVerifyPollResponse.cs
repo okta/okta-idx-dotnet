@@ -24,8 +24,14 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// </summary>
         public string Next { get; set; }
 
+        /// <summary>
+        /// Gets the authentication status.
+        /// </summary>
         public AuthenticationStatus AuthenticationStatus { get; internal set; }
 
+        /// <summary>
+        /// Gets the Token Info.
+        /// </summary>
         public ITokenResponse TokenInfo { get; internal set; }
 
         /// <summary>
