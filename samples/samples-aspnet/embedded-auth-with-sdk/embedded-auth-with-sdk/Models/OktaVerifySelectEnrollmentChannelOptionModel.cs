@@ -20,9 +20,9 @@ namespace embedded_auth_with_sdk.Models
         { 
         }
 
-        public OktaVerifySelectEnrollmentChannelOptionModel(OktaVerifyRemediationParameter remediationOptionParameter)
+        public OktaVerifySelectEnrollmentChannelOptionModel(OktaVerifyRemediationParameter option)
         {
-            this.Value = remediationOptionParameter?.Value;
+            this.Value = option?.Value;
         }
 
         public string LabelText => LabelTexts[Value];

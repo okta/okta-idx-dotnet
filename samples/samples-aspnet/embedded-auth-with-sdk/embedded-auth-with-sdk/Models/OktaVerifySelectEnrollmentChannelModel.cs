@@ -13,10 +13,10 @@ namespace embedded_auth_with_sdk.Models
 
         public OktaVerifySelectEnrollmentChannelModel(OktaVerifyEnrollOptions enrollPollOptions)
         {
-            this.EnrollPollOptions = enrollPollOptions;
+            this.OktaVerifyEnrollOptions = enrollPollOptions;
         }
 
-        protected OktaVerifyEnrollOptions EnrollPollOptions { get; set; }
+        protected OktaVerifyEnrollOptions OktaVerifyEnrollOptions { get; set; }
 
         [Required]
         [Display(Name = "enrollment channel")]
@@ -28,10 +28,10 @@ namespace embedded_auth_with_sdk.Models
 
         public IList<OktaVerifySelectEnrollmentChannelOptionModel> EnrollmentChannelOptions 
         {
-            get => EnrollPollOptions?
+            get => OktaVerifyEnrollOptions?
                 .GetChannelOptions()
-                .Where(rop => rop.Value != OktaVerifyEnrollmentChannel.QrCode)
-                .Select(optionParameter => new OktaVerifySelectEnrollmentChannelOptionModel(optionParameter))
+                .Where(option => option.Value != OktaVerifyEnrollmentChannel.QrCode)
+                .Select(option => new OktaVerifySelectEnrollmentChannelOptionModel(option))
                 .ToList();
         } 
     }
