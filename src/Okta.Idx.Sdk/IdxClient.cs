@@ -1330,6 +1330,7 @@ namespace Okta.Idx.Sdk
                 throw new UnexpectedRemediationException(
                     new List<string>
                     {
+                            RemediationType.EnrollPoll,
                             RemediationType.AuthenticatorEnrollmentData,
                             RemediationType.EnrollAuthenticator,
                     },
