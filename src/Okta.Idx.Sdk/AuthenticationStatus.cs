@@ -54,10 +54,5 @@ namespace Okta.Idx.Sdk
         /// Waiting for an authenticator selection to continue with the authentication process.
         /// </summary>
         AwaitingChallengeAuthenticatorSelection,
-
-        /// <summary>
-        /// An exception occurred.
-        /// </summary>
-        Exception,
     }
 }

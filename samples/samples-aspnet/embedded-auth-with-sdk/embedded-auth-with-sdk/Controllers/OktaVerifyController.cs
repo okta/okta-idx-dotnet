@@ -68,8 +68,8 @@ namespace embedded_auth_with_sdk.Controllers
                 case "sms":
                     return View("EnrollWithPhoneNumber", new OktaVerifyEnrollWithPhoneNumberModel { CountryCode = "+1" });
             }
-
-            throw new ArgumentException($"Unrecognized Okta Verify channel: {model.SelectedChannel}");
+            ModelState.AddModelError("SelectedChannel", new ArgumentException($"Unrecognized Okta Verify channel: {model.SelectedChannel}"));
+            return View(model);
         }
 
         [HttpPost]
@@ -124,8 +124,8 @@ namespace embedded_auth_with_sdk.Controllers
                     _ = await oktaVerifyAuthenticationOptions.SelectPushMethodAsync();
                     return View("PushSent", new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
             }
-
-            throw new ArgumentException($"Unrecognized Okta Verify authentication method: {methodType}");
+            ModelState.AddModelError("", new ArgumentException($"Unrecognized Okta Verify authentication method: {methodType}"));
+            return View(new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
         }
 
         [HttpPost]
@@ -157,9 +157,6 @@ namespace embedded_auth_with_sdk.Controllers
                     Session["isChallengeFlow"] = false;
                     Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authenticationResponse.Authenticators);
                     return RedirectToAction("SelectAuthenticator", "Manage");
-                case AuthenticationStatus.Exception:
-                    ModelState.AddModelError("Code", authenticationResponse.MessageToUser);
-                    return View("EnterCode", oktaVerifyEnterCodeModel);
                 default:
                     return View("Login");
             }            

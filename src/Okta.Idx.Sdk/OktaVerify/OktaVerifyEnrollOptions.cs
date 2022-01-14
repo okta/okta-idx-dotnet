@@ -157,8 +157,6 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// <returns>The authentication response.</returns>
         public async Task<AuthenticationResponse> SelectEnrollmentChannelAsync(string enrollmentChannelName)
         {
-            ValidateEnrollmentChannel(enrollmentChannelName);
-
             IdxRequestPayload idxRequestPayload = new IdxRequestPayload
             {
                 StateHandle = StateHandle,
@@ -178,20 +176,6 @@ namespace Okta.Idx.Sdk.OktaVerify
             EnrollmentChannelDataRemediationOption = selectEnrollmentChannelResponse.FindRemediationOption(RemediationType.EnrollmentChannelData);
 
             return authenticationResponse;
-        }
-
-        /// <summary>
-        /// Throws an InvalidEnrollmentChannelException if the specified channel is not valid.
-        /// </summary>
-        /// <param name="enrollmentChannelName">The name of the enrollment channel to validate.</param>
-        /// <exception cref="InvalidOktaVerifyEnrollmentChannelException">The exception thrown if the specified channel is not valid.</exception>
-        protected void ValidateEnrollmentChannel(string enrollmentChannelName)
-        {
-            IList<OktaVerifyRemediationParameter> channelOptions = GetChannelOptions();
-            if (!channelOptions.Any(rop => rop.Value == enrollmentChannelName))
-            {
-                throw new InvalidOktaVerifyEnrollmentChannelException(enrollmentChannelName, channelOptions.Select(co => co.Value).ToArray());
-            }
         }
 
         /// <summary>
