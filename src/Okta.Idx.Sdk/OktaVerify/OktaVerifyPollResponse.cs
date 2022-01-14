@@ -35,7 +35,7 @@ namespace Okta.Idx.Sdk.OktaVerify
         public ITokenResponse TokenInfo { get; internal set; }
 
         /// <summary>
-        /// Gets the message to user
+        /// Gets the message to user.
         /// </summary>
         public string MessageToUser { get; internal set; }
     }

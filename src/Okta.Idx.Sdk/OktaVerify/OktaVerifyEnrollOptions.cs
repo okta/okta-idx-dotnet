@@ -225,8 +225,8 @@ namespace Okta.Idx.Sdk.OktaVerify
                 StateHandle = StateHandle,
             };
 
-            var idxResponse = await EnrollPollRemediationOption.ProceedAsync(requestPayload);
-            bool continuePolling = idxResponse.ContainsRemediationOption(RemediationType.EnrollPoll, out IRemediationOption enrollPollRemediationOption);
+            var enrollResponse = await EnrollPollRemediationOption.ProceedAsync(requestPayload);
+            bool continuePolling = enrollResponse.ContainsRemediationOption(RemediationType.EnrollPoll, out IRemediationOption enrollPollRemediationOption);
 
             return new OktaVerifyPollResponse
             {

@@ -172,7 +172,7 @@ namespace embedded_auth_with_sdk.Controllers
             var pollResponse = await oktaVerifyAuthenticationOptions.PollOnceAsync();
             if (!pollResponse.ContinuePolling)
             {
-                ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, oktaVerifyAuthenticationOptions.TokenInfo);
+                ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, pollResponse.TokenInfo);
                 _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                 pollResponse.Next = "/Home/Index";
             }
