@@ -83,7 +83,7 @@ namespace embedded_auth_with_sdk.Controllers
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
-                        if (authnResponse.IsOktaVerifyCurrentAuthenticator == true)
+                        if (authnResponse.IsOktaVerifyCurrentAuthenticator)
                         {
                             Session[nameof(OktaVerifyAuthenticationOptions)] = authnResponse.OktaVerifyAuthenticationOptions;
                             return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
