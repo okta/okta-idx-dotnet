@@ -1528,5 +1528,40 @@ namespace Okta.Idx.Sdk
                     return await GetAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
             }
         }
+
+        public async Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(SelectOktaVerifyAuthenticatorOptions challengeAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (!introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+            {
+                throw new UnexpectedRemediationException(
+                    new List<string>
+                    {
+                        RemediationType.SelectAuthenticatorAuthenticate,
+                    }, introspectResponse);
+            }
+
+            IdxRequestPayload idxRequestPayload = new IdxRequestPayload();
+            idxRequestPayload.SetProperty("authenticator", new { id = challengeAuthenticatorOptions.AuthenticatorId, methodType = challengeAuthenticatorOptions.AuthenticatorMethodType });
+            idxRequestPayload.SetProperty("stateHandle", introspectResponse.StateHandle);
+
+            var selectAuthenticatorResponse = await introspectResponse.ProceedWithRemediationOptionAsync(
+                RemediationType.SelectAuthenticatorAuthenticate,
+                idxRequestPayload,
+                cancellationToken);
+            // TODO: Review where put this
+            //this.ChallengePollRemediationOption = selectAuthenticatorResponse.FindRemediationOption(RemediationType.ChallengePoll);
+            //this.ChallengeAuthenticatorRemediationOption = selectAuthenticatorResponse.FindRemediationOption(RemediationType.ChallengeAuthenticator);
+
+            var authenticationResponse = new AuthenticationResponse
+            {
+                IdxContext = idxContext,
+                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
+                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value),
+            };
+
+            return authenticationResponse;
+        }
     }
 }

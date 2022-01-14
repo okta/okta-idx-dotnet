@@ -511,6 +511,7 @@ namespace embedded_auth_with_sdk.Controllers
                 Session["isPhoneSelected"] = model.IsPhoneSelected;
                 Session["phoneId"] = model.PhoneId;
                 Session["isWebAuthnSelected"] = model.IsWebAuthnSelected;
+                Session["isOktaVerifySelected"] = model.IsOktaVerifySelected;
 
                 if (isChallengeFlow)
                 {

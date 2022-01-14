@@ -29,6 +29,11 @@ namespace embedded_auth_with_sdk.Controllers
         public ActionResult SelectAuthenticatorMethod()
         {
             var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
+            var viewModel = new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions)
+            {
+                AuthenticatorId = ((IAuthenticationResponse)Session["ovAuthnResponse"]).CurrentAuthenticator.Id,
+            };
+
             return View(new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
         }
 
@@ -112,19 +117,52 @@ namespace embedded_auth_with_sdk.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> SelectAuthenticatorMethod(string methodType)
+        //public async Task<ActionResult> SelectAuthenticatorMethod(AuthenticatorMethodType methodType)
+        public async Task<ActionResult> SelectAuthenticatorMethod(OktaVerifySelectAuthenticatorMethodModel model)
         {
             var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
-            switch (methodType)
+
+            var selectAuthenticatorOptions = new SelectOktaVerifyAuthenticatorOptions
             {
-                case "totp":
-                    _ = await oktaVerifyAuthenticationOptions.SelectTotpMethodAsync();
-                    return View("EnterCode");
-                case "push":
-                    _ = await oktaVerifyAuthenticationOptions.SelectPushMethodAsync();
-                    return View("PushSent", new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
+                AuthenticatorMethodType = model.MethodType,
+                AuthenticatorId = model.AuthenticatorId,
+            };
+            
+            
+            //switch (methodType)
+            //{
+            //    case "totp":
+            //        _ = await oktaVerifyAuthenticationOptions.SelectTotpMethodAsync();
+            //        return View("EnterCode");
+            //    case "push":
+            //        _ = await oktaVerifyAuthenticationOptions.SelectPushMethodAsync();
+            //        return View("PushSent", new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
+            //}
+            try
+            {
+
+                var authnResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions,
+                    (IIdxContext)Session["IdxContext"]);
+
+                if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    switch (model.MethodType)
+                    {
+                        // TODO: change it to enum
+                        case "totp":
+                            return View("EnterCode");
+                        case "push":
+                            return View("PushSent",
+                                new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
+                    }
+                }
             }
-            ModelState.AddModelError("", new ArgumentException($"Unrecognized Okta Verify authentication method: {methodType}"));
+            catch (Exception e)
+            {
+                // Add errors to model
+            }
+
+            //ModelState.AddModelError("", new ArgumentException($"Unrecognized Okta Verify authentication method: {methodType}"));
             return View(new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
         }
 
@@ -147,11 +185,12 @@ namespace embedded_auth_with_sdk.Controllers
                 case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
                     Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authenticationResponse.Authenticators);
                     Session["isChallengeFlow"] = true;
-                    if (authenticationResponse.IsOktaVerifyCurrentAuthenticator == true)
-                    {
-                        Session[nameof(OktaVerifyAuthenticationOptions)] = authenticationResponse.OktaVerifyAuthenticationOptions;
-                        return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
-                    }
+                    // TODO: Review this
+                    //if (authenticationResponse.IsOktaVerifyCurrentAuthenticator == true)
+                    //{
+                    //    Session[nameof(OktaVerifyAuthenticationOptions)] = authenticationResponse.OktaVerifyAuthenticationOptions;
+                    //    return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
+                    //}
                     return RedirectToAction("SelectAuthenticator", "Manage");
                 case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                     Session["isChallengeFlow"] = false;

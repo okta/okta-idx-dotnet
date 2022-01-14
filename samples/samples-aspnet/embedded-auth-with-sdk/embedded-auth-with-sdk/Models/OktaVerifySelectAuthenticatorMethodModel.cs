@@ -1,4 +1,5 @@
-﻿using Okta.Idx.Sdk.OktaVerify;
+﻿using Okta.Idx.Sdk;
+using Okta.Idx.Sdk.OktaVerify;
 
 namespace embedded_auth_with_sdk.Models
 {
@@ -9,6 +10,10 @@ namespace embedded_auth_with_sdk.Models
             this.OktaVerifyAuthenticationOptions = oktaVerifyAuthenticationOptions;
             this.PollEndpoint = pollEndpoint;
         }
+
+        public string AuthenticatorId { get; set; }
+
+        public AuthenticatorMethodType MethodType { get; set; }
 
         public OktaVerifyAuthenticationOptions OktaVerifyAuthenticationOptions { get; }
 

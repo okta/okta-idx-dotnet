@@ -63,9 +63,9 @@ namespace Okta.Idx.Sdk
         /// </summary>
         public OktaVerifyAuthenticationOptions OktaVerifyAuthenticationOptions { get; internal set; }
 
-        /// <summary>
-        /// Gets a value that indicates whether Okta Verify is the current authenticator.
-        /// </summary>
-        public bool? IsOktaVerifyCurrentAuthenticator => OktaVerifyAuthenticationOptions?.CurrentAuthenticator?.Key.Equals("okta_verify");
+        ///// <summary>
+        ///// Gets a value that indicates whether Okta Verify is the current authenticator.
+        ///// </summary>
+        //public bool? IsOktaVerifyCurrentAuthenticator => OktaVerifyAuthenticationOptions?.CurrentAuthenticator?.Key.Equals("okta_verify");
     }
 }
