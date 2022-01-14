@@ -57,7 +57,7 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// <summary>
         /// Gets the `challenge-authenticator` remediation option.
         /// </summary>
-        protected IRemediationOption ChallengeAuthenticatorRemedationOption { get; private set; }
+        protected IRemediationOption ChallengeAuthenticatorRemediationOption { get; private set; }
 
         /// <summary>
         /// Gets the current authenticator.
@@ -77,7 +77,7 @@ namespace Okta.Idx.Sdk.OktaVerify
 
             var selectAuthenticatorResponse = await SelectAuthenticatorAuthenticateRemediationOption.ProceedAsync(idxRequestPayload);
             this.ChallengePollRemediationOption = selectAuthenticatorResponse.FindRemediationOption(RemediationType.ChallengePoll);
-            this.ChallengeAuthenticatorRemedationOption = selectAuthenticatorResponse.FindRemediationOption(RemediationType.ChallengeAuthenticator);
+            this.ChallengeAuthenticatorRemediationOption = selectAuthenticatorResponse.FindRemediationOption(RemediationType.ChallengeAuthenticator);
 
             var authenticationResponse = new AuthenticationResponse
             {
@@ -120,9 +120,9 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// <exception cref="ArgumentException">If the challenge authenticator is not valid.</exception>
         public async Task<AuthenticationResponse> EnterCodeAsync(string code)
         {
-            if (ChallengeAuthenticatorRemedationOption.Name != RemediationType.ChallengeAuthenticator)
+            if (ChallengeAuthenticatorRemediationOption.Name != RemediationType.ChallengeAuthenticator)
             {
-                throw new ArgumentException($"Expected remediation option of type '{RemediationType.ChallengeAuthenticator}', the specified remediation option is of type {ChallengeAuthenticatorRemedationOption.Name}.");
+                throw new ArgumentException($"Expected remediation option of type '{RemediationType.ChallengeAuthenticator}', the specified remediation option is of type {ChallengeAuthenticatorRemediationOption.Name}.");
             }
 
             IdxRequestPayload requestPayload = new IdxRequestPayload
@@ -132,7 +132,7 @@ namespace Okta.Idx.Sdk.OktaVerify
             requestPayload.SetProperty("credentials", new { totp = code });
             try
             {
-                var challengeResponse = await ChallengeAuthenticatorRemedationOption.ProceedAsync(requestPayload);
+                var challengeResponse = await ChallengeAuthenticatorRemediationOption.ProceedAsync(requestPayload);
                 if (challengeResponse.SuccessWithInteractionCode != null)
                 {
                     TokenInfo = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(IdxContext);
