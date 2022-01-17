@@ -50,6 +50,18 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
+        public async Task PassRecoveryTokenWhenCallingInteract()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            await testClient.InteractAsync(recoveryToken: "myRecoveryToken");
+
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"recovery_token\":\"myRecoveryToken\"");
+        }
+
+        [Fact]
         public async Task SendPkceCodeChallengeWhenExchangingTokens()
         {
             #region rawSuccessResponse
