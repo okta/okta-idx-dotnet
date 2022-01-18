@@ -197,7 +197,7 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// </summary>
         /// <returns>The poll response.</returns>
         /// <exception cref="ArgumentException">If the poll option is not valid.</exception>
-        public async Task<OktaVerifyPollResponse> PollOnceAsync()
+        public async Task<PollResponse> PollOnceAsync()
         {
             if (EnrollPollRemediationOption.Name != RemediationType.EnrollPoll)
             {
@@ -212,7 +212,7 @@ namespace Okta.Idx.Sdk.OktaVerify
             var enrollResponse = await EnrollPollRemediationOption.ProceedAsync(requestPayload);
             bool continuePolling = enrollResponse.ContainsRemediationOption(RemediationType.EnrollPoll, out IRemediationOption enrollPollRemediationOption);
 
-            return new OktaVerifyPollResponse
+            return new PollResponse
             {
                 Refresh = enrollPollRemediationOption?.Refresh,
                 ContinuePolling = continuePolling,

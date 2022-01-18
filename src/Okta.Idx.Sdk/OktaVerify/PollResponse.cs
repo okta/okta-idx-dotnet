@@ -1,4 +1,9 @@
-﻿using System;
+﻿// <copyright file="PollResponse.cs" company="Okta, Inc">
+// Copyright (c) 2020 - present Okta, Inc. All rights reserved.
+// Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +12,7 @@ namespace Okta.Idx.Sdk.OktaVerify
     /// <summary>
     /// Class that contains information relevant to client side polling.
     /// </summary>
-    public class OktaVerifyPollResponse : AuthenticationResponse
+    public class PollResponse : AuthenticationResponse
     {
         /// <summary>
         /// Gets or sets the duration to wait until the next poll request, in milliseconds.
@@ -19,9 +24,9 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// </summary>
         public bool ContinuePolling { get; set; }
 
-        /// <summary>
-        /// Gets or sets a path value indicating where to direct the client when polling is complete.
-        /// </summary>
-        public string Next { get; set; }
+        ///// <summary>
+        ///// Gets or sets a path value indicating where to direct the client when polling is complete.
+        ///// </summary>
+        //public string Next { get; set; }
     }
 }

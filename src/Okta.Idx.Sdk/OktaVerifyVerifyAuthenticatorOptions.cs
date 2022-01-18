@@ -9,6 +9,6 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets or sets the code.
         /// </summary>
-        public string Code { get; set; }
+        public string TotpCode { get; set; }
     }
 }

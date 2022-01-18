@@ -142,12 +142,19 @@ namespace embedded_auth_with_sdk.Controllers
         {
             var idxContext = (IIdxContext)Session["idxContext"];
             var pollResponse = await _idxClient.PollEnroll(idxContext);
+            //pollResponse.Next = "/Account/Login";
+            dynamic pollViewModel = new
+            {
+                Refresh = pollResponse.Refresh,
+                ContinuePolling = pollResponse.ContinuePolling
+            };
+
             if (!pollResponse.ContinuePolling)
             {
-                pollResponse.Next = "/Account/Login";
-            }
-
-            return Json(pollResponse, JsonRequestBehavior.AllowGet);
+                pollViewModel.Next = "/Account/Login";
+            };
+            
+            return Json(pollViewModel, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -200,7 +207,7 @@ namespace embedded_auth_with_sdk.Controllers
         public async Task<ActionResult> EnterCodeAsync(OktaVerifyEnterCodeModel oktaVerifyEnterCodeModel)
         {
             var authenticationResponse = await _idxClient.VerifyAuthenticatorAsync(
-                new OktaVerifyVerifyAuthenticatorOptions { Code = oktaVerifyEnterCodeModel.Code },
+                new OktaVerifyVerifyAuthenticatorOptions { TotpCode = oktaVerifyEnterCodeModel.Code },
                 (IIdxContext)Session["idxContext"]);
 
             switch (authenticationResponse?.AuthenticationStatus)
@@ -236,15 +243,22 @@ namespace embedded_auth_with_sdk.Controllers
         {
             var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
 
-            var pollResponse = await oktaVerifyAuthenticationOptions.PollOnceAsync();
+            var pollResponse = await _idxClient.PollAuthenticatorPushStatusAsync((IIdxContext)Session["idxContext"]);
+            // oktaVerifyAuthenticationOptions.PollOnceAsync();
+            dynamic pollViewModel = new
+            {
+                Refresh = pollResponse.Refresh,
+                ContinuePolling = pollResponse.ContinuePolling,
+            };
+
             if (!pollResponse.ContinuePolling)
             {
                 ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, pollResponse.TokenInfo);
                 _authenticationManager.SignIn(new AuthenticationProperties(), identity);
-                pollResponse.Next = "/Home/Index";
+                pollViewModel.Next = "/Home/Index";
             }
 
-            return Json(pollResponse, JsonRequestBehavior.AllowGet);
+            return Json(pollViewModel, JsonRequestBehavior.AllowGet);
         }
     }
 }

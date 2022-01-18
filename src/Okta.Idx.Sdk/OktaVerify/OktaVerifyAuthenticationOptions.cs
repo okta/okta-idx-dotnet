@@ -176,7 +176,7 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// </summary>
         /// <returns>OktaVerifyPollResponse.</returns>
         /// <exception cref="ArgumentException">If the challenge authenticator is not valid.</exception>
-        public async Task<OktaVerifyPollResponse> PollOnceAsync()
+        public async Task<PollResponse> PollOnceAsync()
         {
             IdxRequestPayload requestPayload = new IdxRequestPayload
             {
@@ -189,7 +189,7 @@ namespace Okta.Idx.Sdk.OktaVerify
             if (challengeResponse.SuccessWithInteractionCode != null)
             {
                 TokenInfo = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(IdxContext);
-                return new OktaVerifyPollResponse
+                return new PollResponse
                 {
                     AuthenticationStatus = AuthenticationStatus.Success,
                     TokenInfo = TokenInfo,
@@ -199,7 +199,7 @@ namespace Okta.Idx.Sdk.OktaVerify
 
             if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
             {
-                return new OktaVerifyPollResponse
+                return new PollResponse
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
                     ContinuePolling = continuePolling,
@@ -208,7 +208,7 @@ namespace Okta.Idx.Sdk.OktaVerify
 
             if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
             {
-                return new OktaVerifyPollResponse
+                return new PollResponse
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
                     ContinuePolling = continuePolling,

@@ -74,6 +74,14 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Poll the status of a push request. This is only applicable to Okta Verify.
+        /// </summary>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<PollResponse> PollAuthenticatorPushStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Verify an Okta Verify authenticator
         /// </summary>
         /// <param name="verifyAuthenticatorOptions">The options to verify an Okta Verify authenticator.</param>
@@ -216,8 +224,8 @@ namespace Okta.Idx.Sdk
         /// <returns>The identity providers response.</returns>
         Task<IdentityProvidersResponse> GetIdentityProvidersAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
 
-        Task<OktaVerifyPollResponse> PollEnroll(IIdxContext idxContext, CancellationToken cancellationToken = default);
+        Task<PollResponse> PollEnroll(IIdxContext idxContext, CancellationToken cancellationToken = default);
 
-        Task<OktaVerifyPollResponse> PollChallenge(IIdxContext idxContext, CancellationToken cancellationToken = default);
+        Task<PollResponse> PollChallenge(IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }
