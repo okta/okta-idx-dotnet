@@ -529,10 +529,10 @@ namespace embedded_auth_with_sdk.Controllers
 
                         selectAuthenticatorResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectPhoneOptions, (IIdxContext)Session["IdxContext"]);
                     }
-/*                    else if (model.IsOktaVerifySelected)
+                    else if (model.IsOktaVerifySelected)
                     {
                         return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
-                    }*/
+                    }
                     else
                     {
                         var selectAuthenticatorOptions = new SelectAuthenticatorOptions
