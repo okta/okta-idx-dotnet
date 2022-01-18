@@ -11,6 +11,7 @@
         @using (Html.BeginForm("SelectEnrollmentChannel", "OktaVerify", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
         {
             @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.AuthenticatorId)
             <h4>More options</h4>
             <div>Which option do you want to try?</div>
 

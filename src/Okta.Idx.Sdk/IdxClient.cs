@@ -1344,6 +1344,7 @@ namespace Okta.Idx.Sdk
                 CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value, selectAuthenticatorResponse.AuthenticatorEnrollments.Value),
             };
 
+            // TODO: remove this line when everything is converted
             authenticationResponse.OktaVerifyEnrollOptions = new OktaVerifyEnrollOptions(authenticationResponse, selectAuthenticatorResponse);
 
             return authenticationResponse;
@@ -1542,7 +1543,7 @@ namespace Okta.Idx.Sdk
                     }, introspectResponse);
             }
 
-            IdxRequestPayload idxRequestPayload = new IdxRequestPayload();
+            var idxRequestPayload = new IdxRequestPayload();
             idxRequestPayload.SetProperty("authenticator", new { id = challengeAuthenticatorOptions.AuthenticatorId, methodType = challengeAuthenticatorOptions.AuthenticatorMethodType });
             idxRequestPayload.SetProperty("stateHandle", introspectResponse.StateHandle);
 
@@ -1562,6 +1563,133 @@ namespace Okta.Idx.Sdk
             };
 
             return authenticationResponse;
+        }
+
+        public async Task<AuthenticationResponse> SelectEnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (!introspectResponse.ContainsRemediationOption(RemediationType.SelectEnrollmentChannel))
+            {
+                throw new UnexpectedRemediationException(
+                    new List<string>
+                    {
+                        RemediationType.SelectEnrollmentChannel,
+                    }, introspectResponse);
+            }
+
+            var idxRequestPayload = new IdxRequestPayload();
+            idxRequestPayload.SetProperty("authenticator", new { channel = enrollAuthenticatorOptions.Channel, id = enrollAuthenticatorOptions.AuthenticatorId });
+            idxRequestPayload.SetProperty("stateHandle", introspectResponse.StateHandle);
+
+            var selectEnrollmentChannelResponse = await introspectResponse.ProceedWithRemediationOptionAsync(
+                RemediationType.SelectEnrollmentChannel, idxRequestPayload, cancellationToken);
+
+            var authenticationResponse = new AuthenticationResponse
+            {
+                IdxContext = idxContext,
+                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollmentData,
+                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectEnrollmentChannelResponse.Authenticators?.Value, selectEnrollmentChannelResponse.CurrentAuthenticator?.Value),
+            };
+
+            return authenticationResponse;
+        }
+
+        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions oktaVerifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            if (!introspectResponse.ContainsRemediationOption(RemediationType.EnrollmentChannelData))
+            {
+                throw new UnexpectedRemediationException(
+                    new List<string>
+                    {
+                        RemediationType.EnrollmentChannelData,
+                    }, introspectResponse);
+            }
+
+            var idxRequestPayload = new IdxRequestPayload { StateHandle = introspectResponse.StateHandle };
+
+            switch (oktaVerifyAuthenticatorOptions.Channel)
+            {
+                case "email":
+                    idxRequestPayload.SetProperty("email", oktaVerifyAuthenticatorOptions.Email);
+                    break;
+                case "sms":
+                    idxRequestPayload.SetProperty("phoneNumber", oktaVerifyAuthenticatorOptions.PhoneNumber);
+                    break;
+            }
+
+            var enrollmentChannelDataResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.EnrollmentChannelData, idxRequestPayload, cancellationToken);
+
+            var authenticationResponse = new AuthenticationResponse
+            {
+                IdxContext = idxContext,
+                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(enrollmentChannelDataResponse.Authenticators?.Value, enrollmentChannelDataResponse.CurrentAuthenticator?.Value),
+            };
+
+            return authenticationResponse;
+        }
+
+        public async Task<OktaVerifyPollResponse> PollEnroll(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            bool continuePolling = introspectResponse.ContainsRemediationOption(RemediationType.EnrollPoll, out IRemediationOption remediationOption);
+
+            if (continuePolling)
+            {
+                return new OktaVerifyPollResponse
+                {
+                    Refresh = remediationOption?.Refresh,
+                    ContinuePolling = continuePolling,
+                    CurrentAuthenticator = continuePolling ? IdxResponseHelper.ConvertToAuthenticator(introspectResponse.Authenticators?.Value, introspectResponse.CurrentAuthenticator?.Value) : null,
+                };
+            }
+            else
+            {
+                if (introspectResponse.SuccessWithInteractionCode != null)
+                {
+                    return new OktaVerifyPollResponse
+                    {
+                        AuthenticationStatus = AuthenticationStatus.Success,
+                        TokenInfo = await introspectResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext),
+                    };
+                }
+
+                if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+                {
+                    return new OktaVerifyPollResponse
+                    {
+                        IdxContext = idxContext,
+                        AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
+                        Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators?.Value, introspectResponse.AuthenticatorEnrollments?.Value),
+                    };
+                }
+
+                if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+                {
+                    return new OktaVerifyPollResponse
+                    {
+                        IdxContext = idxContext,
+                        AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                        Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators?.Value),
+                    };
+                }
+            }
+
+            throw new UnexpectedRemediationException(
+                new List<string>
+                {
+                    RemediationType.EnrollPoll,
+                    RemediationType.SelectAuthenticatorAuthenticate,
+                    RemediationType.SelectAuthenticatorEnroll,
+                },
+                introspectResponse);
+        }
+
+        public Task<OktaVerifyPollResponse> PollChallenge(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
     }
 }

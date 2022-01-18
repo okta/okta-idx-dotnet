@@ -90,7 +90,8 @@ namespace embedded_auth_with_sdk.Controllers
                         //    return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
                         //}
                         // Assuming this is OV
-                        Session["ovAuthnResponse"] = authnResponse;
+                        Session["oktaVerifyAuthenticator"] = authnResponse.CurrentAuthenticator;
+                        //Session["ovAuthnResponse"] = authnResponse;
                         return RedirectToAction("SelectAuthenticator", "Manage");
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["isChallengeFlow"] = false;

@@ -9,7 +9,6 @@ namespace embedded_auth_with_sdk.Models
         {
             LabelTexts = new Dictionary<string, string>
             {
-                { "qrcode", "Scan a QR code" },
                 { "email", "Email me a setup link" },
                 { "sms", "Text me a setup link" }
             };
@@ -20,9 +19,9 @@ namespace embedded_auth_with_sdk.Models
         { 
         }
 
-        public OktaVerifySelectEnrollmentChannelOptionModel(OktaVerifyRemediationParameter option)
+        public OktaVerifySelectEnrollmentChannelOptionModel(string value)
         {
-            this.Value = option?.Value;
+            this.Value = value;
         }
 
         public string LabelText => LabelTexts[Value];

@@ -7,7 +7,7 @@ namespace Okta.Idx.Sdk.OktaVerify
     /// <summary>
     /// Class that contains information relevant to client side polling.
     /// </summary>
-    public class OktaVerifyPollResponse
+    public class OktaVerifyPollResponse : AuthenticationResponse
     {
         /// <summary>
         /// Gets or sets the duration to wait until the next poll request, in milliseconds.
@@ -23,20 +23,5 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// Gets or sets a path value indicating where to direct the client when polling is complete.
         /// </summary>
         public string Next { get; set; }
-
-        /// <summary>
-        /// Gets the authentication status.
-        /// </summary>
-        public AuthenticationStatus AuthenticationStatus { get; internal set; }
-
-        /// <summary>
-        /// Gets the Token Info.
-        /// </summary>
-        public ITokenResponse TokenInfo { get; internal set; }
-
-        /// <summary>
-        /// Gets the message to user.
-        /// </summary>
-        public string MessageToUser { get; internal set; }
     }
 }

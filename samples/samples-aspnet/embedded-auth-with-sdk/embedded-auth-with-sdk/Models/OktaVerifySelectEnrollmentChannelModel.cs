@@ -1,4 +1,5 @@
-﻿using Okta.Idx.Sdk.OktaVerify;
+﻿using Okta.Idx.Sdk;
+using Okta.Idx.Sdk.OktaVerify;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -16,6 +17,11 @@ namespace embedded_auth_with_sdk.Models
             this.OktaVerifyEnrollOptions = enrollPollOptions;
         }
 
+        public OktaVerifySelectEnrollmentChannelModel(IAuthenticator authenticator)
+        {
+            this.AuthenticatorId = authenticator.Id;
+        }
+
         protected OktaVerifyEnrollOptions OktaVerifyEnrollOptions { get; set; }
 
         [Required]
@@ -26,11 +32,12 @@ namespace embedded_auth_with_sdk.Models
             set;
         }
 
+        [Required]
+        public string AuthenticatorId { get; set; }
+
         public IList<OktaVerifySelectEnrollmentChannelOptionModel> EnrollmentChannelOptions 
         {
-            get => OktaVerifyEnrollOptions?
-                .GetChannelOptions()
-                .Where(option => option.Value != OktaVerifyEnrollmentChannel.QrCode)
+            get => new List<string>(new string[] {"email", "sms"})
                 .Select(option => new OktaVerifySelectEnrollmentChannelOptionModel(option))
                 .ToList();
         } 

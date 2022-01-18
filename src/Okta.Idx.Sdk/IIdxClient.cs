@@ -7,6 +7,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Okta.Idx.Sdk.Configuration;
+using Okta.Idx.Sdk.OktaVerify;
 using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
@@ -108,6 +109,8 @@ namespace Okta.Idx.Sdk
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> SelectEnrollAuthenticatorAsync(SelectEnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
+        Task<AuthenticationResponse> SelectEnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
         /// <summary>
         /// Starts the password recovery process with the recovery authenticator.
         /// </summary>
@@ -134,6 +137,8 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken= default);
 
         /// <summary>
         /// Select an authenticator to continue with the challenge process.
@@ -201,5 +206,9 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The identity providers response.</returns>
         Task<IdentityProvidersResponse> GetIdentityProvidersAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        Task<OktaVerifyPollResponse> PollEnroll(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        Task<OktaVerifyPollResponse> PollChallenge(IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }

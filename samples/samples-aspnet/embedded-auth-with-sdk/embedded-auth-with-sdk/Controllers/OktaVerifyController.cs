@@ -28,26 +28,29 @@ namespace embedded_auth_with_sdk.Controllers
 
         public ActionResult SelectAuthenticatorMethod()
         {
-            var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
-            var viewModel = new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions)
-            {
-                AuthenticatorId = ((IAuthenticationResponse)Session["ovAuthnResponse"]).CurrentAuthenticator.Id,
-            };
+            //var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
+            /*            var viewModel = new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions)
+                        {
+                            AuthenticatorId = ((IAuthenticationResponse)Session["ovAuthnResponse"]).CurrentAuthenticator.Id,
+                        };*/
 
-            return View(new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
+            var oktaAuthenticator = (IAuthenticator)Session["oktaVerifyAuthenticator"];
+            return View(new OktaVerifySelectAuthenticatorMethodModel(oktaAuthenticator));
         }
 
         public ActionResult Enroll()
         {
-            var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
-            return View("EnrollWithQrCode", new OktaVerifyEnrollPollModel(oktaVerifyEnrollOptions));
+            //var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
+            var oktaVerifyAuthenticator = (IAuthenticator)Session["oktaVerifyAuthenticator"];
+            return View("EnrollWithQrCode", new OktaVerifyEnrollPollModel(oktaVerifyAuthenticator.ContextualData.QrCode.Href));
         }
 
         [HttpGet]
         public ActionResult SelectEnrollmentChannel()
         {
-            var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
-            var selectEnrollmentChannelModel = new OktaVerifySelectEnrollmentChannelModel(oktaVerifyEnrollOptions);
+            //var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
+            var oktaVerifyAuthenticator = (IAuthenticator)Session["oktaVerifyAuthenticator"];
+            var selectEnrollmentChannelModel = new OktaVerifySelectEnrollmentChannelModel(oktaVerifyAuthenticator);
             return View(selectEnrollmentChannelModel);
         }
 
@@ -57,14 +60,22 @@ namespace embedded_auth_with_sdk.Controllers
             var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
             if (!ModelState.IsValid)
             {
-                var selectEnrollmentChannelViewModel = new OktaVerifySelectEnrollmentChannelModel(oktaVerifyEnrollOptions)
+                var selectEnrollmentChannelViewModel = new OktaVerifySelectEnrollmentChannelModel()// oktaVerifyEnrollOptions)
                 {
                     SelectedChannel = model.SelectedChannel,
                 };
                 return View(selectEnrollmentChannelViewModel);
             }
 
-            await oktaVerifyEnrollOptions.SelectEnrollmentChannelAsync(model.SelectedChannel);
+            //_ = await oktaVerifyEnrollOptions.SelectEnrollmentChannelAsync(model.SelectedChannel);
+            var idxContext = (IIdxContext)Session["idxContext"];
+            var enrollOktaVerifyOptions = new EnrollOktaVerifyAuthenticatorOptions
+            {
+                Channel = model.SelectedChannel,
+                AuthenticatorId = model.AuthenticatorId
+            };
+
+            await _idxClient.SelectEnrollAuthenticatorAsync(enrollOktaVerifyOptions, idxContext);
 
             switch (model.SelectedChannel)
             {
@@ -73,16 +84,24 @@ namespace embedded_auth_with_sdk.Controllers
                 case "sms":
                     return View("EnrollWithPhoneNumber", new OktaVerifyEnrollWithPhoneNumberModel { CountryCode = "+1" });
             }
+
             ModelState.AddModelError("SelectedChannel", new ArgumentException($"Unrecognized Okta Verify channel: {model.SelectedChannel}"));
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult EnrollWithEmail(OktaVerifyEnrollWithEmailModel emailModel)
+        public async Task<ActionResult> EnrollWithEmail(OktaVerifyEnrollWithEmailModel emailModel)
         {
-            var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
-            _ = oktaVerifyEnrollOptions.SendLinkToEmailAsync(emailModel.Email);
-            var oktaVerifyEnrollModel = new OktaVerifyEnrollPollModel(oktaVerifyEnrollOptions)
+            //var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
+            //_ = oktaVerifyEnrollOptions.SendLinkToEmailAsync(emailModel.Email);
+            var idxContext = (IIdxContext)Session["idxContext"];
+            var okaVerifyEnrollWithEmailOptions = new EnrollOktaVerifyAuthenticatorOptions
+            {
+                Channel = "email",
+                Email = emailModel.Email,
+            };
+            _ = await _idxClient.EnrollAuthenticatorAsync(okaVerifyEnrollWithEmailOptions, idxContext);
+            var oktaVerifyEnrollModel = new OktaVerifyEnrollPollModel()//oktaVerifyEnrollOptions)
             {
                 Message = "An activation link was sent to your email, use it to complete Okta Verify enrollment."
             };
@@ -91,11 +110,20 @@ namespace embedded_auth_with_sdk.Controllers
         }
 
         [HttpPost]
-        public ActionResult EnrollWithPhoneNumber(OktaVerifyEnrollWithPhoneNumberModel phoneNumberModel)
+        public async Task<ActionResult> EnrollWithPhoneNumber(OktaVerifyEnrollWithPhoneNumberModel phoneNumberModel)
         {
-            var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
-            _ = oktaVerifyEnrollOptions.SendLinkToPhoneNumberAsync($"{phoneNumberModel.CountryCode}{phoneNumberModel.PhoneNumber}");
-            var oktaVerifyEnrollModel = new OktaVerifyEnrollPollModel(oktaVerifyEnrollOptions)
+            //var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
+            //_ = oktaVerifyEnrollOptions.SendLinkToPhoneNumberAsync($"{phoneNumberModel.CountryCode}{phoneNumberModel.PhoneNumber}");
+            var idxContext = (IIdxContext)Session["idxContext"];
+
+            var oktaVerifEnrollAuthenticatorOptions = new EnrollOktaVerifyAuthenticatorOptions()
+            {
+                Channel = "sms",
+                PhoneNumber = phoneNumberModel.PhoneNumber,
+            };
+
+            _ = await _idxClient.EnrollAuthenticatorAsync(oktaVerifEnrollAuthenticatorOptions, idxContext);
+            var oktaVerifyEnrollModel = new OktaVerifyEnrollPollModel()
             {
                 Message = "An activation link was sent to your phone via sms, use it to complete Okta Verify enrollment."
             };
@@ -105,9 +133,8 @@ namespace embedded_auth_with_sdk.Controllers
 
         public async Task<ActionResult> EnrollPoll()
         {
-            var oktaVerifyEnrollmentOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
-
-            var pollResponse = await oktaVerifyEnrollmentOptions.PollOnceAsync();
+            var idxContext = (IIdxContext)Session["idxContext"];
+            var pollResponse = await _idxClient.PollEnroll(idxContext);
             if (!pollResponse.ContinuePolling)
             {
                 pollResponse.Next = "/Account/Login";
@@ -117,7 +144,6 @@ namespace embedded_auth_with_sdk.Controllers
         }
 
         [HttpPost]
-        //public async Task<ActionResult> SelectAuthenticatorMethod(AuthenticatorMethodType methodType)
         public async Task<ActionResult> SelectAuthenticatorMethod(OktaVerifySelectAuthenticatorMethodModel model)
         {
             var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];

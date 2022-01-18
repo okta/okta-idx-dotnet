@@ -507,7 +507,7 @@ namespace embedded_auth_with_sdk.Controllers
 
             try
             {
-                var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;
+                var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;                
                 Session["isPhoneSelected"] = model.IsPhoneSelected;
                 Session["phoneId"] = model.PhoneId;
                 Session["isWebAuthnSelected"] = model.IsWebAuthnSelected;
@@ -529,6 +529,10 @@ namespace embedded_auth_with_sdk.Controllers
 
                         selectAuthenticatorResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectPhoneOptions, (IIdxContext)Session["IdxContext"]);
                     }
+/*                    else if (model.IsOktaVerifySelected)
+                    {
+                        return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
+                    }*/
                     else
                     {
                         var selectAuthenticatorOptions = new SelectAuthenticatorOptions
@@ -601,6 +605,7 @@ namespace embedded_auth_with_sdk.Controllers
                                 else if(model.IsOktaVerifySelected)
                                 {
                                     Session[nameof(OktaVerifyEnrollOptions)] = enrollResponse.OktaVerifyEnrollOptions;
+                                    Session["oktaVerifyAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("Enroll", "OktaVerify");
                                 }
 
