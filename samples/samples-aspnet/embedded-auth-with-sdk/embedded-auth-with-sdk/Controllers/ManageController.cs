@@ -531,7 +531,11 @@ namespace embedded_auth_with_sdk.Controllers
                     }
                     else if (model.IsOktaVerifySelected)
                     {
-                        return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
+                        var viewModel = new OktaVerifySelectAuthenticatorMethodModel
+                        {
+                            AuthenticatorId = model.AuthenticatorId,
+                        };
+                        return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify", viewModel);
                     }
                     else
                     {

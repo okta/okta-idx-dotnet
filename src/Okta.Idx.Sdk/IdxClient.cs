@@ -1058,7 +1058,30 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
+        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(OktaVerifyVerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var challengeAuthenticatorRequest = new IdxRequestPayload();
+            challengeAuthenticatorRequest.SetProperty("credentials", new
+            {
+                totp = verifyAuthenticatorOptions.Code,
+            });
+
+            return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var challengeAuthenticatorRequest = new IdxRequestPayload();
+            challengeAuthenticatorRequest.SetProperty("credentials", new
+            {
+                passcode = verifyAuthenticatorOptions.Code,
+            });
+
+            return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        private async Task<AuthenticationResponse> VerifyAuthenticatorAsync(IdxRequestPayload challengeAuthenticatorRequest, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
@@ -1101,14 +1124,7 @@ namespace Okta.Idx.Sdk
                 }
             }
 
-            var challengeAuthenticatorRequest = new IdxRequestPayload
-            {
-                StateHandle = introspectResponse.StateHandle,
-            };
-            challengeAuthenticatorRequest.SetProperty("credentials", new
-            {
-                passcode = verifyAuthenticatorOptions.Code,
-            });
+            challengeAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
 
             return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, introspectResponse, currentRemediationType, idxContext, cancellationToken);
         }

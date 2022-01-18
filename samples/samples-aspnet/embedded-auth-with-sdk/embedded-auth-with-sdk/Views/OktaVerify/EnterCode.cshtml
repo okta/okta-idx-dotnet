@@ -8,7 +8,7 @@
 
 <div class="row d-center">
     <div class="col-md-8">
-        @using (Html.BeginForm("EnterCode", "OktaVerify", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        @using (Html.BeginForm("EnterCodeAsync", "OktaVerify", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
         {
             @Html.AntiForgeryToken()
             <h4>Enter a code</h4>

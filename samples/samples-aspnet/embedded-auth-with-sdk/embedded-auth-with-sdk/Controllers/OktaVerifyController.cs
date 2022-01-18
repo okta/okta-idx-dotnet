@@ -1,5 +1,7 @@
 ﻿
 
+using System.Web.UI.WebControls;
+
 namespace embedded_auth_with_sdk.Controllers
 {
     using embedded_auth_with_sdk.Models;
@@ -26,16 +28,21 @@ namespace embedded_auth_with_sdk.Controllers
             _idxClient = idxClient;
         }
 
-        public ActionResult SelectAuthenticatorMethod()
-        {
-            //var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
-            /*            var viewModel = new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions)
-                        {
-                            AuthenticatorId = ((IAuthenticationResponse)Session["ovAuthnResponse"]).CurrentAuthenticator.Id,
-                        };*/
+        //public ActionResult SelectAuthenticatorMethod()
+        //{
+        //    //var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
+        //    /*            var viewModel = new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions)
+        //                {
+        //                    AuthenticatorId = ((IAuthenticationResponse)Session["ovAuthnResponse"]).CurrentAuthenticator.Id,
+        //                };*/
 
-            var oktaAuthenticator = (IAuthenticator)Session["oktaVerifyAuthenticator"];
-            return View(new OktaVerifySelectAuthenticatorMethodModel(oktaAuthenticator));
+        //    var oktaAuthenticator = (IAuthenticator)Session["oktaVerifyAuthenticator"];
+        //    return View(new OktaVerifySelectAuthenticatorMethodModel(oktaAuthenticator));
+        //}
+
+        public ActionResult SelectAuthenticatorMethod(OktaVerifySelectAuthenticatorMethodModel model)
+        {
+            return View(model);
         }
 
         public ActionResult Enroll()
@@ -144,7 +151,7 @@ namespace embedded_auth_with_sdk.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> SelectAuthenticatorMethod(OktaVerifySelectAuthenticatorMethodModel model)
+        public async Task<ActionResult> SelectAuthenticatorMethodAsync(OktaVerifySelectAuthenticatorMethodModel model)
         {
             var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
 
@@ -154,16 +161,6 @@ namespace embedded_auth_with_sdk.Controllers
                 AuthenticatorId = model.AuthenticatorId,
             };
             
-            
-            //switch (methodType)
-            //{
-            //    case "totp":
-            //        _ = await oktaVerifyAuthenticationOptions.SelectTotpMethodAsync();
-            //        return View("EnterCode");
-            //    case "push":
-            //        _ = await oktaVerifyAuthenticationOptions.SelectPushMethodAsync();
-            //        return View("PushSent", new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
-            //}
             try
             {
 
@@ -193,15 +190,23 @@ namespace embedded_auth_with_sdk.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> EnterCode(OktaVerifyEnterCodeModel oktaVerifyEnterCodeModel)
+        public async Task<ActionResult> EnterCode()
         {
-            var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
-            var authenticationResponse = await oktaVerifyAuthenticationOptions.EnterCodeAsync(oktaVerifyEnterCodeModel.Code);
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult> EnterCodeAsync(OktaVerifyEnterCodeModel oktaVerifyEnterCodeModel)
+        {
+            var authenticationResponse = await _idxClient.VerifyAuthenticatorAsync(
+                new OktaVerifyVerifyAuthenticatorOptions { Code = oktaVerifyEnterCodeModel.Code },
+                (IIdxContext)Session["idxContext"]);
 
             switch (authenticationResponse?.AuthenticationStatus)
             {
                 case AuthenticationStatus.Success:
-                    ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, oktaVerifyAuthenticationOptions.TokenInfo);
+                    ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authenticationResponse.TokenInfo);
                     _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                     return RedirectToAction("Index", "Home");
 

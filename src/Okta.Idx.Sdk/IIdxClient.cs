@@ -74,6 +74,15 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Verify an Okta Verify authenticator
+        /// </summary>
+        /// <param name="verifyAuthenticatorOptions">The options to verify an Okta Verify authenticator.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> VerifyAuthenticatorAsync(OktaVerifyVerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Challenge a  web authn authenticator
         /// </summary>
         /// <param name="verifyAuthenticatorOptions">The options to verify an authenticator.</param>

@@ -5,6 +5,11 @@ namespace embedded_auth_with_sdk.Models
 {
     public class OktaVerifySelectAuthenticatorMethodModel
     {
+        public OktaVerifySelectAuthenticatorMethodModel()
+        {
+            PollEndpoint = "/OktaVerify/ChallengePoll";
+        }
+
         public OktaVerifySelectAuthenticatorMethodModel(OktaVerifyAuthenticationOptions oktaVerifyAuthenticationOptions, string pollEndpoint = "/OktaVerify/ChallengePoll")
         {   
             this.OktaVerifyAuthenticationOptions = oktaVerifyAuthenticationOptions;
@@ -19,7 +24,7 @@ namespace embedded_auth_with_sdk.Models
 
         public string AuthenticatorId { get; set; }
 
-        public AuthenticatorMethodType MethodType { get; set; }
+        public string MethodType { get; set; }
 
         public OktaVerifyAuthenticationOptions OktaVerifyAuthenticationOptions { get; }
 
