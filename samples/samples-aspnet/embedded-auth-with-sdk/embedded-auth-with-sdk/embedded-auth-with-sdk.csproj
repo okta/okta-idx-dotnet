@@ -342,6 +342,7 @@
     <Compile Include="Models\OktaVerifySelectAuthenticatorMethodModel.cs" />
     <Compile Include="Models\OktaVerifySelectEnrollmentChannelModel.cs" />
     <Compile Include="Models\OktaVerifySelectEnrollmentChannelOptionModel.cs" />
+    <Compile Include="Models\OktaVerifyPollResponseModel.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Models\SelectAuthenticatorMethodViewModel.cs" />
     <Compile Include="Models\SelectAuthenticatorViewModel.cs" />

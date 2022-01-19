@@ -1,18 +1,10 @@
-﻿
-
-using System.Web.UI.WebControls;
-
-namespace embedded_auth_with_sdk.Controllers
+﻿namespace embedded_auth_with_sdk.Controllers
 {
     using embedded_auth_with_sdk.Models;
     using Microsoft.Owin.Security;
     using Okta.Idx.Sdk;
-    using Okta.Idx.Sdk.OktaVerify;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Security.Claims;
-    using System.Text;
     using System.Threading.Tasks;
     using System.Web.Mvc;
 
@@ -28,18 +20,6 @@ namespace embedded_auth_with_sdk.Controllers
             _idxClient = idxClient;
         }
 
-        //public ActionResult SelectAuthenticatorMethod()
-        //{
-        //    //var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
-        //    /*            var viewModel = new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions)
-        //                {
-        //                    AuthenticatorId = ((IAuthenticationResponse)Session["ovAuthnResponse"]).CurrentAuthenticator.Id,
-        //                };*/
-
-        //    var oktaAuthenticator = (IAuthenticator)Session["oktaVerifyAuthenticator"];
-        //    return View(new OktaVerifySelectAuthenticatorMethodModel(oktaAuthenticator));
-        //}
-
         public ActionResult SelectAuthenticatorMethod(OktaVerifySelectAuthenticatorMethodModel model)
         {
             return View(model);
@@ -47,7 +27,6 @@ namespace embedded_auth_with_sdk.Controllers
 
         public ActionResult Enroll()
         {
-            //var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
             var oktaVerifyAuthenticator = (IAuthenticator)Session["oktaVerifyAuthenticator"];
             return View("EnrollWithQrCode", new OktaVerifyEnrollPollModel(oktaVerifyAuthenticator.ContextualData.QrCode.Href));
         }
@@ -55,7 +34,6 @@ namespace embedded_auth_with_sdk.Controllers
         [HttpGet]
         public ActionResult SelectEnrollmentChannel()
         {
-            //var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
             var oktaVerifyAuthenticator = (IAuthenticator)Session["oktaVerifyAuthenticator"];
             var selectEnrollmentChannelModel = new OktaVerifySelectEnrollmentChannelModel(oktaVerifyAuthenticator);
             return View(selectEnrollmentChannelModel);
@@ -64,17 +42,16 @@ namespace embedded_auth_with_sdk.Controllers
         [HttpPost]
         public async Task<ActionResult> SelectEnrollmentChannel(OktaVerifySelectEnrollmentChannelModel model)
         {
-            var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
+            var oktaVerifyAuthenticator = (IAuthenticator)Session["oktaVerifyAuthenticator"];
             if (!ModelState.IsValid)
             {
-                var selectEnrollmentChannelViewModel = new OktaVerifySelectEnrollmentChannelModel()// oktaVerifyEnrollOptions)
+                var selectEnrollmentChannelViewModel = new OktaVerifySelectEnrollmentChannelModel(oktaVerifyAuthenticator)
                 {
                     SelectedChannel = model.SelectedChannel,
                 };
                 return View(selectEnrollmentChannelViewModel);
             }
 
-            //_ = await oktaVerifyEnrollOptions.SelectEnrollmentChannelAsync(model.SelectedChannel);
             var idxContext = (IIdxContext)Session["idxContext"];
             var enrollOktaVerifyOptions = new EnrollOktaVerifyAuthenticatorOptions
             {
@@ -99,16 +76,15 @@ namespace embedded_auth_with_sdk.Controllers
         [HttpPost]
         public async Task<ActionResult> EnrollWithEmail(OktaVerifyEnrollWithEmailModel emailModel)
         {
-            //var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
-            //_ = oktaVerifyEnrollOptions.SendLinkToEmailAsync(emailModel.Email);
             var idxContext = (IIdxContext)Session["idxContext"];
             var okaVerifyEnrollWithEmailOptions = new EnrollOktaVerifyAuthenticatorOptions
             {
                 Channel = "email",
                 Email = emailModel.Email,
             };
+
             _ = await _idxClient.EnrollAuthenticatorAsync(okaVerifyEnrollWithEmailOptions, idxContext);
-            var oktaVerifyEnrollModel = new OktaVerifyEnrollPollModel()//oktaVerifyEnrollOptions)
+            var oktaVerifyEnrollModel = new OktaVerifyEnrollPollModel()
             {
                 Message = "An activation link was sent to your email, use it to complete Okta Verify enrollment."
             };
@@ -119,8 +95,6 @@ namespace embedded_auth_with_sdk.Controllers
         [HttpPost]
         public async Task<ActionResult> EnrollWithPhoneNumber(OktaVerifyEnrollWithPhoneNumberModel phoneNumberModel)
         {
-            //var oktaVerifyEnrollOptions = (OktaVerifyEnrollOptions)Session[nameof(OktaVerifyEnrollOptions)];
-            //_ = oktaVerifyEnrollOptions.SendLinkToPhoneNumberAsync($"{phoneNumberModel.CountryCode}{phoneNumberModel.PhoneNumber}");
             var idxContext = (IIdxContext)Session["idxContext"];
 
             var oktaVerifEnrollAuthenticatorOptions = new EnrollOktaVerifyAuthenticatorOptions()
@@ -141,18 +115,42 @@ namespace embedded_auth_with_sdk.Controllers
         public async Task<ActionResult> EnrollPoll()
         {
             var idxContext = (IIdxContext)Session["idxContext"];
-            var pollResponse = await _idxClient.PollEnroll(idxContext);
-            //pollResponse.Next = "/Account/Login";
-            dynamic pollViewModel = new
+            var pollResponse = await _idxClient.PollEnrollmentStatusAsync(idxContext);
+
+            var pollViewModel = new OktaVerifyPollResponseModel
             {
                 Refresh = pollResponse.Refresh,
-                ContinuePolling = pollResponse.ContinuePolling
+                ContinuePolling = pollResponse.ContinuePolling,
+                Next = "/Account/Login",
             };
 
             if (!pollResponse.ContinuePolling)
             {
-                pollViewModel.Next = "/Account/Login";
-            };
+                switch (pollResponse?.AuthenticationStatus)
+                {
+                    case AuthenticationStatus.Success:
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, pollResponse.TokenInfo);
+                        _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                        pollViewModel.Next = "/Home/Index";
+                        break;
+                    case AuthenticationStatus.PasswordExpired:
+                        pollViewModel.Next = "/Manage/ChangePassword";
+                        break;
+                    case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(pollResponse.Authenticators);
+                        Session["isChallengeFlow"] = true;
+                        pollViewModel.Next = "/Manage/SelectAuthenticator";
+                        break;
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["isChallengeFlow"] = false;
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(pollResponse.Authenticators);
+                        pollViewModel.Next = "/Manage/SelectAuthenticator";
+                        break;
+                    default:
+                        pollViewModel.Next = "/Account/Login";
+                        break;
+                }
+            }
             
             return Json(pollViewModel, JsonRequestBehavior.AllowGet);
         }
@@ -160,8 +158,6 @@ namespace embedded_auth_with_sdk.Controllers
         [HttpPost]
         public async Task<ActionResult> SelectAuthenticatorMethodAsync(OktaVerifySelectAuthenticatorMethodModel model)
         {
-            var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
-
             var selectAuthenticatorOptions = new SelectOktaVerifyAuthenticatorOptions
             {
                 AuthenticatorMethodType = model.MethodType,
@@ -170,7 +166,6 @@ namespace embedded_auth_with_sdk.Controllers
             
             try
             {
-
                 var authnResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions,
                     (IIdxContext)Session["IdxContext"]);
 
@@ -178,31 +173,22 @@ namespace embedded_auth_with_sdk.Controllers
                 {
                     switch (model.MethodType)
                     {
-                        // TODO: change it to enum
                         case "totp":
                             return View("EnterCode");
                         case "push":
                             return View("PushSent",
-                                new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
+                                new OktaVerifySelectAuthenticatorMethodModel());
                     }
                 }
             }
             catch (Exception e)
             {
-                // Add errors to model
+                ModelState.AddModelError("MethodType", e);
             }
 
-            //ModelState.AddModelError("", new ArgumentException($"Unrecognized Okta Verify authentication method: {methodType}"));
-            return View(new OktaVerifySelectAuthenticatorMethodModel(oktaVerifyAuthenticationOptions));
+            return View(new OktaVerifySelectAuthenticatorMethodModel());
         }
-
-        [HttpPost]
-        public async Task<ActionResult> EnterCode()
-        {
-            return View();
-        }
-
-
+        
         [HttpPost]
         public async Task<ActionResult> EnterCodeAsync(OktaVerifyEnterCodeModel oktaVerifyEnterCodeModel)
         {
@@ -216,19 +202,11 @@ namespace embedded_auth_with_sdk.Controllers
                     ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authenticationResponse.TokenInfo);
                     _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                     return RedirectToAction("Index", "Home");
-
                 case AuthenticationStatus.PasswordExpired:
                     return RedirectToAction("ChangePassword", "Manage");
-
                 case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
                     Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authenticationResponse.Authenticators);
                     Session["isChallengeFlow"] = true;
-                    // TODO: Review this
-                    //if (authenticationResponse.IsOktaVerifyCurrentAuthenticator == true)
-                    //{
-                    //    Session[nameof(OktaVerifyAuthenticationOptions)] = authenticationResponse.OktaVerifyAuthenticationOptions;
-                    //    return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
-                    //}
                     return RedirectToAction("SelectAuthenticator", "Manage");
                 case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                     Session["isChallengeFlow"] = false;
@@ -241,21 +219,18 @@ namespace embedded_auth_with_sdk.Controllers
 
         public async Task<ActionResult> ChallengePoll()
         {
-            var oktaVerifyAuthenticationOptions = (OktaVerifyAuthenticationOptions)Session[nameof(OktaVerifyAuthenticationOptions)];
-
             var pollResponse = await _idxClient.PollAuthenticatorPushStatusAsync((IIdxContext)Session["idxContext"]);
-            // oktaVerifyAuthenticationOptions.PollOnceAsync();
-            dynamic pollViewModel = new
+            var pollViewModel = new OktaVerifyPollResponseModel
             {
                 Refresh = pollResponse.Refresh,
                 ContinuePolling = pollResponse.ContinuePolling,
+                Next = "/Home/Index"
             };
 
             if (!pollResponse.ContinuePolling)
             {
                 ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, pollResponse.TokenInfo);
-                _authenticationManager.SignIn(new AuthenticationProperties(), identity);
-                pollViewModel.Next = "/Home/Index";
+                _authenticationManager.SignIn(new AuthenticationProperties(), identity);                
             }
 
             return Json(pollViewModel, JsonRequestBehavior.AllowGet);

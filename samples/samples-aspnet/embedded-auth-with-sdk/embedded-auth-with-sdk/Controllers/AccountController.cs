@@ -6,7 +6,6 @@ using System.Web.Mvc;
 using embedded_auth_with_sdk.Models;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
-using Okta.Idx.Sdk.OktaVerify;
 using Okta.Sdk.Abstractions;
 
 namespace embedded_auth_with_sdk.Controllers
@@ -83,15 +82,6 @@ namespace embedded_auth_with_sdk.Controllers
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
-                        // TODO: Review this
-                        //if (authnResponse.IsOktaVerifyCurrentAuthenticator)
-                        //{
-                        //    Session[nameof(OktaVerifyAuthenticationOptions)] = authnResponse.OktaVerifyAuthenticationOptions;
-                        //    return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
-                        //}
-                        // Assuming this is OV
-                        Session["oktaVerifyAuthenticator"] = authnResponse.CurrentAuthenticator;
-                        //Session["ovAuthnResponse"] = authnResponse;
                         return RedirectToAction("SelectAuthenticator", "Manage");
                     case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                         Session["isChallengeFlow"] = false;

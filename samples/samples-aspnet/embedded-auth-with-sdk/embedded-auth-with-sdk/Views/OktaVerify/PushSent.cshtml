@@ -22,7 +22,6 @@
         fetch('@Model.PollEndpoint')
             .then(response => response.json())
             .then(data => {
-                debugger;
                 if (data.ContinuePolling) {
                     setTimeout(poll, data.Refresh);
                 } else {

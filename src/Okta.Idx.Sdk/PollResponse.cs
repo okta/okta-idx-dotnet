@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Okta.Idx.Sdk.OktaVerify
+namespace Okta.Idx.Sdk
 {
     /// <summary>
     /// Class that contains information relevant to client side polling.
@@ -23,10 +23,5 @@ namespace Okta.Idx.Sdk.OktaVerify
         /// Gets or sets a value indicating whether to continue polling.
         /// </summary>
         public bool ContinuePolling { get; set; }
-
-        ///// <summary>
-        ///// Gets or sets a path value indicating where to direct the client when polling is complete.
-        ///// </summary>
-        //public string Next { get; set; }
     }
 }

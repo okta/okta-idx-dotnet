@@ -46,7 +46,7 @@ namespace Okta.Idx.Sdk
         public static AuthenticatorMethodType Totp = new AuthenticatorMethodType("totp");
 
         /// <summary>
-        /// TOTP
+        /// Push
         /// </summary>
         public static AuthenticatorMethodType Push = new AuthenticatorMethodType("push");
 

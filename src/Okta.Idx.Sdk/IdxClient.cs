@@ -21,7 +21,6 @@ using Newtonsoft.Json.Linq;
 using Okta.Idx.Sdk.Configuration;
 using Okta.Idx.Sdk.Extensions;
 using Okta.Idx.Sdk.Helpers;
-using Okta.Idx.Sdk.OktaVerify;
 using Okta.Sdk.Abstractions;
 using Okta.Sdk.Abstractions.Configuration.Providers.EnvironmentVariables;
 using Okta.Sdk.Abstractions.Configuration.Providers.Object;
@@ -602,7 +601,7 @@ namespace Okta.Idx.Sdk
                             Authenticators = IdxResponseHelper.ConvertToAuthenticators(challengeResponse.Authenticators.Value, challengeResponse.AuthenticatorEnrollments.Value),
                         };
 
-                        authenticationResponse.OktaVerifyAuthenticationOptions = new OktaVerifyAuthenticationOptions(authenticationResponse, challengeResponse);
+                        //authenticationResponse.OktaVerifyAuthenticationOptions = new OktaVerifyAuthenticationOptions(authenticationResponse, challengeResponse);
                         return authenticationResponse;
                     }
                     else
@@ -1360,9 +1359,6 @@ namespace Okta.Idx.Sdk
                 CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value, selectAuthenticatorResponse.AuthenticatorEnrollments.Value),
             };
 
-            // TODO: remove this line when everything is converted
-            authenticationResponse.OktaVerifyEnrollOptions = new OktaVerifyEnrollOptions(authenticationResponse, selectAuthenticatorResponse);
-
             return authenticationResponse;
         }
 
@@ -1546,6 +1542,7 @@ namespace Okta.Idx.Sdk
             }
         }
 
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(SelectOktaVerifyAuthenticatorOptions challengeAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
@@ -1567,16 +1564,13 @@ namespace Okta.Idx.Sdk
                 RemediationType.SelectAuthenticatorAuthenticate,
                 idxRequestPayload,
                 cancellationToken);
-            // TODO: Review where put this
-            //this.ChallengePollRemediationOption = selectAuthenticatorResponse.FindRemediationOption(RemediationType.ChallengePoll);
-            //this.ChallengeAuthenticatorRemediationOption = selectAuthenticatorResponse.FindRemediationOption(RemediationType.ChallengeAuthenticator);
 
             var authenticationResponse = new AuthenticationResponse
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
-                // TODO: CHeck that method types are being populated for Okta Verify
                 CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value),
+                CanSkip = selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.Skip),
             };
 
             return authenticationResponse;
@@ -1607,6 +1601,7 @@ namespace Okta.Idx.Sdk
                 IdxContext = idxContext,
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollmentData,
                 CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectEnrollmentChannelResponse.Authenticators?.Value, selectEnrollmentChannelResponse.CurrentAuthenticator?.Value),
+                CanSkip = selectEnrollmentChannelResponse.ContainsRemediationOption(RemediationType.Skip),
             };
 
             return authenticationResponse;
@@ -1648,7 +1643,7 @@ namespace Okta.Idx.Sdk
             return authenticationResponse;
         }
 
-        public async Task<PollResponse> PollEnroll(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        public async Task<PollResponse> PollEnrollmentStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
             bool continuePolling = introspectResponse.ContainsRemediationOption(RemediationType.EnrollPoll, out IRemediationOption remediationOption);
@@ -1657,9 +1652,11 @@ namespace Okta.Idx.Sdk
             {
                 return new PollResponse
                 {
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
                     Refresh = remediationOption?.Refresh,
                     ContinuePolling = continuePolling,
-                    CurrentAuthenticator = continuePolling ? IdxResponseHelper.ConvertToAuthenticator(introspectResponse.Authenticators?.Value, introspectResponse.CurrentAuthenticator?.Value) : null,
+                    CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(introspectResponse.Authenticators?.Value, introspectResponse.CurrentAuthenticator?.Value),
+                    CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
                 };
             }
             else
@@ -1670,6 +1667,7 @@ namespace Okta.Idx.Sdk
                     {
                         AuthenticationStatus = AuthenticationStatus.Success,
                         TokenInfo = await introspectResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext),
+                        CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
                     };
                 }
 
@@ -1680,6 +1678,7 @@ namespace Okta.Idx.Sdk
                         IdxContext = idxContext,
                         AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
                         Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators?.Value, introspectResponse.AuthenticatorEnrollments?.Value),
+                        CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
                     };
                 }
 
@@ -1690,6 +1689,7 @@ namespace Okta.Idx.Sdk
                         IdxContext = idxContext,
                         AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
                         Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators?.Value),
+                        CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
                     };
                 }
             }
@@ -1702,11 +1702,6 @@ namespace Okta.Idx.Sdk
                     RemediationType.SelectAuthenticatorEnroll,
                 },
                 introspectResponse);
-        }
-
-        public Task<PollResponse> PollChallenge(IIdxContext idxContext, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
@@ -1733,8 +1728,7 @@ namespace Okta.Idx.Sdk
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
                     ContinuePolling = continuePolling,
-                    // TODO: Set Refresh
-                    Refresh = 400,
+                    Refresh = challengePollRemediationOption?.Refresh ?? 4000,
                 };
             }
 
@@ -1746,8 +1740,7 @@ namespace Okta.Idx.Sdk
                     AuthenticationStatus = AuthenticationStatus.Success,
                     TokenInfo = tokenInfo,
                     ContinuePolling = continuePolling,
-                    // TODO: Set Refresh
-                    Refresh = 400,
+                    Refresh = challengePollRemediationOption?.Refresh ?? 4000,
                 };
             }
 
@@ -1757,6 +1750,7 @@ namespace Okta.Idx.Sdk
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
                     ContinuePolling = continuePolling,
+                    Refresh = challengePollRemediationOption?.Refresh ?? 4000,
                 };
             }
 
@@ -1766,6 +1760,7 @@ namespace Okta.Idx.Sdk
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
                     ContinuePolling = continuePolling,
+                    Refresh = challengePollRemediationOption?.Refresh ?? 4000,
                 };
             }
 

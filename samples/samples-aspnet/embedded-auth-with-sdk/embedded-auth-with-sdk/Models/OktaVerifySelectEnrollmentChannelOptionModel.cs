@@ -1,5 +1,4 @@
-﻿using Okta.Idx.Sdk.OktaVerify;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace embedded_auth_with_sdk.Models
 {

@@ -13,7 +13,6 @@ namespace embedded_auth_with_sdk.Controllers
     using Microsoft.Owin.Security;
 
     using Okta.Idx.Sdk;
-    using Okta.Idx.Sdk.OktaVerify;
     using Okta.Sdk.Abstractions;
 
     public class ManageController : Controller
@@ -608,7 +607,6 @@ namespace embedded_auth_with_sdk.Controllers
                                 }
                                 else if(model.IsOktaVerifySelected)
                                 {
-                                    Session[nameof(OktaVerifyEnrollOptions)] = enrollResponse.OktaVerifyEnrollOptions;
                                     Session["oktaVerifyAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("Enroll", "OktaVerify");
                                 }

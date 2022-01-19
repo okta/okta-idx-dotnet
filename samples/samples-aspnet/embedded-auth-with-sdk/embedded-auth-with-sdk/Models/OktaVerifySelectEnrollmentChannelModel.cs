@@ -1,5 +1,4 @@
 ﻿using Okta.Idx.Sdk;
-using Okta.Idx.Sdk.OktaVerify;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,17 +11,10 @@ namespace embedded_auth_with_sdk.Models
         { 
         }
 
-        public OktaVerifySelectEnrollmentChannelModel(OktaVerifyEnrollOptions enrollPollOptions)
-        {
-            this.OktaVerifyEnrollOptions = enrollPollOptions;
-        }
-
         public OktaVerifySelectEnrollmentChannelModel(IAuthenticator authenticator)
         {
             this.AuthenticatorId = authenticator.Id;
         }
-
-        protected OktaVerifyEnrollOptions OktaVerifyEnrollOptions { get; set; }
 
         [Required]
         [Display(Name = "enrollment channel")]
