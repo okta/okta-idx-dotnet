@@ -41,8 +41,6 @@ namespace Okta.Idx.Sdk.Helpers
                 MethodTypes = authenticatorEnrollment.Methods?.Select(x => x.Type).ToList(),
                 EnrollmentId = authenticatorEnrollment.Id,
                 Profile = GetAuthenticatorProfile(authenticatorEnrollment),
-                //QrCode = authenticatorEnrollment.OktaVerifyContextualData?.QrCode,
-                //SelectedChannel = authenticatorEnrollment.OktaVerifyContextualData?.SelectedChannel,
             };
         }
 

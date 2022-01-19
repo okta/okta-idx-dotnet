@@ -12,6 +12,7 @@ namespace embedded_auth_with_sdk.Models
                 { "sms", "Text me a setup link" }
             };
         }
+
         public static Dictionary<string, string> LabelTexts { get; }
 
         public OktaVerifySelectEnrollmentChannelOptionModel()

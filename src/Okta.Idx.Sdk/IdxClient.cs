@@ -1576,6 +1576,7 @@ namespace Okta.Idx.Sdk
             return authenticationResponse;
         }
 
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> SelectEnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
@@ -1607,6 +1608,7 @@ namespace Okta.Idx.Sdk
             return authenticationResponse;
         }
 
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions oktaVerifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
@@ -1638,11 +1640,13 @@ namespace Okta.Idx.Sdk
                 IdxContext = idxContext,
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
                 CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(enrollmentChannelDataResponse.Authenticators?.Value, enrollmentChannelDataResponse.CurrentAuthenticator?.Value),
+                CanSkip = enrollmentChannelDataResponse.ContainsRemediationOption(RemediationType.Skip),
             };
 
             return authenticationResponse;
         }
 
+        /// <inheritdoc/>
         public async Task<PollResponse> PollEnrollmentStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
