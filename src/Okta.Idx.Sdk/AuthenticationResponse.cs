@@ -51,20 +51,5 @@ namespace Okta.Idx.Sdk
         /// Gets the message to user
         /// </summary>
         public string MessageToUser { get; internal set; }
-
-        /// <summary>
-        /// Gets the options for Okta Verify enrollment.
-        /// </summary>
-        //public OktaVerifyEnrollOptions OktaVerifyEnrollOptions { get; internal set; }
-
-        /// <summary>
-        /// Gets the options for Okta Verify authentication.
-        /// </summary>
-        //public OktaVerifyAuthenticationOptions OktaVerifyAuthenticationOptions { get; internal set; }
-
-        ///// <summary>
-        ///// Gets a value that indicates whether Okta Verify is the current authenticator.
-        ///// </summary>
-        //public bool? IsOktaVerifyCurrentAuthenticator => OktaVerifyAuthenticationOptions?.CurrentAuthenticator?.Key.Equals("okta_verify");
     }
 }
