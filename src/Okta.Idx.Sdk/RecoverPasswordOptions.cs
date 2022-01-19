@@ -19,5 +19,10 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the authenticator type.
         /// </summary>
         public AuthenticatorType AuthenticatorType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the recovery token.
+        /// </summary>
+        public string RecoveryToken { get; set; }
     }
 }
