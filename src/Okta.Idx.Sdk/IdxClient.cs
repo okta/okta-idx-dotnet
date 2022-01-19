@@ -594,15 +594,12 @@ namespace Okta.Idx.Sdk
                     }
                     else if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
                     {
-                        var authenticationResponse = new AuthenticationResponse
+                        return new AuthenticationResponse
                         {
                             IdxContext = idxContext,
                             AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
                             Authenticators = IdxResponseHelper.ConvertToAuthenticators(challengeResponse.Authenticators.Value, challengeResponse.AuthenticatorEnrollments.Value),
                         };
-
-                        //authenticationResponse.OktaVerifyAuthenticationOptions = new OktaVerifyAuthenticationOptions(authenticationResponse, challengeResponse);
-                        return authenticationResponse;
                     }
                     else
                     {
@@ -1352,14 +1349,12 @@ namespace Okta.Idx.Sdk
                     selectAuthenticatorResponse);
             }
 
-            var authenticationResponse = new AuthenticationResponse
+            return new AuthenticationResponse
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = status,
                 CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value, selectAuthenticatorResponse.AuthenticatorEnrollments.Value),
             };
-
-            return authenticationResponse;
         }
 
         private static bool IsRemediationRequireCredentials(string remediationOptionName, IIdxResponse idxResponse)

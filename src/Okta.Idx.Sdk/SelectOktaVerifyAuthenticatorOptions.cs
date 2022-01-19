@@ -11,6 +11,5 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the authenticator method type
         /// </summary>
         public AuthenticatorMethodType AuthenticatorMethodType { get; set; }
-
     }
 }

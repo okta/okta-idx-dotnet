@@ -81,7 +81,7 @@ namespace Okta.Idx.Sdk
         Task<PollResponse> PollAuthenticatorPushStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Verify an Okta Verify authenticator
+        /// Verify an Okta Verify authenticator.
         /// </summary>
         /// <param name="verifyAuthenticatorOptions">The options to verify an Okta Verify authenticator.</param>
         /// <param name="idxContext">The IDX context.</param>
@@ -162,7 +162,7 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Enroll Okta Verify authenticator
+        /// Enroll Okta Verify authenticator.
         /// </summary>
         /// <param name="verifyAuthenticatorOptions">The options to enroll an authenticator.</param>
         /// <param name="idxContext">The IDX context.</param>
