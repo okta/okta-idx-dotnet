@@ -1642,7 +1642,7 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<PollResponse> PollEnrollmentStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        public async Task<PollResponse> PollAuthenticatorEnrollmentStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
             bool continuePolling = introspectResponse.ContainsRemediationOption(RemediationType.EnrollPoll, out IRemediationOption remediationOption);
@@ -1727,7 +1727,7 @@ namespace Okta.Idx.Sdk
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
                     ContinuePolling = continuePolling,
-                    Refresh = challengePollRemediationOption?.Refresh ?? 4000,
+                    Refresh = challengePollRemediationOption?.Refresh,
                 };
             }
 
@@ -1739,7 +1739,7 @@ namespace Okta.Idx.Sdk
                     AuthenticationStatus = AuthenticationStatus.Success,
                     TokenInfo = tokenInfo,
                     ContinuePolling = continuePolling,
-                    Refresh = challengePollRemediationOption?.Refresh ?? 4000,
+                    Refresh = challengePollRemediationOption?.Refresh,
                 };
             }
 
@@ -1749,7 +1749,7 @@ namespace Okta.Idx.Sdk
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
                     ContinuePolling = continuePolling,
-                    Refresh = challengePollRemediationOption?.Refresh ?? 4000,
+                    Refresh = challengePollRemediationOption?.Refresh,
                 };
             }
 
@@ -1759,7 +1759,7 @@ namespace Okta.Idx.Sdk
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
                     ContinuePolling = continuePolling,
-                    Refresh = challengePollRemediationOption?.Refresh ?? 4000,
+                    Refresh = challengePollRemediationOption?.Refresh,
                 };
             }
 

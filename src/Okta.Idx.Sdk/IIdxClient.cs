@@ -243,6 +243,6 @@ namespace Okta.Idx.Sdk
         /// <param name="idxContext">The IDX context.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
-        Task<PollResponse> PollEnrollmentStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+        Task<PollResponse> PollAuthenticatorEnrollmentStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }

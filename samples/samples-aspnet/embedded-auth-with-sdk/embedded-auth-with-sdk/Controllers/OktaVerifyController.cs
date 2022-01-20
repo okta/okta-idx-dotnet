@@ -115,7 +115,7 @@
         public async Task<ActionResult> EnrollPoll()
         {
             var idxContext = (IIdxContext)Session["idxContext"];
-            var pollResponse = await _idxClient.PollEnrollmentStatusAsync(idxContext);
+            var pollResponse = await _idxClient.PollAuthenticatorEnrollmentStatusAsync(idxContext);
 
             var pollViewModel = new OktaVerifyPollResponseModel
             {
@@ -184,6 +184,7 @@
             catch (Exception e)
             {
                 ModelState.AddModelError("MethodType", e);
+                return View("SelectAuthenticatorMethod", model);
             }
 
             return View(new OktaVerifySelectAuthenticatorMethodModel());
@@ -222,7 +223,7 @@
             var pollResponse = await _idxClient.PollAuthenticatorPushStatusAsync((IIdxContext)Session["idxContext"]);
             var pollViewModel = new OktaVerifyPollResponseModel
             {
-                Refresh = pollResponse.Refresh,
+                Refresh = pollResponse.Refresh ?? 4000,
                 ContinuePolling = pollResponse.ContinuePolling,
                 Next = "/Home/Index"
             };
