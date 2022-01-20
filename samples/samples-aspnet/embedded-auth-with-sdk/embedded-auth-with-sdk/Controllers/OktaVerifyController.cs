@@ -116,6 +116,7 @@
         {
             var idxContext = (IIdxContext)Session["idxContext"];
             var pollResponse = await _idxClient.PollAuthenticatorEnrollmentStatusAsync(idxContext);
+            TempData["canSkip"] = pollResponse.CanSkip;
 
             var pollViewModel = new OktaVerifyPollResponseModel
             {
