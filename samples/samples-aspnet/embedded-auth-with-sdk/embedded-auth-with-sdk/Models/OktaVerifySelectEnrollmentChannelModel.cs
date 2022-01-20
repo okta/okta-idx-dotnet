@@ -26,12 +26,5 @@ namespace embedded_auth_with_sdk.Models
 
         [Required]
         public string AuthenticatorId { get; set; }
-
-        public IList<OktaVerifySelectEnrollmentChannelOptionModel> EnrollmentChannelOptions 
-        {
-            get => new List<string>(new string[] {"email", "sms"})
-                .Select(option => new OktaVerifySelectEnrollmentChannelOptionModel(option))
-                .ToList();
-        } 
     }
 }
