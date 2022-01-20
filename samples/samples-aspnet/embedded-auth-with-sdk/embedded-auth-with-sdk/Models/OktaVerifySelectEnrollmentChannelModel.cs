@@ -14,7 +14,7 @@ namespace embedded_auth_with_sdk.Models
         public OktaVerifySelectEnrollmentChannelModel(IAuthenticator authenticator)
         {
             this.AuthenticatorId = authenticator.Id;
-            this.ChannelTypes = authenticator.ChannelTypes;
+            this.ChannelTypes = authenticator.ChannelTypes.Where(x => x.Value != "qrcode").ToList();
         }
 
         [Required]
