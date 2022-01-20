@@ -17,12 +17,12 @@
 
             <div class="form-group">
                 <div class="col-md-10">
-                    @foreach (OktaVerifySelectEnrollmentChannelOptionModel option in Model.EnrollmentChannelOptions)
+                    @foreach (var channel in Model.ChannelTypes)
                     {
                     <div>
                         <label>
-                            @Html.RadioButton(option.Name, option.Value, new { id = $"{option.Value}_Id" })
-                            @option.LabelText
+                            @Html.RadioButtonFor(m => m.SelectedChannel, channel)
+                            @channel
                         </label>
                     </div>
                     }

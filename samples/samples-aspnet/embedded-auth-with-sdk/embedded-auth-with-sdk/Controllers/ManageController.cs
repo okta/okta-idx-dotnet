@@ -530,11 +530,25 @@ namespace embedded_auth_with_sdk.Controllers
                     }
                     else if (model.IsOktaVerifySelected)
                     {
-                        var viewModel = new OktaVerifySelectAuthenticatorMethodModel
+
+                        var selectAuthenticatorOptions = new SelectOktaVerifyAuthenticatorOptions
                         {
                             AuthenticatorId = model.AuthenticatorId,
                         };
-                        return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify", viewModel);
+
+
+                        selectAuthenticatorResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+
+
+                        var viewModel = new OktaVerifySelectAuthenticatorMethodModel
+                        {
+                            AuthenticatorId = model.AuthenticatorId,
+                            MethodTypes = selectAuthenticatorResponse.CurrentAuthenticator.MethodTypes,
+                            
+                        };
+
+                        Session[nameof(OktaVerifySelectAuthenticatorMethodModel)] = viewModel;
+                        return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
                     }
                     else
                     {

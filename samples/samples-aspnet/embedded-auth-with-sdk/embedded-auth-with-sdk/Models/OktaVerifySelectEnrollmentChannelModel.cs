@@ -14,6 +14,7 @@ namespace embedded_auth_with_sdk.Models
         public OktaVerifySelectEnrollmentChannelModel(IAuthenticator authenticator)
         {
             this.AuthenticatorId = authenticator.Id;
+            this.ChannelTypes = authenticator.ChannelTypes;
         }
 
         [Required]
@@ -26,5 +27,7 @@ namespace embedded_auth_with_sdk.Models
 
         [Required]
         public string AuthenticatorId { get; set; }
+
+        public IList<AuthenticatorChannelType> ChannelTypes { get; set; }
     }
 }

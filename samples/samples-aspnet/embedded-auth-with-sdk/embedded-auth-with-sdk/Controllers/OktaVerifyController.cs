@@ -20,8 +20,10 @@
             _idxClient = idxClient;
         }
 
-        public ActionResult SelectAuthenticatorMethod(OktaVerifySelectAuthenticatorMethodModel model)
+        public ActionResult SelectAuthenticatorMethod()
         {
+            var model = (OktaVerifySelectAuthenticatorMethodModel)Session[nameof(OktaVerifySelectAuthenticatorMethodModel)];
+
             return View(model);
         }
 

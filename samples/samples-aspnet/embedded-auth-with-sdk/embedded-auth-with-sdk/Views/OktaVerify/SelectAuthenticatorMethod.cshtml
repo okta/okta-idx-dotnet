@@ -16,15 +16,24 @@
             @Html.AntiForgeryToken()
             @Html.HiddenFor(m => m.AuthenticatorId)
             <div class="form-group">
-                <div class="col-md-10">
+                @foreach (var methodType in Model.MethodTypes)
+                {
+                    @*<div class="col-md-10">
 
-                    <label>
-                        @Html.RadioButtonFor(m => m.MethodType, AuthenticatorMethodType.Totp)
-                        Enter a code
-                    </label>
-                </div>
+                        <label>
+                            @Html.RadioButtonFor(m => m.MethodType, AuthenticatorMethodType.Totp)
+                            Enter a code
+                        </label>
+                    </div>*@
+                    <div>
+                        <label>
+                            @Html.RadioButtonFor(m => m.MethodType, methodType)
+                            @methodType
+                        </label>
+                    </div>
+                }
             </div>
-            <div class="form-group">
+            @*<div class="form-group">
                 <div class="col-md-10">
 
                     <label>
@@ -32,7 +41,7 @@
                         Get a push notification
                     </label>
                 </div>
-            </div>
+            </div>*@
 
             <div class="form-group">
                 <div class="col-md-offset-0 col-md-10">
