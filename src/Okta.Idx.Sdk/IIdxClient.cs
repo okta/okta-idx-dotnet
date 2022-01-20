@@ -189,7 +189,7 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(SelectPhoneAuthenticatorOptions selectAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Challenge a phone authenticator.
+        /// Selects the Okta Verify authenticator for a challenge.
         /// </summary>
         /// <param name="selectAuthenticatorOptions">The options for selecting an authenticator challenge.</param>
         /// <param name="idxContext">The IDX context.</param>
