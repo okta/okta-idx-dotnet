@@ -900,6 +900,40 @@ namespace Okta.Idx.Sdk
             var idxContext = await InteractAsync(cancellationToken: cancellationToken, recoveryToken: recoverPasswordOptions.RecoveryToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
+            if (!string.IsNullOrEmpty(recoverPasswordOptions.RecoveryToken))
+            {
+                var resetAuthenticatorOption = introspectResponse.FindRemediationOption(RemediationType.ResetAuthenticator);
+                if (resetAuthenticatorOption != null)
+                {
+                    var resetAuthenticatorRequest = new IdxRequestPayload
+                    {
+                        StateHandle = introspectResponse.StateHandle,
+                    };
+                    resetAuthenticatorRequest.SetProperty(
+                        "credentials",
+                        new
+                        {
+                            passcode = recoverPasswordOptions.Passcode,
+                        });
+
+                    var resetResponse = await resetAuthenticatorOption
+                        .ProceedAsync(resetAuthenticatorRequest, cancellationToken);
+
+                    if (resetResponse.IsLoginSuccess)
+                    {
+                        var tokenResponse = await resetResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.Success,
+                            TokenInfo = tokenResponse,
+                        };
+                    }
+
+                    throw new OktaException("Unexpected response. Cannot reset password.");
+                }
+            }
+
             var identifyOption = introspectResponse.FindRemediationOption(RemediationType.Identify, throwIfNotFound: true);
             var requiresCredentials = identifyOption.Form.Any(f => f.Name == "credentials");
 

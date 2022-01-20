@@ -22,7 +22,14 @@ namespace Okta.Idx.Sdk
 
         /// <summary>
         /// Gets or sets the recovery token.
+        /// The property should be set together with the Passcode property.
         /// </summary>
         public string RecoveryToken { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user password.
+        /// The property should be used in conjunction with RecoveryToken property.
+        /// </summary>
+        public string Passcode { get; set; }
     }
 }
