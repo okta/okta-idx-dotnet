@@ -22,7 +22,8 @@ namespace Okta.Idx.Sdk
 
         /// <summary>
         /// Gets or sets the recovery token.
-        /// The property should be set together with the Passcode property.
+        /// The token can be obtained using ForgotPasswordGenerateOneTimeTokenAsync user API call.
+        /// It should be used together with the Passcode property.
         /// </summary>
         public string RecoveryToken { get; set; }
 
