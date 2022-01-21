@@ -41,6 +41,16 @@ namespace Okta.Idx.Sdk
         public static AuthenticatorMethodType WebAuthn = new AuthenticatorMethodType("webauthn");
 
         /// <summary>
+        /// TOTP
+        /// </summary>
+        public static AuthenticatorMethodType Totp = new AuthenticatorMethodType("totp");
+
+        /// <summary>
+        /// Push
+        /// </summary>
+        public static AuthenticatorMethodType Push = new AuthenticatorMethodType("push");
+
+        /// <summary>
         /// Implicit operator declaration to accept and convert a string value as a <see cref="AuthenticatorMethodType"/>
         /// </summary>
         /// <param name="value">The value to use</param>

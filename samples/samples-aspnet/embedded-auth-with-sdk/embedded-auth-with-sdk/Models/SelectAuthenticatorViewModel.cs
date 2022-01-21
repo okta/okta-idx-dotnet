@@ -18,8 +18,11 @@ namespace embedded_auth_with_sdk.Models
         public string PhoneId { get; set; }
 
         public string WebAuthnId { get; set; }
-        public string TotpId { get; set; }
 
+        public string TotpId { get; set; }
+        
+        public string OktaVerifyId { get; set; }
+        
         public bool CanSkip { get; set; }
 
         public IList<AuthenticatorViewModel> Authenticators { get; set; }
@@ -31,5 +34,7 @@ namespace embedded_auth_with_sdk.Models
         public bool IsWebAuthnSelected => WebAuthnId != null && WebAuthnId == AuthenticatorId;
 
         public bool IsTotpSelected => TotpId != null && TotpId == AuthenticatorId;
+
+        public bool IsOktaVerifySelected => OktaVerifyId != null && OktaVerifyId == AuthenticatorId;
     }
 }

@@ -32,6 +32,18 @@ namespace Okta.Idx.Sdk.Helpers
             return authenticatorOptions;
         }
 
+        internal static IAuthenticator ConvertToAuthenticator(IList<IAuthenticatorValue> authenticators, IAuthenticatorEnrollment authenticatorEnrollment)
+        {
+            return new Authenticator
+            {
+                Id = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment.Key)?.Id,
+                Name = authenticatorEnrollment.DisplayName,
+                MethodTypes = authenticatorEnrollment.Methods?.Select(x => x.Type).ToList(),
+                EnrollmentId = authenticatorEnrollment.Id,
+                Profile = GetAuthenticatorProfile(authenticatorEnrollment),
+            };
+        }
+
         internal static IAuthenticator ConvertToAuthenticator(
             IList<IAuthenticatorValue> authenticators,
             IAuthenticatorEnrollment authenticatorEnrollment,

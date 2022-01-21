@@ -39,6 +39,11 @@ namespace Okta.Idx.Sdk
         IList<AuthenticatorMethodType> MethodTypes { get; set; }
 
         /// <summary>
+        /// Gets or sets the authenticator channels if applicable (i.e. Okta Verify channels).
+        /// </summary>
+        IList<AuthenticatorChannelType> ChannelTypes { get; set; }
+
+        /// <summary>
         /// Gets or sets the authenticator contextual data. This is only applicable for Web Authn authenticators.
         /// </summary>
         IAuthenticatorContextualData ContextualData { get; set; }

@@ -408,6 +408,7 @@ namespace embedded_auth_with_sdk.Controllers
                 PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
                 WebAuthnId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security key or biometric")?.AuthenticatorId,
                 TotpId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "google authenticator")?.AuthenticatorId,
+                OktaVerifyId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "okta verify")?.AuthenticatorId,
                 CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
             };
 
@@ -505,10 +506,11 @@ namespace embedded_auth_with_sdk.Controllers
 
             try
             {
-                var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;
+                var isChallengeFlow = (bool?)Session["isChallengeFlow"] ?? false;                
                 Session["isPhoneSelected"] = model.IsPhoneSelected;
                 Session["phoneId"] = model.PhoneId;
                 Session["isWebAuthnSelected"] = model.IsWebAuthnSelected;
+                Session["isOktaVerifySelected"] = model.IsOktaVerifySelected;
 
                 if (isChallengeFlow)
                 {
@@ -525,6 +527,28 @@ namespace embedded_auth_with_sdk.Controllers
                         };
 
                         selectAuthenticatorResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectPhoneOptions, (IIdxContext)Session["IdxContext"]);
+                    }
+                    else if (model.IsOktaVerifySelected)
+                    {
+
+                        var selectAuthenticatorOptions = new SelectOktaVerifyAuthenticatorOptions
+                        {
+                            AuthenticatorId = model.AuthenticatorId,
+                        };
+
+
+                        selectAuthenticatorResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+
+
+                        var viewModel = new OktaVerifySelectAuthenticatorMethodModel
+                        {
+                            AuthenticatorId = model.AuthenticatorId,
+                            MethodTypes = selectAuthenticatorResponse.CurrentAuthenticator.MethodTypes,
+                            
+                        };
+
+                        Session[nameof(OktaVerifySelectAuthenticatorMethodModel)] = viewModel;
+                        return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
                     }
                     else
                     {
@@ -594,6 +618,11 @@ namespace embedded_auth_with_sdk.Controllers
                                 {
                                     Session["currentWebAuthnAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("EnrollWebAuthnAuthenticator", "Manage");
+                                }
+                                else if(model.IsOktaVerifySelected)
+                                {
+                                    Session["oktaVerifyAuthenticator"] = enrollResponse.CurrentAuthenticator;
+                                    return RedirectToAction("Enroll", "OktaVerify");
                                 }
 
                                 return RedirectToAction("VerifyAuthenticator", "Manage");
