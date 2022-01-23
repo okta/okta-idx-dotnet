@@ -19,5 +19,19 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the authenticator type.
         /// </summary>
         public AuthenticatorType AuthenticatorType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the recovery token.
+        /// The property must be used together with the Passcode property.
+        /// Use user API, ForgotPasswordGenerateOneTimeTokenAsync function to get the the recovery URL containing the token.
+        /// With the function parameter, you can control whether the URL is returned as part of the response or sent in the recovery email.
+        /// </summary>
+        public string RecoveryToken { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user password.
+        /// The property should be used in conjunction with RecoveryToken property.
+        /// </summary>
+        public string Passcode { get; set; }
     }
 }
