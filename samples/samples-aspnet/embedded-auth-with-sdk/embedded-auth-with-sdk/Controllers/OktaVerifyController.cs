@@ -20,10 +20,29 @@
             _idxClient = idxClient;
         }
 
-        public ActionResult SelectAuthenticatorMethod()
+        public async Task<ActionResult> SelectAuthenticatorMethod()
         {
             var model = (OktaVerifySelectAuthenticatorMethodModel)Session[nameof(OktaVerifySelectAuthenticatorMethodModel)];
 
+            if (model.MethodTypes?.Count == 1)
+            {
+                string methodType = model.MethodTypes[0];
+                var selectAuthenticatorOptions = new SelectOktaVerifyAuthenticatorOptions
+                {
+                    AuthenticatorMethodType = methodType,
+                    AuthenticatorId = model.AuthenticatorId,
+                };
+
+                var authnResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+
+                switch (methodType)
+                {
+                    case "totp":
+                        return View("EnterCode");
+                    case "push":
+                        return View("PushSent", new OktaVerifySelectAuthenticatorMethodModel());
+                }
+            }
             return View(model);
         }
 
