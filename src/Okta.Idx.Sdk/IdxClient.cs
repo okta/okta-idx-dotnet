@@ -53,6 +53,11 @@ namespace Okta.Idx.Sdk
         }
 
         /// <summary>
+        /// Gets the Request Options.
+        /// </summary>
+        public RequestOptions RequestOptions { get; internal set; } = new RequestOptions();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="IdxClient"/> class using the specified <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="configuration">
@@ -215,6 +220,18 @@ namespace Okta.Idx.Sdk
             var codeVerifier = GenerateSecureRandomString(86);
             var codeChallenge = GenerateCodeChallenge(codeVerifier, out var codeChallengeMethod);
 
+            Dictionary<string, string> headers;
+            if (RequestOptions?.Headers != null)
+            {
+                headers = new Dictionary<string, string>(RequestOptions.Headers);
+            }
+            else
+            {
+                headers = new Dictionary<string, string>();
+            }
+
+            headers.Add(RequestHeaders.ContentType, HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
+
             var payload = new Dictionary<string, string>
             {
                 { "scope", string.Join(" ", Configuration.Scopes) },
@@ -227,6 +244,15 @@ namespace Okta.Idx.Sdk
                 { "state", state },
             };
 
+            if (Configuration.IsConfidentialClient)
+            {
+                payload.Add("client_secret", Configuration.ClientSecret);
+                if (!string.IsNullOrEmpty(Configuration.DeviceToken))
+                {
+                    headers.Add(RequestHeaders.XDeviceToken, Configuration.DeviceToken);
+                }
+            }
+
             if (!string.IsNullOrEmpty(activationToken))
             {
                 payload.Add("activation_token", activationToken);
@@ -237,8 +263,6 @@ namespace Okta.Idx.Sdk
                 payload.Add("recovery_token", recoveryToken);
             }
 
-            var headers = new Dictionary<string, string>();
-            headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
             Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/interact"));
 
             var request = new HttpRequest
@@ -347,7 +371,7 @@ namespace Okta.Idx.Sdk
                 StringBuilder requestContent = new StringBuilder();
                 IdxUrlHelper.AddParameter(requestContent, "grant_type", "interaction_code", false);
                 IdxUrlHelper.AddParameter(requestContent, "client_id", Configuration.ClientId, true);
-                if (!string.IsNullOrEmpty(Configuration.ClientSecret))
+                if (Configuration.IsConfidentialClient)
                 {
                     IdxUrlHelper.AddParameter(requestContent, "client_secret", Configuration.ClientSecret, true);
                 }
@@ -1135,18 +1159,22 @@ namespace Okta.Idx.Sdk
                 { "client_id", Configuration.ClientId },
             };
 
+            var headers = new Dictionary<string, string>
+            {
+                { RequestHeaders.ContentType, HttpRequestContentBuilder.ContentTypeFormUrlEncoded },
+            };
+
             if (Configuration.IsConfidentialClient)
             {
                 payload.Add("client_secret", Configuration.ClientSecret);
+                if (!string.IsNullOrEmpty(Configuration.DeviceToken))
+                {
+                    headers.Add(RequestHeaders.XDeviceToken, Configuration.DeviceToken);
+                }
             }
 
             payload.Add("token_type_hint", tokenType.ToTokenHintString());
             payload.Add("token", token);
-
-            var headers = new Dictionary<string, string>
-            {
-                { "Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded },
-            };
 
             Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/revoke"));
             var request = new HttpRequest
