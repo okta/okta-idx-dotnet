@@ -483,9 +483,7 @@ namespace Okta.Idx.Sdk
         private async Task<AuthenticationResponse> AuthenticateWithActivationTokenAsync(
             AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
-            var idxContext = await InteractAsync(
-                cancellationToken: cancellationToken,
-                activationToken: authenticationOptions.ActivationToken);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
@@ -505,9 +503,7 @@ namespace Okta.Idx.Sdk
 
         private async Task<AuthenticationResponse> AuthenticateWithPasswordAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
-            var idxContext = await InteractAsync(
-                cancellationToken: cancellationToken,
-                activationToken: authenticationOptions.ActivationToken);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Check if identify flow include credentials
@@ -1199,10 +1195,6 @@ namespace Okta.Idx.Sdk
             if (Configuration.IsConfidentialClient)
             {
                 payload.Add("client_secret", Configuration.ClientSecret);
-                if (!string.IsNullOrEmpty(Configuration.DeviceToken))
-                {
-                    headers.Add(RequestHeaders.XDeviceToken, Configuration.DeviceToken);
-                }
             }
 
             payload.Add("token_type_hint", tokenType.ToTokenHintString());
