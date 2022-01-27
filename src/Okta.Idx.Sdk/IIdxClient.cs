@@ -44,18 +44,16 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="authenticationOptions">The authentication options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="recoveryToken">The recovery token.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, string recoveryToken = null);
+        Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Initiates the password recovery flow
         /// </summary>
         /// <param name="recoverPasswordOptions">The password recovery options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="recoveryToken">The recovery token.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default, string recoveryToken = null);
+        Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Resend Code
@@ -89,9 +87,8 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="userProfile">The user profile. Contains all the dynamic properties required for registration.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="recoveryToken">The recovery token.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default, string recoveryToken = null);
+        Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Select an authenticator to start the enrollment flow.
@@ -151,9 +148,8 @@ namespace Okta.Idx.Sdk
         /// Start an interaction to be completed by the sign-in widget.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        /// <param name="recoveryToken">The recovery token.</param>
         /// <returns>The widget sign in response.</returns>
-        Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default, string recoveryToken = null);
+        Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Skips optional authenticators
@@ -169,7 +165,7 @@ namespace Okta.Idx.Sdk
         /// <param name="state">The state handle to use or null to autogenerate.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The identity providers response.</returns>
-        Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default, string recoveryToken = null);
+        Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets available identity providers.

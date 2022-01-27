@@ -310,9 +310,9 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default, string recoveryToken = null)
+        public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default)
         {
-            IIdxContext idxContext = await this.InteractAsync(state, cancellationToken, recoveryToken: recoveryToken);
+            IIdxContext idxContext = await this.InteractAsync(state, cancellationToken);
             return await GetIdentityProvidersAsync(idxContext, cancellationToken);
         }
 
@@ -339,9 +339,9 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default, string recoveryToken = null)
+        public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default)
         {
-            var idxContext = await this.InteractAsync(cancellationToken: cancellationToken, recoveryToken: recoveryToken);
+            var idxContext = await this.InteractAsync(cancellationToken: cancellationToken);
             return new WidgetSignInResponse
             {
                 IdxContext = idxContext,
@@ -420,24 +420,24 @@ namespace Okta.Idx.Sdk
             => new IdxClient(_dataStore, Configuration, requestContext);
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, string recoveryToken = null)
+        public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
             var isPasswordFlow = !string.IsNullOrEmpty(authenticationOptions.Password);
             var isActivationTokenFlow = !string.IsNullOrEmpty(authenticationOptions.ActivationToken);
 
             if (isActivationTokenFlow)
             {
-                return await AuthenticateWithActivationTokenAsync(authenticationOptions, cancellationToken, recoveryToken: recoveryToken);
+                return await AuthenticateWithActivationTokenAsync(authenticationOptions, cancellationToken);
             }
 
             if (isPasswordFlow)
             {
-                return await AuthenticateWithPasswordAsync(authenticationOptions, cancellationToken, recoveryToken: recoveryToken);
+                return await AuthenticateWithPasswordAsync(authenticationOptions, cancellationToken);
             }
 
             // assume users will log in with the authenticator they want
 
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken, recoveryToken: recoveryToken);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Common request payload
@@ -481,12 +481,11 @@ namespace Okta.Idx.Sdk
         }
 
         private async Task<AuthenticationResponse> AuthenticateWithActivationTokenAsync(
-            AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, string recoveryToken = null)
+            AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
             var idxContext = await InteractAsync(
                 cancellationToken: cancellationToken,
-                activationToken: authenticationOptions.ActivationToken,
-                recoveryToken: recoveryToken);
+                activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
@@ -504,12 +503,11 @@ namespace Okta.Idx.Sdk
                     introspectResponse);
         }
 
-        private async Task<AuthenticationResponse> AuthenticateWithPasswordAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, string recoveryToken = null)
+        private async Task<AuthenticationResponse> AuthenticateWithPasswordAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
         {
             var idxContext = await InteractAsync(
                 cancellationToken: cancellationToken,
-                activationToken: authenticationOptions.ActivationToken,
-                recoveryToken: recoveryToken);
+                activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Check if identify flow include credentials
@@ -925,10 +923,44 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default, string recoveryToken = null)
+        public async Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default)
         {
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken, recoveryToken: recoveryToken);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, recoveryToken: recoverPasswordOptions.RecoveryToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (!string.IsNullOrEmpty(recoverPasswordOptions.RecoveryToken))
+            {
+                var resetAuthenticatorOption = introspectResponse.FindRemediationOption(RemediationType.ResetAuthenticator);
+                if (resetAuthenticatorOption != null)
+                {
+                    var resetAuthenticatorRequest = new IdxRequestPayload
+                    {
+                        StateHandle = introspectResponse.StateHandle,
+                    };
+                    resetAuthenticatorRequest.SetProperty(
+                        "credentials",
+                        new
+                        {
+                            passcode = recoverPasswordOptions.Passcode,
+                        });
+
+                    var resetResponse = await resetAuthenticatorOption
+                        .ProceedAsync(resetAuthenticatorRequest, cancellationToken);
+
+                    if (resetResponse.IsLoginSuccess)
+                    {
+                        var tokenResponse = await resetResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.Success,
+                            TokenInfo = tokenResponse,
+                        };
+                    }
+
+                    throw new OktaException("Unexpected response. Cannot reset password.");
+                }
+            }
 
             var identifyOption = introspectResponse.FindRemediationOption(RemediationType.Identify, throwIfNotFound: true);
             var requiresCredentials = identifyOption.Form.Any(f => f.Name == "credentials");
@@ -1188,9 +1220,9 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default, string recoveryToken = null)
+        public async Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default)
         {
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken, recoveryToken: recoveryToken);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             var enrollRequest = new IdxRequestPayload
