@@ -26,6 +26,59 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
+        public async Task GenerateSecureClientPropsWhenCallingInteract()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(
+                mockRequestExecutor,
+                new Configuration.IdxConfiguration
+                {
+                    Issuer = "https://fake.example.com",
+                    ClientId = "foo",
+                    RedirectUri = "https://fake.example.com/redirectUri",
+                    ClientSecret = "clientSecret",
+                    DeviceToken = "deviceToken",
+                }
+                );
+
+            await testClient.InteractAsync();
+            var deviceTokenHeader = mockRequestExecutor.ReceivedHeaders.FirstOrDefault(h => h.Key.Equals(RequestHeaders.XDeviceToken));
+            
+            deviceTokenHeader.Should().NotBeNull();
+            deviceTokenHeader.Value.Should().Be("deviceToken");
+
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"client_secret\":\"clientSecret\"");
+        }
+
+        [Fact]
+        public async Task UseProvidedCustomHeadersWhenCallingInteract()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(
+                mockRequestExecutor,
+                new Configuration.IdxConfiguration
+                {
+                    Issuer = "https://fake.example.com",
+                    ClientId = "foo",
+                    RedirectUri = "https://fake.example.com/redirectUri",
+                }
+                );
+
+            testClient.RequestOptions
+                .UseHeader(RequestHeaders.UserAgent, "MyUserAgent")
+                .UseHeader(RequestHeaders.XOktaUserAgentExtended, "MyXUserAgent")
+                .UseHeader(RequestHeaders.XForwardedFor, "MyForwardedFor");
+
+            await testClient.InteractAsync();
+
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.UserAgent) && h.Value.Equals("MyUserAgent"));
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.XOktaUserAgentExtended) && h.Value.Equals("MyXUserAgent"));
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.XForwardedFor) && h.Value.Equals("MyForwardedFor"));
+        }
+
+        [Fact]
         public async Task UseProvidedStateWhenCallingInteract()
         {
             var rawResponse = @"{ 'interaction_handle' : 'foo' }";
