@@ -71,6 +71,17 @@ var client = new IdxClient(new IdxConfiguration()
             });
 ```
 
+#### Adding custom headers
+
+Custom request headers can be set using `IdxClient.RequestOptions`:
+
+```csharp
+    Client.RequestOptions
+        .UseHeader(RequestHeaders.UserAgent, "MyUserAgent")
+        .UseHeader(RequestHeaders.XOktaUserAgentExtended, "MyXUserAgent")
+        .UseHeader(RequestHeaders.XForwardedFor, "MyForwardedFor");
+```
+
 ### Authenticate users
 
 #### Authenticate users with username and password
@@ -159,7 +170,6 @@ The user needs to provide additional authenticator information. For example, whe
 Type: `AwaitingPasswordReset`
 
 The user needs to reset their password to continue with the authentication flow and retrieve tokens.
-
 
 ### Revoke Tokens
 
