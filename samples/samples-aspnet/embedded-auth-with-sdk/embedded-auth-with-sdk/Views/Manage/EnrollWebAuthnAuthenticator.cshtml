@@ -57,8 +57,12 @@
 
             fetch("@Url.Action("EnrollWebAuthnAuthenticatorAsync", "Manage")", options)
                 .then(res => {
-                    console.log("Request successful! Response:", res);
-                    location.href = '@Url.Action("EnrollWebAuthnAuthenticator", "Manage", new { verificationCompleted = true})';
+                    if (res.ok) {
+                        console.log("Request successful! Response:", res);
+                        location.href = '@Url.Action("EnrollWebAuthnAuthenticator", "Manage", new { verificationCompleted = true })';
+                    } else {
+                        throw "There was an error when enrolling webAuthn";
+                    }
                 }).catch(function(err) {
                     console.error(err);
                     }
