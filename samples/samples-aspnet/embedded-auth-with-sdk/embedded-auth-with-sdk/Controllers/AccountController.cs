@@ -196,5 +196,37 @@ namespace embedded_auth_with_sdk.Controllers
                 return View("ForgotPassword", model);
             }
         }
+
+        [AllowAnonymous]
+        public ActionResult RecoverWithToken()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RecoverWithTokenAsync(RecoverPasswordWithTokenViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("RecoverWithToken", model);
+            }
+
+            var recoveryToken = await OktaSdkHelper.ForgotPasswordGenerateToken(model.UserName);
+            if (recoveryToken == null)
+            {
+                ModelState.AddModelError(string.Empty, $"Unable to get recovery token. Check if the user name is spelled correctly.");
+                return View("RecoverWithToken", model);
+            }
+
+            var changePasswordViewModel = new ChangePasswordRecoveryTokenViewModel
+            {
+                RecoveryToken = recoveryToken,
+                UserName = model.UserName,
+            };
+
+            return View("~/Views/Manage/ChangePasswordRecoveryToken.cshtml", changePasswordViewModel);
+        }
     }
 }
