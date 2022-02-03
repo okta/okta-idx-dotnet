@@ -414,8 +414,8 @@
     <Content Include="Views\Shared\_LogoutPartial.cshtml" />
     <Content Include="Views\Shared\Idps.cshtml" />
     <Content Include="Views\InteractionCode\Error.cshtml" />
-    <Content Include="Views\Account\RecoverWithToken.cshtml" />
-    <Content Include="Views\Manage\ChangePasswordRecoveryToken.cshtml" />
+    <Content Include="Views\Account\RecoverPasswordWithToken.cshtml" />
+    <Content Include="Views\Manage\ChangePasswordWithRecoveryToken.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

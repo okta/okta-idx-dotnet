@@ -198,7 +198,7 @@ namespace embedded_auth_with_sdk.Controllers
         }
 
         [AllowAnonymous]
-        public ActionResult RecoverWithToken()
+        public ActionResult RecoverPasswordWithToken()
         {
             return View();
         }
@@ -210,14 +210,14 @@ namespace embedded_auth_with_sdk.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("RecoverWithToken", model);
+                return View("RecoverPasswordWithToken", model);
             }
 
             var recoveryToken = await OktaSdkHelper.ForgotPasswordGenerateToken(model.UserName);
             if (recoveryToken == null)
             {
                 ModelState.AddModelError(string.Empty, $"Unable to get recovery token. Check if the user name is spelled correctly.");
-                return View("RecoverWithToken", model);
+                return View("RecoverPasswordWithToken", model);
             }
 
             var changePasswordViewModel = new ChangePasswordWithRecoveryTokenViewModel
@@ -226,7 +226,7 @@ namespace embedded_auth_with_sdk.Controllers
                 UserName = model.UserName,
             };
 
-            return View("~/Views/Manage/ChangePasswordRecoveryToken.cshtml", changePasswordViewModel);
+            return View("~/Views/Manage/ChangePasswordWithRecoveryToken.cshtml", changePasswordViewModel);
         }
     }
 }

@@ -458,7 +458,7 @@
         {
             if (!ModelState.IsValid)
             {
-                return View("ChangePasswordRecoveryToken", model);
+                return View("ChangePasswordWithRecoveryToken", model);
             }
 
             try
@@ -484,7 +484,7 @@
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
-                return View("ChangePasswordRecoveryToken", model);
+                return View("ChangePasswordWithRecoveryToken", model);
             }
         }
 
