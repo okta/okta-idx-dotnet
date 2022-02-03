@@ -346,7 +346,7 @@
     <Compile Include="Models\AuthenticatorViewModel.cs" />
     <Compile Include="Models\BaseViewModel.cs" />
     <Compile Include="Models\ChangePasswordViewModel.cs" />
-    <Compile Include="Models\ChangePasswordRecoveryTokenViewModel.cs" />
+    <Compile Include="Models\ChangePasswordWithRecoveryTokenViewModel.cs" />
     <Compile Include="Models\EnrollPhoneViewModel.cs" />
     <Compile Include="Models\ForgotPasswordViewModel.cs" />
     <Compile Include="Models\InteractionCodeErrorViewModel.cs" />

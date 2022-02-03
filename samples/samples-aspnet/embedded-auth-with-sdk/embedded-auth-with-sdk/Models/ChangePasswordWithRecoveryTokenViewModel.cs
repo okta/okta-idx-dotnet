@@ -6,7 +6,7 @@ using System.Web;
 
 namespace embedded_auth_with_sdk.Models
 {
-    public class ChangePasswordRecoveryTokenViewModel : BaseViewModel
+    public class ChangePasswordWithRecoveryTokenViewModel : BaseViewModel
     {
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]

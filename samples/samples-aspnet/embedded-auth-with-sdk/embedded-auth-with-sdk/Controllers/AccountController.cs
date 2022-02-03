@@ -206,7 +206,7 @@ namespace embedded_auth_with_sdk.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> RecoverWithTokenAsync(RecoverPasswordWithTokenViewModel model)
+        public async Task<ActionResult> RecoverPasswordWithTokenAsync(RecoverPasswordWithTokenViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -220,7 +220,7 @@ namespace embedded_auth_with_sdk.Controllers
                 return View("RecoverWithToken", model);
             }
 
-            var changePasswordViewModel = new ChangePasswordRecoveryTokenViewModel
+            var changePasswordViewModel = new ChangePasswordWithRecoveryTokenViewModel
             {
                 RecoveryToken = recoveryToken,
                 UserName = model.UserName,

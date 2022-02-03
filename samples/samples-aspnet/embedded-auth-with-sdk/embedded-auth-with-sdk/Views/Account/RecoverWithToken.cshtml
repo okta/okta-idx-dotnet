@@ -10,7 +10,7 @@
 <div class="row d-center"">
     <div class="col-md-8">
         <section id="forgotPasswordForm">
-            @using (Html.BeginForm("RecoverWithTokenAsync", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            @using (Html.BeginForm("RecoverPasswordWithTokenAsync", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
                 <h4>Reset your password</h4>

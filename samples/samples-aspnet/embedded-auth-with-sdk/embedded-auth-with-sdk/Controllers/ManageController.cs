@@ -454,7 +454,7 @@
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ChangePasswordRecoveryTokenAsync(ChangePasswordRecoveryTokenViewModel model)
+        public async Task<ActionResult> ChangePasswordWithRecoveryTokenAsync(ChangePasswordWithRecoveryTokenViewModel model)
         {
             if (!ModelState.IsValid)
             {
