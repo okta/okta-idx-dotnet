@@ -85,6 +85,16 @@
             }
         </section>
 
+        <section id="recoverPasswordWithToken">
+            @using (Html.BeginForm("RecoverPasswordWithToken", "Account", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
+            {
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Recover Password with Recovery Token" class="btn btn-info btn-stretch-wide" id="RecoverPasswordWithTokenBtn" />
+                        </div>
+                    </div>            
+             }
+        </section>
     </div>
 </div>
 
