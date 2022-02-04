@@ -686,5 +686,42 @@ namespace embedded_auth_with_sdk.Controllers
             }
         }
 
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ChangePasswordWithRecoveryTokenAsync(ChangePasswordWithRecoveryTokenViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("ChangePasswordWithRecoveryToken", model);
+            }
+
+            try
+            {
+                var recoverPasswordResponse = await _idxClient.RecoverPasswordAsync(
+                    new RecoverPasswordOptions
+                    {
+                        RecoveryToken = model.RecoveryToken,
+                        Username = model.UserName,
+                        Passcode = model.NewPassword,
+                    });
+
+                if (recoverPasswordResponse.AuthenticationStatus == AuthenticationStatus.Success)
+                {
+                    ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(
+                        _idxClient.Configuration,
+                        recoverPasswordResponse.TokenInfo);
+                    _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                    return RedirectToAction("Index", "Home");
+                }
+                return RedirectToAction("Index", "Home");
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                return View("ChangePasswordWithRecoveryToken", model);
+            }
+        }
+
     }
 }
