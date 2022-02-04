@@ -53,6 +53,11 @@ namespace Okta.Idx.Sdk
         }
 
         /// <summary>
+        /// Gets the Request Options.
+        /// </summary>
+        public RequestOptions RequestOptions { get; internal set; } = new RequestOptions();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="IdxClient"/> class using the specified <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="configuration">
@@ -205,26 +210,59 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="state">Optional value to use as the state argument when initiating the authentication flow. This is used to provide contextual information to survive redirects.</param>
         /// <param name="cancellationToken">The cancellation token. Optional.</param>
+        /// <param name="activationToken">The activation token. Optional.</param>
+        /// <param name="recoveryToken">The recovery token. Optional.</param>
         /// <returns>The IDX context.</returns>
-        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
+        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null, string recoveryToken = null)
         {
             // PKCE props
             state = state ?? GenerateSecureRandomString(16);
             var codeVerifier = GenerateSecureRandomString(86);
             var codeChallenge = GenerateCodeChallenge(codeVerifier, out var codeChallengeMethod);
 
-            var payload = new Dictionary<string, string>();
-            payload.Add("scope", string.Join(" ", Configuration.Scopes));
-            payload.Add("client_id", Configuration.ClientId);
+            Dictionary<string, string> headers;
+            if (RequestOptions?.Headers != null)
+            {
+                headers = new Dictionary<string, string>(RequestOptions.Headers);
+            }
+            else
+            {
+                headers = new Dictionary<string, string>();
+            }
 
-            // Add PKCE params and state
-            payload.Add("code_challenge_method", codeChallengeMethod);
-            payload.Add("code_challenge", codeChallenge);
-            payload.Add("redirect_uri", Configuration.RedirectUri);
-            payload.Add("state", state);
+            headers.Add(RequestHeaders.ContentType, HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
 
-            var headers = new Dictionary<string, string>();
-            headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
+            var payload = new Dictionary<string, string>
+            {
+                { "scope", string.Join(" ", Configuration.Scopes) },
+                { "client_id", Configuration.ClientId },
+
+                // Add PKCE params and state
+                { "code_challenge_method", codeChallengeMethod },
+                { "code_challenge", codeChallenge },
+                { "redirect_uri", Configuration.RedirectUri },
+                { "state", state },
+            };
+
+            if (Configuration.IsConfidentialClient)
+            {
+                payload.Add("client_secret", Configuration.ClientSecret);
+                if (!string.IsNullOrEmpty(Configuration.DeviceToken))
+                {
+                    headers.Add(RequestHeaders.XDeviceToken, Configuration.DeviceToken);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(activationToken))
+            {
+                payload.Add("activation_token", activationToken);
+            }
+
+            if (!string.IsNullOrEmpty(recoveryToken))
+            {
+                payload.Add("recovery_token", recoveryToken);
+            }
+
             Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/interact"));
 
             var request = new HttpRequest
@@ -333,7 +371,7 @@ namespace Okta.Idx.Sdk
                 StringBuilder requestContent = new StringBuilder();
                 IdxUrlHelper.AddParameter(requestContent, "grant_type", "interaction_code", false);
                 IdxUrlHelper.AddParameter(requestContent, "client_id", Configuration.ClientId, true);
-                if (!string.IsNullOrEmpty(Configuration.ClientSecret))
+                if (Configuration.IsConfidentialClient)
                 {
                     IdxUrlHelper.AddParameter(requestContent, "client_secret", Configuration.ClientSecret, true);
                 }
@@ -861,8 +899,42 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default)
         {
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, recoveryToken: recoverPasswordOptions.RecoveryToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (!string.IsNullOrEmpty(recoverPasswordOptions.RecoveryToken))
+            {
+                var resetAuthenticatorOption = introspectResponse.FindRemediationOption(RemediationType.ResetAuthenticator);
+                if (resetAuthenticatorOption != null)
+                {
+                    var resetAuthenticatorRequest = new IdxRequestPayload
+                    {
+                        StateHandle = introspectResponse.StateHandle,
+                    };
+                    resetAuthenticatorRequest.SetProperty(
+                        "credentials",
+                        new
+                        {
+                            passcode = recoverPasswordOptions.Passcode,
+                        });
+
+                    var resetResponse = await resetAuthenticatorOption
+                        .ProceedAsync(resetAuthenticatorRequest, cancellationToken);
+
+                    if (resetResponse.IsLoginSuccess)
+                    {
+                        var tokenResponse = await resetResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.Success,
+                            TokenInfo = tokenResponse,
+                        };
+                    }
+
+                    throw new OktaException("Unexpected response. Cannot reset password.");
+                }
+            }
 
             var identifyOption = introspectResponse.FindRemediationOption(RemediationType.Identify, throwIfNotFound: true);
             var requiresCredentials = identifyOption.Form.Any(f => f.Name == "credentials");
@@ -1219,6 +1291,11 @@ namespace Okta.Idx.Sdk
                 { "client_id", Configuration.ClientId },
             };
 
+            var headers = new Dictionary<string, string>
+            {
+                { RequestHeaders.ContentType, HttpRequestContentBuilder.ContentTypeFormUrlEncoded },
+            };
+
             if (Configuration.IsConfidentialClient)
             {
                 payload.Add("client_secret", Configuration.ClientSecret);
@@ -1226,11 +1303,6 @@ namespace Okta.Idx.Sdk
 
             payload.Add("token_type_hint", tokenType.ToTokenHintString());
             payload.Add("token", token);
-
-            var headers = new Dictionary<string, string>
-            {
-                { "Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded },
-            };
 
             Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/revoke"));
             var request = new HttpRequest

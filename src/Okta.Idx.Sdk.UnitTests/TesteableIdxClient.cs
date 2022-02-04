@@ -17,7 +17,6 @@ namespace Okta.Idx.Sdk.UnitTests
             ClientId = "foo",
             RedirectUri = "https://fake.example.com/redirectUri"
         };
-        
         public TesteableIdxClient(IRequestExecutor requestExecutor)
             : base(
                 requestExecutor,
@@ -26,5 +25,12 @@ namespace Okta.Idx.Sdk.UnitTests
         {
         }
 
+        public TesteableIdxClient(IRequestExecutor requestExecutor, IdxConfiguration configuration)
+            : base(
+        requestExecutor,
+        configuration,
+        new RequestContext())
+        {
+        }
     }
 }
