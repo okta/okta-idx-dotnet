@@ -251,14 +251,14 @@ The information in the YAML file should be formatted as follows:
 ```
 okta:
   idx:
-    issuer: "https://${yourOktaDomain}/oauth2/default"
-    clientId: "${clientId}"
-    clientSecret: "${clientSecret}"
+    issuer: "https://{yourOktaDomain}/oauth2/default"
+    clientId: "{clientId}"
+    clientSecret: "{clientSecret}"
     scopes:
       - "openid"
       - "profile"
       - "offline_access"
-    redirectUri: "${redirectUri}"
+    redirectUri: "{redirectUri}"
 ```
 ### JSON Configuration
 The SDK will look for a JSON file named `appsettings.json` in:
@@ -272,10 +272,10 @@ The information in the JSON file should be formatted as follows:
 {
     "okta": {
         "idx": {
-            "issuer" : "https://${yourOktaDomain}/oauth2/default",
-            "clientId" : "${clientId}",
-            "clientSecret": "${clientSecret}",
-            "redirectUri": "${redirectUri}",
+            "issuer" : "https://{yourOktaDomain}/oauth2/default",
+            "clientId" : "{clientId}",
+            "clientSecret": "{clientSecret}",
+            "redirectUri": "{redirectUri}",
             "scopes": [ "openid", "profile", "offline_access" ]
         }
     }
