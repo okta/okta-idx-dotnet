@@ -9,14 +9,8 @@
 
     public class MagicLinkController : Controller
     {
-        private readonly IAuthenticationManager _authenticationManager;
-
-        private readonly IIdxClient _idxClient;
-
-        public MagicLinkController(IAuthenticationManager authenticationManager, IIdxClient idxClient)
+        public MagicLinkController()
         {
-            _authenticationManager = authenticationManager;
-            _idxClient = idxClient;
         }
 
         /// <summary>
