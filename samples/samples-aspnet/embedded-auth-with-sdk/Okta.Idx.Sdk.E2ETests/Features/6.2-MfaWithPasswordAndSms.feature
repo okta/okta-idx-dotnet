@@ -18,9 +18,10 @@
 	Then the screen changes to receive an input for a code
 	When She inputs the correct code from the SMS
 	And She selects "Verify"
-	Then she is redirected to the Root View
+    And she skips optional authenticators if prompted
+    Then she is redirected to the Root View
     And an application session is created
-	
+
   Scenario: 6.2.2: 2FA Login with SMS
 	Given Mary navigates to the Basic Login View
 	And she has enrolled her phone already
