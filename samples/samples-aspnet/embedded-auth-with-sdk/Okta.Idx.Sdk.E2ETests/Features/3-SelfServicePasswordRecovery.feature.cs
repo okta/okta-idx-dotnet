@@ -136,37 +136,37 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 11
  testRunner.And("she submits the recovery form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 13
+#line 12
  testRunner.Then("she sees a page to select an authenticator", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 14
+#line 13
  testRunner.When("she chooses Email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 14
  testRunner.And("she submits the select form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 17
+#line 15
  testRunner.Then("she sees a page to input her code", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 18
+#line 16
  testRunner.When("she fills in the correct code", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 19
+#line 17
  testRunner.And("she submits the verification form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 20
+#line 18
  testRunner.Then("she sees a page to set her password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 21
+#line 19
  testRunner.When("she fills a password that fits within the password policy", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 22
+#line 20
  testRunner.And("she confirms that password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 23
+#line 21
  testRunner.And("she submits the change password form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 24
+#line 22
  testRunner.Then("she is redirected to the Root Page is provided", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -181,7 +181,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("3.1.2 Mary tries to reset a password with the wrong email", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 26
+#line 24
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -204,19 +204,19 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 3
   this.FeatureBackground();
 #line hidden
-#line 27
+#line 25
  testRunner.Given("Mary navigates to the Self Service Password Reset View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 29
+#line 26
  testRunner.Then("she sees the Password Recovery Page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 30
+#line 27
  testRunner.When("she inputs an Email that doesn\'t exist", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 31
+#line 28
  testRunner.And("she submits the recovery form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 32
+#line 29
  testRunner.Then("she sees a message \"There is no account with the Username {username}.\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

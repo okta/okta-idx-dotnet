@@ -117,6 +117,17 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
             _selectAuthenticatorPageModel.SkipThisStepButton.Click();
         }
 
+
+        [When(@"she skips optional authenticators if prompted")]
+        public void WhenSheSkipsOptionalAuthenticatorsIfPrompted()
+        {
+            if (_selectAuthenticatorPageModel.IsPageOpened)
+            {
+                _selectAuthenticatorPageModel.SkipThisStepButton.Click();
+            }
+        }
+
+
         [Then(@"she sees the list of required factors \(Google Authenticator\) to enroll")]
 
         [Then(@"she is presented with an option to select Google Authenticator to verify")]

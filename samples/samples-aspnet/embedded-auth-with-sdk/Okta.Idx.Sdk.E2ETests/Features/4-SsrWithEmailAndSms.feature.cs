@@ -291,20 +291,23 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 50
  testRunner.When("she selects Phone from the list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 52
+#line 51
  testRunner.And("She inputs a valid phone number", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 53
+#line 52
  testRunner.And("She selects \"Receive a Code\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 54
+#line 53
  testRunner.Then("the screen changes to receive an input for a code", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 55
+#line 54
  testRunner.When("She inputs the correct code from her SMS", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 56
+#line 55
  testRunner.And("She selects \"Verify\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 56
+ testRunner.And("she skips optional authenticators if prompted", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 57
  testRunner.Then("she is redirected to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

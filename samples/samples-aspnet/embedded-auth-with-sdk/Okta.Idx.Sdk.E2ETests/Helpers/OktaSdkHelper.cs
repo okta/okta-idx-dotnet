@@ -100,6 +100,8 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
                                },
                                user.Id,
                                factor.Id);
+
+                await AddUserToGroup(user, "MFA required");
             }
         } 
 

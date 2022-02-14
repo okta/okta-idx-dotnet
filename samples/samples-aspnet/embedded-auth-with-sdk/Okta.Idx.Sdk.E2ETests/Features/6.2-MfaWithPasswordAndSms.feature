@@ -7,14 +7,11 @@
 
   Scenario: 6.2.1: Enroll in SMS Factor prompt when authenticating
 	Given Mary navigates to the Basic Login View
-#added:
 	And she has inserted her username
-
 	And she has inserted her password
 	And her password is correct
 	When she clicks Login
 	Then she is presented with a list of factors
-#
 	When She selects Phone from the list
 	And She inputs a valid phone number
 	And She selects "Receive a Code"
@@ -26,9 +23,7 @@
 	
   Scenario: 6.2.2: 2FA Login with SMS
 	Given Mary navigates to the Basic Login View
-#added 
 	And she has enrolled her phone already
-#added:
 	And she has inserted her username	
 	And she has inserted her password
 	And her password is correct
@@ -46,7 +41,6 @@
 
   Scenario: 6.2.3: Enroll with Invalid Phone Number
 	Given Mary navigates to the Basic Login View
-#added:
 	And she has inserted her username
 	And she has inserted her password
 	And her password is correct
@@ -54,29 +48,22 @@
 	Then she is presented with an option to select SMS to enroll
 	When She selects Phone from the list
 	And she inputs an invalid phone number
-	#And She selects "Receive a Code"
 	And submits the enrollment form
 	Then she should see a message "Invalid Phone Number"
 
   Scenario: 6.2.4: Mary enters a wrong verification code on verify
 	Given Mary navigates to the Basic Login View
-#added 
 	And she has enrolled her phone already
-#added:
 	And she has inserted her username	
 	And she has inserted her password
 	And her password is correct
 	When she clicks Login
-#
 	Then she is presented with an option to select Phone
 	When she selects Phone from the list
 	And She selects "Receive a Code"
-# two lines added
     Then she is presented with an option to select SMS to verify
 	When She selects SMS from the list
-
 	Then the screen changes to receive an input for a code
-# was: When She inputs the incorrect code from the email
 	When She inputs the incorrect code from the sms
 	Then the sample show as error message "Invalid code. Try again." on the SMS Challenge page
 	And she sees a field to re-enter another code
