@@ -77,7 +77,7 @@ namespace embedded_auth_with_sdk.E2ETests.Helpers
             var a18nprofile = _ia18nHelper.GetDefaultProfile();
             var oktaUser = await _oktaHelper.CreateActiveUser(a18nprofile.EmailAddress, a18nprofile.PhoneNumber, firstName, _passwordToUse);
             await _oktaHelper.AddUserToGroup(oktaUser, "TOTP required");
-            await _oktaHelper.AddUserToGroup(oktaUser, "MFA required");
+         //   await _oktaHelper.AddUserToGroup(oktaUser, "MFA required");
 
             UserProfile = new UserProfile()
             {

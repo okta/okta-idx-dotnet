@@ -19,6 +19,7 @@
     Then the screen changes to receive an input for a TOTP code
     When She inputs the correct code from her Google Authenticator App
     And She selects Verify
+    And she skips optional authenticators if prompted
     Then she is redirected to the Root View
     And she sees a table with her profile info
     And the cell for the value of email is shown and contains her email
@@ -38,7 +39,7 @@
     Then the screen changes to receive an input for a TOTP code
     When She inputs the correct code from her Google Authenticator App
     And She selects Verify
-	And she skips optional authenticators if prompted
+    And she skips optional authenticators if prompted
     Then she is redirected to the Root View
     And she sees a table with her profile info
     And the cell for the value of email is shown and contains her email
