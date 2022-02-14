@@ -16,25 +16,25 @@ namespace embedded_auth_with_sdk.Models
         public string PasswordId { get; set; }
 
         public string PhoneId { get; set; }
+
+        public string WebAuthnId { get; set; }
+
+        public string TotpId { get; set; }
+        
+        public string OktaVerifyId { get; set; }
         
         public bool CanSkip { get; set; }
 
         public IList<AuthenticatorViewModel> Authenticators { get; set; }
 
-        public bool IsPasswordSelected
-        {
-            get
-            {
-                return (PasswordId!= null && PasswordId == AuthenticatorId);
-            }
-        }
+        public bool IsPasswordSelected => PasswordId != null && PasswordId == AuthenticatorId;
 
-        public bool IsPhoneSelected
-        {
-            get
-            {
-                return (PhoneId != null && PhoneId == AuthenticatorId);
-            }
-        }
+        public bool IsPhoneSelected => PhoneId != null && PhoneId == AuthenticatorId;
+
+        public bool IsWebAuthnSelected => WebAuthnId != null && WebAuthnId == AuthenticatorId;
+
+        public bool IsTotpSelected => TotpId != null && TotpId == AuthenticatorId;
+
+        public bool IsOktaVerifySelected => OktaVerifyId != null && OktaVerifyId == AuthenticatorId;
     }
 }

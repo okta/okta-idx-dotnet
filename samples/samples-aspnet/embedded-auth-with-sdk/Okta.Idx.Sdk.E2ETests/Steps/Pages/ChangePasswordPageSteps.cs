@@ -52,6 +52,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         }
 
         [When(@"she submits the change password form")]
+        [When(@"she submits the set new password form")]
         public void WhenSheSubmitsTheChangePasswordForm()
         {
             _changePasswordPageModel.SubmitButton.Click();

@@ -16,6 +16,8 @@ namespace Okta.Idx.Sdk.UnitTests
 
         public string ReceivedBody { get; set; }
 
+        public IEnumerable<KeyValuePair<string, string>> ReceivedHeaders { get; set; }
+
         public string OktaDomain => throw new NotImplementedException();
 
         public MockedStringRequestExecutor(string returnThis, int statusCode = 200)
@@ -26,6 +28,7 @@ namespace Okta.Idx.Sdk.UnitTests
 
         public Task<HttpResponse<string>> GetAsync(string href, IEnumerable<KeyValuePair<string, string>> headers, CancellationToken cancellationToken)
         {
+            ReceivedHeaders = headers;
             ReceivedHref = href;
             return Task.FromResult(new HttpResponse<string>
             {
@@ -38,6 +41,7 @@ namespace Okta.Idx.Sdk.UnitTests
         {
             ReceivedHref = href;
             ReceivedBody = body;
+            ReceivedHeaders = headers;
             return Task.FromResult(new HttpResponse<string>
             {
                 StatusCode = _statusCode,

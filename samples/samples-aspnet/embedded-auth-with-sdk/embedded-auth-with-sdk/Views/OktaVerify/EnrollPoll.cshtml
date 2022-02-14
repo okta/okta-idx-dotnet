@@ -1,0 +1,37 @@
+﻿@model embedded_auth_with_sdk.Models.OktaVerifyEnrollPollModel
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Enroll Okta Verify";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+
+        <h4>Set up Okta Verify</h4>
+        <ol>
+            <li>On your mobile device, download the Okta Verify app from the App Store (iPhone and iPad) or Google Play (Android devices).</li>
+            <li>@Model.Message</li>
+        </ol>
+        <hr />        
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+    function poll() {
+        fetch('@Model.PollEndpoint')
+            .then(response => response.json())
+            .then(data => {
+                if (data.ContinuePolling) {
+                    setTimeout(poll, data.Refresh);
+                } else {
+                    window.location.href = data.Next;
+                }
+            });
+    }
+
+    setTimeout(poll, @Model.RefreshInterval);
+</script>
