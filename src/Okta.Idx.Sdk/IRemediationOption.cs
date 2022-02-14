@@ -41,6 +41,11 @@ namespace Okta.Idx.Sdk
         string Href { get; }
 
         /// <summary>
+        /// Gets the polling refresh interval.
+        /// </summary>
+        int? Refresh { get; }
+
+        /// <summary>
         /// Gets the Idp
         /// </summary>
         IIdp Idp { get; }

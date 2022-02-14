@@ -25,7 +25,7 @@
 	Then she sees a page to input a code
 	When she inputs the correct code from her email
 	Then she sees the list of optional factors (SMS)
-	When she selects "Skip" on SMS
+	When she selects Skip
 	Then she is redirected to the Root View
     And an application session is created
 
@@ -48,12 +48,12 @@
 	When she inputs the correct code from her email
 	Then she sees a list of factors to register
 	When she selects Phone from the list
-
 	And She inputs a valid phone number
 	And She selects "Receive a Code"
 	Then the screen changes to receive an input for a code
 	When She inputs the correct code from her SMS
 	And She selects "Verify"
+	And she skips optional authenticators if prompted
 	Then she is redirected to the Root View
     And an application session is created
 	

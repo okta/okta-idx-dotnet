@@ -13,6 +13,8 @@ namespace embedded_auth_with_sdk.E2ETests.PageObjectModels
         public IWebElement LogoutButton => _webDriver.FindElement(By.Id("LogoutBtn"));
         public IWebElement RegisterButton => _webDriver.FindElement(By.Id("RegisterBtn"));
         public IWebElement ClaimUserNameLabel => _webDriver.FindElement(By.Id("claim-preferred_username"));
+        public IWebElement ClaimGivenNameLabel => _webDriver.FindElement(By.Id("claim-given_name"));
+        public IWebElement ClaimFamilyNameLabel => _webDriver.FindElement(By.Id("claim-family_name"));
         public IWebElement ClaimIdTokenLabel => _webDriver.FindElement(By.Id("claim-id_token"));
         public IWebElement ClaimAccessTokenLabel => _webDriver.FindElement(By.Id("claim-access_token"));
 
