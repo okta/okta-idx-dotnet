@@ -3,6 +3,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,6 +25,7 @@ namespace Okta.Idx.Sdk.Helpers
                     MethodTypes = authenticator.Methods?.Select(x => x.Type).ToList(),
                     EnrollmentId = enrollment?.Id,
                     Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
+                    CredentialId = string.Equals(authenticator.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase) ? enrollment?.CredentialId : null,
                 });
             }
 
@@ -31,14 +33,42 @@ namespace Okta.Idx.Sdk.Helpers
         }
 
         internal static IAuthenticator ConvertToAuthenticator(IList<IAuthenticatorValue> authenticators, IAuthenticatorEnrollment authenticatorEnrollment)
-        => new Authenticator
         {
-            Id = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment.Key)?.Id,
-            Name = authenticatorEnrollment.DisplayName,
-            MethodTypes = authenticatorEnrollment.Methods?.Select(x => x.Type).ToList(),
-            EnrollmentId = authenticatorEnrollment.Id,
-            Profile = GetAuthenticatorProfile(authenticatorEnrollment),
-        };
+            return new Authenticator
+            {
+                Id = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment.Key)?.Id,
+                Name = authenticatorEnrollment.DisplayName,
+                MethodTypes = authenticatorEnrollment.Methods?.Select(x => x.Type).ToList(),
+                EnrollmentId = authenticatorEnrollment.Id,
+                Profile = GetAuthenticatorProfile(authenticatorEnrollment),
+            };
+        }
+
+        internal static IAuthenticator ConvertToAuthenticator(
+            IList<IAuthenticatorValue> authenticators,
+            IAuthenticatorEnrollment authenticatorEnrollment,
+            IList<IAuthenticatorEnrollment> authenticatorEnrollments)
+        {
+            var credentialId = string.Empty;
+
+            // currentAuthenticatorEnrollment not present with webAuthn
+            if (string.Equals(authenticatorEnrollment.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                credentialId = authenticatorEnrollments?.FirstOrDefault(x =>
+                    string.Equals(x.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase))?.CredentialId;
+            }
+
+            return new Authenticator
+            {
+                Id = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment?.Key)?.Id,
+                Name = authenticatorEnrollment?.DisplayName,
+                MethodTypes = authenticatorEnrollment?.Methods?.Select(x => x.Type).ToList(),
+                EnrollmentId = authenticatorEnrollment?.Id,
+                Profile = (authenticatorEnrollment != null) ? GetAuthenticatorProfile(authenticatorEnrollment) : string.Empty,
+                ContextualData = authenticatorEnrollment?.AuthenticatorContextualData,
+                CredentialId = credentialId,
+            };
+        }
 
         internal static string GetAuthenticatorProfile(IAuthenticatorEnrollment authenticatorEnrollment)
         {

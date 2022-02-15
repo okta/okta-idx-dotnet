@@ -53,6 +53,11 @@ namespace Okta.Idx.Sdk
         }
 
         /// <summary>
+        /// Gets the Request Options.
+        /// </summary>
+        public RequestOptions RequestOptions { get; internal set; } = new RequestOptions();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="IdxClient"/> class using the specified <see cref="HttpClient"/>.
         /// </summary>
         /// <param name="configuration">
@@ -205,26 +210,59 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="state">Optional value to use as the state argument when initiating the authentication flow. This is used to provide contextual information to survive redirects.</param>
         /// <param name="cancellationToken">The cancellation token. Optional.</param>
+        /// <param name="activationToken">The activation token. Optional.</param>
+        /// <param name="recoveryToken">The recovery token. Optional.</param>
         /// <returns>The IDX context.</returns>
-        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default)
+        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null, string recoveryToken = null)
         {
             // PKCE props
             state = state ?? GenerateSecureRandomString(16);
             var codeVerifier = GenerateSecureRandomString(86);
             var codeChallenge = GenerateCodeChallenge(codeVerifier, out var codeChallengeMethod);
 
-            var payload = new Dictionary<string, string>();
-            payload.Add("scope", string.Join(" ", Configuration.Scopes));
-            payload.Add("client_id", Configuration.ClientId);
+            Dictionary<string, string> headers;
+            if (RequestOptions?.Headers != null)
+            {
+                headers = new Dictionary<string, string>(RequestOptions.Headers);
+            }
+            else
+            {
+                headers = new Dictionary<string, string>();
+            }
 
-            // Add PKCE params and state
-            payload.Add("code_challenge_method", codeChallengeMethod);
-            payload.Add("code_challenge", codeChallenge);
-            payload.Add("redirect_uri", Configuration.RedirectUri);
-            payload.Add("state", state);
+            headers.Add(RequestHeaders.ContentType, HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
 
-            var headers = new Dictionary<string, string>();
-            headers.Add("Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded);
+            var payload = new Dictionary<string, string>
+            {
+                { "scope", string.Join(" ", Configuration.Scopes) },
+                { "client_id", Configuration.ClientId },
+
+                // Add PKCE params and state
+                { "code_challenge_method", codeChallengeMethod },
+                { "code_challenge", codeChallenge },
+                { "redirect_uri", Configuration.RedirectUri },
+                { "state", state },
+            };
+
+            if (Configuration.IsConfidentialClient)
+            {
+                payload.Add("client_secret", Configuration.ClientSecret);
+                if (!string.IsNullOrEmpty(Configuration.DeviceToken))
+                {
+                    headers.Add(RequestHeaders.XDeviceToken, Configuration.DeviceToken);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(activationToken))
+            {
+                payload.Add("activation_token", activationToken);
+            }
+
+            if (!string.IsNullOrEmpty(recoveryToken))
+            {
+                payload.Add("recovery_token", recoveryToken);
+            }
+
             Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/interact"));
 
             var request = new HttpRequest
@@ -333,7 +371,7 @@ namespace Okta.Idx.Sdk
                 StringBuilder requestContent = new StringBuilder();
                 IdxUrlHelper.AddParameter(requestContent, "grant_type", "interaction_code", false);
                 IdxUrlHelper.AddParameter(requestContent, "client_id", Configuration.ClientId, true);
-                if (!string.IsNullOrEmpty(Configuration.ClientSecret))
+                if (Configuration.IsConfidentialClient)
                 {
                     IdxUrlHelper.AddParameter(requestContent, "client_secret", Configuration.ClientSecret, true);
                 }
@@ -778,13 +816,18 @@ namespace Okta.Idx.Sdk
                 idxRequestPayload,
                 cancellationToken);
 
+            // WebAuthN enrollment data is available in authenticatorSelectionResponse.CurrentAuthenticator instead of authenticatorSelectionResponse.CurrentAuthenticatorEnrollment unlike other authenticators
+            var currentAuthenticatorEnrollment =
+                authenticatorSelectionResponse.CurrentAuthenticatorEnrollment?.Value ??
+                authenticatorSelectionResponse.CurrentAuthenticator?.Value;
+
             if (authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.AuthenticatorVerificationData))
             {
                 return new AuthenticationResponse
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorData,
-                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, authenticatorSelectionResponse.CurrentAuthenticatorEnrollment.Value),
+                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, currentAuthenticatorEnrollment, authenticatorSelectionResponse.AuthenticatorEnrollments.Value),
                 };
             }
             else //(authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
@@ -793,7 +836,7 @@ namespace Okta.Idx.Sdk
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
-                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, authenticatorSelectionResponse.CurrentAuthenticatorEnrollment.Value),
+                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, currentAuthenticatorEnrollment, authenticatorSelectionResponse.AuthenticatorEnrollments?.Value),
                 };
             }
         }
@@ -856,8 +899,42 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public async Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default)
         {
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, recoveryToken: recoverPasswordOptions.RecoveryToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (!string.IsNullOrEmpty(recoverPasswordOptions.RecoveryToken))
+            {
+                var resetAuthenticatorOption = introspectResponse.FindRemediationOption(RemediationType.ResetAuthenticator);
+                if (resetAuthenticatorOption != null)
+                {
+                    var resetAuthenticatorRequest = new IdxRequestPayload
+                    {
+                        StateHandle = introspectResponse.StateHandle,
+                    };
+                    resetAuthenticatorRequest.SetProperty(
+                        "credentials",
+                        new
+                        {
+                            passcode = recoverPasswordOptions.Passcode,
+                        });
+
+                    var resetResponse = await resetAuthenticatorOption
+                        .ProceedAsync(resetAuthenticatorRequest, cancellationToken);
+
+                    if (resetResponse.IsLoginSuccess)
+                    {
+                        var tokenResponse = await resetResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                        return new AuthenticationResponse
+                        {
+                            AuthenticationStatus = AuthenticationStatus.Success,
+                            TokenInfo = tokenResponse,
+                        };
+                    }
+
+                    throw new OktaException("Unexpected response. Cannot reset password.");
+                }
+            }
 
             var identifyOption = introspectResponse.FindRemediationOption(RemediationType.Identify, throwIfNotFound: true);
             var requiresCredentials = identifyOption.Form.Any(f => f.Name == "credentials");
@@ -879,9 +956,9 @@ namespace Okta.Idx.Sdk
                 AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorSelection,
                 Authenticators = authenticators,
             };
-
         }
 
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> ResendCodeAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
@@ -892,7 +969,7 @@ namespace Okta.Idx.Sdk
                 StateHandle = introspectResponse.StateHandle,
             };
 
-            if (introspectResponse?.CurrentAuthenticatorEnrollment != null 
+            if (introspectResponse?.CurrentAuthenticatorEnrollment != null
                 && introspectResponse?.CurrentAuthenticatorEnrollment.Value?.Resend != null)
             {
                 var resendResponse = await introspectResponse.CurrentAuthenticatorEnrollment.Value.Resend.ProceedAsync(resendRequest, cancellationToken);
@@ -905,7 +982,7 @@ namespace Okta.Idx.Sdk
                 {
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
                     IdxContext = idxContext,
-                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(resendResponse.Authenticators.Value, resendResponse.CurrentAuthenticatorEnrollment.Value),
+                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(resendResponse.Authenticators.Value, resendResponse.CurrentAuthenticatorEnrollment.Value, resendResponse.AuthenticatorEnrollments.Value),
                 };
             }
             else if (introspectResponse?.CurrentAuthenticator != null
@@ -922,7 +999,7 @@ namespace Okta.Idx.Sdk
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
-                    CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(resendResponse.Authenticators.Value, resendResponse.CurrentAuthenticator.Value),
+                    CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(resendResponse.Authenticators.Value, resendResponse.CurrentAuthenticator.Value, resendResponse.AuthenticatorEnrollments.Value),
                 };
             }
             else
@@ -986,7 +1063,93 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
+        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(
+            EnrollWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            var currentRemediationType = RemediationType.Unknown;
+
+            if (introspectResponse.ContainsRemediationOption(RemediationType.EnrollAuthenticator))
+            {
+                currentRemediationType = RemediationType.EnrollAuthenticator;
+            }
+            else
+            {
+                throw new UnexpectedRemediationException(RemediationType.EnrollAuthenticator, introspectResponse);
+            }
+
+            var verifyAuthenticatorRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            verifyAuthenticatorRequest.SetProperty("credentials", new
+            {
+                attestation = verifyAuthenticatorOptions.Attestation,
+                clientData = verifyAuthenticatorOptions.ClientData,
+            });
+
+            var enrollAuthenticatorResponse = await introspectResponse
+                .ProceedWithRemediationOptionAsync(currentRemediationType, verifyAuthenticatorRequest, cancellationToken);
+
+            var isAuthenticatorEnroll = enrollAuthenticatorResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll);
+
+            if (enrollAuthenticatorResponse.IsLoginSuccess)
+            {
+                var tokenResponse = await enrollAuthenticatorResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+
+            if (isAuthenticatorEnroll)
+            {
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(enrollAuthenticatorResponse.Authenticators.Value),
+                    IdxContext = idxContext,
+                    CanSkip = enrollAuthenticatorResponse.ContainsRemediationOption(RemediationType.Skip),
+                };
+            }
+
+            throw new UnexpectedRemediationException(
+                new List<string>
+                {
+                    RemediationType.SelectAuthenticatorEnroll,
+                },
+                enrollAuthenticatorResponse);
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(OktaVerifyVerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var challengeAuthenticatorRequest = new IdxRequestPayload();
+            challengeAuthenticatorRequest.SetProperty("credentials", new
+            {
+                totp = verifyAuthenticatorOptions.TotpCode,
+            });
+
+            return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var challengeAuthenticatorRequest = new IdxRequestPayload();
+            challengeAuthenticatorRequest.SetProperty("credentials", new
+            {
+                passcode = verifyAuthenticatorOptions.Code,
+            });
+
+            return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        private async Task<AuthenticationResponse> VerifyAuthenticatorAsync(IdxRequestPayload challengeAuthenticatorRequest, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
@@ -1000,6 +1163,14 @@ namespace Okta.Idx.Sdk
             else if (introspectResponse.ContainsRemediationOption(RemediationType.EnrollAuthenticator))
             {
                 currentRemediationType = RemediationType.EnrollAuthenticator;
+            }
+            else if (introspectResponse.ContainsRemediationOption(RemediationType.EnrollPoll))
+            {
+                currentRemediationType = RemediationType.EnrollPoll;
+            }
+            else if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+            {
+                currentRemediationType = RemediationType.SelectAuthenticatorEnroll;
             }
             else
             {
@@ -1020,22 +1191,54 @@ namespace Okta.Idx.Sdk
                         {
                             RemediationType.ChallengeAuthenticator,
                             RemediationType.EnrollAuthenticator,
+                            RemediationType.SelectAuthenticatorEnroll,
+                            RemediationType.EnrollPoll,
                         },
                         introspectResponse);
                 }
+            }
+
+            challengeAuthenticatorRequest.StateHandle = introspectResponse.StateHandle;
+
+            return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, introspectResponse, currentRemediationType, idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> ChallengeAuthenticatorAsync(ChallengeWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            var currentRemediationType = RemediationType.Unknown;
+
+            // Check if flow is challenge authenticator or enroll authenticator, otherwise throw
+            if (introspectResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
+            {
+                currentRemediationType = RemediationType.ChallengeAuthenticator;
+            }
+            else
+            {
+                throw new UnexpectedRemediationException(RemediationType.ChallengeAuthenticator, introspectResponse);
             }
 
             var challengeAuthenticatorRequest = new IdxRequestPayload
             {
                 StateHandle = introspectResponse.StateHandle,
             };
+
             challengeAuthenticatorRequest.SetProperty("credentials", new
             {
-                passcode = verifyAuthenticatorOptions.Code,
+                authenticatorData = verifyAuthenticatorOptions.AuthenticatorData,
+                clientData = verifyAuthenticatorOptions.ClientData,
+                signatureData = verifyAuthenticatorOptions.SignatureData,
             });
 
-            var challengeAuthenticatorResponse = await introspectResponse
-                .ProceedWithRemediationOptionAsync(currentRemediationType, challengeAuthenticatorRequest, cancellationToken);
+            return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, introspectResponse, currentRemediationType, idxContext, cancellationToken);
+        }
+
+        private async Task<AuthenticationResponse> VerifyAuthenticatorAsync(IdxRequestPayload payload, IIdxResponse proceedResponse, string remediationType, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var challengeAuthenticatorResponse = await proceedResponse
+                .ProceedWithRemediationOptionAsync(remediationType, payload, cancellationToken);
 
             var isResetAuthenticator = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.ResetAuthenticator);
             var isAuthenticatorEnroll = challengeAuthenticatorResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll);
@@ -1088,6 +1291,11 @@ namespace Okta.Idx.Sdk
                 { "client_id", Configuration.ClientId },
             };
 
+            var headers = new Dictionary<string, string>
+            {
+                { RequestHeaders.ContentType, HttpRequestContentBuilder.ContentTypeFormUrlEncoded },
+            };
+
             if (Configuration.IsConfidentialClient)
             {
                 payload.Add("client_secret", Configuration.ClientSecret);
@@ -1095,11 +1303,6 @@ namespace Okta.Idx.Sdk
 
             payload.Add("token_type_hint", tokenType.ToTokenHintString());
             payload.Add("token", token);
-
-            var headers = new Dictionary<string, string>
-            {
-                { "Content-Type", HttpRequestContentBuilder.ContentTypeFormUrlEncoded },
-            };
 
             Uri uri = new Uri(IdxUrlHelper.GetNormalizedUriString(UrlHelper.EnsureTrailingSlash(Configuration.Issuer), "v1/revoke"));
             var request = new HttpRequest
@@ -1205,24 +1408,56 @@ namespace Okta.Idx.Sdk
             {
                 currentRemediationType = RemediationType.EnrollAuthenticator;
             }
-
-            if (currentRemediationType != RemediationType.EnrollAuthenticator &&
-                    currentRemediationType != RemediationType.AuthenticatorEnrollmentData)
+            else if (selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.EnrollPoll))
+            {
+                currentRemediationType = RemediationType.EnrollPoll;
+            }
+            else if (selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.SelectEnrollmentChannel))
+            {
+                currentRemediationType = RemediationType.SelectEnrollmentChannel;
+            }
+            
+            if (currentRemediationType != RemediationType.EnrollPoll &&
+            currentRemediationType != RemediationType.EnrollAuthenticator &&
+            currentRemediationType != RemediationType.AuthenticatorEnrollmentData && 
+            currentRemediationType != RemediationType.SelectEnrollmentChannel)
             {
                 throw new UnexpectedRemediationException(
                     new List<string>
                     {
+                            RemediationType.EnrollPoll,
                             RemediationType.AuthenticatorEnrollmentData,
                             RemediationType.EnrollAuthenticator,
+                            RemediationType.SelectEnrollmentChannel,
                     },
                     selectAuthenticatorResponse);
+            }
+
+
+            var currentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(
+                selectAuthenticatorResponse.Authenticators.Value,
+                selectAuthenticatorResponse.CurrentAuthenticator.Value,
+                selectAuthenticatorResponse.AuthenticatorEnrollments.Value);
+
+            // Assuming Okta Verify for now
+            if (currentRemediationType == RemediationType.EnrollPoll ||
+                currentRemediationType == RemediationType.SelectEnrollmentChannel)
+            {
+                // TODO: Move this to convertToAuthenticator
+                currentAuthenticator.ChannelTypes = selectAuthenticatorResponse.FindRemediationOption(RemediationType.SelectEnrollmentChannel)
+                    .Form?
+                    .FirstOrDefault(x => x.Name == "authenticator")?.GetProperty<IFormValue>("value")?
+                    .Form?
+                    .GetArrayProperty<IFormValue>("value")?
+                    .FirstOrDefault(x => x.Name == "channel")?.Options
+                    ?.Select(x => x.GetProperty<AuthenticatorChannelType>("value")).ToList();
             }
 
             return new AuthenticationResponse
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = status,
-                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value),
+                CurrentAuthenticator = currentAuthenticator,
             };
         }
 
@@ -1406,5 +1641,251 @@ namespace Okta.Idx.Sdk
             }
         }
 
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(SelectOktaVerifyAuthenticatorOptions challengeAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (!introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+            {
+                throw new UnexpectedRemediationException(
+                    new List<string>
+                    {
+                        RemediationType.SelectAuthenticatorAuthenticate,
+                    }, introspectResponse);
+            }
+
+            var idxRequestPayload = new IdxRequestPayload();
+            idxRequestPayload.SetProperty("authenticator", new { id = challengeAuthenticatorOptions.AuthenticatorId, methodType = challengeAuthenticatorOptions.AuthenticatorMethodType });
+            idxRequestPayload.SetProperty("stateHandle", introspectResponse.StateHandle);
+
+            var selectAuthenticatorResponse = await introspectResponse.ProceedWithRemediationOptionAsync(
+                RemediationType.SelectAuthenticatorAuthenticate,
+                idxRequestPayload,
+                cancellationToken);
+
+            var authenticationResponse = new AuthenticationResponse
+            {
+                IdxContext = idxContext,
+                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
+                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, selectAuthenticatorResponse.CurrentAuthenticator.Value),
+                CanSkip = selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.Skip),
+            };
+
+            return authenticationResponse;
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> SelectEnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (!introspectResponse.ContainsRemediationOption(RemediationType.SelectEnrollmentChannel))
+            {
+                throw new UnexpectedRemediationException(
+                    new List<string>
+                    {
+                        RemediationType.SelectEnrollmentChannel,
+                    }, introspectResponse);
+            }
+
+            var idxRequestPayload = new IdxRequestPayload();
+            idxRequestPayload.SetProperty("authenticator", new { channel = enrollAuthenticatorOptions.Channel, id = enrollAuthenticatorOptions.AuthenticatorId });
+            idxRequestPayload.SetProperty("stateHandle", introspectResponse.StateHandle);
+
+            var selectEnrollmentChannelResponse = await introspectResponse.ProceedWithRemediationOptionAsync(
+                RemediationType.SelectEnrollmentChannel, idxRequestPayload, cancellationToken);
+
+
+            var remediationOption = selectEnrollmentChannelResponse.FindRemediationOption(RemediationType.SelectEnrollmentChannel, true);
+
+
+            var currentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(
+                selectEnrollmentChannelResponse.Authenticators?.Value,
+                selectEnrollmentChannelResponse.CurrentAuthenticator?.Value);
+
+            // TODO: Move this to convertToAuthenticator
+            currentAuthenticator.ChannelTypes = remediationOption.Form?.FirstOrDefault(x => x.Name == "channel")?.Options
+                ?.Select(x => x.GetProperty<AuthenticatorChannelType>("value")).ToList();
+
+            var authenticationResponse = new AuthenticationResponse
+            {
+                IdxContext = idxContext,
+                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollmentData,
+                CurrentAuthenticator = currentAuthenticator,
+                CanSkip = selectEnrollmentChannelResponse.ContainsRemediationOption(RemediationType.Skip),
+            };
+
+            return authenticationResponse;
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions oktaVerifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            if (!introspectResponse.ContainsRemediationOption(RemediationType.EnrollmentChannelData))
+            {
+                throw new UnexpectedRemediationException(
+                    new List<string>
+                    {
+                        RemediationType.EnrollmentChannelData,
+                    }, introspectResponse);
+            }
+
+            var idxRequestPayload = new IdxRequestPayload { StateHandle = introspectResponse.StateHandle };
+
+            switch (oktaVerifyAuthenticatorOptions.Channel)
+            {
+                case "email":
+                    idxRequestPayload.SetProperty("email", oktaVerifyAuthenticatorOptions.Email);
+                    break;
+                case "sms":
+                    idxRequestPayload.SetProperty("phoneNumber", oktaVerifyAuthenticatorOptions.PhoneNumber);
+                    break;
+            }
+
+            var enrollmentChannelDataResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.EnrollmentChannelData, idxRequestPayload, cancellationToken);
+
+            var authenticationResponse = new AuthenticationResponse
+            {
+                IdxContext = idxContext,
+                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(enrollmentChannelDataResponse.Authenticators?.Value, enrollmentChannelDataResponse.CurrentAuthenticator?.Value),
+                CanSkip = enrollmentChannelDataResponse.ContainsRemediationOption(RemediationType.Skip),
+            };
+
+            return authenticationResponse;
+        }
+
+        /// <inheritdoc/>
+        public async Task<PollResponse> PollAuthenticatorEnrollmentStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            bool continuePolling = introspectResponse.ContainsRemediationOption(RemediationType.EnrollPoll, out IRemediationOption remediationOption);
+
+            if (continuePolling)
+            {
+                return new PollResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                    Refresh = remediationOption?.Refresh,
+                    ContinuePolling = continuePolling,
+                    CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(introspectResponse.Authenticators?.Value, introspectResponse.CurrentAuthenticator?.Value),
+                    CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
+                };
+            }
+            else
+            {
+                if (introspectResponse.SuccessWithInteractionCode != null)
+                {
+                    return new PollResponse
+                    {
+                        AuthenticationStatus = AuthenticationStatus.Success,
+                        TokenInfo = await introspectResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext),
+                        CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
+                    };
+                }
+
+                if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+                {
+                    return new PollResponse
+                    {
+                        IdxContext = idxContext,
+                        AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
+                        Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators?.Value, introspectResponse.AuthenticatorEnrollments?.Value),
+                        CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
+                    };
+                }
+
+                if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+                {
+                    return new PollResponse
+                    {
+                        IdxContext = idxContext,
+                        AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                        Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators?.Value),
+                        CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
+                    };
+                }
+            }
+
+            throw new UnexpectedRemediationException(
+                new List<string>
+                {
+                    RemediationType.EnrollPoll,
+                    RemediationType.SelectAuthenticatorAuthenticate,
+                    RemediationType.SelectAuthenticatorEnroll,
+                },
+                introspectResponse);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PollResponse> PollAuthenticatorPushStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            IdxRequestPayload requestPayload = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            if (!introspectResponse.ContainsRemediationOption(RemediationType.ChallengePoll))
+            {
+                throw new UnexpectedRemediationException(RemediationType.ChallengePoll, introspectResponse);
+            }
+
+            var challengeResponse = await introspectResponse.ProceedWithRemediationOptionAsync(RemediationType.ChallengePoll, requestPayload, cancellationToken);
+            bool continuePolling = challengeResponse.ContainsRemediationOption(RemediationType.ChallengePoll, out IRemediationOption challengePollRemediationOption);
+
+            if (continuePolling)
+            {
+                return new PollResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
+                    ContinuePolling = continuePolling,
+                    Refresh = challengePollRemediationOption?.Refresh,
+                };
+            }
+
+            if (challengeResponse.SuccessWithInteractionCode != null)
+            {
+                var tokenInfo = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+                return new PollResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenInfo,
+                    ContinuePolling = continuePolling,
+                    Refresh = challengePollRemediationOption?.Refresh,
+                };
+            }
+
+            if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+            {
+                return new PollResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
+                    ContinuePolling = continuePolling,
+                    Refresh = challengePollRemediationOption?.Refresh,
+                };
+            }
+
+            if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+            {
+                return new PollResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                    ContinuePolling = continuePolling,
+                    Refresh = challengePollRemediationOption?.Refresh,
+                };
+            }
+
+            throw new UnexpectedRemediationException(
+                new List<string>
+                {
+                    RemediationType.SelectAuthenticatorAuthenticate,
+                    RemediationType.SelectAuthenticatorEnroll,
+                },
+                challengeResponse);
+        }
     }
 }

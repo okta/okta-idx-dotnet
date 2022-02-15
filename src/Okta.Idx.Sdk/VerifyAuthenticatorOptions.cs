@@ -5,8 +5,14 @@
 
 namespace Okta.Idx.Sdk
 {
+    /// <summary>
+    /// The options to verify an email or phone authenticators.
+    /// </summary>
     public class VerifyAuthenticatorOptions
     {
+        /// <summary>
+        /// Gets or sets the code.
+        /// </summary>
         public string Code { get; set; }
     }
 }

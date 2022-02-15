@@ -143,7 +143,6 @@ Type: `AwaitingPasswordReset`
 
 The user needs to reset their password to continue with the authentication flow and retrieve tokens.
 
-
 ### Revoke Tokens
 
 ```csharp
