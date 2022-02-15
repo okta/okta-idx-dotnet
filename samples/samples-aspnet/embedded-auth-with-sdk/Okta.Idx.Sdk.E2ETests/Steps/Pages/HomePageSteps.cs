@@ -88,5 +88,11 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
             _homePageModel.ClaimUserNameLabel.Text.Should().Be(_context.UserProfile.Email);
         }
 
+        [Then(@"the cell for the value of name is shown and contains her first name and last name")]
+        public void ThenTheCellForTheValueOfNameIsShownAndContainsHerFirstNameAndLastName()
+        {
+            _homePageModel.ClaimGivenNameLabel.Text.Should().Be(_context.UserProfile.FirstName);
+            _homePageModel.ClaimFamilyNameLabel.Text.Should().Be(_context.UserProfile.LastName);
+        }
     }
 }
