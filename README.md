@@ -5,11 +5,11 @@
 
 # Okta .NET IDX SDK
 
-This library is built for server-side projects in .NET to communicate with Okta as an OAuth
-2.0 + OpenID Connect provider. It works with the [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/) to authenticate and register users.
+This library is built for server-side projects in .NET to communicate with Okta as an OAuth 
+2.0 + OpenID Connect provider. It works with the [Okta's Identity Engine](https://developer.okta.com/docs/guides/oie-intro/) to authenticate and register users.
 
-To see this library working in a sample, check out our [ASP.NET Samples](samples/samples-aspnet). You can also check out our guides for step-by-step instructions:
- 
+To see this library working in a sample, check out our [ASP.NET Samples](samples/samples-aspnet). You can also check out our guides for step-by-step instructions — for both embedded SDK and embedded widget samples, get started with [Run the sample apps](https://developer.okta.com/docs/guides/oie-embedded-common-run-samples/aspnet/main/).
+
 * [Pre-requisites](https://developer.okta.com/docs/guides/oie-embedded-common-run-samples/aspnet/main/)
 * [Build with the embedded SDK](https://developer.okta.com/docs/guides/oie-embedded-common-run-samples/aspnet/main/#run-the-embedded-sdk-sample-app)
 * [Build with the embedded widget](https://developer.okta.com/docs/guides/oie-embedded-common-run-samples/aspnet/main/#run-the-embedded-widget-sample-app)
