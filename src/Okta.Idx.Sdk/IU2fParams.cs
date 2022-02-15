@@ -11,7 +11,7 @@ namespace Okta.Idx.Sdk
     public interface IU2fParams
     {
         /// <summary>
-        /// Gets or sets the application ID
+        /// Gets the application ID
         /// </summary>
         string ApplicationId { get; }
     }

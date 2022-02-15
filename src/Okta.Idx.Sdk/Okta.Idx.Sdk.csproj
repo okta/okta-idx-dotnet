@@ -10,14 +10,15 @@
     <Description>Official Okta .NET IDX SDK.</Description>
     <RepositoryUrl>https://github.com/okta/okta-idx-dotnet</RepositoryUrl>
     <PackageProjectUrl>https://github.com/okta/okta-idx-dotnet</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/okta/okta-idx-dotnet/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Authors>Okta, Inc.</Authors>
     <PackageTags>okta api authentication identity management</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/okta/okta-sdk-dotnet/master/icon.png</PackageIconUrl>
+     <PackageIconUrl>https://raw.githubusercontent.com/okta/okta-sdk-dotnet/master/icon.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Okta.Sdk.Abstractions" Version="4.0.2" />
+    <PackageReference Include="Okta.Sdk.Abstractions" Version="4.0.3" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,6 +29,11 @@
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
+
+   <ItemGroup>
+      <None Include="..\..\icon.png" Pack="true" PackagePath=""/>
+      <None Include="..\..\LICENSE" Pack="true" PackagePath=""/>
+   </ItemGroup>
 
   <PropertyGroup>
     <CodeAnalysisRuleSet>..\OktaSdk.ruleset</CodeAnalysisRuleSet>
