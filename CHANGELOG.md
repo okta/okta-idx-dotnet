@@ -1,6 +1,17 @@
 # Changelog
 
 
+## 2.0.0
+
+### Features
+
+* Add support for Google Authenticator TOTP.
+* Add support for WebAuthn 
+* Add support for Okta Verify
+* Add support for Device Token configuration
+* Add support for Recovery Token
+* Add support for Activation Token
+
 ## 1.0.1
 
 ### Updates

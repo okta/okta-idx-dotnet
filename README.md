@@ -5,13 +5,14 @@
 
 # Okta .NET IDX SDK
 
-This library is built for server-side projects in .NET to communicate with Okta as an OAuth 
+This library is built for server-side projects in .NET to communicate with Okta as an OAuth
 2.0 + OpenID Connect provider. It works with the [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/) to authenticate and register users.
 
 To see this library working in a sample, check out our [ASP.NET Samples](samples/samples-aspnet). You can also check out our guides for step-by-step instructions:
  
-* [Build with the embedded SDK](https://developer.okta.com/docs/guides/oie-embedded-sdk-run-sample/aspnet/main/)
-* [Build with the embedded widget](https://developer.okta.com/docs/guides/oie-embedded-widget-use-cases/aspnet/oie-embedded-widget-use-case-overview/) 
+* [Pre-requisites](https://developer.okta.com/docs/guides/oie-embedded-common-run-samples/aspnet/main/)
+* [Build with the embedded SDK](https://developer.okta.com/docs/guides/oie-embedded-common-run-samples/aspnet/main/#run-the-embedded-sdk-sample-app)
+* [Build with the embedded widget](https://developer.okta.com/docs/guides/oie-embedded-common-run-samples/aspnet/main/#run-the-embedded-widget-sample-app)
 
 > :grey_exclamation: The use of this SDK requires usage of the Okta Identity Engine. This functionality is in general availability but is being gradually rolled out to customers. If you want to request to gain access to the Okta Identity Engine, please reach out to your account manager. If you do not have an account manager, please reach out to oie@okta.com for more information.
 
@@ -38,9 +39,9 @@ This library uses semantic versioning and follows Okta's [Library Version Policy
 The latest release can always be found on the [releases page][github-releases].
 
 ## Need help?
- 
+
 If you run into problems using the SDK, you can
- 
+
 * Ask questions on the [Okta Developer Forums][devforum]
 * Post [issues][github-issues] here on GitHub (for code errors)
 
@@ -66,9 +67,22 @@ var client = new IdxClient(new IdxConfiguration()
                 Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
                 ClientId = "{YOUR_CLIENT_ID}",
                 ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
+                DeviceToken = "{YOUR_DEVICE_TOKEN}", // Client device token. Optional property. Only used for confidential clients with ClientSecret. 
                 RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
                 Scopes = "openid profile offline_access",
             });
+
+```
+
+#### Adding custom headers
+
+Custom request headers can be set using `IdxClient.RequestOptions`:
+
+```csharp
+    Client.RequestOptions
+        .UseHeader(RequestHeaders.UserAgent, "MyUserAgent")
+        .UseHeader(RequestHeaders.XOktaUserAgentExtended, "MyXUserAgent")
+        .UseHeader(RequestHeaders.XForwardedFor, "MyForwardedFor");
 ```
 
 ### Authenticate users
@@ -79,7 +93,7 @@ var authnOptions = new AuthenticationOptions
                         Username = "username@mail.com",
                         Password = "superSecretPassword",
                     };
-            
+
 var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
 
 if (authn.AuthenticationStatus == AuthenticationStatus.Success)
@@ -142,7 +156,6 @@ Type: `AwaitingPasswordReset`
 
 The user needs to reset their password to continue with the authentication flow and retrieve tokens.
 
-
 ### Revoke Tokens
 
 ```csharp
@@ -160,7 +173,7 @@ userProfile.SetProperty("email", model.Email);
 
 var registerResponse = await _idxClient.RegisterAsync(userProfile);
 
-if (registerResponse.AuthenticationStatus == AuthenticationStatus.Success) 
+if (registerResponse.AuthenticationStatus == AuthenticationStatus.Success)
 {
     // Retrieve tokens
 }
@@ -190,13 +203,13 @@ The SDK throws an `OktaException` everytime the server responds with an invalid 
 
 `TerminalStateException`  is an `OktaException` derived class that indicates that the user cannot continue the current flow, possibly due to an error or required additional actions outside of the authentication flow.
 
-This exception object contains an array of messages that can be shown to the user as they are. Each message object in the array also contains a key property that can be used for internationalization. 
+This exception object contains an array of messages that can be shown to the user as they are. Each message object in the array also contains a key property that can be used for internationalization.
 Here is an example of accessing the exception data. All the properties can be null. Null checks are not shown in the example.
 
 ```csharp
 try
 {
-    // Trying to sign-on with a non-existent user name. 
+    // Trying to sign-on with a non-existent user name.
     // The exact error depends on the Org settings and may differ.
 }
 catch (TerminalStateException exception)
@@ -212,7 +225,7 @@ catch (TerminalStateException exception)
     string firstMessageI18nKey = firstMessageI18nInfo.Key; // "idx.unknown.user"
 
     IList<string> firstMessageI18nParams = firstMessageI18nInfo.Params; // an empty list
-    
+
     //.........................
 }
 
@@ -221,46 +234,81 @@ catch (TerminalStateException exception)
 For more usage examples check out our [ASP.NET Sample Application](samples/samples-aspnet).
 
 ## Configuration Reference
-  
+
 This library looks for configuration in the following sources:
- 
-1. An `okta.yaml` file in a `.okta` folder in the current user's home directory (`~/.okta/okta.yaml` or `%userprofile%\.okta\okta.yaml`)
-2. An `okta.yaml` file in a `.okta` folder in the application or project's root directory
-3. Environment variables
-4. Configuration explicitly passed to the constructor (see the example in [Getting started](#getting-started))
- 
-Higher numbers win. In other words, configuration passed via the constructor will override configuration found in environment variables, which will override configuration in `okta.yaml` (if any), and so on.
- 
+
+1. As a YAML file in your home directory
+2. As part of an appsettings.json file in your application’s working directory
+3. As a YAML file in your application’s working directory
+4. In environment variables
+5. In the client constructor for the application  (see the example in [Getting started](#getting-started))
+
+This is the order that the locations are searched for configuration information. If information is set in more than one location, it is overwritten so if, for example, the Issuer is set in both an okta.yaml file and in environment variables, the value in the environment variables takes precedence. If the Issuer was also set in the client constructor, that value would be used instead of either of the other two.
+
+> Note: To avoid confusion as to which configuration values are used by the SDK, you should use only one configuration option in your solution.
+
+
 ### YAML configuration
- 
-The full YAML configuration looks like:
- 
-```yaml
+
+The SDK will look for a YAML file named `okta.yaml` in:
+
+- A folder called .okta whose parent is the current user's home directory
+  - On Mac/Linux, this is `~/.okta/okta.yaml`
+  - On Windows, this is `%userprofile%\.okta\okta.yaml`
+- The application's current working directory
+  - If you're using the recommended IISExpress debugger in Visual Studio to run your app, this is `${IIS Express install location}\IIS Express`, for example, `C:\Program Files\IIS Express\okta.yaml`.
+
+The information in the YAML file should be formatted as follows:
+
+```
 okta:
   idx:
-    issuer: "https://{yourOktaDomain}/oauth2/{authorizationServerId}" # e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
-    clientId: "{clientId}"
-    clientSecret: "{clientSecret}" # Required for confidential clients
+    issuer: "{YOUR_ISSUER}"
+    clientId: "{YOUR_CLIENT_ID}"
+    clientSecret: "{YOUR_CLIENT_SECRET}"
     scopes:
-    - "{scope1}"
-    - "{scope2}"
-    redirectUri: "{redirectUri}"
+      - "openid"
+      - "profile"
+      - "offline_access"
+    redirectUri: "{YOUR_REDIRECT_URI}"
 ```
- 
+### JSON Configuration
+The SDK will look for a JSON file named `appsettings.json` in:
+
+- The application’s current working directory
+  - If you're using the recommended IISExpress debugger in Visual Studio to run your app, this is `${IIS Express install location}\IIS Express`, for example, `C:\Program Files\IIS Express\appsettings.json`.
+
+The information in the JSON file should be formatted as follows:
+
+```
+{
+    "okta": {
+        "idx": {
+            "issuer" : "{YOUR_ISSUER}",
+            "clientId" : "{YOUR_CLIENT_ID}",
+            "clientSecret": "{YOUR_CLIENT_SECRET}",
+            "redirectUri": "{YOUR_REDIRECT_URI}",
+            "scopes": [ "openid", "profile", "offline_access" ]
+        }
+    }
+}
+```
+
 ### Environment variables
- 
-Each one of the configuration values above can be turned into an environment variable name with the `_` (underscore) character:
+
+The SDK will search your machine’s environment variables for any of the following keys:
 
 * `OKTA_IDX_ISSUER`
 * `OKTA_IDX_CLIENTID`
 * `OKTA_IDX_CLIENTSECRET`
 * `OKTA_IDX_REDIRECTURI`
 
-You can optionally set `OKTA_IDX_SCOPES` via env vars. Since this is an array you have to specify it in the following way:
+Environment variables hold only single values so you need to create one for each scope you need to give to your application.
 
 ```
-OKTA_IDX_SCOPES_0 = "{scope0}"
-OKTA_IDX_SCOPES_1 = "{scope1}"
+OKTA_IDX_SCOPES_0 = "openid"
+OKTA_IDX_SCOPES_1 = "profile"
+OKTA_IDX_SCOPES_2 = "offline_access"
 ```
 
 ## Building the SDK
@@ -268,7 +316,7 @@ OKTA_IDX_SCOPES_1 = "{scope1}"
 In most cases, you won't need to build the SDK from source. If you want to build it yourself just clone the repo and compile using Visual Studio.
 
 ## Contributing
- 
+
 We are happy to accept contributions and PRs! Please see the [contribution guide](CONTRIBUTING.md) to understand how to structure a contribution.
 
 [devforum]: https://devforum.okta.com/
