@@ -82,3 +82,6 @@ Example of the settings.json:
   }
 }
 ```
+
+### Recover Password with Recovery Token flow
+This functionality uses [Okta .NET management SDK](https://github.com/okta/okta-sdk-dotnet) to get the recovery token and requires additional configuration parameters to be provided. Detailed information on Okta SDK Client configuration can be found in this [reference](https://github.com/okta/okta-sdk-dotnet#configuration-reference).

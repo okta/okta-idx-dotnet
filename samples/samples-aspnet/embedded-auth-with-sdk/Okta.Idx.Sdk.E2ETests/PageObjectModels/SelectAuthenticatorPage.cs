@@ -9,6 +9,8 @@ namespace embedded_auth_with_sdk.E2ETests.PageObjectModels
         public IWebElement PasswordAuthenticator => _webDriver.FindElement(By.XPath("//label[contains(normalize-space(.),\"Password\")]"));
         public IWebElement EmailAuthenticator => _webDriver.FindElement(By.XPath("//label[contains(normalize-space(.),\"Email\")]"));
         public IWebElement PhoneAuthenticator => _webDriver.FindElement(By.XPath("//label[contains(normalize-space(.),\"Phone\")]"));
+
+        public IWebElement GoogleAuthenticator => _webDriver.FindElement(By.XPath("//label[contains(normalize-space(.),\"Google Authenticator\")]"));
         public IWebElement SubmitButton => _webDriver.FindElement(By.XPath("//input[@Value=\"Submit\"]"));
         public IWebElement SkipThisStepButton => _webDriver.FindElement(By.XPath("//input[@name=\"skip\"]"));
 

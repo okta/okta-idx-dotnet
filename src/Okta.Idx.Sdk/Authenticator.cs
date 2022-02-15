@@ -23,6 +23,15 @@ namespace Okta.Idx.Sdk
         public IList<AuthenticatorMethodType> MethodTypes { get; set; }
 
         /// <inheritdoc/>
+        public IList<AuthenticatorChannelType> ChannelTypes { get; set; }
+
+        /// <inheritdoc/>
         public string Profile { get; set; }
+
+        /// <inheritdoc/>
+        public IAuthenticatorContextualData ContextualData { get; set; }
+
+        /// <inheritdoc/>
+        public string CredentialId { get; set; }
     }
 }

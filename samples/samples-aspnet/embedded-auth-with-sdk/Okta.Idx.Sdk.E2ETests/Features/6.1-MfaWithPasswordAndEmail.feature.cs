@@ -127,34 +127,34 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 8
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 10
+#line 9
  testRunner.And("she has inserted her username", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 13
+#line 10
  testRunner.And("she has inserted her password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 17
+#line 11
  testRunner.When("she clicks Login", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 18
+#line 12
  testRunner.Then("she is presented with an option to select Email to verify", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 19
+#line 13
  testRunner.When("She selects Email from the list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 22
+#line 14
  testRunner.And("She selects \"Receive a Code\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 23
+#line 15
  testRunner.Then("the screen changes to receive an input for a code", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 24
+#line 16
  testRunner.When("She inputs the correct code from the Email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 26
+#line 17
  testRunner.Then("she is redirected to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 27
+#line 18
     testRunner.And("an application session is created", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -169,7 +169,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("6.1.3: Mary enters a wrong verification code", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 29
+#line 20
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -192,28 +192,28 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 3
   this.FeatureBackground();
 #line hidden
-#line 30
+#line 21
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 31
+#line 22
  testRunner.When("she fills in her username", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 32
+#line 23
  testRunner.And("she fills in her correct password", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 33
+#line 24
  testRunner.And("she clicks Login", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 34
+#line 25
  testRunner.Then("She sees a list of factors", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 35
+#line 26
  testRunner.When("She has selected Email from the list of factors", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 36
+#line 27
  testRunner.And("She inputs the incorrect code from the email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 37
+#line 28
  testRunner.Then("the sample shows an error message \"Invalid code. Try again.\" on the Sample App", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
