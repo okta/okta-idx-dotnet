@@ -142,7 +142,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 13
  testRunner.And("logs in to Okta", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 15
+#line 14
  testRunner.Then("Mary should see an error message \"Multifactor Authentication and Social Identity " +
                         "Providers is not currently supported, Authentication failed.\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
