@@ -283,11 +283,13 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\InteractionCodeController.cs" />
+    <Compile Include="Controllers\MagicLinkController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="AuthenticationHelper.cs" />
     <Compile Include="Models\InteractionCodeErrorViewModel.cs" />
+    <Compile Include="Models\MagicLinkCallbackModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -333,6 +335,8 @@
     <Content Include="Views\Shared\_LogoutPartial.cshtml" />
     <Content Include="Views\InteractionCode\Error.cshtml" />
     <Content Include="Views\Account\SignInWidget.cshtml" />
+    <Content Include="Views\MagicLink\Callback.cshtml" />
+    <Content Include="Views\MagicLink\SignInWidget.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
