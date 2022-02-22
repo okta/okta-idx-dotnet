@@ -6,23 +6,14 @@
 
   Scenario: 6.1.2: 2FA Login with Email
 	Given Mary navigates to the Basic Login View
-#
 	And she has inserted her username
-#
-
 	And she has inserted her password
-
-# ???
-#	And her password is correct 
 	When she clicks Login
 	Then she is presented with an option to select Email to verify
 	When She selects Email from the list
-
-# not a real button
 	And She selects "Receive a Code"
 	Then the screen changes to receive an input for a code
 	When She inputs the correct code from the Email
-#	And She selects "Verify"
 	Then she is redirected to the Root View
     And an application session is created
 
