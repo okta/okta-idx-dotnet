@@ -11,5 +11,4 @@
 	Given Mary navigates to the Basic Login View
 	When she clicks the Login with Okta button
 	And logs in to Okta
-#	And the remediation returns "MFA_REQUIRED"
 	Then Mary should see an error message "Multifactor Authentication and Social Identity Providers is not currently supported, Authentication failed." 

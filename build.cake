@@ -195,7 +195,8 @@ Task("Default")
 Task("EmbeddedWidgetTest")
     .IsDependentOn("RestoreEmbeddedWidgetSampleApp")
     .IsDependentOn("BuildEmbeddedWidgetSampleApp")
-    .IsDependentOn("TestEmbeddedWidgetSampleApp");
+    //.IsDependentOn("TestEmbeddedWidgetSampleApp")
+	;
 
 Task("DefaultE2e")
     .IsDependentOn("Info")

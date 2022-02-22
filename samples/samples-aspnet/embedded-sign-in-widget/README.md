@@ -7,11 +7,11 @@ to request to gain access to the Okta Identity Engine, please reach out to your 
 do not have an account manager, please reach out to oie@okta.com for more information.
 
 This Sample Application will show you the best practices for integrating Authentication by embedding the 
-Sign In Widget into your application. The Sign In Widget is powered by [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/) and will adjust your user experience based on policies. 
+Sign In Widget into your application. The Sign In Widget is powered by [Okta's Identity Engine](https://developer.okta.com/docs/guides/oie-intro/) and will adjust your user experience based on policies. 
 Once integrated, you will be able to utilize all the features of Okta's Sign In Widget in your application.
 
-For information and guides on how to build your app with this sample, please take a look at the [.NET 
-guides for Embedded Widget](https://developer.okta.com/docs/guides/oie-embedded-widget-use-cases/aspnet/oie-embedded-widget-use-case-overview/)
+For information and guides on how to build your app with this sample, please take a look at the .NET 
+guides for Embedded Widget, starting with [Load the widget](https://developer.okta.com/docs/guides/oie-embedded-widget-use-case-load/aspnet/main/)
 
 ## Installation & Running The App
 
