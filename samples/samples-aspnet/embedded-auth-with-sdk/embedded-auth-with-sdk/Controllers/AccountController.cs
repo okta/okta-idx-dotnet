@@ -68,7 +68,7 @@ namespace embedded_auth_with_sdk.Controllers
             {
                 var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
                 Session["idxContext"] = authnResponse.IdxContext;
-                Session[authnResponse?.IdxContext.State] = authnResponse?.IdxContext; // save context in session keyed by state for retrieval by magiclink, see MagicLinkController.Callback.
+                Session[authnResponse?.IdxContext?.State] = authnResponse?.IdxContext; // save context in session keyed by state for retrieval by magiclink, see MagicLinkController.Callback.
 
                 switch (authnResponse?.AuthenticationStatus)
                 {
