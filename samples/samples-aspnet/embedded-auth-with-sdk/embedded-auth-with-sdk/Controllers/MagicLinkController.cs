@@ -41,6 +41,10 @@
             // The `state` value serves as your handle to recover the idx context
             // to continue the authentication flow.
             IIdxContext idxContext = Session[state] as IIdxContext;
+            if (idxContext == null)
+            {
+                idxContext = Session["idxContext"] as IIdxContext;
+            }
 
             if (idxContext != null)
             {
