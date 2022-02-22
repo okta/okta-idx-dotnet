@@ -337,6 +337,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\InteractionCodeController.cs" />
+    <Compile Include="Controllers\MagicLinkController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\OktaVerifyController.cs" />
     <Compile Include="Global.asax.cs">
@@ -353,6 +354,7 @@
     <Compile Include="Models\ForgotPasswordViewModel.cs" />
     <Compile Include="Models\InteractionCodeErrorViewModel.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
+    <Compile Include="Models\MagicLinkCallbackModel.cs" />
     <Compile Include="Models\OktaVerifyEnrollPollModel.cs" />
     <Compile Include="Models\OktaVerifyEnrollWithEmailModel.cs" />
     <Compile Include="Models\OktaVerifyEnrollWithPhoneNumberModel.cs" />
@@ -441,6 +443,7 @@
     <Content Include="Views\OktaVerify\SelectEnrollmentChannel.cshtml" />
     <Content Include="Views\Account\RecoverPasswordWithToken.cshtml" />
     <Content Include="Views\Manage\ChangePasswordWithRecoveryToken.cshtml" />
+    <Content Include="Views\MagicLink\Callback.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
