@@ -1,6 +1,12 @@
 # Changelog
 
 
+## 2.0.1
+
+### Bug Fixes
+
+* SSPR process fails for Embedded SDK sample.
+
 ## 2.0.0
 
 ### Features
