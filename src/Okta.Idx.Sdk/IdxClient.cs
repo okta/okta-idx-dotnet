@@ -1013,28 +1013,43 @@ namespace Okta.Idx.Sdk
         {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+            IIdxResponse recoveryResponse = null;
 
-            var recoveryRequest = new IdxRequestPayload
+            if (introspectResponse.CurrentAuthenticatorEnrollment != null)
             {
-                StateHandle = introspectResponse.StateHandle,
-            };
+                var recoveryRequest = new IdxRequestPayload
+                {
+                    StateHandle = introspectResponse.StateHandle,
+                };
 
-            var currentEnrollment = introspectResponse
-                                        .CurrentAuthenticatorEnrollment
-                                        .Value;
+                var currentEnrollment = introspectResponse
+                                            .CurrentAuthenticatorEnrollment
+                                            .Value;
 
-            var recoveryResponse = await currentEnrollment
-                                        .Recover
-                                        .ProceedAsync(recoveryRequest, cancellationToken);
+                recoveryResponse = await currentEnrollment
+                                            .Recover
+                                            .ProceedAsync(recoveryRequest, cancellationToken);
 
-            var recoveryAuthenticator = recoveryResponse
-                .Authenticators
-                .Value
-                .FirstOrDefault(x => x.Id == selectAuthenticatorOptions.AuthenticatorId);
+                var recoveryAuthenticator = recoveryResponse?
+                    .Authenticators
+                    .Value
+                    .FirstOrDefault(x => x.Id == selectAuthenticatorOptions.AuthenticatorId);
 
-            if (recoveryAuthenticator == null)
+                if (recoveryAuthenticator == null)
+                {
+                    throw new OktaException($"Authenticator not found. Verify that you have the selected authenticator enabled for your application.");
+                }
+            }
+            else
             {
-                throw new OktaException($"Authenticator not found. Verify that you have the selected authenticator enabled for your application.");
+                if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+                {
+                    recoveryResponse = introspectResponse;
+                }
+                else
+                {
+                    throw new UnexpectedRemediationException(new List<string> { RemediationType.SelectAuthenticatorAuthenticate }, introspectResponse);
+                }
             }
 
             var selectAuthenticatorRequest = new IdxRequestPayload
@@ -1044,7 +1059,7 @@ namespace Okta.Idx.Sdk
 
             selectAuthenticatorRequest.SetProperty("authenticator", new
             {
-                id = recoveryAuthenticator.Id,
+                id = selectAuthenticatorOptions.AuthenticatorId,
             });
 
             var selectRecoveryAuthenticatorRemediationOption = await recoveryResponse
