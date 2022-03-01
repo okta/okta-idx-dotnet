@@ -14,9 +14,9 @@ namespace embedded_sign_in_widget_e2etests.PageObjectModels
         { }
 
         public override string RelativePageUri => "Account/SignInWidget";
-        public IWebElement UserNameInput => TryFindElement(By.Id("input3"));
-        public IWebElement PasswordInput => TryFindElement(By.Id("input5"));
-        public IWebElement NextButton => TryFindElement(By.XPath("//*[@id=\"form1\"]/div[2]/input"));
+        public IWebElement UserNameInput => TryFindElement(By.CssSelector("[name='identifier']"));
+        public IWebElement PasswordInput => TryFindElement(By.CssSelector("[name='credentials.passcode']"));
+        public IWebElement NextButton => TryFindElement(By.CssSelector("[type='submit']"));
         public IWebElement SignonWithOktaIdpButton => TryFindElement(By.XPath("//a[@data-se=\"social-auth-general-idp-button\"]"));
         public IWebElement SelectEmailButton => TryFindElement(By.CssSelector("[data-se='okta_email']"));
     }
