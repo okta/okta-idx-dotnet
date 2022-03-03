@@ -1,0 +1,62 @@
+{
+    "version": "1.0.0",
+    "stateHandle": "02sILRenbb1lirSzk42DvHMpE3OodSScQtzMrh3PIL",
+    "expiresAt": "2022-03-03T17:00:00.000Z",
+    "intent": "LOGIN",
+    "remediation": {
+        "type": "array",
+        "value": [
+            {
+                "rel": [
+                    "create-form"
+                ],
+                "name": "identify-recovery",
+                "href": "https://dotnet-sdk-idx.okta.com/idp/idx/identify",
+                "method": "POST",
+                "produces": "application/ion+json; okta-version=1.0.0",
+                "value": [
+                    {
+                        "name": "identifier",
+                        "label": "Username",
+                        "required": true
+                    },
+                    {
+                        "name": "stateHandle",
+                        "required": true,
+                        "value": "02sILRenbb1lirSzk42DvHMpE3OodSScQtzMrh3PIL",
+                        "visible": false,
+                        "mutable": false
+                    }
+                ],
+                "accepts": "application/json; okta-version=1.0.0"
+            }
+        ]
+    },
+    "cancel": {
+        "rel": [
+            "create-form"
+        ],
+        "name": "cancel",
+        "href": "https://dotnet-sdk-idx.okta.com/idp/idx/cancel",
+        "method": "POST",
+        "produces": "application/ion+json; okta-version=1.0.0",
+        "value": [
+            {
+                "name": "stateHandle",
+                "required": true,
+                "value": "02sILRenbb1lirSzk42DvHMpE3OodSScQtzMrh3PIL",
+                "visible": false,
+                "mutable": false
+            }
+        ],
+        "accepts": "application/json; okta-version=1.0.0"
+    },
+    "app": {
+        "type": "object",
+        "value": {
+            "name": "oidc_client",
+            "label": "Dotnet IDX Web App",
+            "id": "0oa2xoe0xbZuSCSWZ5d7"
+        }
+    }
+}

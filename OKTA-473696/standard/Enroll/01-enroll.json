@@ -1,0 +1,102 @@
+{
+    "version": "1.0.0",
+    "stateHandle": "028Iw6C9XIrN1Pez_NZ6ulTaQmgBVr6R7WFxWr6E6E",
+    "expiresAt": "2022-03-03T17:22:08.000Z",
+    "intent": "LOGIN",
+    "remediation": {
+        "type": "array",
+        "value": [
+            {
+                "rel": [
+                    "create-form"
+                ],
+                "name": "enroll-profile",
+                "href": "https://dotnet-sdk-idx.okta.com/idp/idx/enroll/new",
+                "method": "POST",
+                "produces": "application/ion+json; okta-version=1.0.0",
+                "value": [
+                    {
+                        "name": "userProfile",
+                        "form": {
+                            "value": [
+                                {
+                                    "name": "firstName",
+                                    "label": "First name",
+                                    "required": true,
+                                    "minLength": 1,
+                                    "maxLength": 50
+                                },
+                                {
+                                    "name": "lastName",
+                                    "label": "Last name",
+                                    "required": true,
+                                    "minLength": 1,
+                                    "maxLength": 50
+                                },
+                                {
+                                    "name": "email",
+                                    "label": "Email",
+                                    "required": true
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "stateHandle",
+                        "required": true,
+                        "value": "028Iw6C9XIrN1Pez_NZ6ulTaQmgBVr6R7WFxWr6E6E",
+                        "visible": false,
+                        "mutable": false
+                    }
+                ],
+                "accepts": "application/json; okta-version=1.0.0"
+            },
+            {
+                "rel": [
+                    "create-form"
+                ],
+                "name": "select-identify",
+                "href": "https://dotnet-sdk-idx.okta.com/idp/idx/identify/select",
+                "method": "POST",
+                "produces": "application/ion+json; okta-version=1.0.0",
+                "value": [
+                    {
+                        "name": "stateHandle",
+                        "required": true,
+                        "value": "028Iw6C9XIrN1Pez_NZ6ulTaQmgBVr6R7WFxWr6E6E",
+                        "visible": false,
+                        "mutable": false
+                    }
+                ],
+                "accepts": "application/json; okta-version=1.0.0"
+            }
+        ]
+    },
+    "cancel": {
+        "rel": [
+            "create-form"
+        ],
+        "name": "cancel",
+        "href": "https://dotnet-sdk-idx.okta.com/idp/idx/cancel",
+        "method": "POST",
+        "produces": "application/ion+json; okta-version=1.0.0",
+        "value": [
+            {
+                "name": "stateHandle",
+                "required": true,
+                "value": "028Iw6C9XIrN1Pez_NZ6ulTaQmgBVr6R7WFxWr6E6E",
+                "visible": false,
+                "mutable": false
+            }
+        ],
+        "accepts": "application/json; okta-version=1.0.0"
+    },
+    "app": {
+        "type": "object",
+        "value": {
+            "name": "okta_enduser",
+            "label": "Okta Dashboard",
+            "id": "0oa2xo0xhlKaAplfq5d7"
+        }
+    }
+}
