@@ -34,7 +34,7 @@ This section describes **OIE** specific terminology.
 - **Remediation invocation** - An HTTP call made to an endpoint associated with a remediation.  See also, [Remediation Object](#remediation-object).
 - **Remediation object** - A [value object](#ion-spec-terminology) contained in the `remediation` collection member of an **OIE** response.  Remediation objects provide the necessary information to make a `remediation invocation`.  See also, [Remediation Object](#remediation-object).
 - **Remediation parameter** - A JSON object expected as an argument to a `remediation invocation`.  The structure of a `remediation parameter` is described by the dependent `remediation object`.  See also, [Remediation Object](#remediation-object).
-- **Remediation parameter property descriptor** - A JSON object that describes a property of a `remediation parameter`, it may or may not be a [value object](#ion-spec-terminology).  See also, [Remediation Object](#remediation-object).
+- **Remediation parameter property descriptor** - A JSON object that describes a property of a `remediation parameter`, it may or may not be a [value object](#ion-spec-terminology).  See also, [Remediation Parameter](#remediation-parameter).
 - **Authenticator** - A way to authenticate a user.
 - **Authenticator enrollment** - An `authenticator` that a user has registered or "enrolled" as a way to authenticate.
 - **State handle** - A value that a developer may use to reference a specific authentication session.
@@ -82,7 +82,7 @@ An **OIE** response is the [root object](#ion-spec-terminology) and the [members
     }
 }
 ```
-The members included in the OIE response [root object](#ion-spec-terminology) change as the authentication flow progresses.  The primary member of concern for the purposes of authentication is `remediation`.  See also, [Remdediation Object](#remediation-object) and [Object Model](#object-model).
+The members included in the OIE response [root object](#ion-spec-terminology) change as the authentication flow progresses.  The primary member of concern for the purposes of authentication is `remediation`.  See also, [Remdediation Object](#remediation-object) and [Sdk Object Model](#sdk-object-model).
 
 The [root object](#ion-spec-terminology) may contain the following members at different points during the authentciation flow:
 
@@ -138,7 +138,9 @@ A `remediation object` is an ion [collection object](#ion-spec-terminology) that
     "accepts": "application/json; okta-version=1.0.0"
 }
 ```
-To make the associated [remediation invocation](#okta-identity-engine-terminology) the JSON argument provided must have [members](#ion-spec-terminology) as described by the [remediation parameter property descriptors](#okta-identity-engine-terminology) contained in the `remediation object`.  The following JSON may be used as an argument to the `remediation object` previously defined.  See also, [Object Model](#object-model):
+
+### Remediation Parameter
+To invoke the associated [remediation invocation](#okta-identity-engine-terminology) the JSON argument provided in the invocation request body must have [members](#ion-spec-terminology) as described by the [remediation parameter property descriptors](#okta-identity-engine-terminology) contained in the `remediation object`.  The following JSON may be used as an argument to the `remediation object` [previously defined](#remediation-object).  See also, [Sdk Object Model](#sdk-object-model):
 ```json
 {
     "identifier": "username@domain.com",
@@ -151,8 +153,15 @@ To make the associated [remediation invocation](#okta-identity-engine-terminolog
 ```
 
 ## SDK Client
+Because members included in the OIE response [root object](#ion-spec-terminology) change as the authentication flow progresses, it isn't possible to define a static [class](https://en.wikipedia.org/wiki/Class_(computer_programming)) that represents it.  In order to reference the members of the OIE response [root object](#ion-spec-terminology) an Ion API is recommended.
 
-### Object Model
+- parsing strategy - why?
+    - dynamic root object
+
+### Ion Object Model
+    - ion object model to reference root members
+
+### Sdk Object Model
 
 
 ### View Rendering
