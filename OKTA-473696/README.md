@@ -1,9 +1,12 @@
-# Dynamic Identity Engine View Rendering (OKTA-473696)
+# Okta Dynamic Authentication Control (.NET)
 ## DRAFT
 This document is a work in progress.
 
+## Problem
+The functionality of the current Okta Identity Engine SDK ****REQUIRES**** policy configuration that results in a finite set of known JSON response data structures.  If a feature or functionality is added or changed, or if policy configuration is modified, the resulting response structures **MAY** not be supported by the SDK resulting in unexpected [sample application](https://github.com/okta/okta-idx-dotnet/tree/master/samples/samples-aspnet/embedded-auth-with-sdk) behavior or unexpected [Idx Client](https://github.com/okta/okta-idx-dotnet/blob/master/src/Okta.Idx.Sdk/IdxClient.cs) behavior, including unhandled exceptions. 
+
 ## Abstract
-This document describes **Okta Identity Engine** response structure and a strategy for rendering responses to accept input for the purpose of authentication. 
+This document describes **Okta Identity Engine** response structure and a strategy for rendering responses to accept input for the purpose of authentication.  
 
 ## Introducation
 **Okta Identity Engine** hereinafter referred to as **OIE**, is an authentication API modeled as a [state machine](https://developer.mozilla.org/en-US/docs/Glossary/State_machine); this allows a consumer of the API to design a rendering loop that renders responses from **OIE** that is resilient to changes in [Sign-on policies](https://help.okta.com/en/prod/Content/Topics/Security/policies/policies-home.htm).  See [Sdk Client](#sdk-client).
@@ -153,15 +156,16 @@ To invoke the associated [remediation invocation](#okta-identity-engine-terminol
 ```
 
 ## SDK Client
-Because members included in the OIE response [root object](#ion-spec-terminology) change as the authentication flow progresses, it isn't possible to define a static [class](https://en.wikipedia.org/wiki/Class_(computer_programming)) that represents it.  In order to reference the members of the OIE response [root object](#ion-spec-terminology) an Ion API is recommended.
+Because members included in the OIE response [root object](#ion-spec-terminology) change as the authentication flow progresses, it isn't possible to define a static [class](https://en.wikipedia.org/wiki/Class_(computer_programming)) that represents it.  In order to reference the members of the OIE response [root object](#ion-spec-terminology) an Ion API is recommended.  See also, [Ion Object Model](#ion-object-model).
 
-- parsing strategy - why?
-    - dynamic root object
+Additionally, because the underlying design of OIE is based on a call and response model, the SDK requires some awareness of the UI and related views.  See also, [SDK Object Model](#sdk-object-model).
 
 ### Ion Object Model
-    - ion object model to reference root members
 
-### Sdk Object Model
+    - ion object model to reference root members
+    - loop over members
+
+### SDK Object Model
 
 
 ### View Rendering
