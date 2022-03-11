@@ -91,7 +91,7 @@ The [root object](#ion-spec-terminology) may contain the following members at di
 
 - **remediation** - The `remediation` member is an ion [collection object](#ion-spec-terminology) that contains `remediation objects`.  See also [Remediation Object](#remediation-object).
 - **currentAuthenticator** - The `currentAuthenticator` member provides additional information for the authenticator in the current context of the authentication session.
-- **authenticators** - The `authenticators` member is an ion [collection object](#ion-spec-terminology) that contains objects that describe []().
+- **authenticators** - The `authenticators` member is an ion [collection object](#ion-spec-terminology) that contains objects that describe available [authenticators](#okta-identity-engine-terminology).
 - **authenticatorEnrollments** - The `authenticatorEnrollments` member is an ion [collection object](#ion-spec-terminology) that contains objects that describe [authenticator enrollments](#okta-identity-engine-terminology).
 
 ### Remediation Object
@@ -143,7 +143,7 @@ A `remediation object` is an ion [collection object](#ion-spec-terminology) that
 ```
 
 ### Remediation Parameter
-To invoke the associated [remediation invocation](#okta-identity-engine-terminology) the JSON argument provided in the invocation request body must have [members](#ion-spec-terminology) as described by the [remediation parameter property descriptors](#okta-identity-engine-terminology) contained in the `remediation object`.  The following JSON may be used as an argument to the `remediation object` [previously defined](#remediation-object).  See also, [Sdk Object Model](#sdk-object-model):
+To invoke the associated [remediation invocation](#okta-identity-engine-terminology) the JSON argument provided in the invocation request body must have [members](#ion-spec-terminology) as described by the [remediation parameter property descriptors](#okta-identity-engine-terminology) contained in the `remediation object`.  The following JSON may be used as an argument to invoke the `remediation object` [previously defined](#remediation-object).  See also, [Sdk Object Model](#sdk-object-model):
 ```json
 {
     "identifier": "username@domain.com",
