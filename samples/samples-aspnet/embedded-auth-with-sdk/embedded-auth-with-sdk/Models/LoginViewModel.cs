@@ -9,6 +9,11 @@ namespace embedded_auth_with_sdk.Models
 {
     public class LoginViewModel
     {
+        public LoginViewModel()
+        {
+            this.ShouldRenderPasswordField = true;
+        }
+
         [Required]
         [Display(Name = "Username")]
         public string UserName { get; set; }
@@ -22,5 +27,7 @@ namespace embedded_auth_with_sdk.Models
         public bool RememberMe { get; set; } = false;
 
         public List<IdpOption> IdpOptions { get; set; } = new List<IdpOption>();
+
+        public bool ShouldRenderPasswordField { get; set; }
     }
 }
