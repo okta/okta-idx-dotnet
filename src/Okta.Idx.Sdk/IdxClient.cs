@@ -1902,5 +1902,30 @@ namespace Okta.Idx.Sdk
                 },
                 challengeResponse);
         }
+
+        /// <inheritdoc/>
+        public async Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(string state = null, CancellationToken cancellationToken = default)
+        {
+            var idxContext = await this.InteractAsync(state, cancellationToken);
+            return await CheckIsPasswordRequiredAsync(idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            if (idxContext == null)
+            {
+                throw new ArgumentNullException(nameof(idxContext));
+            }
+
+            var introspectResponse = await this.IntrospectAsync(idxContext, cancellationToken);
+
+            return new PasswordRequiredResponse
+            {
+                Context = idxContext,
+                IsPasswordRequired = IsRemediationRequireCredentials("identify", introspectResponse),
+                Response = introspectResponse,
+            };
+        }
     }
 }
