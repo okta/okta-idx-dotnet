@@ -109,5 +109,20 @@ namespace Okta.Idx.Sdk
         /// This is not a remediation itself, but it's used internally to identify unknown remediations.
         /// </summary>
         public static readonly string Unknown = "unknown";
+
+        /// <summary>
+        /// This is not a remediation itself, but it's used internally to identify successful unlock account.
+        /// </summary>
+        public static readonly string UnlockAccountSuccess = "unlock-account-success";
+
+        /// <summary>
+        /// unlock-account
+        /// </summary>
+        public static readonly string UnlockAccount = "unlock-account";
+
+        /// <summary>
+        /// select-authenticator-unlock-account
+        /// </summary>
+        public static readonly string SelectAuthenticatorUnlockAccount = "select-authenticator-unlock-account";
     }
 }

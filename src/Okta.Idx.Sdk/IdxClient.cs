@@ -1187,6 +1187,14 @@ namespace Okta.Idx.Sdk
             {
                 currentRemediationType = RemediationType.SelectAuthenticatorEnroll;
             }
+            //// If terminal state due to successful unlock account
+            //if (introspectResponse.IdxMessages?.Messages?.FirstOrDefault(x => x.I18n.Key == MessagesType.SelfServiceUnlockUserSuccess) != null)
+            //{
+            //    return new AuthenticationResponse
+            //    {
+            //        AuthenticationStatus = AuthenticationStatus.UnlockAccountSuccess,
+            //    };
+            //}
             else
             {
                 if (currentRemediationType == RemediationType.EnrollAuthenticator &&
@@ -1289,11 +1297,21 @@ namespace Okta.Idx.Sdk
                 };
             }
 
+            // If terminal state due to successful unlock account
+            if (challengeAuthenticatorResponse.IdxMessages?.Messages?.FirstOrDefault(x => x.I18n.Key == MessagesType.SelfServiceUnlockUserSuccess) != null)
+            {
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.UnlockAccountSuccess,
+                };
+            }
+
             throw new UnexpectedRemediationException(
                       new List<string>
                       {
                             RemediationType.ResetAuthenticator,
                             RemediationType.SelectAuthenticatorEnroll,
+                            RemediationType.UnlockAccountSuccess,
                       },
                       challengeAuthenticatorResponse);
         }
@@ -1901,6 +1919,78 @@ namespace Okta.Idx.Sdk
                     RemediationType.SelectAuthenticatorEnroll,
                 },
                 challengeResponse);
+        }
+
+        public async Task<AuthenticationResponse> UnlockAccountAsync(CancellationToken cancellationToken = default)
+        {
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            var unlockAccountRemediation = introspectResponse.FindRemediationOption(RemediationType.UnlockAccount, true);
+
+            var idxRequestPayload = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            var unlockAccountResponse = await unlockAccountRemediation.ProceedAsync(idxRequestPayload, cancellationToken);
+
+            if (unlockAccountResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorUnlockAccount))
+            {
+                return new AuthenticationResponse
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorSelection,
+                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(unlockAccountResponse.Authenticators.Value, unlockAccountResponse.AuthenticatorEnrollments.Value),
+                };
+            }
+
+            throw new UnexpectedRemediationException(RemediationType.SelectAuthenticatorUnlockAccount,
+                unlockAccountResponse);
+        }
+
+        public async Task<AuthenticationResponse> SelectUnlockAccountAuthenticatorAsync(UnlockAccountOptions unlockAccountOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            var idxRequestPayload = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            idxRequestPayload.SetProperty("identifier", unlockAccountOptions.Username);
+            idxRequestPayload.SetProperty("authenticator", new
+            {
+                id = unlockAccountOptions.AuthenticatorId,
+            });
+
+            var selectAuthenticatorUnlockAccountRemediation = introspectResponse.FindRemediationOption(RemediationType.SelectAuthenticatorUnlockAccount, true);
+
+            var selectAuthenticatorResponse = await selectAuthenticatorUnlockAccountRemediation.ProceedAsync(idxRequestPayload, cancellationToken);
+
+            // WebAuthN enrollment data is available in authenticatorSelectionResponse.CurrentAuthenticator instead of authenticatorSelectionResponse.CurrentAuthenticatorEnrollment unlike other authenticators
+            var currentAuthenticatorEnrollment =
+                selectAuthenticatorResponse.CurrentAuthenticatorEnrollment?.Value ??
+                selectAuthenticatorResponse.CurrentAuthenticator?.Value;
+
+            if (selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.AuthenticatorVerificationData))
+            {
+                return new AuthenticationResponse
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorData,
+                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, currentAuthenticatorEnrollment, selectAuthenticatorResponse.AuthenticatorEnrollments.Value),
+                };
+            }
+            else //(authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
+            {
+                return new AuthenticationResponse
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
+                    CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value, currentAuthenticatorEnrollment, selectAuthenticatorResponse.AuthenticatorEnrollments?.Value),
+                };
+            }
         }
     }
 }

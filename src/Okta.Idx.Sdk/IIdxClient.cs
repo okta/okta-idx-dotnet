@@ -222,6 +222,22 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> SkipAuthenticatorSelectionAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Starts the flow to unlocks the user's account
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> UnlockAccountAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Selects the authenticator to unlock the user's account
+        /// </summary>
+        /// <param name="unlockAccountOptions">The options.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> SelectUnlockAccountAuthenticatorAsync(UnlockAccountOptions unlockAccountOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Gets available identity providers.
         /// </summary>
         /// <param name="state">The state handle to use or null to autogenerate.</param>

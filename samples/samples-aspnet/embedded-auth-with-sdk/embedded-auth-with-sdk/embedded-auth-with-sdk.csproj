@@ -367,6 +367,7 @@
     <Compile Include="Models\SelectAuthenticatorMethodViewModel.cs" />
     <Compile Include="Models\SelectAuthenticatorViewModel.cs" />
     <Compile Include="Models\SelectRecoveryAuthenticatorViewModel.cs" />
+    <Compile Include="Models\UnlockAccountViewModel.cs" />
     <Compile Include="Models\VerifyAuthenticatorViewModel.cs" />
     <Compile Include="Models\EnrollWebAuthnViewModel.cs" />
     <Compile Include="Models\VerifyWebAuthnViewModel.cs" />
@@ -444,6 +445,7 @@
     <Content Include="Views\Account\RecoverPasswordWithToken.cshtml" />
     <Content Include="Views\Manage\ChangePasswordWithRecoveryToken.cshtml" />
     <Content Include="Views\MagicLink\Callback.cshtml" />
+    <Content Include="Views\Account\UnlockAccount.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

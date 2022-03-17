@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -228,6 +229,41 @@ namespace embedded_auth_with_sdk.Controllers
             };
 
             return View("~/Views/Manage/ChangePasswordWithRecoveryToken.cshtml", changePasswordViewModel);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UnlockAccountAsync()
+        {
+            try
+            {
+                var response = await _idxClient.UnlockAccountAsync();
+
+                if (response.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorSelection)
+                {
+                    Session["idxContext"] = response.IdxContext;
+                    Session["authenticators"] =
+                        ViewModelHelper.ConvertToAuthenticatorViewModelList(response.Authenticators);
+                    var authenticators = (IList<AuthenticatorViewModel>)Session["authenticators"] ??
+                                         new List<AuthenticatorViewModel>();
+
+                    var viewModel = new UnlockAccountViewModel
+                    {
+                        Authenticators = authenticators,
+                        CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
+                    };
+
+                    return View("UnlockAccount", viewModel);
+                }
+
+                return View("Login");
+            }
+            catch (OktaException ex)
+            {
+                TempData["MessageToUser"] = $"Oops! Something went wrong. Try again. {ex.Message}";
+                return View("Login");
+            }
         }
     }
 }

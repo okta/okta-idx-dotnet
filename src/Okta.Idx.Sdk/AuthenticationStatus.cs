@@ -54,5 +54,10 @@ namespace Okta.Idx.Sdk
         /// Waiting for an authenticator selection to continue with the authentication process.
         /// </summary>
         AwaitingChallengeAuthenticatorSelection,
+
+        /// <summary>
+        /// The user's account was successfully unlocked.
+        /// </summary>
+        UnlockAccountSuccess,
     }
 }

@@ -404,11 +404,6 @@ namespace embedded_auth_with_sdk.Controllers
             {
                 Authenticators = authenticators,
                 AuthenticatorId = authenticators.FirstOrDefault()?.AuthenticatorId,
-                PasswordId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId,
-                PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
-                WebAuthnId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security key or biometric")?.AuthenticatorId,
-                TotpId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "google authenticator")?.AuthenticatorId,
-                OktaVerifyId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "okta verify")?.AuthenticatorId,
                 CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
             };
 
@@ -643,6 +638,48 @@ namespace embedded_auth_with_sdk.Controllers
                 return View("SelectAuthenticator", model);
             }
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SelectUnlockAccountAuthenticatorAsync(UnlockAccountViewModel model)
+        {
+            var authenticators = (IList<AuthenticatorViewModel>)Session["authenticators"];
+
+            if (!ModelState.IsValid)
+            {
+                model.Authenticators = authenticators;
+                return View("~/Views/Account/UnlockAccount.cshtml", model);
+            }
+
+            var unlockAccountOptions = new UnlockAccountOptions
+            {
+                AuthenticatorId = model.AuthenticatorId,
+                Username = model.UserName,
+            };
+
+            try
+            {
+                var response = await _idxClient.SelectUnlockAccountAuthenticatorAsync(unlockAccountOptions,
+                    (IIdxContext)Session["idxContext"]);
+
+                if (response.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    return View("VerifyAuthenticator");
+                }
+
+                model.Authenticators = authenticators;
+                ModelState.AddModelError(string.Empty, $"Something went wrong. Expected {AuthenticationStatus.AwaitingAuthenticatorVerification} but got {response.AuthenticationStatus}");
+                return View("~/Views/Account/UnlockAccount.cshtml", model);
+            }
+            catch (OktaException exception)
+            {
+                ModelState.AddModelError(string.Empty, exception.Message);
+                model.Authenticators = authenticators;
+                return View("~/Views/Account/UnlockAccount.cshtml", model);
+            }
+        }
+        
 
         public ActionResult SelectRecoveryAuthenticator()
         {
