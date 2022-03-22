@@ -16,6 +16,7 @@ namespace embedded_auth_with_sdk.E2ETests.PageObjectModels
         public string FullPageUrl => $"{_baseUrl}/{RelativePageUri}";
         public bool IsPageOpened => WaitForCondition(()=>_webDriver.Url.StartsWith(FullPageUrl));
         public IWebElement ValidationErrors => _webDriver.FindElement(By.XPath("//div[@class=\"validation-summary-errors text-danger\"]"));
+
         public BasePage(WebDriverDriver webDriverDriver, ITestConfiguration testConfiguration)
         {
             _webDriver = webDriverDriver.WebDriver;

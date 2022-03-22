@@ -79,5 +79,28 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         {
             _loginPageModel.OktaIdpButton.Click();
         }
+
+        [When(@"she sees a link to unlock her account")]
+        public void WhenSheSeesALinkToUnlockHerAccount()
+        {
+        }
+
+        [When(@"she clicks the link to unlock her account")]
+        public void WhenSheClicksTheLinkToUnlockHerAccount()
+        {
+            _loginPageModel.UnlockAccountButton.Click();
+        }
+
+        [Then(@"she is redirected to the Basic Login View")]
+        public void SheIsRedirectedToTheRootView()
+        {
+            _loginPageModel.AssertPageOpenedAndValid();
+        }
+
+        [Then(@"she should see the terminal message ""(.*)""")]
+        public void SheShouldSeeTheMessage(string terminalMessage)
+        {
+            _loginPageModel.TerminalMessage.Text.Should().Contain(terminalMessage);
+        }
     }
 }

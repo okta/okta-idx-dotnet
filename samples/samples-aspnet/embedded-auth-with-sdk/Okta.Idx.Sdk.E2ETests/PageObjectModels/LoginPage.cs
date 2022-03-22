@@ -12,12 +12,17 @@ namespace embedded_auth_with_sdk.E2ETests.PageObjectModels
         public override string RelativePageUri => "Account/Login";
         public IWebElement LoginButton => _webDriver.FindElement(By.Id("LoginBtn"));
         public IWebElement ForgotPasswordButton => _webDriver.FindElement(By.Id("ForgotPasswordBtn"));
+
+        public IWebElement UnlockAccountButton => _webDriver.FindElement(By.Id("UnlockAccountBtn"));
+
         public IWebElement UserNameInput => _webDriver.FindElement(By.Id("UserName"));
 
         public IWebElement PasswordInput => _webDriver.FindElement(By.Id("Password"));
         public IWebElement FacebookIdpButton => _webDriver.FindElement(By.XPath("//input[contains(@value, \"Facebook\")]"));
         public IWebElement GoogleIdpButton => _webDriver.FindElement(By.XPath("//input[contains(@value, \"Google\")]"));
         public IWebElement OktaIdpButton => _webDriver.FindElement(By.XPath("//input[contains(@value, \"Okta\")]"));
+
+        public IWebElement TerminalMessage => _webDriver.FindElement(By.Id("MessageToUser"));
 
         public override void AssertPageOpenedAndValid() 
         {
