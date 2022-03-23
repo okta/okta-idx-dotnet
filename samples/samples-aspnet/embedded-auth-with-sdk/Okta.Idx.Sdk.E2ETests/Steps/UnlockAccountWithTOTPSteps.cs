@@ -48,6 +48,12 @@ namespace embedded_auth_with_sdk.E2ETests.Steps
             _unlockAccountPageModel.AssertPageOpenedAndValid();
         }
 
+        [When(@"she selects Phone from the list")]
+        public void WhenSheSelectsPhone()
+        {
+            _unlockAccountPageModel.PhoneAuthenticator.Click();
+            _unlockAccountPageModel.SubmitButton.Click();
+        }
 
         //[When(@"she enters the OTP from her email in the original tab")]
         //public void WhenSheEntersTheOTPFromHerEmailInTheOriginalTab()

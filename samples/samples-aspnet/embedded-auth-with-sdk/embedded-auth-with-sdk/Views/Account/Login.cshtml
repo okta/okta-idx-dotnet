@@ -11,7 +11,7 @@
 @if(TempData["MessageToUser"]!=null)
 {
     <div class="text-warning">
-    <h4>@TempData["MessageToUser"]</h4>
+    <h4 id="MessageToUser">@TempData["MessageToUser"]</h4>
     <hr />
     </div>
 }
@@ -69,9 +69,9 @@
         </section>
 
         @* Remove this section if you don't want or need social login buttons *@
-        <section id="idpButtons">
+        @*<section id="idpButtons">
             @Html.Partial("Idps", Model.IdpOptions)
-        </section>
+        </section>*@
 
         <section id="register">
             @using (Html.BeginForm("Register", "Account", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))

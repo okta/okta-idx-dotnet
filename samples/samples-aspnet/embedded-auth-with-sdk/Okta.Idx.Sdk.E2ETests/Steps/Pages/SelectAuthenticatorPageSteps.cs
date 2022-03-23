@@ -11,14 +11,16 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
     {
         private SelectAuthenticatorPage _selectAuthenticatorPageModel;
         private SelectAuthenticatorAsyncPage _selectAuthenticatorAsyncPageModel;
+        private SelectUnlockAccountAuthenticatorAsyncPage _selectUnlockAccountAuthenitcatorAsyncPageModel;
 
         public SelectAuthenticatorPageSteps(ITestContext context,
             SelectAuthenticatorPage selectAuthenticatorPageModel,
-            SelectAuthenticatorAsyncPage selectAuthenticatorAsyncPageModel)
+            SelectAuthenticatorAsyncPage selectAuthenticatorAsyncPageModel, SelectUnlockAccountAuthenticatorAsyncPage selectUnlockAccountAuthenitcatorAsyncPageModel)
             : base(context)
         {
             _selectAuthenticatorPageModel = selectAuthenticatorPageModel;
             _selectAuthenticatorAsyncPageModel = selectAuthenticatorAsyncPageModel;
+            _selectUnlockAccountAuthenitcatorAsyncPageModel = selectUnlockAccountAuthenitcatorAsyncPageModel;
         }
 
         [Then(@"She sees a list of factors")]
@@ -61,6 +63,15 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         public void ThenSheIsPresentedWithAnOptionToSelectSmsToVerify()
         {
             _selectAuthenticatorAsyncPageModel.AssertPageOpenedAndValid();
+            Func<IWebElement> getSmsFactor = () => _selectAuthenticatorAsyncPageModel.SmsAuthenticator;
+            getSmsFactor.Should().NotThrow<NoSuchElementException>();
+            _selectAuthenticatorAsyncPageModel.SmsAuthenticator.Displayed.Should().BeTrue();
+        }
+
+        [Then(@"she is presented with an option to select SMS to verify and unlock her account")]
+        public void ThenSheIsPresentedWithAnOptionToSelectSmsToVerifyAndUnlockHerAccount()
+        {
+            _selectUnlockAccountAuthenitcatorAsyncPageModel.AssertPageOpenedAndValid();
             Func<IWebElement> getSmsFactor = () => _selectAuthenticatorAsyncPageModel.SmsAuthenticator;
             getSmsFactor.Should().NotThrow<NoSuchElementException>();
             _selectAuthenticatorAsyncPageModel.SmsAuthenticator.Displayed.Should().BeTrue();

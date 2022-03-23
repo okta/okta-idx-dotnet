@@ -21,5 +21,12 @@ namespace embedded_auth_with_sdk.E2ETests.Steps
         {
             await _context.SetActivePasswordUserAsync(userName);
         }
+
+        [Given(@"a User named ""(.*)"" exists, and this user has already setup email, phone and password factors")]
+        public async Task GivenAUserNamedExistsAndThisUserHasAlreadySetupEmailAndPhoneAndPasswordFactors(string userName)
+        {
+            await _context.SetActivePasswordAndSmsUserAsync(userName);
+            await _context.EnrollPhoneAuthenticator();
+        }
     }
 }
