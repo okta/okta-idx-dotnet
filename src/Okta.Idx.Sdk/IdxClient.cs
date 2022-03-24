@@ -1924,7 +1924,6 @@ namespace Okta.Idx.Sdk
             {
                 Context = idxContext,
                 IsPasswordRequired = IsRemediationRequireCredentials("identify", introspectResponse),
-                Response = introspectResponse,
             };
         }
     }

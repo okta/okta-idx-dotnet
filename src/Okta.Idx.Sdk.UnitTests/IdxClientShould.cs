@@ -15363,7 +15363,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""identify"",
-                ""href"": ""https://vm-test-oie.trexcloud.com/idp/idx/identify"",
+                ""href"": ""https://testdomain.com/idp/idx/identify"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -15406,7 +15406,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""select-enroll-profile"",
-                ""href"": ""https://vm-test-oie.trexcloud.com/idp/idx/enroll"",
+                ""href"": ""https://testdomain.com/idp/idx/enroll"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -15430,7 +15430,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""recover"",
-                ""href"": ""https://vm-test-oie.trexcloud.com/idp/idx/recover"",
+                ""href"": ""https://testdomain.com/idp/idx/recover"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -15460,7 +15460,7 @@ namespace Okta.Idx.Sdk.UnitTests
             ""create-form""
         ],
         ""name"": ""cancel"",
-        ""href"": ""https://vm-test-oie.trexcloud.com/idp/idx/cancel"",
+        ""href"": ""https://testdomain.com/idp/idx/cancel"",
         ""method"": ""POST"",
         ""produces"": ""application/ion+json; okta-version=1.0.0"",
         ""value"": [
@@ -15514,7 +15514,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""identify"",
-                ""href"": ""https://vm-test-oie.trexcloud.com/idp/idx/identify"",
+                ""href"": ""https://testdomain.com/idp/idx/identify"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -15543,7 +15543,7 @@ namespace Okta.Idx.Sdk.UnitTests
                     ""create-form""
                 ],
                 ""name"": ""select-enroll-profile"",
-                ""href"": ""https://vm-test-oie.trexcloud.com/idp/idx/enroll"",
+                ""href"": ""https://testdomain.com/idp/idx/enroll"",
                 ""method"": ""POST"",
                 ""produces"": ""application/ion+json; okta-version=1.0.0"",
                 ""value"": [
@@ -15564,7 +15564,7 @@ namespace Okta.Idx.Sdk.UnitTests
             ""create-form""
         ],
         ""name"": ""cancel"",
-        ""href"": ""https://vm-test-oie.trexcloud.com/idp/idx/cancel"",
+        ""href"": ""https://testdomain.com/idp/idx/cancel"",
         ""method"": ""POST"",
         ""produces"": ""application/ion+json; okta-version=1.0.0"",
         ""value"": [

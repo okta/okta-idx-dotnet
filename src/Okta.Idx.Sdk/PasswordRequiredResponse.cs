@@ -28,10 +28,5 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the context.
         /// </summary>
         public IIdxContext Context { get; set; }
-
-        /// <summary>
-        /// Gets or sets the response.
-        /// </summary>
-        public IIdxResponse Response { get; set; }
     }
 }
