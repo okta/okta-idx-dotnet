@@ -244,5 +244,21 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<PollResponse> PollAuthenticatorEnrollmentStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Determines if password is required.
+        /// </summary>
+        /// <param name="state">The state handle to use or null to autogenerate.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The password required response.</returns>
+        Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(string state = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Determines if password is required.
+        /// </summary>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The password required response.</returns>
+        Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }
