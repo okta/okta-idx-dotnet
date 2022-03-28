@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0
+
+### Features
+
+* Add support for optional Password.
 
 ## 2.0.1
 
