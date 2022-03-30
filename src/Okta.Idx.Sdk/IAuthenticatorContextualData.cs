@@ -4,6 +4,7 @@
 // </copyright>
 
 using Okta.Sdk.Abstractions;
+using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
 {
@@ -33,5 +34,15 @@ namespace Okta.Idx.Sdk
         /// This is the value encoded into the QrCode and can be used to compute a TOTP.
         /// </summary>
         string SharedSecret { get; }
+
+        /// <summary>
+        /// Gets the question keys, related to security questions.
+        /// </summary>
+        IList<string> QuestionKeys { get; }
+
+        /// <summary>
+        /// Gets the security questions.
+        /// </summary>
+        IList<SecurityQuestion> Questions { get; } 
     }
 }

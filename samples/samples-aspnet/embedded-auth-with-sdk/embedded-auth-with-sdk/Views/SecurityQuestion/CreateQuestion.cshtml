@@ -1,0 +1,37 @@
+﻿@model embedded_auth_with_sdk.Models.SecurityQuestionModel
+@using Okta.Idx.Sdk
+@using embedded_auth_with_sdk.Models
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Select Security Question";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+        @Html.ActionLink("Choose a security question", "ChooseQuestion")
+        @using (Html.BeginForm("Answer", "SecurityQuestion", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            <h4>Setup Security Question</h4>
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="form-group">
+                <div class="col-md-10">
+                    @Html.LabelFor(m => m.QuestionKey, new { @class = "control-label" })
+                    @Html.DropDownList("question", Model.SelectListItems)
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-10">
+                    <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
+                </div>
+            </div>
+        }
+        <hr />
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+

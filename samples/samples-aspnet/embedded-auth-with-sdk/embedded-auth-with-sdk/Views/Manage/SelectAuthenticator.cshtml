@@ -46,6 +46,7 @@
                 @Html.HiddenFor(m => m.PhoneId)
                 @Html.HiddenFor(m => m.WebAuthnId)
                 @Html.HiddenFor(m => m.OktaVerifyId)
+                @Html.HiddenFor(m => m.SecurityQuestionId)
                 @Html.HiddenFor(m => m.TotpId)
                 <ul class="no-padding-left">
                     @foreach (var authenticator in Model.Authenticators)

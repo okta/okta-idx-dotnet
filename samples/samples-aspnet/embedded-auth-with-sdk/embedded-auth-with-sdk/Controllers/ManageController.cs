@@ -409,6 +409,7 @@ namespace embedded_auth_with_sdk.Controllers
                 WebAuthnId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security key or biometric")?.AuthenticatorId,
                 TotpId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "google authenticator")?.AuthenticatorId,
                 OktaVerifyId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "okta verify")?.AuthenticatorId,
+                SecurityQuestionId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security question")?.AuthenticatorId,
                 CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
             };
 
@@ -619,10 +620,15 @@ namespace embedded_auth_with_sdk.Controllers
                                     Session["currentWebAuthnAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("EnrollWebAuthnAuthenticator", "Manage");
                                 }
-                                else if(model.IsOktaVerifySelected)
+                                else if (model.IsOktaVerifySelected)
                                 {
                                     Session["oktaVerifyAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("Enroll", "OktaVerify");
+                                }
+                                else if (model.IsSecurtiyQuestionSelected)
+                                {
+                                    Session["securityQuestionAuthenticator"] = enrollResponse.CurrentAuthenticator;
+                                    return RedirectToAction("SelectQuestion", "SecurityQuestion");
                                 }
 
                                 return RedirectToAction("VerifyAuthenticator", "Manage");

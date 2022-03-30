@@ -340,6 +340,7 @@
     <Compile Include="Controllers\MagicLinkController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\OktaVerifyController.cs" />
+    <Compile Include="Controllers\SecurityQuestionController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -364,6 +365,7 @@
     <Compile Include="Models\OktaVerifySelectEnrollmentChannelOptionModel.cs" />
     <Compile Include="Models\OktaVerifyPollResponseModel.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
+    <Compile Include="Models\SecurityQuestionModel.cs" />
     <Compile Include="Models\SelectAuthenticatorMethodViewModel.cs" />
     <Compile Include="Models\SelectAuthenticatorViewModel.cs" />
     <Compile Include="Models\SelectRecoveryAuthenticatorViewModel.cs" />
@@ -444,6 +446,8 @@
     <Content Include="Views\Account\RecoverPasswordWithToken.cshtml" />
     <Content Include="Views\Manage\ChangePasswordWithRecoveryToken.cshtml" />
     <Content Include="Views\MagicLink\Callback.cshtml" />
+    <Content Include="Views\SecurityQuestion\SelectQuestion.cshtml" />
+    <Content Include="Views\SecurityQuestion\CreateQuestion.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
