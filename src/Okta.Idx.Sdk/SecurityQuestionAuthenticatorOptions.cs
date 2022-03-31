@@ -8,8 +8,8 @@ namespace Okta.Idx.Sdk
     {
         public string Answer { get; set; }
 
-        public string Question { get; set; }
-
         public string QuestionKey { get; set; }
+
+        public string Question { get; set; }
     }
 }

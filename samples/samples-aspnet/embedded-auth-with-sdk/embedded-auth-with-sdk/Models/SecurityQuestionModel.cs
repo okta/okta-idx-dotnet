@@ -12,9 +12,8 @@ namespace embedded_auth_with_sdk.Models
     {
         [Required]
         [Display(Name = "Answer")]
+        [StringLength(100, MinimumLength = 4)]
         public string Answer { get; set; }
-
-        public string Question { get; set; }
 
         [Required]
         [Display(Name = "Question")]

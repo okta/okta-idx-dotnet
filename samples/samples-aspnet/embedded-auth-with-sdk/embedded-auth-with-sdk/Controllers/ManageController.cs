@@ -628,7 +628,7 @@ namespace embedded_auth_with_sdk.Controllers
                                 else if (model.IsSecurityQuestionSelected)
                                 {
                                     Session["securityQuestionAuthenticator"] = enrollResponse.CurrentAuthenticator;
-                                    return RedirectToAction("SelectQuestion", "SecurityQuestion");
+                                    return RedirectToAction("ChooseQuestion", "SecurityQuestion");
                                 }
 
                                 return RedirectToAction("VerifyAuthenticator", "Manage");

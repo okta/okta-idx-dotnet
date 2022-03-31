@@ -349,6 +349,7 @@
     <Compile Include="Models\AuthenticatorViewModel.cs" />
     <Compile Include="Models\BaseViewModel.cs" />
     <Compile Include="Models\ChangePasswordViewModel.cs" />
+    <Compile Include="Models\CustomSecurityQuestionModel.cs" />
     <Compile Include="Models\EnrollGoogleAuthenticatorViewModel.cs" />
     <Compile Include="Models\ChangePasswordWithRecoveryTokenViewModel.cs" />
     <Compile Include="Models\EnrollPhoneViewModel.cs" />

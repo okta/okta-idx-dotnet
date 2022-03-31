@@ -1144,11 +1144,23 @@ namespace Okta.Idx.Sdk
         public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(SecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var challengeAuthenticatorRequest = new IdxRequestPayload();
-            challengeAuthenticatorRequest.SetProperty("credentials", new
+            if ((bool)verifyAuthenticatorOptions.QuestionKey?.Equals("custom"))
             {
-                answer = verifyAuthenticatorOptions.Answer,
-                questionKey = verifyAuthenticatorOptions.QuestionKey,
-            });
+                challengeAuthenticatorRequest.SetProperty("credentials", new
+                {
+                    answer = verifyAuthenticatorOptions.Answer,
+                    questionKey = verifyAuthenticatorOptions.QuestionKey,
+                    question = verifyAuthenticatorOptions.Question,
+                });
+            }
+            else
+            {
+                challengeAuthenticatorRequest.SetProperty("credentials", new
+                {
+                    answer = verifyAuthenticatorOptions.Answer,
+                    questionKey = verifyAuthenticatorOptions.QuestionKey,
+                });
+            }
 
             return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, idxContext, cancellationToken);
         }
