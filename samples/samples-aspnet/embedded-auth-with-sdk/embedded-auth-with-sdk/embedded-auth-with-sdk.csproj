@@ -446,7 +446,7 @@
     <Content Include="Views\Account\RecoverPasswordWithToken.cshtml" />
     <Content Include="Views\Manage\ChangePasswordWithRecoveryToken.cshtml" />
     <Content Include="Views\MagicLink\Callback.cshtml" />
-    <Content Include="Views\SecurityQuestion\SelectQuestion.cshtml" />
+    <Content Include="Views\SecurityQuestion\ChooseQuestion.cshtml" />
     <Content Include="Views\SecurityQuestion\CreateQuestion.cshtml" />
   </ItemGroup>
   <ItemGroup>

@@ -35,7 +35,8 @@ namespace embedded_auth_with_sdk.Models
         public bool IsWebAuthnSelected => WebAuthnId != null && WebAuthnId == AuthenticatorId;
 
         public bool IsTotpSelected => TotpId != null && TotpId == AuthenticatorId;
-        public bool IsSecurtiyQuestionSelected => SecurityQuestionId != null && SecurityQuestionId == AuthenticatorId;
+
+        public bool IsSecurityQuestionSelected => SecurityQuestionId != null && SecurityQuestionId == AuthenticatorId;
 
         public bool IsOktaVerifySelected => OktaVerifyId != null && OktaVerifyId == AuthenticatorId;
     }

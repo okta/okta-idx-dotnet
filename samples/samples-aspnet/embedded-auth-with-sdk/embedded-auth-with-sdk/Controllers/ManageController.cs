@@ -625,7 +625,7 @@ namespace embedded_auth_with_sdk.Controllers
                                     Session["oktaVerifyAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("Enroll", "OktaVerify");
                                 }
-                                else if (model.IsSecurtiyQuestionSelected)
+                                else if (model.IsSecurityQuestionSelected)
                                 {
                                     Session["securityQuestionAuthenticator"] = enrollResponse.CurrentAuthenticator;
                                     return RedirectToAction("SelectQuestion", "SecurityQuestion");

@@ -20,7 +20,7 @@
             _idxClient = idxClient;
         }
 
-        public ActionResult SelectQuestion()
+        public ActionResult ChooseQuestion()
         {
             var securityQuestionAuthenticator = (IAuthenticator)Session["securityQuestionAuthenticator"];
             return View(new SecurityQuestionModel
