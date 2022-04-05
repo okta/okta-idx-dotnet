@@ -271,7 +271,7 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> EnrollAuthenticatorAsync(SecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Enroll a security question.
+        /// Verify a security question.
         /// </summary>
         /// <param name="verifyAuthenticatorOptions">The options to verify a security question.</param>
         /// <param name="idxContext">The IDX context.</param>
