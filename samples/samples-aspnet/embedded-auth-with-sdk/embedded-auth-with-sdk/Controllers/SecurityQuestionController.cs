@@ -68,7 +68,7 @@
         {
             if (!ModelState.IsValid)
             {
-                return View("CreateQuestion", model);
+                return View("EnrollCustomSecurityQuestion", model);
             }
             try
             {
