@@ -27,5 +27,8 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public IList<SecurityQuestion> Questions => GetArrayProperty<SecurityQuestion>("questions");
+
+        /// <inheritdoc/>
+        public SecurityQuestion EnrolledQuestion => GetProperty<SecurityQuestion>("enrolledQuestion");
     }
 }

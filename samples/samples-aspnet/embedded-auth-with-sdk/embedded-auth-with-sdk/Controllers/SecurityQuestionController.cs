@@ -21,30 +21,21 @@
             _idxClient = idxClient;
         }
 
-        public ActionResult ChooseQuestion()
+        public ActionResult EnrollSecurityQuestion()
         {
             var securityQuestionAuthenticator = (IAuthenticator)Session["securityQuestionAuthenticator"];
-            return View(new SecurityQuestionModel
+            return View(new EnrollSecurityQuestionModel
             {
                 QuestionKeys = securityQuestionAuthenticator.ContextualData.QuestionKeys.ToList(),
                 Questions = securityQuestionAuthenticator.ContextualData.Questions.ToList(),
             });
         }
 
-        public ActionResult CreateQuestion()
-        {
-            var securityQuestionAuthenticator = (IAuthenticator)Session["securityQuestionAuthenticator"];
-            return View(new CustomSecurityQuestionModel
-            {
-                QuestionKey = "custom",
-            });
-        }
-
-        public async Task<ActionResult> AnswerQuestion(SecurityQuestionModel model)
+        public async Task<ActionResult> EnrollSecurityQuestionAsync(EnrollSecurityQuestionModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View("Select", model);
+                return View("EnrollSecurityQuestion", model);
             }
             try
             {
@@ -55,26 +46,32 @@
                     QuestionKey = model.QuestionKey,
                 };
 
-                var securityQuestionResponse = await _idxClient.VerifyAuthenticatorAsync(securityQuestionOptions, idxContext);
+                var securityQuestionResponse = await _idxClient.EnrollAuthenticatorAsync(securityQuestionOptions, idxContext);
                 TempData["canSkip"] = securityQuestionResponse.CanSkip;
                 return await RedirectForStatusAsync(securityQuestionResponse);
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("Answer", $"An exception occurred: ({ex.Message})");
-                return View("ChooseQuestion", model);
+                return View("EnrollSecurityQuestion", model);
             }
         }
 
-        public async Task<ActionResult> AnswerCustomQuestion(CustomSecurityQuestionModel model)
+        [HttpGet]
+        public ActionResult EnrollCustomSecurityQuestion()
+        {
+            return View(new EnrollCustomSecurityQuestionModel());
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> EnrollCustomSecurityQuestionAsync(EnrollCustomSecurityQuestionModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View("Select", model);
+                return View("CreateQuestion", model);
             }
             try
             {
-
                 var idxContext = (IIdxContext)Session["idxContext"];
                 var securityQuestionOptions = new SecurityQuestionAuthenticatorOptions
                 {
@@ -83,14 +80,48 @@
                     QuestionKey = model.QuestionKey,
                 };
 
-                var securityQuestionResponse = await _idxClient.VerifyAuthenticatorAsync(securityQuestionOptions, idxContext);
-                TempData["canSkip"] = securityQuestionResponse.CanSkip;
-                return await RedirectForStatusAsync(securityQuestionResponse);
+                var securityQuestionEnrollResponse = await _idxClient.EnrollAuthenticatorAsync(securityQuestionOptions, idxContext);
+                TempData["canSkip"] = securityQuestionEnrollResponse.CanSkip;
+                return await RedirectForStatusAsync(securityQuestionEnrollResponse);
             }
             catch(Exception ex)
             {
                 ModelState.AddModelError("Answer", $"An exception occurred: ({ex.Message})");
                 return View("CreateQuestion", model);
+            }
+        }
+
+        [HttpGet]
+        public ActionResult VerifyAuthenticator()
+        {
+            var model = (AnswerSecurityQuestionModel)Session[nameof(AnswerSecurityQuestionModel)];
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> VerifyAuthenticatorAsync(AnswerSecurityQuestionModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("VerifyAuthenticator", model);
+            }
+            try
+            {
+                var idxContext = (IIdxContext)Session["idxContext"];
+                var securityQuestionOptions = new SecurityQuestionAuthenticatorOptions
+                {
+                    Answer = model.Answer,
+                    QuestionKey = model.QuestionKey,
+                };
+
+                var securityQuestionAuthenticateResponse = await _idxClient.VerifyAuthenticatorAsync(securityQuestionOptions, idxContext);
+                TempData["canSkip"] = securityQuestionAuthenticateResponse.CanSkip;
+                return await RedirectForStatusAsync(securityQuestionAuthenticateResponse);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("Answer", $"An exception occurred: ({ex.Message})");
+                return View("VerifyAuthenticator", model);
             }
         }
 

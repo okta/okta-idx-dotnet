@@ -8,16 +8,15 @@ using System.Web.Mvc;
 
 namespace embedded_auth_with_sdk.Models
 {
-    public class CustomSecurityQuestionModel : SecurityQuestionModel
+    public class AnswerSecurityQuestionModel : EnrollSecurityQuestionModel
     {
-        public CustomSecurityQuestionModel()
+        public AnswerSecurityQuestionModel()
         {
-            this.QuestionKey = "custom";
         }
 
-        [Required]
-        [Display(Name = "Question")]
+        public string QuestionKey { get; set; }
         public string Question { get; set; }
+        public string Answer { get; set; }
 
     }
 }

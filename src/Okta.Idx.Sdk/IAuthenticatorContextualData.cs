@@ -43,6 +43,11 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets the security questions.
         /// </summary>
-        IList<SecurityQuestion> Questions { get; } 
+        IList<SecurityQuestion> Questions { get; }
+
+        /// <summary>
+        /// Gets the enrolled quesiton.
+        /// </summary>
+        SecurityQuestion EnrolledQuestion { get; }
     }
 }

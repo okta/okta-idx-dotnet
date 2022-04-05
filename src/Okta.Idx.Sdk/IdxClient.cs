@@ -1141,28 +1141,41 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(SecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(SecurityQuestionAuthenticatorOptions securityQuestionAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var challengeAuthenticatorRequest = new IdxRequestPayload();
-            if ((bool)verifyAuthenticatorOptions.QuestionKey?.Equals("custom"))
+            if ((bool)securityQuestionAuthenticatorOptions.QuestionKey?.Equals("custom"))
             {
                 challengeAuthenticatorRequest.SetProperty("credentials", new
                 {
-                    answer = verifyAuthenticatorOptions.Answer,
-                    questionKey = verifyAuthenticatorOptions.QuestionKey,
-                    question = verifyAuthenticatorOptions.Question,
+                    answer = securityQuestionAuthenticatorOptions.Answer,
+                    questionKey = securityQuestionAuthenticatorOptions.QuestionKey,
+                    question = securityQuestionAuthenticatorOptions.Question,
                 });
             }
             else
             {
                 challengeAuthenticatorRequest.SetProperty("credentials", new
                 {
-                    answer = verifyAuthenticatorOptions.Answer,
-                    questionKey = verifyAuthenticatorOptions.QuestionKey,
+                    answer = securityQuestionAuthenticatorOptions.Answer,
+                    questionKey = securityQuestionAuthenticatorOptions.QuestionKey,
                 });
             }
 
             return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(SecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var challengeAnswerAuthenticatorRequest = new IdxRequestPayload();
+            challengeAnswerAuthenticatorRequest.SetProperty("credentials", new
+            {
+                answer = verifyAuthenticatorOptions.Answer,
+                questionKey = verifyAuthenticatorOptions.QuestionKey,
+            });
+
+            return await VerifyAuthenticatorAsync(challengeAnswerAuthenticatorRequest, idxContext, cancellationToken);
         }
 
         /// <inheritdoc/>

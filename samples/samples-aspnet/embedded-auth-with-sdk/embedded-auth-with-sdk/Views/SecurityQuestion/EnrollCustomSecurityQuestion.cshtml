@@ -1,4 +1,4 @@
-﻿@model embedded_auth_with_sdk.Models.CustomSecurityQuestionModel
+﻿@model embedded_auth_with_sdk.Models.EnrollCustomSecurityQuestionModel
 @using Okta.Idx.Sdk
 @using embedded_auth_with_sdk.Models
 
@@ -8,7 +8,7 @@
 
 <div class="row d-center">
     <div class="col-md-8">
-    @using (Html.BeginForm("AnswerCustomQuestion", "SecurityQuestion", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    @using (Html.BeginForm("EnrollCustomSecurityQuestionAsync", "SecurityQuestion", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
     {
         @Html.AntiForgeryToken()
         @Html.HiddenFor(m => m.QuestionKey)
@@ -17,7 +17,7 @@
         @Html.ValidationSummary("", new { @class = "text-danger" })
         <div class="form-group">
             <div class="col-md-10">
-                @Html.ActionLink("Choose a security question", "ChooseQuestion")
+                @Html.ActionLink("Choose a security question", "EnrollSecurityQuestion")
                 <div class="row row-no-gutters">
                     @Html.LabelFor(m => m.Question, new { @class = "control-label" })
                 </div>

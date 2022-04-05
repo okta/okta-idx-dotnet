@@ -8,7 +8,7 @@ using System.Web.Mvc;
 
 namespace embedded_auth_with_sdk.Models
 {
-    public class SecurityQuestionModel
+    public class EnrollSecurityQuestionModel
     {
         [Required]
         [Display(Name = "Answer")]

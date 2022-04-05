@@ -551,6 +551,24 @@ namespace embedded_auth_with_sdk.Controllers
                         Session[nameof(OktaVerifySelectAuthenticatorMethodModel)] = viewModel;
                         return RedirectToAction("SelectAuthenticatorMethod", "OktaVerify");
                     }
+                    else if (model.IsSecurityQuestionSelected)
+                    {
+                        var selectAuthenticatorOptions = new SelectAuthenticatorOptions
+                        {
+                            AuthenticatorId = model.AuthenticatorId,
+                        };
+
+                        selectAuthenticatorResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
+
+                        var viewModel = new AnswerSecurityQuestionModel()
+                        {
+                            QuestionKey = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.ContextualData.EnrolledQuestion.QuestionKey,
+                            Question = selectAuthenticatorResponse.CurrentAuthenticatorEnrollment.ContextualData.EnrolledQuestion.Question
+                        };
+
+                        Session[nameof(AnswerSecurityQuestionModel)] = viewModel;
+                        return RedirectToAction("VerifyAuthenticator", "SecurityQuestion");
+                    }
                     else
                     {
                         var selectAuthenticatorOptions = new SelectAuthenticatorOptions
@@ -628,7 +646,7 @@ namespace embedded_auth_with_sdk.Controllers
                                 else if (model.IsSecurityQuestionSelected)
                                 {
                                     Session["securityQuestionAuthenticator"] = enrollResponse.CurrentAuthenticator;
-                                    return RedirectToAction("ChooseQuestion", "SecurityQuestion");
+                                    return RedirectToAction("EnrollSecurityQuestion", "SecurityQuestion");
                                 }
 
                                 return RedirectToAction("VerifyAuthenticator", "Manage");
