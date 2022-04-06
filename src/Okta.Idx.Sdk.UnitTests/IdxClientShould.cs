@@ -15598,5 +15598,686 @@ namespace Okta.Idx.Sdk.UnitTests
             (await testClient.CheckIsPasswordRequiredAsync()).IsPasswordRequired.Should().Be(false);
         }
         #endregion
+
+        # region security question
+
+        [Fact]
+        public async Task GetSecurityQuestions()
+        {
+            var idxContext = Substitute.For<IIdxContext>();
+            #region mock responses
+            var introspectResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02NEtILgyR1C17MkKIsSAZmccezlHcOuOJeZGkn7rh"",
+    ""expiresAt"": ""2022-04-05T14:12:12.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-authenticator-enroll"",
+                ""href"": ""https://testdomain.com/idp/idx/credential/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""type"": ""object"",
+                        ""options"": [
+                            {
+                                ""label"": ""Email"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut47hb8fj3PqU6dh0g7"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""email"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[0]""
+                            },
+                            {
+                                ""label"": ""Password"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut47hb8fiHtj6pqG0g7"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""password"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[1]""
+                            },
+                            {
+                                ""label"": ""Security Question"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut47hb8fllgs7BO50g7"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""security_question"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[2]""
+                            }
+                        ]
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02NEtILgyR1C17MkKIsSAZmccezlHcOuOJeZGkn7rh"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""authenticators"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""type"": ""email"",
+                ""key"": ""okta_email"",
+                ""id"": ""aut47hb8fj3PqU6dh0g7"",
+                ""displayName"": ""Email"",
+                ""methods"": [
+                    {
+                        ""type"": ""email""
+                    }
+                ]
+            },
+            {
+                ""type"": ""password"",
+                ""key"": ""okta_password"",
+                ""id"": ""aut47hb8fiHtj6pqG0g7"",
+                ""displayName"": ""Password"",
+                ""methods"": [
+                    {
+                        ""type"": ""password""
+                    }
+                ]
+            },
+            {
+                ""type"": ""security_question"",
+                ""key"": ""security_question"",
+                ""id"": ""aut47hb8fllgs7BO50g7"",
+                ""displayName"": ""Security Question"",
+                ""methods"": [
+                    {
+                        ""type"": ""security_question""
+                    }
+                ]
+            }
+        ]
+    },
+    ""authenticatorEnrollments"": {
+        ""type"": ""array"",
+        ""value"": []
+    },
+    ""user"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""id"": ""00u48tqxwdHay91rO0g7"",
+            ""identifier"": ""testuser@threeheadz.com"",
+            ""profile"": {
+                ""firstName"": ""test"",
+                ""lastName"": ""user"",
+                ""timeZone"": ""America/Los_Angeles"",
+                ""locale"": ""en_US""
+            }
+        }
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://testdomain.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02NEtILgyR1C17MkKIsSAZmccezlHcOuOJeZGkn7rh"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""SQ Web App"",
+            ""id"": ""0oa48qersyX7e6sSt0g7""
+        }
+    }
+}";
+            var enrollResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02NEtILgyR1C17MkKIsSAZmccezlHcOuOJeZGkn7rh"",
+    ""expiresAt"": ""2022-04-05T14:12:23.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""enroll-authenticator"",
+                ""relatesTo"": [
+                    ""$.currentAuthenticator""
+                ],
+                ""href"": ""https://testdomain.com/idp/idx/challenge/answer"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""credentials"",
+                        ""type"": ""object"",
+                        ""required"": true,
+                        ""options"": [
+                            {
+                                ""label"": ""Choose a security question"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""questionKey"",
+                                                ""type"": ""string"",
+                                                ""label"": ""Choose a security question"",
+                                                ""required"": true,
+                                                ""options"": [
+                                                    {
+                                                        ""label"": ""What is the food you least liked as a child?"",
+                                                        ""value"": ""disliked_food""
+                                                    },
+                                                    {
+                                                        ""label"": ""What is the name of your first stuffed animal?"",
+                                                        ""value"": ""name_of_first_plush_toy""
+                                                    },
+                                                    {
+                                                        ""label"": ""What did you earn your first medal or award for?"",
+                                                        ""value"": ""first_award""
+                                                    },
+                                                    {
+                                                        ""label"": ""What is your favorite security question?"",
+                                                        ""value"": ""favorite_security_question""
+                                                    },
+                                                    {
+                                                        ""label"": ""What is the toy/stuffed animal you liked the most as a kid?"",
+                                                        ""value"": ""favorite_toy""
+                                                    },
+                                                    {
+                                                        ""label"": ""What was the first computer game you played?"",
+                                                        ""value"": ""first_computer_game""
+                                                    },
+                                                    {
+                                                        ""label"": ""What is your favorite movie quote?"",
+                                                        ""value"": ""favorite_movie_quote""
+                                                    },
+                                                    {
+                                                        ""label"": ""What was the mascot of the first sports team you played on?"",
+                                                        ""value"": ""first_sports_team_mascot""
+                                                    },
+                                                    {
+                                                        ""label"": ""What music album or song did you first purchase?"",
+                                                        ""value"": ""first_music_purchase""
+                                                    },
+                                                    {
+                                                        ""label"": ""What is your favorite piece of art?"",
+                                                        ""value"": ""favorite_art_piece""
+                                                    },
+                                                    {
+                                                        ""label"": ""What was your grandmother's favorite dessert?"",
+                                                        ""value"": ""grandmother_favorite_desert""
+                                                    },
+                                                    {
+                                                        ""label"": ""What was the first thing you learned to cook?"",
+                                                        ""value"": ""first_thing_cooked""
+                                                    },
+                                                    {
+                                                        ""label"": ""What was your dream job as a child?"",
+                                                        ""value"": ""childhood_dream_job""
+                                                    },
+                                                    {
+                                                        ""label"": ""Where did you meet your spouse/significant other?"",
+                                                        ""value"": ""place_where_significant_other_was_met""
+                                                    },
+                                                    {
+                                                        ""label"": ""Where did you go for your favorite vacation?"",
+                                                        ""value"": ""favorite_vacation_location""
+                                                    },
+                                                    {
+                                                        ""label"": ""Where were you on New Year's Eve in the year 2000?"",
+                                                        ""value"": ""new_years_two_thousand""
+                                                    },
+                                                    {
+                                                        ""label"": ""Who is your favorite speaker/orator?"",
+                                                        ""value"": ""favorite_speaker_actor""
+                                                    },
+                                                    {
+                                                        ""label"": ""Who is your favorite book/movie character?"",
+                                                        ""value"": ""favorite_book_movie_character""
+                                                    },
+                                                    {
+                                                        ""label"": ""Who is your favorite sports player?"",
+                                                        ""value"": ""favorite_sports_player""
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                ""name"": ""answer"",
+                                                ""label"": ""Answer"",
+                                                ""required"": true
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                ""label"": ""Create my own security question"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""questionKey"",
+                                                ""required"": true,
+                                                ""value"": ""custom"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""question"",
+                                                ""label"": ""Create a security question"",
+                                                ""required"": true
+                                            },
+                                            {
+                                                ""name"": ""answer"",
+                                                ""label"": ""Answer"",
+                                                ""required"": true
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02NEtILgyR1C17MkKIsSAZmccezlHcOuOJeZGkn7rh"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-authenticator-enroll"",
+                ""href"": ""https://testdomain.com/idp/idx/credential/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""type"": ""object"",
+                        ""options"": [
+                            {
+                                ""label"": ""Email"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut47hb8fj3PqU6dh0g7"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""email"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[0]""
+                            },
+                            {
+                                ""label"": ""Password"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut47hb8fiHtj6pqG0g7"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""password"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[1]""
+                            },
+                            {
+                                ""label"": ""Security Question"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut47hb8fllgs7BO50g7"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""required"": false,
+                                                ""value"": ""security_question"",
+                                                ""mutable"": false
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[2]""
+                            }
+                        ]
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02NEtILgyR1C17MkKIsSAZmccezlHcOuOJeZGkn7rh"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""currentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""contextualData"": {
+                ""questionKeys"": [
+                    ""favorite_vacation_location"",
+                    ""first_music_purchase"",
+                    ""favorite_toy"",
+                    ""grandmother_favorite_desert"",
+                    ""favorite_sports_player"",
+                    ""custom"",
+                    ""disliked_food"",
+                    ""favorite_movie_quote"",
+                    ""favorite_book_movie_character"",
+                    ""first_computer_game"",
+                    ""first_thing_cooked"",
+                    ""first_award"",
+                    ""name_of_first_plush_toy"",
+                    ""place_where_significant_other_was_met"",
+                    ""favorite_art_piece"",
+                    ""childhood_dream_job"",
+                    ""new_years_two_thousand"",
+                    ""favorite_security_question"",
+                    ""favorite_speaker_actor"",
+                    ""first_sports_team_mascot""
+                ],
+                ""questions"": [
+                    {
+                        ""questionKey"": ""disliked_food"",
+                        ""question"": ""What is the food you least liked as a child?""
+                    },
+                    {
+                        ""questionKey"": ""name_of_first_plush_toy"",
+                        ""question"": ""What is the name of your first stuffed animal?""
+                    },
+                    {
+                        ""questionKey"": ""first_award"",
+                        ""question"": ""What did you earn your first medal or award for?""
+                    },
+                    {
+                        ""questionKey"": ""favorite_security_question"",
+                        ""question"": ""What is your favorite security question?""
+                    },
+                    {
+                        ""questionKey"": ""favorite_toy"",
+                        ""question"": ""What is the toy/stuffed animal you liked the most as a kid?""
+                    },
+                    {
+                        ""questionKey"": ""first_computer_game"",
+                        ""question"": ""What was the first computer game you played?""
+                    },
+                    {
+                        ""questionKey"": ""favorite_movie_quote"",
+                        ""question"": ""What is your favorite movie quote?""
+                    },
+                    {
+                        ""questionKey"": ""first_sports_team_mascot"",
+                        ""question"": ""What was the mascot of the first sports team you played on?""
+                    },
+                    {
+                        ""questionKey"": ""first_music_purchase"",
+                        ""question"": ""What music album or song did you first purchase?""
+                    },
+                    {
+                        ""questionKey"": ""favorite_art_piece"",
+                        ""question"": ""What is your favorite piece of art?""
+                    },
+                    {
+                        ""questionKey"": ""grandmother_favorite_desert"",
+                        ""question"": ""What was your grandmother's favorite dessert?""
+                    },
+                    {
+                        ""questionKey"": ""first_thing_cooked"",
+                        ""question"": ""What was the first thing you learned to cook?""
+                    },
+                    {
+                        ""questionKey"": ""childhood_dream_job"",
+                        ""question"": ""What was your dream job as a child?""
+                    },
+                    {
+                        ""questionKey"": ""place_where_significant_other_was_met"",
+                        ""question"": ""Where did you meet your spouse/significant other?""
+                    },
+                    {
+                        ""questionKey"": ""favorite_vacation_location"",
+                        ""question"": ""Where did you go for your favorite vacation?""
+                    },
+                    {
+                        ""questionKey"": ""new_years_two_thousand"",
+                        ""question"": ""Where were you on New Year's Eve in the year 2000?""
+                    },
+                    {
+                        ""questionKey"": ""favorite_speaker_actor"",
+                        ""question"": ""Who is your favorite speaker/orator?""
+                    },
+                    {
+                        ""questionKey"": ""favorite_book_movie_character"",
+                        ""question"": ""Who is your favorite book/movie character?""
+                    },
+                    {
+                        ""questionKey"": ""favorite_sports_player"",
+                        ""question"": ""Who is your favorite sports player?""
+                    }
+                ]
+            },
+            ""type"": ""security_question"",
+            ""key"": ""security_question"",
+            ""id"": ""aut47hb8fllgs7BO50g7"",
+            ""displayName"": ""Security Question"",
+            ""methods"": [
+                {
+                    ""type"": ""security_question""
+                }
+            ]
+        }
+    },
+    ""authenticators"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""type"": ""email"",
+                ""key"": ""okta_email"",
+                ""id"": ""aut47hb8fj3PqU6dh0g7"",
+                ""displayName"": ""Email"",
+                ""methods"": [
+                    {
+                        ""type"": ""email""
+                    }
+                ]
+            },
+            {
+                ""type"": ""password"",
+                ""key"": ""okta_password"",
+                ""id"": ""aut47hb8fiHtj6pqG0g7"",
+                ""displayName"": ""Password"",
+                ""methods"": [
+                    {
+                        ""type"": ""password""
+                    }
+                ]
+            },
+            {
+                ""type"": ""security_question"",
+                ""key"": ""security_question"",
+                ""id"": ""aut47hb8fllgs7BO50g7"",
+                ""displayName"": ""Security Question"",
+                ""methods"": [
+                    {
+                        ""type"": ""security_question""
+                    }
+                ]
+            }
+        ]
+    },
+    ""authenticatorEnrollments"": {
+        ""type"": ""array"",
+        ""value"": []
+    },
+    ""enrollmentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""type"": ""security_question"",
+            ""key"": ""security_question"",
+            ""id"": ""aut47hb8fllgs7BO50g7"",
+            ""displayName"": ""Security Question"",
+            ""methods"": [
+                {
+                    ""type"": ""security_question""
+                }
+            ]
+        }
+    },
+    ""user"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""id"": ""00u48tqxwdHay91rO0g7"",
+            ""identifier"": ""testuser@threeheadz.com"",
+            ""profile"": {
+                ""firstName"": ""test"",
+                ""lastName"": ""user"",
+                ""timeZone"": ""America/Los_Angeles"",
+                ""locale"": ""en_US""
+            }
+        }
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://testdomain.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02NEtILgyR1C17MkKIsSAZmccezlHcOuOJeZGkn7rh"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""SQ Web App"",
+            ""id"": ""0oa48qersyX7e6sSt0g7""
+        }
+    }
+}";
+            #endregion
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = introspectResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = enrollResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var enrollAuthenticatorOptions = new SelectEnrollAuthenticatorOptions
+            {
+                AuthenticatorId = "test authenticator id",
+            };
+            var securityQuestionEnrollResponse = await testClient.SelectEnrollAuthenticatorAsync(enrollAuthenticatorOptions, idxContext);
+            securityQuestionEnrollResponse.Should().NotBeNull();
+            securityQuestionEnrollResponse.CurrentAuthenticator.Should().NotBeNull();
+            securityQuestionEnrollResponse.CurrentAuthenticator.ContextualData.Should().NotBeNull();
+            securityQuestionEnrollResponse.CurrentAuthenticator.ContextualData.QuestionKeys.Should().NotBeNull();
+            securityQuestionEnrollResponse.CurrentAuthenticator.ContextualData.QuestionKeys.Should().HaveCount(20);
+            securityQuestionEnrollResponse.CurrentAuthenticator.ContextualData.Questions.Should().NotBeNull();
+            securityQuestionEnrollResponse.CurrentAuthenticator.ContextualData.Questions.Should().HaveCount(19);
+        }
+
+        #endregion
     }
 }

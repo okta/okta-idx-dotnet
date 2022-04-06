@@ -44,6 +44,24 @@ namespace Okta.Idx.Sdk.Helpers
             };
         }
 
+        internal static IAuthenticator ConvertToAuthenticator(IIdxResponse idxResponse)
+        {
+            var authenticator = ConvertToAuthenticator(idxResponse.Authenticators.Value,
+                idxResponse.CurrentAuthenticator.Value,
+                idxResponse.AuthenticatorEnrollments.Value);
+
+            // Okta Verify channel types
+            authenticator.ChannelTypes = idxResponse.FindRemediationOption(RemediationType.SelectEnrollmentChannel)
+                    .Form?
+                    .FirstOrDefault(x => x.Name == "authenticator")?.GetProperty<IFormValue>("value")?
+                    .Form?
+                    .GetArrayProperty<IFormValue>("value")?
+                    .FirstOrDefault(x => x.Name == "channel")?.Options
+                    ?.Select(x => x.GetProperty<AuthenticatorChannelType>("value")).ToList();
+
+            return authenticator;
+        }
+
         internal static IAuthenticator ConvertToAuthenticator(
             IList<IAuthenticatorValue> authenticators,
             IAuthenticatorEnrollment authenticatorEnrollment,
