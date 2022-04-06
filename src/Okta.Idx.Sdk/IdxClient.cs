@@ -1142,6 +1142,44 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
+        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollSecurityQuestionAuthenticatorOptions securityQuestionAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var challengeAuthenticatorRequest = new IdxRequestPayload();
+            if ((bool)securityQuestionAuthenticatorOptions.QuestionKey?.Equals("custom"))
+            {
+                challengeAuthenticatorRequest.SetProperty("credentials", new
+                {
+                    answer = securityQuestionAuthenticatorOptions.Answer,
+                    questionKey = securityQuestionAuthenticatorOptions.QuestionKey,
+                    question = securityQuestionAuthenticatorOptions.Question,
+                });
+            }
+            else
+            {
+                challengeAuthenticatorRequest.SetProperty("credentials", new
+                {
+                    answer = securityQuestionAuthenticatorOptions.Answer,
+                    questionKey = securityQuestionAuthenticatorOptions.QuestionKey,
+                });
+            }
+
+            return await VerifyAuthenticatorAsync(challengeAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifySecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            var challengeAnswerAuthenticatorRequest = new IdxRequestPayload();
+            challengeAnswerAuthenticatorRequest.SetProperty("credentials", new
+            {
+                answer = verifyAuthenticatorOptions.Answer,
+                questionKey = verifyAuthenticatorOptions.QuestionKey,
+            });
+
+            return await VerifyAuthenticatorAsync(challengeAnswerAuthenticatorRequest, idxContext, cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(OktaVerifyVerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var challengeAuthenticatorRequest = new IdxRequestPayload();
@@ -1449,23 +1487,19 @@ namespace Okta.Idx.Sdk
                     selectAuthenticatorResponse);
             }
 
-            var currentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(
-                selectAuthenticatorResponse.Authenticators.Value,
-                selectAuthenticatorResponse.CurrentAuthenticator.Value,
-                selectAuthenticatorResponse.AuthenticatorEnrollments.Value);
+            IAuthenticator currentAuthenticator;
 
             // Assuming Okta Verify for now
             if (currentRemediationType == RemediationType.EnrollPoll ||
                 currentRemediationType == RemediationType.SelectEnrollmentChannel)
             {
-                // TODO: Move this to convertToAuthenticator
-                currentAuthenticator.ChannelTypes = selectAuthenticatorResponse.FindRemediationOption(RemediationType.SelectEnrollmentChannel)
-                    .Form?
-                    .FirstOrDefault(x => x.Name == "authenticator")?.GetProperty<IFormValue>("value")?
-                    .Form?
-                    .GetArrayProperty<IFormValue>("value")?
-                    .FirstOrDefault(x => x.Name == "channel")?.Options
-                    ?.Select(x => x.GetProperty<AuthenticatorChannelType>("value")).ToList();
+                currentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse);
+            }
+            else
+            {
+                currentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(selectAuthenticatorResponse.Authenticators.Value,
+                    selectAuthenticatorResponse.CurrentAuthenticator.Value,
+                    selectAuthenticatorResponse.AuthenticatorEnrollments.Value);
             }
 
             return new AuthenticationResponse
