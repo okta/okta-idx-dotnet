@@ -40,7 +40,7 @@
             try
             {
                 var idxContext = (IIdxContext)Session["idxContext"];
-                var securityQuestionOptions = new SecurityQuestionAuthenticatorOptions
+                var securityQuestionOptions = new EnrollSecurityQuestionAuthenticatorOptions
                 {
                     Answer = model.Answer,
                     QuestionKey = model.QuestionKey,
@@ -73,7 +73,7 @@
             try
             {
                 var idxContext = (IIdxContext)Session["idxContext"];
-                var securityQuestionOptions = new SecurityQuestionAuthenticatorOptions
+                var securityQuestionOptions = new EnrollSecurityQuestionAuthenticatorOptions
                 {
                     Answer = model.Answer,
                     Question = model.Question,
@@ -108,7 +108,7 @@
             try
             {
                 var idxContext = (IIdxContext)Session["idxContext"];
-                var securityQuestionOptions = new SecurityQuestionAuthenticatorOptions
+                var securityQuestionOptions = new VerifySecurityQuestionAuthenticatorOptions
                 {
                     Answer = model.Answer,
                     QuestionKey = model.QuestionKey,

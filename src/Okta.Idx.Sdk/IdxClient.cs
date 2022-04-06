@@ -1141,7 +1141,7 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(SecurityQuestionAuthenticatorOptions securityQuestionAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        public async Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollSecurityQuestionAuthenticatorOptions securityQuestionAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var challengeAuthenticatorRequest = new IdxRequestPayload();
             if ((bool)securityQuestionAuthenticatorOptions.QuestionKey?.Equals("custom"))
@@ -1166,7 +1166,7 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(SecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        public async Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifySecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             var challengeAnswerAuthenticatorRequest = new IdxRequestPayload();
             challengeAnswerAuthenticatorRequest.SetProperty("credentials", new

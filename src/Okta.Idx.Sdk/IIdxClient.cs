@@ -268,7 +268,7 @@ namespace Okta.Idx.Sdk
         /// <param name="idxContext">The IDX context.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> EnrollAuthenticatorAsync(SecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+        Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollSecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Verify a security question.
@@ -277,6 +277,6 @@ namespace Okta.Idx.Sdk
         /// <param name="idxContext">The IDX context.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> VerifyAuthenticatorAsync(SecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+        Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifySecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }
