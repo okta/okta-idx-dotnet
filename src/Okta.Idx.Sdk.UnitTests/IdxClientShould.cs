@@ -15341,5 +15341,262 @@ namespace Okta.Idx.Sdk.UnitTests
                 .WithMessage("*'Email' must be in the form of an email address*");
         }
         #endregion
+
+        #region Is Password Required
+        [Fact]
+        public async Task RequirePassword()
+        {
+            #region mockResponses
+            string interactResponse = @"{
+    ""interaction_handle"": ""HtXTMBoVlBzhIAzDM-GNGkddbYzTCrt1NmEyCUhdzY4""
+}";
+            string introspectResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02nICqFbKn4utN-0rrIZaQ9DZU5jeukrr7NCJp0RUv"",
+    ""expiresAt"": ""2022-03-10T15:45:49.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""identify"",
+                ""href"": ""https://testdomain.com/idp/idx/identify"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""identifier"",
+                        ""label"": ""Username"",
+                        ""required"": true
+                    },
+                    {
+                        ""name"": ""credentials"",
+                        ""type"": ""object"",
+                        ""form"": {
+                            ""value"": [
+                                {
+                                    ""name"": ""passcode"",
+                                    ""label"": ""Password"",
+                                    ""secret"": true
+                                }
+                            ]
+                        },
+                        ""required"": true
+                    },
+                    {
+                        ""name"": ""rememberMe"",
+                        ""type"": ""boolean"",
+                        ""label"": ""Remember this device""
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02nICqFbKn4utN-0rrIZaQ9DZU5jeukrr7NCJp0RUv"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-enroll-profile"",
+                ""href"": ""https://testdomain.com/idp/idx/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02nICqFbKn4utN-0rrIZaQ9DZU5jeukrr7NCJp0RUv"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""currentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""recover"": {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""recover"",
+                ""href"": ""https://testdomain.com/idp/idx/recover"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02nICqFbKn4utN-0rrIZaQ9DZU5jeukrr7NCJp0RUv"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            ""type"": ""password"",
+            ""key"": ""okta_password"",
+            ""id"": ""aut47hb8fiHtj6pqG0g7"",
+            ""displayName"": ""Password"",
+            ""methods"": [
+                {
+                    ""type"": ""password""
+                }
+            ]
+        }
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://testdomain.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02nICqFbKn4utN-0rrIZaQ9DZU5jeukrr7NCJp0RUv"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Bryan Magic Link"",
+            ""id"": ""0oa47ljmt8gt6YXSx0g7""
+        }
+    }
+}";
+            #endregion
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = interactResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = introspectResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            (await testClient.CheckIsPasswordRequiredAsync()).IsPasswordRequired.Should().Be(true);
+        }
+
+        [Fact]
+        public async Task NotRequirePassword()
+        {
+            #region mockResponses
+            string interactResponse = @"{
+    ""interaction_handle"": ""HtXTMBoVlBzhIAzDM-GNGkddbYzTCrt1NmEyCUhdzY4""
+}";
+            string introspectResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02nICqFbKn4utN-0rrIZaQ9DZU5jeukrr7NCJp0RUv"",
+    ""expiresAt"": ""2022-03-10T15:45:49.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""identify"",
+                ""href"": ""https://testdomain.com/idp/idx/identify"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""identifier"",
+                        ""label"": ""Username"",
+                        ""required"": true
+                    },
+                    {
+                        ""name"": ""rememberMe"",
+                        ""type"": ""boolean"",
+                        ""label"": ""Remember this device""
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02nICqFbKn4utN-0rrIZaQ9DZU5jeukrr7NCJp0RUv"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-enroll-profile"",
+                ""href"": ""https://testdomain.com/idp/idx/enroll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02nICqFbKn4utN-0rrIZaQ9DZU5jeukrr7NCJp0RUv"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://testdomain.com/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02nICqFbKn4utN-0rrIZaQ9DZU5jeukrr7NCJp0RUv"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Bryan Magic Link"",
+            ""id"": ""0oa47ljmt8gt6YXSx0g7""
+        }
+    }
+}";
+            #endregion
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = interactResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = introspectResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            (await testClient.CheckIsPasswordRequiredAsync()).IsPasswordRequired.Should().Be(false);
+        }
+        #endregion
     }
 }

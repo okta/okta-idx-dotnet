@@ -31,6 +31,7 @@ namespace embedded_auth_with_sdk.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
             IdentityProvidersResponse identityProvidersResponse = await _idxClient.GetIdentityProvidersAsync();
+            bool shouldRenderPasswordField = (await _idxClient.CheckIsPasswordRequiredAsync(identityProvidersResponse.Context)).IsPasswordRequired;
 
             // save the context in session, keyed by state handle, so it can be retrieved on callback.  See InteractionCodeController.Callback
             Session[identityProvidersResponse.State] = identityProvidersResponse.Context;
@@ -38,6 +39,7 @@ namespace embedded_auth_with_sdk.Controllers
             LoginViewModel loginViewModel = new LoginViewModel
             {
                 IdpOptions = identityProvidersResponse.IdpOptions,  // You can keep IdpOptions unset (set to null) if you don't want or need social login buttons
+                ShouldRenderPasswordField = shouldRenderPasswordField,
             };
 
             if (TempData.ContainsKey("TerminalStateMessage"))
@@ -68,6 +70,7 @@ namespace embedded_auth_with_sdk.Controllers
             {
                 var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
                 Session["idxContext"] = authnResponse.IdxContext;
+                Session[authnResponse?.IdxContext?.State] = authnResponse?.IdxContext; // save context in session keyed by state for retrieval by magiclink, see MagicLinkController.Callback.
 
                 switch (authnResponse?.AuthenticationStatus)
                 {

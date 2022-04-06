@@ -11,7 +11,9 @@
 
 <div id="okta-signin-widget-container"></div>
 <script type="text/javascript">
-    const widgetConfig = @Html.Raw(JsonConvert.SerializeObject(Model));
+    var widgetConfig = @Html.Raw(JsonConvert.SerializeObject(Model));
+
+    @Html.Raw($"widgetConfig.otp = '{Session["otp"]}';");
 
     console.log(widgetConfig.interactionHandle);
 
