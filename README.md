@@ -68,8 +68,20 @@ var client = new IdxClient(new IdxConfiguration()
     ClientId = "{YOUR_CLIENT_ID}",
     ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients.
     RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
+    DeviceToken = "{YOUR_DEVICE_TOKEN}", // Client device token. Optional property. Only used for confidential clients with ClientSecret.
     Scopes = new List<string> { "openid", "profile", "offline_access" }
 });
+```
+
+#### Adding custom headers
+
+Custom request headers can be set using `IdxClient.RequestOptions`:
+
+```csharp
+    Client.RequestOptions
+        .UseHeader(RequestHeaders.UserAgent, "MyUserAgent")
+        .UseHeader(RequestHeaders.XOktaUserAgentExtended, "MyXUserAgent")
+        .UseHeader(RequestHeaders.XForwardedFor, "MyForwardedFor");
 ```
 
 ### Authenticate users
