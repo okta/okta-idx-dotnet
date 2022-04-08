@@ -63,15 +63,14 @@ Once you initialize a `Client`, you can call methods to make requests to the Okt
 
 ```csharp
 var client = new IdxClient(new IdxConfiguration()
-            {
-                Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
-                ClientId = "{YOUR_CLIENT_ID}",
-                ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
-                DeviceToken = "{YOUR_DEVICE_TOKEN}", // Client device token. Optional property. Only used for confidential clients with ClientSecret. 
-                RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
-                Scopes = "openid profile offline_access",
-            });
-
+{
+    Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
+    ClientId = "{YOUR_CLIENT_ID}",
+    ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients.
+    RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
+    DeviceToken = "{YOUR_DEVICE_TOKEN}", // Client device token. Optional property. Only used for confidential clients with ClientSecret.
+    Scopes = new List<string> { "openid", "profile", "offline_access" }
+});
 ```
 
 #### Adding custom headers
