@@ -5,14 +5,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+using Okta.Sdk.Abstractions;
 
 namespace Okta.Idx.Sdk
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using Okta.Sdk.Abstractions;
-
+   /// <summary>
+   /// The IResend Interface
+   /// </summary>
     public interface IResend : IResource
     {
         /// <summary>
