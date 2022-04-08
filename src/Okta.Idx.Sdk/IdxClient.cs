@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -45,6 +46,11 @@ namespace Okta.Idx.Sdk
         /// </summary>
         private RequestContext _requestContext;
 
+        /// <summary>
+        /// The device context used during IDX bootstrapping.
+        /// </summary>
+        private DeviceContext _deviceContext;
+
         private ILogger _logger;
 
         static IdxClient()
@@ -55,6 +61,7 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets the Request Options.
         /// </summary>
+        [Obsolete("This property has been deprecated and will be removed in the next major version. Use DeviceContext via client's constructor instead.")]
         public RequestOptions RequestOptions { get; internal set; } = new RequestOptions();
 
         /// <summary>
@@ -66,14 +73,17 @@ namespace Okta.Idx.Sdk
         /// </param>
         /// <param name="httpClient">The HTTP client to use for requests to the Okta API.</param>
         /// <param name="logger">The logging interface to use, if any.</param>
+        /// <param name="deviceContext">The device context which specifies the headers to be used during the client's bootstrapping. These headers are *only* sent when calling the /interact endpoint.</param>
         public IdxClient(
             IdxConfiguration configuration = null,
             HttpClient httpClient = null,
-            ILogger logger = null)
+            ILogger logger = null,
+            DeviceContext deviceContext = null)
         {
             Configuration = GetConfigurationOrDefault(configuration);
             IdxConfigurationValidator.Validate(Configuration);
             _logger = logger ?? NullLogger.Instance;
+            _deviceContext = deviceContext;
 
             var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
 
@@ -155,6 +165,7 @@ namespace Okta.Idx.Sdk
             Configuration = configuration;
 
             var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
+            _requestContext = requestContext;
 
             // TODO: Allow proxy configuration
             this.httpClient = httpClient ?? DefaultHttpClient.Create(
@@ -173,6 +184,18 @@ namespace Okta.Idx.Sdk
                 NullLogger.Instance,
                 userAgentBuilder);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IdxClient"/> class.
+        /// </summary>
+        /// <param name="requestExecutor">The <see cref="IRequestExecutor">Request Executor</see> to use.</param>
+        /// <param name="configuration">The client configuration.</param>
+        /// <param name="deviceContext">The device context which specifies the headers to be used during the client's bootstrapping. These headers are *only* sent when calling the /interact endpoint</param>
+        /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
+        protected IdxClient(IRequestExecutor requestExecutor, IdxConfiguration configuration, DeviceContext deviceContext)
+            : this(requestExecutor, configuration, (RequestContext)null) => _deviceContext = deviceContext;
+
+        private IdxConfiguration configuration;
 
         /// <summary>
         /// Gets or sets the Okta configuration.
@@ -221,7 +244,17 @@ namespace Okta.Idx.Sdk
             var codeChallenge = GenerateCodeChallenge(codeVerifier, out var codeChallengeMethod);
 
             Dictionary<string, string> headers;
-            if (RequestOptions?.Headers != null)
+
+            if (_deviceContext?.Headers != null)
+            {
+                // Include all headers but DeviceToken which is for confidential clients only
+                headers = new Dictionary<string, string>(_deviceContext.Headers.Where(x =>
+                                                        !x.Key.Equals(RequestHeaders.XDeviceToken, StringComparison.InvariantCultureIgnoreCase))
+                                                        .ToDictionary(x => x.Key, x => x.Value));
+            }
+
+            // RequestOptions has been now deprecated and will be replaced by DeviceContext.
+            else if (RequestOptions?.Headers != null)
             {
                 headers = new Dictionary<string, string>(RequestOptions.Headers);
             }
@@ -247,7 +280,12 @@ namespace Okta.Idx.Sdk
             if (Configuration.IsConfidentialClient)
             {
                 payload.Add("client_secret", Configuration.ClientSecret);
-                if (!string.IsNullOrEmpty(Configuration.DeviceToken))
+                if (_deviceContext?.Headers?.Any(x =>
+                    x.Key.Equals(RequestHeaders.XDeviceToken, StringComparison.InvariantCultureIgnoreCase)) ?? false)
+                {
+                    headers.Add(RequestHeaders.XDeviceToken, _deviceContext.Headers[RequestHeaders.XDeviceToken]);
+                }
+                else if (!string.IsNullOrEmpty(Configuration.DeviceToken))
                 {
                     headers.Add(RequestHeaders.XDeviceToken, Configuration.DeviceToken);
                 }
