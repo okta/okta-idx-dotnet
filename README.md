@@ -63,26 +63,28 @@ Once you initialize a `Client`, you can call methods to make requests to the Okt
 
 ```csharp
 var client = new IdxClient(new IdxConfiguration()
-{
-    Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
-    ClientId = "{YOUR_CLIENT_ID}",
-    ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients.
-    RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
-    DeviceToken = "{YOUR_DEVICE_TOKEN}", // Client device token. Optional property. Only used for confidential clients with ClientSecret.
-    Scopes = new List<string> { "openid", "profile", "offline_access" }
-});
+            {
+                Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
+                ClientId = "{YOUR_CLIENT_ID}",
+                ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
+                Scopes = new List<string> { "openid", "profile", "offline_access" },
+                RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
+            });
 ```
+#### Provide your device context to be used during the client's bootstrapping
 
-#### Adding custom headers
-
-Custom request headers can be set using `IdxClient.RequestOptions`:
+The device context object specifies the headers to be used during the client's bootstrapping. These headers are *only* sent when calling the /interact endpoint.
 
 ```csharp
-    Client.RequestOptions
-        .UseHeader(RequestHeaders.UserAgent, "MyUserAgent")
-        .UseHeader(RequestHeaders.XOktaUserAgentExtended, "MyXUserAgent")
-        .UseHeader(RequestHeaders.XForwardedFor, "MyForwardedFor");
+var deviceContext = new DeviceContext();
+deviceContext.UseHeader(RequestHeaders.XDeviceToken, "deviceToken"); // Only for confidential clients
+deviceContext.UseHeader(RequestHeaders.UserAgent, "MyUserAgent");
+deviceContext.UseHeader(RequestHeaders.XOktaUserAgentExtended, "MyXUserAgent");
+deviceContext.UseHeader(RequestHeaders.XForwardedFor, "MyForwardedFor");
+
+var client =  new IdxClient(..., deviceContext);
 ```
+> Note: The device token header will be only included for confidential clients.
 
 ### Authenticate users
 

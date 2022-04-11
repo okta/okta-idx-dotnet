@@ -52,6 +52,69 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
+        public async Task GenerateSecureClientPropsWhenCallingInteractUsingDeviceContext()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var deviceContext = new DeviceContext();
+            deviceContext.UseHeader(RequestHeaders.XDeviceToken, "deviceToken");
+            deviceContext.UseHeader(RequestHeaders.UserAgent, "MyUserAgent");
+            deviceContext.UseHeader(RequestHeaders.XOktaUserAgentExtended, "MyXUserAgent");
+            deviceContext.UseHeader(RequestHeaders.XForwardedFor, "MyForwardedFor");
+
+            var testClient = new TesteableIdxClient(
+                mockRequestExecutor,
+                new Configuration.IdxConfiguration
+                {
+                    Issuer = "https://fake.example.com",
+                    ClientId = "foo",
+                    RedirectUri = "https://fake.example.com/redirectUri",
+                    ClientSecret = "bar",
+                },
+                deviceContext
+            );
+
+            await testClient.InteractAsync();
+
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.XDeviceToken) && h.Value.Equals("deviceToken"));
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.UserAgent) && h.Value.Equals("MyUserAgent"));
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.XOktaUserAgentExtended) && h.Value.Equals("MyXUserAgent"));
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.XForwardedFor) && h.Value.Equals("MyForwardedFor"));
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"client_secret\":\"bar\"");
+        }
+
+        [Fact]
+        public async Task NotIncludeDeviceTokenForNonConfidentialClients()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var deviceContext = new DeviceContext();
+            deviceContext.UseHeader(RequestHeaders.XDeviceToken, "deviceToken");
+            deviceContext.UseHeader(RequestHeaders.UserAgent, "MyUserAgent");
+            deviceContext.UseHeader(RequestHeaders.XOktaUserAgentExtended, "MyXUserAgent");
+            deviceContext.UseHeader(RequestHeaders.XForwardedFor, "MyForwardedFor");
+
+            var testClient = new TesteableIdxClient(
+                mockRequestExecutor,
+                new Configuration.IdxConfiguration
+                {
+                    Issuer = "https://fake.example.com",
+                    ClientId = "foo",
+                    RedirectUri = "https://fake.example.com/redirectUri",
+                },
+                deviceContext
+            );
+
+            await testClient.InteractAsync();
+
+            mockRequestExecutor.ReceivedHeaders.Should().NotContain(h => h.Key.Equals(RequestHeaders.XDeviceToken) && h.Value.Equals("deviceToken"));
+
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.UserAgent) && h.Value.Equals("MyUserAgent"));
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.XOktaUserAgentExtended) && h.Value.Equals("MyXUserAgent"));
+            mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.XForwardedFor) && h.Value.Equals("MyForwardedFor"));
+        }
+
+        [Fact]
         public async Task UseProvidedCustomHeadersWhenCallingInteract()
         {
             var rawResponse = @"{ 'interaction_handle' : 'foo' }";

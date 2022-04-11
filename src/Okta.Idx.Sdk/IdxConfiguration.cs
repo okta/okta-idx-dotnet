@@ -23,6 +23,7 @@ namespace Okta.Idx.Sdk.Configuration
         /// <summary>
         /// Gets or Sets the Device token. Optional setting, only effective when the ClientSecret is set.
         /// </summary>
+        [Obsolete("This property has been deprecated and will be removed in the next major version. Use DeviceContext via client's constructor instead.")]
         public string DeviceToken { get; set; }
 
         /// <summary>
