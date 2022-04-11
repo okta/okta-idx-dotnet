@@ -84,7 +84,7 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
-        public async Task NotIncludeDeviceTokenForNonCOnfidentialClients()
+        public async Task NotIncludeDeviceTokenForNonConfidentialClients()
         {
             var rawResponse = @"{ 'interaction_handle' : 'foo' }";
             var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
