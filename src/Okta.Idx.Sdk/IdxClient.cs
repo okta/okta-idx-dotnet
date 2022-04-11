@@ -868,9 +868,10 @@ namespace Okta.Idx.Sdk
                     CurrentAuthenticatorEnrollment = IdxResponseHelper.ConvertToAuthenticator(authenticatorSelectionResponse.Authenticators.Value, currentAuthenticatorEnrollment, authenticatorSelectionResponse.AuthenticatorEnrollments.Value),
                 };
             }
-            else //(authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
+            else
             {
-                return new AuthenticationResponse
+               // (authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
+               return new AuthenticationResponse
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
@@ -1549,9 +1550,9 @@ namespace Okta.Idx.Sdk
 
         private static bool IsRemediationRequireCredentials(string remediationOptionName, IIdxResponse idxResponse)
         {
-            var jToken = JToken.Parse(idxResponse.GetRaw());
+            var jwtToken = JToken.Parse(idxResponse.GetRaw());
 
-            var credentialsObj = jToken.SelectToken($"$.remediation.value[?(@.name == '{remediationOptionName}')].value[?(@.name == 'credentials')]");
+            var credentialsObj = jwtToken.SelectToken($"$.remediation.value[?(@.name == '{remediationOptionName}')].value[?(@.name == 'credentials')]");
 
             return credentialsObj != null;
         }
@@ -1781,11 +1782,7 @@ namespace Okta.Idx.Sdk
 
             var selectEnrollmentChannelResponse = await introspectResponse.ProceedWithRemediationOptionAsync(
                 RemediationType.SelectEnrollmentChannel, idxRequestPayload, cancellationToken);
-
-
             var remediationOption = selectEnrollmentChannelResponse.FindRemediationOption(RemediationType.SelectEnrollmentChannel, true);
-
-
             var currentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(
                 selectEnrollmentChannelResponse.Authenticators?.Value,
                 selectEnrollmentChannelResponse.CurrentAuthenticator?.Value);

@@ -67,10 +67,9 @@ var client = new IdxClient(new IdxConfiguration()
                 Issuer = "{YOUR_ISSUER}", // e.g. https://foo.okta.com/oauth2/default, https://foo.okta.com/oauth2/ausar5vgt5TSDsfcJ0h7
                 ClientId = "{YOUR_CLIENT_ID}",
                 ClientSecret = "{YOUR_CLIENT_SECRET}", //Required for confidential clients. 
+                Scopes = new List<string> { "openid", "profile", "offline_access" },
                 RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
-                Scopes = "openid profile offline_access",
             });
-
 ```
 #### Provide your device context to be used during the client's bootstrapping
 
