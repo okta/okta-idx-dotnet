@@ -1,10 +1,10 @@
 ﻿Feature: 10.4: Security Questions
   Background:
-	Given a Profile Enrollment policy defined assigning new users to the Everyone Group and by collecting "First Name", "Last Name", and "Email", is allowed and assigned to a SPA, WEB APP or MOBILE application
-	And "Required before access is granted" is selected for Email Verification under Profile Enrollment in Security > Profile Enrollment
-	And configured Authenticators are Password (required), Email (required), and SMS (optional)
-	And a user named "Mary"
-	And Mary does not have an account in the org
+    Given a Profile Enrollment policy defined assigning new users to the Everyone Group and by collecting "First Name", "Last Name", and "Email", is allowed and assigned to a SPA, WEB APP or MOBILE application
+    And "Required before access is granted" is selected for Email Verification under Profile Enrollment in Security > Profile Enrollment
+    And configured Authenticators are Password (required), Email (required), and SMS (optional)
+    And a user named "Mary"
+    And Mary does not have an account in the org
 
   Scenario: 10.4.1: Mary signs up for an account and enrolls in Password and a predefined Security Question
     Given Mary navigates to the Self Service Registration View

@@ -30,6 +30,7 @@
 	Then she is redirected to the Root View
     And an application session is created
 
+  @ignore
   Scenario: 4.1.2: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
 	Given Mary navigates to the Self Service Registration View
 	When she fills out her First Name

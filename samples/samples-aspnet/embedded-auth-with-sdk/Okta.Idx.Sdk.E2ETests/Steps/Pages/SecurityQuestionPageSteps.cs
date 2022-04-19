@@ -16,7 +16,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
 
 
         [Then(@"she sees a screen to set up security question")]
-        public void ThenSheSeesAScreenTo()
+        public void ThenSheSeesAScreenToSetupSecurityQuestion()
         {
             _securityQuestionPageModel.AssertPageOpenedAndValid();
 
@@ -25,7 +25,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         [Then(@"she sees dropdown list of questions")]
         public void ThenSheSeesDropdownListOfQuestionsWithTheQuestionIsSelected()
         {
-            _securityQuestionPageModel.QuestionDropDown.Should().NotBeNull();
+            _securityQuestionPageModel.QuestionDropDown.Displayed.Should().BeTrue();
         }
 
         [Then(@"she sees an input box to enter her answer")]
