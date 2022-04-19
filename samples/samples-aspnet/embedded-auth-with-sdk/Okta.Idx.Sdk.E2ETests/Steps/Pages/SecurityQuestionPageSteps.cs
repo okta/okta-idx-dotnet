@@ -19,7 +19,6 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         public void ThenSheSeesAScreenToSetupSecurityQuestion()
         {
             _securityQuestionPageModel.AssertPageOpenedAndValid();
-
         }
 
         [Then(@"she sees dropdown list of questions")]
