@@ -7,6 +7,7 @@
     And the Application Sign on Policy is set to "Password + Another Factor"
 	And a user named Mary does not have an account in the org
 
+  @Ignore
   Scenario: 5.2.1: Mary logs in with a social IDP and gets an error message
 	Given Mary navigates to the Basic Login View
 	When she clicks the Login with Okta button
