@@ -89,8 +89,8 @@ namespace embedded_auth_with_sdk.E2ETests.Features
                     "ile Enrollment in Security > Profile Enrollment", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 5
-    testRunner.And("configured Authenticators are Password (required), Email (required), and SMS (opt" +
-                    "ional)", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+    testRunner.And("configured Authenticators are Password (required), Email (required), and Security" +
+                    " Question (optional)", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 6
     testRunner.And("a user named \"Mary\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

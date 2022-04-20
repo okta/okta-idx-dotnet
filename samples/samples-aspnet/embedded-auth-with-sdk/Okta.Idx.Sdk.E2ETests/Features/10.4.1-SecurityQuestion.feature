@@ -2,7 +2,7 @@
   Background:
     Given a Profile Enrollment policy defined assigning new users to the Everyone Group and by collecting "First Name", "Last Name", and "Email", is allowed and assigned to a SPA, WEB APP or MOBILE application
     And "Required before access is granted" is selected for Email Verification under Profile Enrollment in Security > Profile Enrollment
-    And configured Authenticators are Password (required), Email (required), and SMS (optional)
+    And configured Authenticators are Password (required), Email (required), and Security Question (optional)
     And a user named "Mary"
     And Mary does not have an account in the org
 
