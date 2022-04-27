@@ -14,38 +14,45 @@
 	And she fills out her Email
 	And she submits the registration form
 	Then she sees the Select Authenticator page
+
 	When she selects Email
 	Then she sees a page to input a code
 	When she inputs the correct code from her email
+
 	Then she sees a list of required factors to setup
+
 	When she chooses password factor option
 	And she submits the select authenticator form
 	Then she sees the set new password form
 	When she fills out her Password
 	And she confirms her Password
 	And she submits the change password form
+
 	And she skips optional authenticators if prompted
 	Then she is redirected to the Root View
     And an application session is created
 
-  @ignore
   Scenario: 4.1.2: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
 	Given Mary navigates to the Self Service Registration View
 	When she fills out her First Name
 	And she fills out her Last Name
 	And she fills out her Email
 	And she submits the registration form
-	Then she sees the Select Authenticator page with password as the only option
+	Then she sees the Select Authenticator page
+	
+	When she selects Email
+	Then she sees a page to input a code
+	When she inputs the correct code from her email
+
+	Then she sees a list of required factors to setup
+	
 	When she chooses password factor option
 	And she submits the select authenticator form
 	Then she sees the set new password form
 	When she fills out her Password
 	And she confirms her Password
 	And she submits the registration form
-	Then she sees a list of required factors to setup
-	When she selects Email
-	Then she sees a page to input a code
-	When she inputs the correct code from her email
+
 	Then she sees a list of factors to register
 	When she selects Phone from the list
 	And She inputs a valid phone number
@@ -66,25 +73,28 @@
 	Then she sees an error message "'Email' must be in the form of an email address"
 	And she sees an error message "Provided value for property 'Email' does not match required pattern"
   
-  @ignore
   Scenario: 4.1.4: Mary signs up for an account with Password, sets up required Email factor, And sets up optional SMS with an invalid phone number
 	Given Mary navigates to the Self Service Registration View
 	When she fills out her First Name
 	And she fills out her Last Name
 	And she fills out her Email
 	And she submits the registration form
-	Then she sees the Select Authenticator page with password as the only option
+	Then she sees the Select Authenticator page
+	
+	When she selects Email
+	Then she sees a page to input a code
+	When she inputs the correct code from her email
+	Then she sees a list of factors to register
+
+	Then she sees a list of required factors to setup
+
 	When she chooses password factor option
 	And she submits the select authenticator form
 	Then she sees the set new password form
 	When she fills out her Password
 	And she confirms her Password
 	And she submits the registration form
-	Then she sees a list of required factors to setup
-	When she selects Email
-	Then she sees a page to input a code
-	When she inputs the correct code from her email
-	Then she sees a list of factors to register
+
 	When she selects Phone from the list
 	And she inputs an invalid phone number
 	And submits the enrollment form
