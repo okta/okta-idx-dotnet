@@ -7,6 +7,33 @@
 	And a user named "Mary"
 	And Mary does not have an account in the org
 
+  @Ignore
+  Scenario: 4.1.05: Mary signs up for an account with Password, setups up required Email factor, then skips optional SMS
+    Given The backend bug causing two verification emails is fixed
+    Given Mary navigates to the Self Service Registration View
+    When she fills out her First Name
+    And she fills out her Last Name
+    And she fills out her Email
+    And she submits the registration form
+    Then she sees the Select Authenticator page
+
+    When she chooses password factor option
+    And she submits the select authenticator form
+    Then she sees the set new password form
+    When she fills out her Password
+    And she confirms her Password
+    And she submits the change password form
+
+    Then she sees a list of required factors to setup
+
+    When she selects Email
+    Then she sees a page to input a code
+    When she inputs the correct code from her email
+
+    And she skips optional authenticators if prompted
+    Then she is redirected to the Root View
+    And an application session is created
+
   Scenario: 4.1.1: Mary signs up for an account with Password, setups up required Email factor, then skips optional SMS
 	Given Mary navigates to the Self Service Registration View
 	When she fills out her First Name
