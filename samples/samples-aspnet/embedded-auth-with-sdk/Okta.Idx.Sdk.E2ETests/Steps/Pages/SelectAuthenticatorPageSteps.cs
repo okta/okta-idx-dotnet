@@ -92,6 +92,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         }
 
         [Then(@"she sees the Select Authenticator page with password as the only option")]
+        [Then(@"she sees the Select Authenticator page")]
         public void ThenSheSeesTheSelectAuthenticatorPageWithPasswordAsAnOnlyOption()
         {
             _selectAuthenticatorPageModel.AssertPageOpenedAndValid();
@@ -103,6 +104,13 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         public void WhenSheChoosesPasswordFactorOption()
         {
             _selectAuthenticatorPageModel.PasswordAuthenticator.Click();
+        }
+
+        [When(@"she selects Security Question")]
+        public void WhenSheSelectsSecurityQuestion()
+        {
+            _selectAuthenticatorPageModel.SecurityQuestion.Click();
+            _selectAuthenticatorAsyncPageModel.SubmitButton.Click();
         }
 
         [When(@"she submits the select authenticator form")]

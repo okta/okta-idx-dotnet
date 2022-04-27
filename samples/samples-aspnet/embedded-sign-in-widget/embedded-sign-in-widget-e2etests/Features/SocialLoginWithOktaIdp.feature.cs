@@ -100,15 +100,16 @@ namespace embedded_sign_in_widget_e2etests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Mary Logs in with Okta IDP")]
+        [Xunit.SkippableFactAttribute(DisplayName="Mary Logs in with Okta IDP", Skip="Ignored")]
         [Xunit.TraitAttribute("FeatureTitle", "Social Login with Okta Idp")]
         [Xunit.TraitAttribute("Description", "Mary Logs in with Okta IDP")]
         public virtual void MaryLogsInWithOktaIDP()
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = new string[] {
+                    "ignore"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Mary Logs in with Okta IDP", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 9
+#line 10
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -131,19 +132,19 @@ namespace embedded_sign_in_widget_e2etests.Features
 #line 3
  this.FeatureBackground();
 #line hidden
-#line 10
+#line 11
  testRunner.Given("Mary navigates to the Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 11
+#line 12
  testRunner.When("she clicks the Login with Okta Idp button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 12
+#line 13
  testRunner.And("logs into Okta Idp application", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 13
+#line 14
  testRunner.Then("she is redirected to the sign in widget view", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 14
+#line 15
     testRunner.And("she sees an option for email authenticator", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
