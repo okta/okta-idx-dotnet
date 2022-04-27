@@ -91,6 +91,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
             _selectAuthenticatorPageModel.SubmitButton.Click();
         }
 
+        [Then(@"she sees the Select Authenticator page")]
         [Then(@"she sees the Select Authenticator page with password as the only option")]
         [Then(@"she sees the Select Authenticator page")]
         public void ThenSheSeesTheSelectAuthenticatorPageWithPasswordAsAnOnlyOption()
