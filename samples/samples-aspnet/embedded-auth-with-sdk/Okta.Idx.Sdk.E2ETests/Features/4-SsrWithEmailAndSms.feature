@@ -7,7 +7,7 @@
 	And a user named "Mary"
 	And Mary does not have an account in the org
 
-  @Ignore
+  @ignore
   Scenario: 4.1.05: Mary signs up for an account with Password, setups up required Email factor, then skips optional SMS
     Given The backend bug causing two verification emails is fixed
     Given Mary navigates to the Self Service Registration View
