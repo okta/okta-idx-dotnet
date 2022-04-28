@@ -102,15 +102,16 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="5.2.1: Mary logs in with a social IDP and gets an error message")]
+        [Xunit.SkippableFactAttribute(DisplayName="5.2.1: Mary logs in with a social IDP and gets an error message", Skip="Ignored")]
         [Xunit.TraitAttribute("FeatureTitle", "5.2: Direct Auth Social Login with MFA")]
         [Xunit.TraitAttribute("Description", "5.2.1: Mary logs in with a social IDP and gets an error message")]
         public virtual void _5_2_1MaryLogsInWithASocialIDPAndGetsAnErrorMessage()
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = new string[] {
+                    "Ignore"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("5.2.1: Mary logs in with a social IDP and gets an error message", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 10
+#line 11
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -133,16 +134,16 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 3
   this.FeatureBackground();
 #line hidden
-#line 11
+#line 12
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 12
+#line 13
  testRunner.When("she clicks the Login with Okta button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 13
+#line 14
  testRunner.And("logs in to Okta", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 14
+#line 15
  testRunner.Then("Mary should see an error message \"Multifactor Authentication and Social Identity " +
                         "Providers is not currently supported, Authentication failed.\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

@@ -20,6 +20,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps
         { }
 
         [Given(@"configured Authenticators are Password \(required\), Email \(required\), and SMS \(optional\)")]
+        [Given(@"configured Authenticators are Password \(required\), Email \(required\), and Security Question \(optional\)")]
         public void GivenConfiguredAuthenticatorsArePasswordRequiredEmailRequiredAndSMSOptional()
         { }
 
