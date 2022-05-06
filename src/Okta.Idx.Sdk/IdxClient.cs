@@ -261,9 +261,9 @@ namespace Okta.Idx.Sdk
             if (Configuration.IsConfidentialClient)
             {
                 payload.Add("client_secret", Configuration.ClientSecret);
-                if (!string.IsNullOrEmpty(requestContext?.XDeviceToken))
+                if (!string.IsNullOrEmpty(requestContext?.DeviceToken))
                 {
-                    headers.Add(RequestHeaders.XDeviceToken, requestContext.XDeviceToken);
+                    headers.Add(RequestHeaders.XDeviceToken, requestContext.DeviceToken);
                 }
                 else if (!string.IsNullOrEmpty(Configuration.DeviceToken))
                 {

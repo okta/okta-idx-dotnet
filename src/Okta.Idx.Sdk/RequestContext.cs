@@ -20,7 +20,7 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the x-device-token header.
         /// </summary>
         /// <remarks>For confidential clients only. The SDK will not send this header if the client is public (no client secret provided). </remarks>
-        public string XDeviceToken
+        public string DeviceToken
         {
             get => GetHeader(RequestHeaders.XDeviceToken);
             set => UseHeader(RequestHeaders.XDeviceToken, value);
@@ -39,7 +39,7 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets or sets the x-okta-user-agent-extended header
         /// </summary>
-        public string XOktaUserAgentExtended
+        public string OktaUserAgentExtended
         {
             get => GetHeader(RequestHeaders.XOktaUserAgentExtended);
             set => UseHeader(RequestHeaders.XOktaUserAgentExtended, value);

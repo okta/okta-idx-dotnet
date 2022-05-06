@@ -78,9 +78,9 @@ The request context object specifies the headers to be used in methods that boot
 ```csharp
 var requestContext = new RequestContext
                     {
-                        XDeviceToken = "deviceToken",
-                        XOktaUserAgentExtended = "MyXUserAgent",
-                        XForwardedFor = "MyForwardedFor",
+                        DeviceToken = "deviceToken",
+                        OktaUserAgentExtended = "MyXUserAgent",
+                        XForwardedFor = "10.1.1.1",
                     };
 
 var authResponse = await _idxClient..AuthenticateAsync(authenticationOptions: options, requestContext: requestContext).ConfigureAwait(false);

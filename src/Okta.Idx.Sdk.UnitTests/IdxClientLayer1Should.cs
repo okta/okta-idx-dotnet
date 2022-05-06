@@ -58,8 +58,8 @@ namespace Okta.Idx.Sdk.UnitTests
             var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
             var requestContext = new RequestContext
             {
-                XDeviceToken = "deviceToken",
-                XOktaUserAgentExtended = "MyXUserAgent",
+                DeviceToken = "deviceToken",
+                OktaUserAgentExtended = "MyXUserAgent",
                 XForwardedFor = "MyForwardedFor",
             };
 
@@ -88,8 +88,8 @@ namespace Okta.Idx.Sdk.UnitTests
             var rawResponse = @"{ 'interaction_handle' : 'foo' }";
             var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
             var requestContext = new RequestContext();
-            requestContext.XDeviceToken = "deviceToken";
-            requestContext.XOktaUserAgentExtended = "MyXUserAgent";
+            requestContext.DeviceToken = "deviceToken";
+            requestContext.OktaUserAgentExtended = "MyXUserAgent";
             requestContext.XForwardedFor = "MyForwardedFor";
 
             var testClient = new TesteableIdxClient(
