@@ -1,10 +1,17 @@
 # Changelog
 
+## 2.2.0
+
+### Features
+
+* Add support for security question.
+* Add support for sending device token, user agent and IP address headers in methods that bootstraps a new authentication flow. The device token via client configuration has been deprecated.
+
 ## 2.1.0
 
 ### Features
 
-* Add support for optional Password.
+* Add support for optional Password. 
 
 ## 2.0.1
 
