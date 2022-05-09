@@ -9,6 +9,7 @@ using Okta.Sdk.Configuration;
 using OpenQA.Selenium;
 using OtpNet;
 using ZXing;
+using ZXing.Windows.Compatibility;
 
 namespace embedded_auth_with_sdk.E2ETests.Helpers
 {
