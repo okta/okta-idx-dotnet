@@ -44,16 +44,18 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="authenticationOptions">The authentication options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default);
+        Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Initiates the password recovery flow
         /// </summary>
         /// <param name="recoverPasswordOptions">The password recovery options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default);
+        Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Resend Code
@@ -113,8 +115,9 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="userProfile">The user profile. Contains all the dynamic properties required for registration.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default);
+        Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Select an authenticator to start the enrollment flow.
@@ -210,8 +213,9 @@ namespace Okta.Idx.Sdk
         /// Start an interaction to be completed by the sign-in widget.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param> 
         /// <returns>The widget sign in response.</returns>
-        Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default);
+        Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Skips optional authenticators
@@ -226,8 +230,9 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="state">The state handle to use or null to autogenerate.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
         /// <returns>The identity providers response.</returns>
-        Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default);
+        Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Gets available identity providers.
@@ -250,8 +255,9 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="state">The state handle to use or null to autogenerate.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
         /// <returns>The password required response.</returns>
-        Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(string state = null, CancellationToken cancellationToken = default);
+        Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(string state = null, CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Determines if password is required.

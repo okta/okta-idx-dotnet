@@ -44,12 +44,8 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// The request context to be used when making requests.
         /// </summary>
-        private RequestContext _requestContext;
+        private Okta.Sdk.Abstractions.RequestContext _deprecatedRequestContext;
 
-        /// <summary>
-        /// The device context used during IDX bootstrapping.
-        /// </summary>
-        private DeviceContext _deviceContext;
 
         private ILogger _logger;
 
@@ -73,17 +69,14 @@ namespace Okta.Idx.Sdk
         /// </param>
         /// <param name="httpClient">The HTTP client to use for requests to the Okta API.</param>
         /// <param name="logger">The logging interface to use, if any.</param>
-        /// <param name="deviceContext">The device context which specifies the headers to be used during the client's bootstrapping. These headers are *only* sent when calling the /interact endpoint.</param>
         public IdxClient(
             IdxConfiguration configuration = null,
             HttpClient httpClient = null,
-            ILogger logger = null,
-            DeviceContext deviceContext = null)
+            ILogger logger = null)
         {
             Configuration = GetConfigurationOrDefault(configuration);
             IdxConfigurationValidator.Validate(Configuration);
             _logger = logger ?? NullLogger.Instance;
-            _deviceContext = deviceContext;
 
             var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
 
@@ -146,11 +139,11 @@ namespace Okta.Idx.Sdk
         /// <param name="configuration">The client configuration.</param>
         /// <param name="requestContext">The request context, if any.</param>
         /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
-        protected IdxClient(IDataStore dataStore, IdxConfiguration configuration, RequestContext requestContext)
+        protected IdxClient(IDataStore dataStore, IdxConfiguration configuration, Okta.Sdk.Abstractions.RequestContext requestContext)
         {
             _dataStore = dataStore ?? throw new ArgumentNullException(nameof(dataStore));
             Configuration = configuration;
-            _requestContext = requestContext;
+            _deprecatedRequestContext = requestContext;
         }
 
         /// <summary>
@@ -158,14 +151,12 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="requestExecutor">The <see cref="IRequestExecutor">Request Executor</see> to use.</param>
         /// <param name="configuration">The client configuration.</param>
-        /// <param name="requestContext">The request context, if any.</param>
         /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
-        protected IdxClient(IRequestExecutor requestExecutor, IdxConfiguration configuration, RequestContext requestContext)
+        protected IdxClient(IRequestExecutor requestExecutor, IdxConfiguration configuration)
         {
             Configuration = configuration;
 
             var userAgentBuilder = new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version);
-            _requestContext = requestContext;
 
             // TODO: Allow proxy configuration
             this.httpClient = httpClient ?? DefaultHttpClient.Create(
@@ -184,16 +175,6 @@ namespace Okta.Idx.Sdk
                 NullLogger.Instance,
                 userAgentBuilder);
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="IdxClient"/> class.
-        /// </summary>
-        /// <param name="requestExecutor">The <see cref="IRequestExecutor">Request Executor</see> to use.</param>
-        /// <param name="configuration">The client configuration.</param>
-        /// <param name="deviceContext">The device context which specifies the headers to be used during the client's bootstrapping. These headers are *only* sent when calling the /interact endpoint</param>
-        /// <remarks>This overload is used internally to create cheap copies of an existing client.</remarks>
-        protected IdxClient(IRequestExecutor requestExecutor, IdxConfiguration configuration, DeviceContext deviceContext)
-            : this(requestExecutor, configuration, (RequestContext)null) => _deviceContext = deviceContext;
 
         private IdxConfiguration configuration;
 
@@ -236,7 +217,7 @@ namespace Okta.Idx.Sdk
         /// <param name="activationToken">The activation token. Optional.</param>
         /// <param name="recoveryToken">The recovery token. Optional.</param>
         /// <returns>The IDX context.</returns>
-        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null, string recoveryToken = null)
+        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null, string recoveryToken = null, RequestContext requestContext = null)
         {
             // PKCE props
             state = state ?? GenerateSecureRandomString(16);
@@ -245,11 +226,11 @@ namespace Okta.Idx.Sdk
 
             Dictionary<string, string> headers;
 
-            if (_deviceContext?.Headers != null)
+            if (requestContext?.Headers != null)
             {
-                // Include all headers but DeviceToken which is for confidential clients only
-                headers = new Dictionary<string, string>(_deviceContext.Headers.Where(x =>
-                                                        !x.Key.Equals(RequestHeaders.XDeviceToken, StringComparison.InvariantCultureIgnoreCase))
+                // Include all headers but x-device-token and x-forwarded-for which is for confidential clients only
+                headers = new Dictionary<string, string>(requestContext.Headers.Where(x =>
+                                                        !x.Key.Equals(RequestHeaders.XDeviceToken, StringComparison.InvariantCultureIgnoreCase) && !x.Key.Equals(RequestHeaders.XForwardedFor, StringComparison.InvariantCultureIgnoreCase))
                                                         .ToDictionary(x => x.Key, x => x.Value));
             }
 
@@ -280,14 +261,18 @@ namespace Okta.Idx.Sdk
             if (Configuration.IsConfidentialClient)
             {
                 payload.Add("client_secret", Configuration.ClientSecret);
-                if (_deviceContext?.Headers?.Any(x =>
-                    x.Key.Equals(RequestHeaders.XDeviceToken, StringComparison.InvariantCultureIgnoreCase)) ?? false)
+                if (!string.IsNullOrEmpty(requestContext?.DeviceToken))
                 {
-                    headers.Add(RequestHeaders.XDeviceToken, _deviceContext.Headers[RequestHeaders.XDeviceToken]);
+                    headers.Add(RequestHeaders.XDeviceToken, requestContext.DeviceToken);
                 }
                 else if (!string.IsNullOrEmpty(Configuration.DeviceToken))
                 {
                     headers.Add(RequestHeaders.XDeviceToken, Configuration.DeviceToken);
+                }
+
+                if (!string.IsNullOrEmpty(requestContext?.XForwardedFor))
+                {
+                    headers.Add(RequestHeaders.XForwardedFor, requestContext.XForwardedFor);
                 }
             }
 
@@ -348,9 +333,9 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default)
+        public async Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
-            IIdxContext idxContext = await this.InteractAsync(state, cancellationToken);
+            IIdxContext idxContext = await this.InteractAsync(requestContext: requestContext, state: state, cancellationToken: cancellationToken);
             return await GetIdentityProvidersAsync(idxContext, cancellationToken);
         }
 
@@ -377,9 +362,9 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default)
+        public async Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
-            var idxContext = await this.InteractAsync(cancellationToken: cancellationToken);
+            var idxContext = await this.InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken);
             return new WidgetSignInResponse
             {
                 IdxContext = idxContext,
@@ -454,11 +439,12 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public IOktaClient CreateScoped(RequestContext requestContext)
+        [Obsolete("This method has been deprecated and will be removed in the next major version. You can pass your request context in specific methods of the client.")]
+        public IOktaClient CreateScoped(Okta.Sdk.Abstractions.RequestContext requestContext)
             => new IdxClient(_dataStore, Configuration, requestContext);
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
+        public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
             var isPasswordFlow = !string.IsNullOrEmpty(authenticationOptions.Password);
 
@@ -469,7 +455,7 @@ namespace Okta.Idx.Sdk
 
             // assume users will log in with the authenticator they want
 
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Common request payload
@@ -512,9 +498,9 @@ namespace Okta.Idx.Sdk
                     introspectResponse);
         }
 
-        private async Task<AuthenticationResponse> AuthenticateWithPasswordAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
+        private async Task<AuthenticationResponse> AuthenticateWithPasswordAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Check if identify flow include credentials
@@ -936,9 +922,9 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default)
+        public async Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken, recoveryToken: recoverPasswordOptions.RecoveryToken);
+            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken, recoveryToken: recoverPasswordOptions.RecoveryToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             if (!string.IsNullOrEmpty(recoverPasswordOptions.RecoveryToken))
@@ -1408,9 +1394,9 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default)
+        public async Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
-            var idxContext = await InteractAsync(cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             var enrollRequest = new IdxRequestPayload
@@ -1630,7 +1616,7 @@ namespace Okta.Idx.Sdk
         /// <returns>The collection client.</returns>
         protected CollectionClient<T> GetCollectionClient<T>(HttpRequest initialRequest)
             where T : IResource
-            => new CollectionClient<T>(_dataStore, initialRequest, _requestContext);
+            => new CollectionClient<T>(_dataStore, initialRequest, _deprecatedRequestContext);
 
         /// <inheritdoc/>
         public Task<T> GetAsync<T>(string href, CancellationToken cancellationToken = default(CancellationToken))
@@ -1641,7 +1627,7 @@ namespace Okta.Idx.Sdk
         public async Task<T> GetAsync<T>(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
             where T : BaseResource, new()
         {
-            var response = await _dataStore.GetAsync<T>(request, _requestContext, cancellationToken).ConfigureAwait(false);
+            var response = await _dataStore.GetAsync<T>(request, _deprecatedRequestContext, cancellationToken).ConfigureAwait(false);
             return response?.Payload;
         }
 
@@ -1675,7 +1661,7 @@ namespace Okta.Idx.Sdk
         public async Task<TResponse> PostAsync<TResponse>(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
             where TResponse : BaseResource, new()
         {
-            var response = await _dataStore.PostAsync<TResponse>(request, _requestContext, cancellationToken).ConfigureAwait(false);
+            var response = await _dataStore.PostAsync<TResponse>(request, _deprecatedRequestContext, cancellationToken).ConfigureAwait(false);
             return response?.Payload;
         }
 
@@ -1696,7 +1682,7 @@ namespace Okta.Idx.Sdk
         public async Task<TResponse> PutAsync<TResponse>(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
             where TResponse : BaseResource, new()
         {
-            var response = await _dataStore.PutAsync<TResponse>(request, _requestContext, cancellationToken).ConfigureAwait(false);
+            var response = await _dataStore.PutAsync<TResponse>(request, _deprecatedRequestContext, cancellationToken).ConfigureAwait(false);
             return response?.Payload;
         }
 
@@ -1706,7 +1692,7 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public Task DeleteAsync(HttpRequest request, CancellationToken cancellationToken = default(CancellationToken))
-            => _dataStore.DeleteAsync(request, _requestContext, cancellationToken);
+            => _dataStore.DeleteAsync(request, _deprecatedRequestContext, cancellationToken);
 
         /// <inheritdoc/>
         public async Task<TResponse> SendAsync<TResponse>(HttpRequest request, HttpVerb httpVerb, CancellationToken cancellationToken = default)
@@ -1972,9 +1958,9 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
-        public async Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(string state = null, CancellationToken cancellationToken = default)
+        public async Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(string state = null, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
-            var idxContext = await this.InteractAsync(state, cancellationToken);
+            var idxContext = await this.InteractAsync(requestContext: requestContext, state: state, cancellationToken: cancellationToken);
             return await CheckIsPasswordRequiredAsync(idxContext, cancellationToken);
         }
 

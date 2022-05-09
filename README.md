@@ -34,7 +34,7 @@ This library uses semantic versioning and follows Okta's [Library Version Policy
 
 | Version | Status                             |
 | ------- | ---------------------------------- |
-| 1.0.0    | ✔️ Stable |
+| 2.0.0    | ✔️ Stable |
 
 The latest release can always be found on the [releases page][github-releases].
 
@@ -71,20 +71,22 @@ var client = new IdxClient(new IdxConfiguration()
                 RedirectUri = "{YOUR_REDIRECT_URI}", // Must match the redirect uri in client app settings/console
             });
 ```
-#### Provide your device context to be used during the client's bootstrapping
+#### Provide your request context to be used during the authentication flow bootstrapping
 
-The device context object specifies the headers to be used during the client's bootstrapping. These headers are *only* sent when calling the /interact endpoint.
+The request context object specifies the headers to be used in methods that bootstraps a new authentication flow. In other words, these headers are *only* sent when calling the /interact endpoint.
 
 ```csharp
-var deviceContext = new DeviceContext();
-deviceContext.UseHeader(RequestHeaders.XDeviceToken, "deviceToken"); // Only for confidential clients
-deviceContext.UseHeader(RequestHeaders.UserAgent, "MyUserAgent");
-deviceContext.UseHeader(RequestHeaders.XOktaUserAgentExtended, "MyXUserAgent");
-deviceContext.UseHeader(RequestHeaders.XForwardedFor, "MyForwardedFor");
+var requestContext = new RequestContext
+                    {
+                        DeviceToken = "deviceToken",
+                        OktaUserAgentExtended = "MyXUserAgent",
+                        XForwardedFor = "10.1.1.1",
+                    };
 
-var client =  new IdxClient(..., deviceContext);
+var authResponse = await _idxClient..AuthenticateAsync(authenticationOptions: options, requestContext: requestContext).ConfigureAwait(false);
 ```
-> Note: The device token header will be only included for confidential clients.
+
+> Note: The `x-device-token` and `x-forwarded-for` headers will be only included for confidential clients.
 
 ### Authenticate users
 

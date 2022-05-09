@@ -18,18 +18,16 @@ namespace Okta.Idx.Sdk.UnitTests
             RedirectUri = "https://fake.example.com/redirectUri",
             //ClientSecret = "bar"
         };
-        public TesteableIdxClient(IRequestExecutor requestExecutor, DeviceContext deviceContext = null)
+        public TesteableIdxClient(IRequestExecutor requestExecutor)
             : base(
                 requestExecutor,
-                DefaultFakeConfiguration,
-                deviceContext)
+                DefaultFakeConfiguration)
         {
         }
 
-        public TesteableIdxClient(IRequestExecutor requestExecutor, IdxConfiguration configuration, DeviceContext deviceContext = null)
+        public TesteableIdxClient(IRequestExecutor requestExecutor, IdxConfiguration configuration)
             : base(
         requestExecutor,
-        configuration,
-        deviceContext) {}
+        configuration) {}
     }
 }
