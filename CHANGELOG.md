@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.1
+
+### Updates
+
+* Send method type when selecting email as a challenge authenticator to avoid additional email selection.
+
 ## 2.2.0
 
 ### Features
