@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -773,7 +772,7 @@ namespace Okta.Idx.Sdk
                 id = selectAuthenticatorOptions.AuthenticatorId,
             });
 
-            return await SelectChallengeAuthenticatorAsync(request, idxContext, cancellationToken);
+            return await SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions.AuthenticatorId, request, idxContext, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -785,7 +784,7 @@ namespace Okta.Idx.Sdk
                 id = selectAuthenticatorOptions.AuthenticatorId,
             });
 
-            return await SelectChallengeAuthenticatorAsync(request, idxContext, cancellationToken);
+            return await SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions.AuthenticatorId, request, idxContext, cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -817,7 +816,7 @@ namespace Okta.Idx.Sdk
             throw new UnexpectedRemediationException(RemediationType.SuccessWithInteractionCode, skipResponse);
         }
 
-        private async Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(IdxRequestPayload idxRequestPayload, IIdxContext idxContext, CancellationToken cancellationToken = default)
+        private async Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(string authenticatorId, IdxRequestPayload idxRequestPayload, IIdxContext idxContext, CancellationToken cancellationToken = default)
         {
             // Re-entry flow with context
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
@@ -831,6 +830,17 @@ namespace Okta.Idx.Sdk
                         RemediationType.ChallengeAuthenticator,
                         RemediationType.SelectAuthenticatorAuthenticate,
                     }, introspectResponse);
+            }
+
+            // If email is selected send the methodType as well to avoid selecting email twice - OKTA-493187
+            if (introspectResponse.Authenticators?.Value?.Any(x =>
+                x.Id == authenticatorId && x.Key == AuthenticatorType.Email.ToIdxKeyString()) ?? false)
+            {
+                idxRequestPayload.SetProperty("authenticator", new
+                {
+                    id = authenticatorId,
+                    methodType = "email",
+                });
             }
 
             idxRequestPayload.StateHandle = introspectResponse.StateHandle;
