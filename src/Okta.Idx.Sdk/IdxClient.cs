@@ -1091,11 +1091,24 @@ namespace Okta.Idx.Sdk
             {
                 StateHandle = recoveryResponse.StateHandle,
             };
-
-            selectAuthenticatorRequest.SetProperty("authenticator", new
+            // If email is selected send the methodType as well to avoid selecting email twice - OKTA-493187
+            if (introspectResponse.Authenticators?.Value?.Any(x =>
+                x.Id == selectAuthenticatorOptions.AuthenticatorId &&
+                x.Key == AuthenticatorType.Email.ToIdxKeyString()) ?? false)
             {
-                id = selectAuthenticatorOptions.AuthenticatorId,
-            });
+                selectAuthenticatorRequest.SetProperty("authenticator", new
+                {
+                    id = selectAuthenticatorOptions.AuthenticatorId,
+                    methodType = "email",
+                });
+            }
+            else
+            {
+                selectAuthenticatorRequest.SetProperty("authenticator", new
+                {
+                    id = selectAuthenticatorOptions.AuthenticatorId,
+                });
+            }
 
             var selectRecoveryAuthenticatorRemediationOption = await recoveryResponse
                     .ProceedWithRemediationOptionAsync(RemediationType.SelectAuthenticatorAuthenticate, selectAuthenticatorRequest, cancellationToken);
