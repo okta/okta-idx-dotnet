@@ -1,4 +1,6 @@
-﻿namespace embedded_auth_with_sdk.Models
+﻿using Okta.Idx.Sdk;
+
+namespace embedded_auth_with_sdk.Models
 {
     public class OktaVerifyPollResponseModel
     {

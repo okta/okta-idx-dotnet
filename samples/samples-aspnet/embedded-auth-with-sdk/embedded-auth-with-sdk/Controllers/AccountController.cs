@@ -7,6 +7,7 @@ using embedded_auth_with_sdk.Models;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 using Okta.Sdk.Abstractions;
+using System.Configuration;
 
 namespace embedded_auth_with_sdk.Controllers
 {
@@ -30,8 +31,9 @@ namespace embedded_auth_with_sdk.Controllers
         public async Task<ActionResult> Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
+            bool alwaysRenderPasswordField = bool.Parse(ConfigurationManager.AppSettings["RenderPasswordField"] ?? "false");
             IdentityProvidersResponse identityProvidersResponse = await _idxClient.GetIdentityProvidersAsync();
-            bool shouldRenderPasswordField = (await _idxClient.CheckIsPasswordRequiredAsync(identityProvidersResponse.Context)).IsPasswordRequired;
+            bool shouldRenderPasswordField = (await _idxClient.CheckIsPasswordRequiredAsync(identityProvidersResponse.Context)).IsPasswordRequired || alwaysRenderPasswordField;
 
             // save the context in session, keyed by state handle, so it can be retrieved on callback.  See InteractionCodeController.Callback
             Session[identityProvidersResponse.State] = identityProvidersResponse.Context;
@@ -41,7 +43,7 @@ namespace embedded_auth_with_sdk.Controllers
                 IdpOptions = identityProvidersResponse.IdpOptions,  // You can keep IdpOptions unset (set to null) if you don't want or need social login buttons
                 ShouldRenderPasswordField = shouldRenderPasswordField,
             };
-
+            
             if (TempData.ContainsKey("TerminalStateMessage"))
             {
                 ModelState.AddModelError(string.Empty, (string)TempData["TerminalStateMessage"]);

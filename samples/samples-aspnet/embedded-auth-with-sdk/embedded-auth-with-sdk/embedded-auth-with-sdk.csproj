@@ -450,6 +450,7 @@
     <Content Include="Views\SecurityQuestion\EnrollSecurityQuestion.cshtml" />
     <Content Include="Views\SecurityQuestion\EnrollCustomSecurityQuestion.cshtml" />
     <Content Include="Views\SecurityQuestion\VerifyAuthenticator.cshtml" />
+    <Content Include="Views\OktaVerify\AuthenticationFailed.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

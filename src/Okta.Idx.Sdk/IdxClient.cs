@@ -1921,6 +1921,15 @@ namespace Okta.Idx.Sdk
                 StateHandle = introspectResponse.StateHandle,
             };
 
+            if (introspectResponse.ContainsRemediationOption(RemediationType.Resend, out IRemediationOption resendRemediationOption))
+            {
+                return new PollResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Failed,
+                    ContinuePolling = false,
+                };
+            }
+
             if (!introspectResponse.ContainsRemediationOption(RemediationType.ChallengePoll))
             {
                 throw new UnexpectedRemediationException(RemediationType.ChallengePoll, introspectResponse);
