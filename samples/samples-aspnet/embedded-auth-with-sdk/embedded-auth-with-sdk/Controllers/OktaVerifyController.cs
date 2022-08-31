@@ -219,7 +219,7 @@
                     Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authenticationResponse.Authenticators);
                     return RedirectToAction("SelectAuthenticator", "Manage");
                 default:
-                    return View("Login");
+                    return View("Login", "Account");
             }            
         }
 
