@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.2
+
+* Properly handle Okta Verify push rejection.
+
 ## 2.2.1
 
 ### Updates
