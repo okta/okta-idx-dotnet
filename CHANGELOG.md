@@ -2,6 +2,8 @@
 
 ## 2.2.2
 
+### Bug Fixes
+
 * Properly handle Okta Verify push rejection.
 
 ## 2.2.1
