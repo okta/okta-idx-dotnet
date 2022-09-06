@@ -41,6 +41,11 @@ namespace Okta.Idx.Sdk
         public static readonly string SelectAuthenticatorAuthenticate = "select-authenticator-authenticate";
 
         /// <summary>
+        /// resend
+        /// </summary>
+        public static readonly string Resend = "resend";
+
+        /// <summary>
         /// reset-authenticator
         /// </summary>
         public static readonly string ResetAuthenticator = "reset-authenticator";

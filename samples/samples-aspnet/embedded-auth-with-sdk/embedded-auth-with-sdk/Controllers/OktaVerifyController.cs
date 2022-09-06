@@ -23,7 +23,10 @@
         public ActionResult SelectAuthenticatorMethod()
         {
             var model = (OktaVerifySelectAuthenticatorMethodModel)Session[nameof(OktaVerifySelectAuthenticatorMethodModel)];
-
+            if (!string.IsNullOrEmpty(model.Message))
+            {
+                ModelState.AddModelError("", model.Message);
+            }
             return View(model);
         }
 
@@ -179,8 +182,7 @@
                         case "totp":
                             return View("EnterCode");
                         case "push":
-                            return View("PushSent",
-                                new OktaVerifySelectAuthenticatorMethodModel());
+                            return View("PushSent", model);
                     }
                 }
             }
@@ -217,7 +219,7 @@
                     Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authenticationResponse.Authenticators);
                     return RedirectToAction("SelectAuthenticator", "Manage");
                 default:
-                    return View("Login");
+                    return View("Login", "Account");
             }            
         }
 
@@ -228,13 +230,25 @@
             {
                 Refresh = pollResponse.Refresh ?? 4000,
                 ContinuePolling = pollResponse.ContinuePolling,
-                Next = "/Home/Index"
             };
 
             if (!pollResponse.ContinuePolling)
             {
-                ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, pollResponse.TokenInfo);
-                _authenticationManager.SignIn(new AuthenticationProperties(), identity);                
+                switch (pollResponse.AuthenticationStatus)
+                {
+                    case AuthenticationStatus.Success:
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, pollResponse.TokenInfo);
+                        _authenticationManager.SignIn(new AuthenticationProperties(), identity);
+                        pollViewModel.Next = "/Home/Index";
+                        break;
+                    case AuthenticationStatus.PushChallengeFailed:
+                        var model = (OktaVerifySelectAuthenticatorMethodModel)Session[nameof(OktaVerifySelectAuthenticatorMethodModel)];
+                        model.Message = "Authentication failed";
+                        pollViewModel.Next = "/OktaVerify/SelectAuthenticatorMethod";
+                        break;
+                    default:
+                        return View("Login", "Account");
+                }
             }
 
             return Json(pollViewModel, JsonRequestBehavior.AllowGet);

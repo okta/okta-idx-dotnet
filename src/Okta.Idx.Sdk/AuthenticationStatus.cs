@@ -54,5 +54,10 @@ namespace Okta.Idx.Sdk
         /// Waiting for an authenticator selection to continue with the authentication process.
         /// </summary>
         AwaitingChallengeAuthenticatorSelection,
+
+        /// <summary>
+        /// Okta Verify push challenge rejected.
+        /// </summary>
+        PushChallengeFailed,
     }
 }

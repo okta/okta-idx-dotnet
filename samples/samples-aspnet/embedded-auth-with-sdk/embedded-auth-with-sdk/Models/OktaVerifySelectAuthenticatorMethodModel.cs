@@ -21,5 +21,7 @@ namespace embedded_auth_with_sdk.Models
 
         public IList<AuthenticatorMethodType> MethodTypes { get; set; }
 
+        public string Message { get; set; }
+
     }
 }
