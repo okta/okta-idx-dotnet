@@ -241,7 +241,7 @@
                         _authenticationManager.SignIn(new AuthenticationProperties(), identity);
                         pollViewModel.Next = "/Home/Index";
                         break;
-                    case AuthenticationStatus.Failed:
+                    case AuthenticationStatus.PushChallengeFailed:
                         var model = (OktaVerifySelectAuthenticatorMethodModel)Session[nameof(OktaVerifySelectAuthenticatorMethodModel)];
                         model.Message = "Authentication failed";
                         pollViewModel.Next = "/OktaVerify/SelectAuthenticatorMethod";

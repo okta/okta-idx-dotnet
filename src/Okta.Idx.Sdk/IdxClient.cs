@@ -1925,7 +1925,7 @@ namespace Okta.Idx.Sdk
             {
                 return new PollResponse
                 {
-                    AuthenticationStatus = AuthenticationStatus.Failed,
+                    AuthenticationStatus = AuthenticationStatus.PushChallengeFailed,
                     ContinuePolling = false,
                 };
             }

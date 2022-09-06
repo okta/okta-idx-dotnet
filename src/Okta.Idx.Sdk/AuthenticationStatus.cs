@@ -58,6 +58,6 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Failed.
         /// </summary>
-        Failed,
+        PushChallengeFailed,
     }
 }
