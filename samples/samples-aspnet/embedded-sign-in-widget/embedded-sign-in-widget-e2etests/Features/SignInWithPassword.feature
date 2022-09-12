@@ -5,6 +5,7 @@
 	And the list of Authenticators contains Email and Password
 	And a User named Mary exists, and this user has already setup email and password factors
 
+  @ignore
   Scenario: Mary logs in with a Password
 	Given Mary navigates to the Embedded Widget View
 	When she fills in her correct username
