@@ -5,6 +5,7 @@
 	And a user named "Mary"
 	And Mary is a user with a verified email and a set password
 
+  @Ignore
   Scenario: 3.1.1 Mary resets her password
 	Given Mary navigates to the Self Service Password Reset View
 	When she inputs her correct Email
@@ -21,6 +22,7 @@
 	And she submits the change password form
 	Then she is redirected to the Root Page is provided
 	
+  @Ignore
   Scenario: 3.1.2 Mary tries to reset a password with the wrong email
 	Given Mary navigates to the Self Service Password Reset View
 	Then she sees the Password Recovery Page
