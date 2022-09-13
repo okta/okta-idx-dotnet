@@ -26,4 +26,4 @@
 	Then she sees the Password Recovery Page
 	When she inputs an Email that doesn't exist
 	And she submits the recovery form
-	Then she sees a message "There is no account with the Username {username}." 
+	Then she sees a message "Authentication failed" 
