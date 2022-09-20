@@ -197,7 +197,7 @@ namespace embedded_auth_with_sdk.E2ETests.Features
  testRunner.And("she submits the recovery form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 29
- testRunner.Then("she sees a message \"There is no account with the Username {username}.\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("she sees a message \"Authentication failed\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
