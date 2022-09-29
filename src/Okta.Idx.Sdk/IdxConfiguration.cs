@@ -41,6 +41,16 @@ namespace Okta.Idx.Sdk.Configuration
         /// </summary>
         public string RedirectUri { get; set; }
 
+        /// <summary>
+        /// Gets or sets the acrvalue URI.
+        /// </summary>
+        public string AcrValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets yje login_hint.
+        /// </summary>
+        public string LoginHint { get; set; }
+
         public bool IsConfidentialClient => !string.IsNullOrEmpty(ClientSecret) &&
                                                 ClientSecret.IndexOf("{ClientSecret}", StringComparison.OrdinalIgnoreCase) == -1;
     }
