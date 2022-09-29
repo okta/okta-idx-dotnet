@@ -150,6 +150,20 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
+        public async Task UseLoginHintWhenCallingInteract()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+            testClient.Configuration.AcrValue = "urn:okta:app:mfa:attestation";
+            testClient.Configuration.LoginHint = "Test.User@okta.com";
+            var idxContext = await testClient.InteractAsync("bar");
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"acr_values\":\"urn:okta:app:mfa:attestation\"");
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"login_hint\":\"Test.User@okta.com\"");
+            idxContext.State.Should().Be("bar");
+        }
+
+        [Fact]
         public async Task PassRecoveryTokenWhenCallingInteract()
         {
             var rawResponse = @"{ 'interaction_handle' : 'foo' }";
