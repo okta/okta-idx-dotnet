@@ -216,7 +216,7 @@ namespace Okta.Idx.Sdk
         /// <param name="activationToken">The activation token. Optional.</param>
         /// <param name="recoveryToken">The recovery token. Optional.</param>
         /// <returns>The IDX context.</returns>
-        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null, string recoveryToken = null, RequestContext requestContext = null)
+        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null, string recoveryToken = null, RequestContext requestContext = null, string userName = null)
         {
             // PKCE props
             state = state ?? GenerateSecureRandomString(16);
@@ -260,11 +260,12 @@ namespace Okta.Idx.Sdk
             if (!string.IsNullOrWhiteSpace(Configuration.AcrValue))
             {
                 payload.Add("acr_values", Configuration.AcrValue);
-            }
 
-            if (!string.IsNullOrWhiteSpace(Configuration.LoginHint))
-            {
-                payload.Add("login_hint", Configuration.LoginHint);
+                // Add login_hint only if acr_values is set
+                if (!string.IsNullOrWhiteSpace(userName))
+                {
+                    payload.Add("login_hint", userName);
+                }
             }
 
             if (Configuration.IsConfidentialClient)
@@ -464,7 +465,7 @@ namespace Okta.Idx.Sdk
 
             // assume users will log in with the authenticator they want
 
-            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken, userName: authenticationOptions.Username);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Common request payload
