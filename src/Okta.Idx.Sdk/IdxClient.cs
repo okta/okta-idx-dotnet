@@ -215,6 +215,8 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token. Optional.</param>
         /// <param name="activationToken">The activation token. Optional.</param>
         /// <param name="recoveryToken">The recovery token. Optional.</param>
+        /// <param name="requestContext">The request context. Optional.</param>
+        /// <param name="userName ">The username/login_hint. This value is sent only when ACR Values property is specified via configuration. Optional.</param>
         /// <returns>The IDX context.</returns>
         internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null, string recoveryToken = null, RequestContext requestContext = null, string userName = null)
         {
