@@ -215,8 +215,10 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token. Optional.</param>
         /// <param name="activationToken">The activation token. Optional.</param>
         /// <param name="recoveryToken">The recovery token. Optional.</param>
+        /// <param name="requestContext">The request context. Optional.</param>
+        /// <param name="userName ">The username/login_hint. This value is sent only when ACR Values property is specified via configuration. Optional.</param>
         /// <returns>The IDX context.</returns>
-        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null, string recoveryToken = null, RequestContext requestContext = null)
+        internal async Task<IIdxContext> InteractAsync(string state = null, CancellationToken cancellationToken = default, string activationToken = null, string recoveryToken = null, RequestContext requestContext = null, string userName = null)
         {
             // PKCE props
             state = state ?? GenerateSecureRandomString(16);
@@ -256,6 +258,17 @@ namespace Okta.Idx.Sdk
                 { "redirect_uri", Configuration.RedirectUri },
                 { "state", state },
             };
+
+            if (!string.IsNullOrWhiteSpace(Configuration.AcrValue))
+            {
+                payload.Add("acr_values", Configuration.AcrValue);
+
+                // Add login_hint only if acr_values is set
+                if (!string.IsNullOrWhiteSpace(userName))
+                {
+                    payload.Add("login_hint", userName);
+                }
+            }
 
             if (Configuration.IsConfidentialClient)
             {
@@ -454,19 +467,22 @@ namespace Okta.Idx.Sdk
 
             // assume users will log in with the authenticator they want
 
-            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken, userName: authenticationOptions.Username);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Common request payload
             var identifyRequest = new IdxRequestPayload();
             identifyRequest.StateHandle = introspectResponse.StateHandle;
             identifyRequest.SetProperty("identifier", authenticationOptions.Username);
-
-            var identifyResponse = await introspectResponse
+            var identifyResponse = introspectResponse;
+            if (identifyResponse.ContainsRemediationOption(RemediationType.Identify))
+            {
+                identifyResponse = await introspectResponse
                                             .Remediation
                                             .RemediationOptions
                                             .FirstOrDefault(x => x.Name == RemediationType.Identify)
                                             .ProceedAsync(identifyRequest, cancellationToken);
+            }
 
             if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
             {
@@ -735,11 +751,11 @@ namespace Okta.Idx.Sdk
             if (resetPasswordResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
             {
                 return new AuthenticationResponse
-                           {
-                               IdxContext = idxContext,
-                               AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
-                               Authenticators = IdxResponseHelper.ConvertToAuthenticators(resetPasswordResponse.Authenticators.Value, resetPasswordResponse.AuthenticatorEnrollments.Value),
-                           };
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
+                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(resetPasswordResponse.Authenticators.Value, resetPasswordResponse.AuthenticatorEnrollments.Value),
+                };
             }
 
             if (resetPasswordResponse.IsLoginSuccess)
@@ -866,8 +882,8 @@ namespace Okta.Idx.Sdk
             }
             else
             {
-               // (authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
-               return new AuthenticationResponse
+                // (authenticatorSelectionResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
+                return new AuthenticationResponse
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
@@ -919,7 +935,8 @@ namespace Okta.Idx.Sdk
                                         idxRequestPayload,
                                         cancellationToken);
 
-            if (challengeResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator))
+            if (challengeResponse.ContainsRemediationOption(RemediationType.ChallengeAuthenticator) ||
+                challengeResponse.ContainsRemediationOption(RemediationType.ChallengePoll))
             {
                 return new AuthenticationResponse
                 {

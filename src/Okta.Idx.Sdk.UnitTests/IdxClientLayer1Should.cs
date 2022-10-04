@@ -44,7 +44,6 @@ namespace Okta.Idx.Sdk.UnitTests
 
             await testClient.InteractAsync();
             var deviceTokenHeader = mockRequestExecutor.ReceivedHeaders.FirstOrDefault(h => h.Key.Equals(RequestHeaders.XDeviceToken));
-            
             deviceTokenHeader.Should().NotBeNull();
             deviceTokenHeader.Value.Should().Be("deviceToken");
 
@@ -107,7 +106,6 @@ namespace Okta.Idx.Sdk.UnitTests
             mockRequestExecutor.ReceivedHeaders.Should().NotContain(h => h.Key.Equals(RequestHeaders.XDeviceToken) && h.Value.Equals("deviceToken"));
             mockRequestExecutor.ReceivedHeaders.Should().NotContain(h => h.Key.Equals(RequestHeaders.XForwardedFor) && h.Value.Equals("MyForwardedFor"));
             mockRequestExecutor.ReceivedHeaders.Should().Contain(h => h.Key.Equals(RequestHeaders.XOktaUserAgentExtended) && h.Value.Equals("MyXUserAgent"));
-            
         }
 
         [Fact]
@@ -146,6 +144,19 @@ namespace Okta.Idx.Sdk.UnitTests
 
             var idxContext = await testClient.InteractAsync("bar");
 
+            idxContext.State.Should().Be("bar");
+        }
+
+        [Fact]
+        public async Task UseLoginHintWhenCallingInteract()
+        {
+            var rawResponse = @"{ 'interaction_handle' : 'foo' }";
+            var mockRequestExecutor = new MockedStringRequestExecutor(rawResponse);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+            testClient.Configuration.AcrValue = "urn:okta:app:mfa:attestation";
+            var idxContext = await testClient.InteractAsync("bar", userName: "Test.User@okta.com");
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"acr_values\":\"urn:okta:app:mfa:attestation\"");
+            mockRequestExecutor.ReceivedBody.Should().Contain($"\"login_hint\":\"Test.User@okta.com\"");
             idxContext.State.Should().Be("bar");
         }
 
@@ -2823,9 +2834,9 @@ namespace Okta.Idx.Sdk.UnitTests
 
             // Create a mock for a possible body when making a call to /identify
             var remediationProceedRequest = new IdxRequestPayload()
-                                                {
-                                                    StateHandle = "02eYb3-CKPkh3l9SMxym9zyPZt1bLo5q_yab6ahhFg",
-                                                };
+            {
+                StateHandle = "02eYb3-CKPkh3l9SMxym9zyPZt1bLo5q_yab6ahhFg",
+            };
 
             remediationProceedRequest.SetProperty("credentials", new { passcode = "31416", });
 
