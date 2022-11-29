@@ -175,7 +175,8 @@
                 var authnResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions,
                     (IIdxContext)Session["IdxContext"]);
 
-                if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification ||
+                    authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingChallengePollResponse)
                 {
                     switch (model.MethodType)
                     {
@@ -184,6 +185,10 @@
                         case "push":
                             return View("PushSent", model);
                     }
+                }
+                else
+                {
+                    return RedirectToAction("VerifyAuthenticator", "Manage");
                 }
             }
             catch (Exception e)
