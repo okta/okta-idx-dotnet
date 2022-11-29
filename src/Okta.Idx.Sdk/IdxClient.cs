@@ -2038,7 +2038,5 @@ namespace Okta.Idx.Sdk
                 IsPasswordRequired = IsRemediationRequireCredentials("identify", introspectResponse),
             };
         }
-
-        
     }
 }
