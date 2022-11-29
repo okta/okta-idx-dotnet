@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.4
+
+### Bug Fixes
+
+* Fix Okta Verify push notification not sent if "send push automatically" is unchecked.
+
+## 2.2.3
+
+### Features
+
+* Added support for login_hint and ACR values.
+
 ## 2.2.2
 
 ### Bug Fixes
