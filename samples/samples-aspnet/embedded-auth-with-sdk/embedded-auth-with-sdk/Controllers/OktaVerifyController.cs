@@ -186,10 +186,6 @@
                             return View("PushSent", model);
                     }
                 }
-                else
-                {
-                    return RedirectToAction("VerifyAuthenticator", "Manage");
-                }
             }
             catch (Exception e)
             {
