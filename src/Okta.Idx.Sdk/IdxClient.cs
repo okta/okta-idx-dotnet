@@ -210,12 +210,20 @@ namespace Okta.Idx.Sdk
 
         private static AuthenticationResponse CreateAuthenticationResponse(IIdxContext idxContext, IIdxResponse idxResponse, AuthenticationStatus authenticationStatus)
         {
+            if (idxContext == null)
+            {
+                throw new ArgumentNullException("idxContext");
+            }
+            if (idxResponse == null)
+            {
+                throw new ArgumentNullException("idxResponse");
+            }
             return new AuthenticationResponse
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = authenticationStatus,
-                Authenticators = IdxResponseHelper.ConvertToAuthenticators(idxResponse.Authenticators.Value),
-                CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(idxResponse.Authenticators.Value, idxResponse.CurrentAuthenticator.Value),                
+                Authenticators = idxResponse.Authenticators?.Value == null ? null :  IdxResponseHelper.ConvertToAuthenticators(idxResponse.Authenticators.Value),
+                CurrentAuthenticator = idxResponse.CurrentAuthenticator?.Value == null ? null : IdxResponseHelper.ConvertToAuthenticator(idxResponse.Authenticators.Value, idxResponse.CurrentAuthenticator?.Value),                
                 CanSkip = idxResponse.ContainsRemediationOption(RemediationType.Skip),
             };
         }
