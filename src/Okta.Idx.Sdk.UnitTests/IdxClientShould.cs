@@ -16278,6 +16278,774 @@ namespace Okta.Idx.Sdk.UnitTests
             securityQuestionEnrollResponse.CurrentAuthenticator.ContextualData.Questions.Should().HaveCount(19);
         }
 
+        [Fact]
+        public async Task ProceedWithOktaVerifyPush()
+        {
+            var idxContext = Substitute.For<IIdxContext>();
+            #region mock responses
+            var introspectResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+    ""expiresAt"": ""2022-12-01T14:08:27.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""authenticator-verification-data"",
+                ""relatesTo"": [
+                    ""$.currentAuthenticator""
+                ],
+                ""href"": ""https://test.org/idp/idx/challenge"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""label"": ""Okta Verify"",
+                        ""form"": {
+                            ""value"": [
+                                {
+                                    ""name"": ""id"",
+                                    ""required"": true,
+                                    ""value"": ""aut2xo0xj4LK7Fupb5d7"",
+                                    ""mutable"": false
+                                },
+                                {
+                                    ""name"": ""methodType"",
+                                    ""type"": ""string"",
+                                    ""required"": true,
+                                    ""options"": [
+                                        {
+                                            ""label"": ""Enter a code"",
+                                            ""value"": ""totp""
+                                        },
+                                        {
+                                            ""label"": ""Get a push notification"",
+                                            ""value"": ""push""
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-authenticator-authenticate"",
+                ""href"": ""https://test.org/idp/idx/challenge"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""type"": ""object"",
+                        ""options"": [
+                            {
+                                ""label"": ""Okta Verify"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut2xo0xj4LK7Fupb5d7"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""type"": ""string"",
+                                                ""required"": false,
+                                                ""options"": [
+                                                    {
+                                                        ""label"": ""Enter a code"",
+                                                        ""value"": ""totp""
+                                                    },
+                                                    {
+                                                        ""label"": ""Get a push notification"",
+                                                        ""value"": ""push""
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[0]""
+                            }
+                        ]
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""currentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""type"": ""app"",
+            ""key"": ""okta_verify"",
+            ""id"": ""aut2xo0xj4LK7Fupb5d7"",
+            ""displayName"": ""Okta Verify"",
+            ""methods"": [
+                {
+                    ""type"": ""push""
+                },
+                {
+                    ""type"": ""totp""
+                }
+            ]
+        }
+    },
+    ""authenticators"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""type"": ""app"",
+                ""key"": ""okta_verify"",
+                ""id"": ""aut2xo0xj4LK7Fupb5d7"",
+                ""displayName"": ""Okta Verify"",
+                ""methods"": [
+                    {
+                        ""type"": ""push""
+                    },
+                    {
+                        ""type"": ""totp""
+                    }
+                ],
+                ""allowedFor"": ""any""
+            }
+        ]
+    },
+    ""authenticatorEnrollments"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""profile"": {
+                    ""deviceName"": ""Galaxy Z Fold3 5G""
+                },
+                ""type"": ""app"",
+                ""key"": ""okta_verify"",
+                ""id"": ""pfd7gxyytl0yP3uMR5d7"",
+                ""displayName"": ""Okta Verify"",
+                ""methods"": [
+                    {
+                        ""type"": ""push""
+                    },
+                    {
+                        ""type"": ""totp""
+                    }
+                ]
+            }
+        ]
+    },
+    ""user"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""id"": ""00u2xoipvjOIR19225d7"",
+            ""identifier"": ""user@email.com"",
+            ""profile"": {
+                ""firstName"": ""Bryan"",
+                ""lastName"": ""Apellanes"",
+                ""timeZone"": ""America/Los_Angeles"",
+                ""locale"": ""en_US""
+            }
+        }
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://test.org/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Okta Verify Web App"",
+            ""id"": ""0oa2zrtjg7kdBZ9aG5d7""
+        }
+    },
+    ""authentication"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""protocol"": ""OAUTH2.0"",
+            ""issuer"": {
+                ""id"": ""aus2xo0xe0oJtPzIS5d7"",
+                ""name"": ""default"",
+                ""uri"": ""https://test.org/oauth2/default""
+            },
+            ""request"": {
+                ""max_age"": -1,
+                ""scope"": ""openid profile offline_access"",
+                ""response_type"": ""code"",
+                ""redirect_uri"": ""http://localhost:44314/interactioncode/callback"",
+                ""state"": ""XkTQQBirTnnuD_JB8d2IEw"",
+                ""code_challenge_method"": ""S256"",
+                ""code_challenge"": ""luxCCyaGyq1MmP-NHTxWKCxm3rJdHBHyYiOs-KrkIdM"",
+                ""response_mode"": ""query""
+            }
+        }
+    }
+}";
+            var selectAuthenticatorResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+    ""expiresAt"": ""2022-12-01T14:11:43.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""authenticator-verification-data"",
+                ""relatesTo"": [
+                    ""$.currentAuthenticator""
+                ],
+                ""href"": ""https://test.org/idp/idx/challenge"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""label"": ""Okta Verify"",
+                        ""form"": {
+                            ""value"": [
+                                {
+                                    ""name"": ""id"",
+                                    ""required"": true,
+                                    ""value"": ""aut2xo0xj4LK7Fupb5d7"",
+                                    ""mutable"": false
+                                },
+                                {
+                                    ""name"": ""methodType"",
+                                    ""type"": ""string"",
+                                    ""required"": true,
+                                    ""options"": [
+                                        {
+                                            ""label"": ""Get a push notification"",
+                                            ""value"": ""push""
+                                        }
+                                    ]
+                                },
+                                {
+                                    ""name"": ""autoChallenge"",
+                                    ""type"": ""boolean"",
+                                    ""label"": ""Send push automatically"",
+                                    ""required"": false,
+                                    ""value"": false,
+                                    ""mutable"": true
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-authenticator-authenticate"",
+                ""href"": ""https://test.org/idp/idx/challenge"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""type"": ""object"",
+                        ""options"": [
+                            {
+                                ""label"": ""Okta Verify"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut2xo0xj4LK7Fupb5d7"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""type"": ""string"",
+                                                ""required"": false,
+                                                ""options"": [
+                                                    {
+                                                        ""label"": ""Enter a code"",
+                                                        ""value"": ""totp""
+                                                    },
+                                                    {
+                                                        ""label"": ""Get a push notification"",
+                                                        ""value"": ""push""
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[0]""
+                            }
+                        ]
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""currentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""resend"": {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""resend"",
+                ""href"": ""https://test.org/idp/idx/challenge/resend"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            ""type"": ""app"",
+            ""key"": ""okta_verify"",
+            ""id"": ""aut2xo0xj4LK7Fupb5d7"",
+            ""displayName"": ""Okta Verify"",
+            ""methods"": [
+                {
+                    ""type"": ""push""
+                }
+            ]
+        }
+    },
+    ""authenticators"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""type"": ""app"",
+                ""key"": ""okta_verify"",
+                ""id"": ""aut2xo0xj4LK7Fupb5d7"",
+                ""displayName"": ""Okta Verify"",
+                ""methods"": [
+                    {
+                        ""type"": ""push""
+                    },
+                    {
+                        ""type"": ""totp""
+                    }
+                ],
+                ""allowedFor"": ""any""
+            }
+        ]
+    },
+    ""authenticatorEnrollments"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""profile"": {
+                    ""deviceName"": ""Galaxy Z Fold3 5G""
+                },
+                ""type"": ""app"",
+                ""key"": ""okta_verify"",
+                ""id"": ""pfd7gxyytl0yP3uMR5d7"",
+                ""displayName"": ""Okta Verify"",
+                ""methods"": [
+                    {
+                        ""type"": ""push""
+                    },
+                    {
+                        ""type"": ""totp""
+                    }
+                ]
+            }
+        ]
+    },
+    ""user"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""id"": ""00u2xoipvjOIR19225d7"",
+            ""identifier"": ""user@email.com"",
+            ""profile"": {
+                ""firstName"": ""Bryan"",
+                ""lastName"": ""Apellanes"",
+                ""timeZone"": ""America/Los_Angeles"",
+                ""locale"": ""en_US""
+            }
+        }
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://test.org/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Okta Verify Web App"",
+            ""id"": ""0oa2zrtjg7kdBZ9aG5d7""
+        }
+    },
+    ""authentication"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""protocol"": ""OAUTH2.0"",
+            ""issuer"": {
+                ""id"": ""aus2xo0xe0oJtPzIS5d7"",
+                ""name"": ""default"",
+                ""uri"": ""https://test.org/oauth2/default""
+            },
+            ""request"": {
+                ""max_age"": -1,
+                ""scope"": ""openid profile offline_access"",
+                ""response_type"": ""code"",
+                ""redirect_uri"": ""http://localhost:44314/interactioncode/callback"",
+                ""state"": ""XkTQQBirTnnuD_JB8d2IEw"",
+                ""code_challenge_method"": ""S256"",
+                ""code_challenge"": ""luxCCyaGyq1MmP-NHTxWKCxm3rJdHBHyYiOs-KrkIdM"",
+                ""response_mode"": ""query""
+            }
+        }
+    }
+}";
+            var pushRequestResponse = @"{
+    ""version"": ""1.0.0"",
+    ""stateHandle"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+    ""expiresAt"": ""2022-12-01T14:12:28.000Z"",
+    ""intent"": ""LOGIN"",
+    ""remediation"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""challenge-poll"",
+                ""relatesTo"": [
+                    ""$.currentAuthenticator""
+                ],
+                ""href"": ""https://test.org/idp/idx/authenticators/poll"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""refresh"": 4000,
+                ""value"": [
+                    {
+                        ""name"": ""autoChallenge"",
+                        ""type"": ""boolean"",
+                        ""label"": ""Send push automatically"",
+                        ""required"": false,
+                        ""value"": false,
+                        ""mutable"": true
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""select-authenticator-authenticate"",
+                ""href"": ""https://test.org/idp/idx/challenge"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""type"": ""object"",
+                        ""options"": [
+                            {
+                                ""label"": ""Okta Verify"",
+                                ""value"": {
+                                    ""form"": {
+                                        ""value"": [
+                                            {
+                                                ""name"": ""id"",
+                                                ""required"": true,
+                                                ""value"": ""aut2xo0xj4LK7Fupb5d7"",
+                                                ""mutable"": false
+                                            },
+                                            {
+                                                ""name"": ""methodType"",
+                                                ""type"": ""string"",
+                                                ""required"": false,
+                                                ""options"": [
+                                                    {
+                                                        ""label"": ""Enter a code"",
+                                                        ""value"": ""totp""
+                                                    },
+                                                    {
+                                                        ""label"": ""Get a push notification"",
+                                                        ""value"": ""push""
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""relatesTo"": ""$.authenticators.value[0]""
+                            }
+                        ]
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            }
+        ]
+    },
+    ""currentAuthenticator"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""resend"": {
+                ""rel"": [
+                    ""create-form""
+                ],
+                ""name"": ""resend"",
+                ""href"": ""https://test.org/idp/idx/challenge"",
+                ""method"": ""POST"",
+                ""produces"": ""application/ion+json; okta-version=1.0.0"",
+                ""value"": [
+                    {
+                        ""name"": ""authenticator"",
+                        ""required"": true,
+                        ""value"": {
+                            ""methodType"": ""push"",
+                            ""id"": ""aut2xo0xj4LK7Fupb5d7""
+                        },
+                        ""visible"": false,
+                        ""mutable"": false
+                    },
+                    {
+                        ""name"": ""stateHandle"",
+                        ""required"": true,
+                        ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                        ""visible"": false,
+                        ""mutable"": false
+                    }
+                ],
+                ""accepts"": ""application/json; okta-version=1.0.0""
+            },
+            ""type"": ""app"",
+            ""key"": ""okta_verify"",
+            ""id"": ""aut2xo0xj4LK7Fupb5d7"",
+            ""displayName"": ""Okta Verify"",
+            ""methods"": [
+                {
+                    ""type"": ""push""
+                }
+            ]
+        }
+    },
+    ""authenticators"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""type"": ""app"",
+                ""key"": ""okta_verify"",
+                ""id"": ""aut2xo0xj4LK7Fupb5d7"",
+                ""displayName"": ""Okta Verify"",
+                ""methods"": [
+                    {
+                        ""type"": ""push""
+                    },
+                    {
+                        ""type"": ""totp""
+                    }
+                ],
+                ""allowedFor"": ""any""
+            }
+        ]
+    },
+    ""authenticatorEnrollments"": {
+        ""type"": ""array"",
+        ""value"": [
+            {
+                ""profile"": {
+                    ""deviceName"": ""Galaxy Z Fold3 5G""
+                },
+                ""type"": ""app"",
+                ""key"": ""okta_verify"",
+                ""id"": ""pfd7gxyytl0yP3uMR5d7"",
+                ""displayName"": ""Okta Verify"",
+                ""methods"": [
+                    {
+                        ""type"": ""push""
+                    },
+                    {
+                        ""type"": ""totp""
+                    }
+                ]
+            }
+        ]
+    },
+    ""user"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""id"": ""00u2xoipvjOIR19225d7"",
+            ""identifier"": ""user@email.com"",
+            ""profile"": {
+                ""firstName"": ""Bryan"",
+                ""lastName"": ""Apellanes"",
+                ""timeZone"": ""America/Los_Angeles"",
+                ""locale"": ""en_US""
+            }
+        }
+    },
+    ""cancel"": {
+        ""rel"": [
+            ""create-form""
+        ],
+        ""name"": ""cancel"",
+        ""href"": ""https://test.org/idp/idx/cancel"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+            {
+                ""name"": ""stateHandle"",
+                ""required"": true,
+                ""value"": ""02.id.tJMobed3RY5uohKURnea8XiYDOospIHu9_tUatsz"",
+                ""visible"": false,
+                ""mutable"": false
+            }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+    },
+    ""app"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""name"": ""oidc_client"",
+            ""label"": ""Okta Verify Web App"",
+            ""id"": ""0oa2zrtjg7kdBZ9aG5d7""
+        }
+    },
+    ""authentication"": {
+        ""type"": ""object"",
+        ""value"": {
+            ""protocol"": ""OAUTH2.0"",
+            ""issuer"": {
+                ""id"": ""aus2xo0xe0oJtPzIS5d7"",
+                ""name"": ""default"",
+                ""uri"": ""https://test.org/oauth2/default""
+            },
+            ""request"": {
+                ""max_age"": -1,
+                ""scope"": ""openid profile offline_access"",
+                ""response_type"": ""code"",
+                ""redirect_uri"": ""http://localhost:44314/interactioncode/callback"",
+                ""state"": ""XkTQQBirTnnuD_JB8d2IEw"",
+                ""code_challenge_method"": ""S256"",
+                ""code_challenge"": ""luxCCyaGyq1MmP-NHTxWKCxm3rJdHBHyYiOs-KrkIdM"",
+                ""response_mode"": ""query""
+            }
+        }
+    }
+}";
+            #endregion
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = introspectResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = selectAuthenticatorResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = pushRequestResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var oktaOptions = new SelectOktaVerifyAuthenticatorOptions
+            {
+                AuthenticatorMethodType = AuthenticatorMethodType.Push,
+                AuthenticatorId = "aut2xo0xj4LK7Fupb5d7"
+            };
+
+            var response = await testClient.SelectChallengeAuthenticatorAsync(oktaOptions, idxContext);
+            queue.Count.Should().Be(0);
+            response.Should().NotBeNull();
+            response.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse);
+            response.CurrentAuthenticator.Should().NotBeNull();
+            response.CurrentAuthenticator.Name.Should().Be("Okta Verify");
+        }
+
         #endregion
     }
 }

@@ -135,6 +135,12 @@ The user needs to select and challenge an additional authenticator to continue w
 
 There other statuses that you can get when calling other methods of the `IdxClient`:
 
+#### Awaiting for challenge authenticator poll response
+
+Type: `AwaitingChallengeAuthenticatorPollResponse`
+
+The user needs to acknowledge the pushe request sent by Okta Verify.
+
 #### Awaiting for Authenticator Verification
 
 Type: `AwaitingAuthenticatorVerification`
