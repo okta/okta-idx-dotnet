@@ -176,7 +176,7 @@
                     (IIdxContext)Session["IdxContext"]);
 
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification ||
-                    authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingChallengePollResponse)
+                    authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse)
                 {
                     switch (model.MethodType)
                     {

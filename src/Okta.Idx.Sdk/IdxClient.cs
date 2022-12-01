@@ -1794,14 +1794,14 @@ namespace Okta.Idx.Sdk
                 idxRequestPayload,
                 cancellationToken);
 
-            var status = selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.ChallengePoll) ? AuthenticationStatus.AwaitingChallengePollResponse : AuthenticationStatus.AwaitingAuthenticatorVerification;
+            var status = selectAuthenticatorResponse.ContainsRemediationOption(RemediationType.ChallengePoll) ? AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse : AuthenticationStatus.AwaitingAuthenticatorVerification;
             if (challengeAuthenticatorOptions.AuthenticatorMethodType == AuthenticatorMethodType.Push & status == AuthenticationStatus.AwaitingAuthenticatorVerification)
             {
                 var challengePayload = new IdxRequestPayload();
                 challengePayload.SetProperty("stateHandle", selectAuthenticatorResponse.StateHandle);
                 challengePayload.SetProperty("authenticator", new { id = challengeAuthenticatorOptions.AuthenticatorId, methodType = challengeAuthenticatorOptions.AuthenticatorMethodType, autoChallenge = "false" });
                 selectAuthenticatorResponse = await selectAuthenticatorResponse.ProceedWithRemediationOptionAsync(RemediationType.AuthenticatorVerificationData, challengePayload, cancellationToken);
-                status = AuthenticationStatus.AwaitingChallengePollResponse;
+                status = AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse;
             }
 
             return CreateAuthenticationResponse(idxContext, selectAuthenticatorResponse, status);

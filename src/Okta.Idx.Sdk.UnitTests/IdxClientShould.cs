@@ -17041,7 +17041,7 @@ namespace Okta.Idx.Sdk.UnitTests
             var response = await testClient.SelectChallengeAuthenticatorAsync(oktaOptions, idxContext);
             queue.Count.Should().Be(0);
             response.Should().NotBeNull();
-            response.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingChallengePollResponse);
+            response.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse);
             response.CurrentAuthenticator.Should().NotBeNull();
             response.CurrentAuthenticator.Name.Should().Be("Okta Verify");
         }
