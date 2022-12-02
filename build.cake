@@ -204,11 +204,11 @@ Task("DefaultE2e")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
     .IsDependentOn("Test")
+    .IsDependentOn("Pack") // Moved "Pack" step to occur before test so that nuget package is built regardless of test success or failure.  To be addressed further on https://oktainc.atlassian.net/browse/OKTA-554424
     .IsDependentOn("EmbeddedWidgetTest")
     .IsDependentOn("RestoreEmbeddedAuthSampleApp")
     .IsDependentOn("BuildEmbeddedAuthSampleApp")
-    .IsDependentOn("TestEmbeddedAuthSampleApp")
-    .IsDependentOn("Pack");
+    .IsDependentOn("TestEmbeddedAuthSampleApp");
 
 var target = Argument("target", (BuildSystem.IsRunningOnJenkins) ? "DefaultE2e" : "Default");
 Console.WriteLine("Cake target is " + target);
