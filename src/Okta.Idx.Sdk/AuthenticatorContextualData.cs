@@ -30,5 +30,8 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public SecurityQuestion EnrolledQuestion => GetProperty<SecurityQuestion>("enrolledQuestion");
+
+        /// <inheritdoc/>
+        public string CorrectAnswer => GetProperty<string>("correctAnswer");
     }
 }

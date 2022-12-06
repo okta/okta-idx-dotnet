@@ -51,5 +51,13 @@ namespace Okta.Idx.Sdk
         /// Gets the message to user
         /// </summary>
         public string MessageToUser { get; internal set; }
+
+        /// <summary>
+        /// Gets the correct answer for Okta Verify push challenge if number challenge is required.
+        /// </summary>
+        public string CorrectAnswer
+        {
+            get => CurrentAuthenticator?.ContextualData?.CorrectAnswer;
+        }
     }
 }

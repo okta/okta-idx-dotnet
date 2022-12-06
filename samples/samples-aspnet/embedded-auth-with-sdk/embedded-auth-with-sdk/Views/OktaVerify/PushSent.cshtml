@@ -9,6 +9,12 @@
 <div class="row d-center">
     <div class="col-md-8">
         <h3>Push Sent</h3>
+        @if (!string.IsNullOrEmpty(Model.CorrectAnswer))
+        {
+            <div>
+                <span>@Model.CorrectAnswer</span>
+            </div>
+        }
         @Html.ActionLink("Verify with something else", "SelectAuthenticatorMethod")
     </div>
 </div>

@@ -49,5 +49,10 @@ namespace Okta.Idx.Sdk
         /// Gets the enrolled question.
         /// </summary>
         SecurityQuestion EnrolledQuestion { get; }
+
+        /// <summary>
+        /// Gets the correct answer for Okta Verify push challenge if number challenge is required.
+        /// </summary>
+        string CorrectAnswer { get; }
     }
 }
