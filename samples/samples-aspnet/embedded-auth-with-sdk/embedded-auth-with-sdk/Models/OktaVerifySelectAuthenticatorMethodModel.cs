@@ -23,5 +23,6 @@ namespace embedded_auth_with_sdk.Models
 
         public string Message { get; set; }
 
+        public string CorrectAnswer { get; set; }
     }
 }

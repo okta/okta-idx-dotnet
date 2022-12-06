@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.5
+
+### Features
+
+* Add Okta Verify number challenge support.
+
 ## 2.2.4
 
 ### Bug Fixes

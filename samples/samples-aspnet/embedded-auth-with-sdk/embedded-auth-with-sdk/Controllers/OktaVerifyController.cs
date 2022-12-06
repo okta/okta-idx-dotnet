@@ -175,6 +175,8 @@
                 var authnResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions,
                     (IIdxContext)Session["IdxContext"]);
 
+                model.CorrectAnswer = authnResponse.CorrectAnswer;
+
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification ||
                     authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse)
                 {
