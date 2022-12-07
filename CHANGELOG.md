@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.6
+
+### Bug Fixes
+
+* Properly initialize PollResponse with json data received from server after polling related method calls.
+
 ## 2.2.5
 
 ### Features
