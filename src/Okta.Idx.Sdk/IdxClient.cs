@@ -208,7 +208,8 @@ namespace Okta.Idx.Sdk
             }
         }
 
-        private static AuthenticationResponse CreateAuthenticationResponse(IIdxContext idxContext, IIdxResponse idxResponse, AuthenticationStatus authenticationStatus)
+        private static T CreateAuthenticationResponse<T>(IIdxContext idxContext, IIdxResponse idxResponse, AuthenticationStatus authenticationStatus)
+            where T : AuthenticationResponse, new()
         {
             if (idxContext == null)
             {
@@ -220,7 +221,7 @@ namespace Okta.Idx.Sdk
                 throw new ArgumentNullException(nameof(idxResponse));
             }
 
-            return new AuthenticationResponse
+            return new T
             {
                 IdxContext = idxContext,
                 AuthenticationStatus = authenticationStatus,
@@ -228,6 +229,15 @@ namespace Okta.Idx.Sdk
                 CurrentAuthenticator = idxResponse.CurrentAuthenticator?.Value == null ? null : IdxResponseHelper.ConvertToAuthenticator(idxResponse.Authenticators.Value, idxResponse.CurrentAuthenticator?.Value),
                 CanSkip = idxResponse.ContainsRemediationOption(RemediationType.Skip),
             };
+        }
+
+        private PollResponse CreatePollResponse(IIdxContext idxContext, IIdxResponse idxResponse, AuthenticationStatus authenticationStatus, bool continuePolling = false, int? refresh = null)
+        {
+            var pollRespone = CreateAuthenticationResponse<PollResponse>(idxContext, idxResponse, authenticationStatus);
+            pollRespone.Refresh = refresh;
+            pollRespone.ContinuePolling = continuePolling;
+
+            return pollRespone;
         }
 
         /// <summary>
@@ -1211,7 +1221,7 @@ namespace Okta.Idx.Sdk
 
             if (isAuthenticatorEnroll)
             {
-                return CreateAuthenticationResponse(idxContext, enrollAuthenticatorResponse, AuthenticationStatus.AwaitingAuthenticatorEnrollment);
+                return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, enrollAuthenticatorResponse, AuthenticationStatus.AwaitingAuthenticatorEnrollment);
             }
 
             throw new UnexpectedRemediationException(
@@ -1804,7 +1814,7 @@ namespace Okta.Idx.Sdk
                 status = AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse;
             }
 
-            return CreateAuthenticationResponse(idxContext, selectAuthenticatorResponse, status);
+            return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, selectAuthenticatorResponse, status);
         }
 
         /// <inheritdoc/>
@@ -1893,47 +1903,25 @@ namespace Okta.Idx.Sdk
 
             if (continuePolling)
             {
-                return new PollResponse
-                {
-                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                    Refresh = remediationOption?.Refresh,
-                    ContinuePolling = continuePolling,
-                    CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(introspectResponse.Authenticators?.Value, introspectResponse.CurrentAuthenticator?.Value),
-                    CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
-                };
+                return CreatePollResponse(idxContext, introspectResponse, AuthenticationStatus.AwaitingAuthenticatorEnrollment, continuePolling, remediationOption?.Refresh);
             }
             else
             {
                 if (introspectResponse.SuccessWithInteractionCode != null)
                 {
-                    return new PollResponse
-                    {
-                        AuthenticationStatus = AuthenticationStatus.Success,
-                        TokenInfo = await introspectResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext),
-                        CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
-                    };
+                    var pollResponse = CreatePollResponse(idxContext, introspectResponse, AuthenticationStatus.Success);
+                    pollResponse.TokenInfo = await introspectResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext);
+                    return pollResponse;
                 }
 
                 if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
                 {
-                    return new PollResponse
-                    {
-                        IdxContext = idxContext,
-                        AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
-                        Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators?.Value, introspectResponse.AuthenticatorEnrollments?.Value),
-                        CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
-                    };
+                    return CreatePollResponse(idxContext, introspectResponse, AuthenticationStatus.AwaitingChallengeAuthenticatorSelection);
                 }
 
                 if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
                 {
-                    return new PollResponse
-                    {
-                        IdxContext = idxContext,
-                        AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                        Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators?.Value),
-                        CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
-                    };
+                    return CreatePollResponse(idxContext, introspectResponse, AuthenticationStatus.AwaitingAuthenticatorEnrollment);
                 }
             }
 
@@ -1959,11 +1947,7 @@ namespace Okta.Idx.Sdk
 
             if (introspectResponse.ContainsRemediationOption(RemediationType.Resend, out IRemediationOption resendRemediationOption))
             {
-                return new PollResponse
-                {
-                    AuthenticationStatus = AuthenticationStatus.PushChallengeFailed,
-                    ContinuePolling = false,
-                };
+                return CreatePollResponse(idxContext, introspectResponse, AuthenticationStatus.PushChallengeFailed, false);
             }
 
             if (!introspectResponse.ContainsRemediationOption(RemediationType.ChallengePoll))
@@ -1976,44 +1960,24 @@ namespace Okta.Idx.Sdk
 
             if (continuePolling)
             {
-                return new PollResponse
-                {
-                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
-                    ContinuePolling = continuePolling,
-                    Refresh = challengePollRemediationOption?.Refresh,
-                };
+                return CreatePollResponse(idxContext, challengeResponse, AuthenticationStatus.AwaitingAuthenticatorVerification, continuePolling, challengePollRemediationOption?.Refresh);
             }
 
             if (challengeResponse.SuccessWithInteractionCode != null)
             {
-                var tokenInfo = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
-                return new PollResponse
-                {
-                    AuthenticationStatus = AuthenticationStatus.Success,
-                    TokenInfo = tokenInfo,
-                    ContinuePolling = continuePolling,
-                    Refresh = challengePollRemediationOption?.Refresh,
-                };
+                var pollResponse = CreatePollResponse(idxContext, challengeResponse, AuthenticationStatus.Success, continuePolling, challengePollRemediationOption?.Refresh);
+                pollResponse.TokenInfo = await challengeResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+                return pollResponse;
             }
 
             if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
             {
-                return new PollResponse
-                {
-                    AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
-                    ContinuePolling = continuePolling,
-                    Refresh = challengePollRemediationOption?.Refresh,
-                };
+                return CreatePollResponse(idxContext, challengeResponse, AuthenticationStatus.AwaitingChallengeAuthenticatorSelection, continuePolling, challengePollRemediationOption?.Refresh);
             }
 
             if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
             {
-                return new PollResponse
-                {
-                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                    ContinuePolling = continuePolling,
-                    Refresh = challengePollRemediationOption?.Refresh,
-                };
+                return CreatePollResponse(idxContext, challengeResponse, AuthenticationStatus.AwaitingAuthenticatorEnrollment, continuePolling, challengePollRemediationOption?.Refresh);
             }
 
             throw new UnexpectedRemediationException(
