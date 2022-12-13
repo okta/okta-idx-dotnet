@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <RootNamespace>embedded_auth_with_sdk.E2ETests</RootNamespace>
+    <SpecFlow_DeleteCodeBehindFilesOnCleanRebuild>true</SpecFlow_DeleteCodeBehindFilesOnCleanRebuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\5.1-DirectAuthOidcIdpLoginWithPassword.feature.cs" />
+    <Compile Remove="Features\5.1-DirectAuthOktaOidcSocialLoginPassword.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Remove="Features\5.1-DirectAuthFacebookPassword.feature" />
+    <SpecFlowFeatureFiles Remove="Features\5.1-DirectAuthOidcIdpLoginWithPassword.feature" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\5.1-DirectAuthOktaOidcSocialLoginPassword.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+    <PackageReference Include="Ninject" Version="3.3.4" />
+    <PackageReference Include="Okta.Sdk" Version="5.6.2" />
+    <PackageReference Include="Otp.NET" Version="1.2.2" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.1.1" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="103.0.5060.13400" />
+    <PackageReference Include="SpecFlow.xUnit" Version="3.9.74" />
+    <PackageReference Include="System.Collections" Version="4.3.0" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="3.0.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="ZXing.Net" Version="0.16.8" />
+    <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Okta.Idx.Sdk\Okta.Idx.Sdk.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Features\5.1-OktaOidcIdpSocialLoginWithPassword.feature.cs">
+      <DesignTime>True</DesignTime>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\5.1-OktaOidcIdpSocialLoginWithPassword.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>5.1-OktaOidcIdpSocialLoginWithPassword.feature.cs</LastGenOutput>
+    </SpecFlowFeatureFiles>
+  </ItemGroup>
+</Project>
