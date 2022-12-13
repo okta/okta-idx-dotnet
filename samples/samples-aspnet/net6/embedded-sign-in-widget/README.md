@@ -24,7 +24,7 @@ Before running this sample, you will need the following:
 
 ### Clone the repository
 
-Clone this repo and add your Okta configuration by following the [IDX SDK Configuration Reference](../../../README.md#configuration-reference) 
+Clone this repo and add your Okta configuration by following the [IDX SDK Configuration Reference](../../../../README.md#configuration-reference) 
 
 > Note: This application assumes you have your configuration in an okta.yaml file located in a .okta folder in the application or project's root directory. 
 > The `IdxClient` , which is provided to the application via DI in the `App_Start > UnityConfig.cs` file, grabs the required configuration from the yaml file.
