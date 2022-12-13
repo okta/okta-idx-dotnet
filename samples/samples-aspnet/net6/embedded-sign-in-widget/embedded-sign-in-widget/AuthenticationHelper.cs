@@ -19,7 +19,14 @@ namespace embedded_sign_in_widget
 
     public static class AuthenticationHelper
     {
+        /// <summary>
+        /// Used to retrieve the "state" handle from session.
+        /// </summary>
         public const string IdxStateKey = "IdxStateKey";
+
+        /// <summary>
+        /// Used to retrieve the sign in widget configuration from session.
+        /// </summary>
         public const string SiwConfigKey = "siwConfig";
 
         public static async Task<ClaimsIdentity> GetIdentityFromTokenResponseAsync(IdxConfiguration configuration, ITokenResponse tokenResponse)
