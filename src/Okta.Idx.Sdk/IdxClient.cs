@@ -1090,7 +1090,9 @@ namespace Okta.Idx.Sdk
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
             IIdxResponse recoveryResponse = null;
 
-            if (introspectResponse.CurrentAuthenticatorEnrollment != null)
+            if (introspectResponse.CurrentAuthenticatorEnrollment != null && introspectResponse
+                    .CurrentAuthenticatorEnrollment
+                    .Value?.Recover != null)
             {
                 var recoveryRequest = new IdxRequestPayload
                 {
