@@ -27,7 +27,7 @@ Before running this sample, you will need the following:
 Clone this repo and add your Okta configuration by following the [IDX SDK Configuration Reference](../../../README.md#configuration-reference) 
 
 > Note: This application assumes you have your configuration in an okta.yaml file located in a .okta folder in the application or project's root directory. 
-> The `IdxClient` , which is provided to the application via DI in the `App_Start > UnityConfig.cs` file, grabs the required configuration from the yaml file.
+> The `IdxClient` , which is provided to the application via dependency injection in the `Program.cs` file, grabs the required configuration from the yaml file.
 
 
 ### Run the web application from Visual Studio
@@ -40,7 +40,7 @@ Go to your [Okta Developer Console] and update the following parameters in your 
 * **Login redirect URI** - `https://localhost:44314/interactioncode/callback`
 * **Logout redirect URI** - `https://localhost:44314/account/signout`
 
-The sample application defines an `InteractionCodeController` which receives the `interaction_code` upon successful login; review the `RedeemInteractionCodeAndSignInAsync` method of the `InteractionCodeController` for example code illustrating how to exchange the interaction code for Okta tokens.
+The sample application defines an `InteractionCodeController` which receives the `interaction_code` upon successful login; review the `Callback` method of the `InteractionCodeController` for example code illustrating how to exchange the interaction code for Okta tokens.
 
 ### Enable CORS (Cross-Origin Resource Sharing)
 
@@ -61,18 +61,3 @@ Sign in using the same account you created when you signed up for your Developer
 [Sign Users in to Your Web Application guide]: https://developer.okta.com/guides/sign-into-web-app/aspnet/before-you-begin/
 [Okta Developer Console]: https://login.okta.com
 
-### Other configuration variables
-Following are non-sensitive configuration values which reside in `settings.json` file in the project's root. To set them in the system environment, add `okta_testing_` prefix to a variable name:
-* `IISPort` - sample project will be listening on this port. 
->Note: currently sample project is started on http  using IISExpress. 
-
-Example of the settings.json:
-```json
-{
-    "okta": {
-        "testing": {
-            "IISPort": 8080
-        }
-    }
-}
-```
