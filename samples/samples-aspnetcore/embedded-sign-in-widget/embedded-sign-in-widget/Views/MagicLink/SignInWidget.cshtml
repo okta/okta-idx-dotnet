@@ -1,18 +1,18 @@
 ﻿@using Newtonsoft.Json
 @using Okta.Idx.Sdk
 
-@model SignInWidgetConfiguration
+@inject IHttpContextAccessor HttpContextAccessor
 
-@{
-    ViewData["Title"] = "Sign In";
-}
+@model SignInWidgetConfiguration
 
 <script src="https://global.oktacdn.com/okta-signin-widget/6.0.0/js/okta-sign-in.min.js" type="text/javascript"></script>
 <link href="https://global.oktacdn.com/okta-signin-widget/6.0.0/css/okta-sign-in.min.css" type="text/css" rel="stylesheet" />
 
 <div id="okta-signin-widget-container"></div>
 <script type="text/javascript">
-    const widgetConfig = @Html.Raw(JsonConvert.SerializeObject(Model));
+    var widgetConfig = @Html.Raw(JsonConvert.SerializeObject(Model));
+    
+    @Html.Raw($"widgetConfig.otp = '{HttpContextAccessor?.HttpContext?.Session.GetString("otp")}';");
 
     console.log(widgetConfig.interactionHandle);
 

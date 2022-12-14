@@ -29,7 +29,6 @@ Clone this repo and add your Okta configuration by following the [IDX SDK Config
 > Note: This application assumes you have your configuration in an okta.yaml file located in a .okta folder in the application or project's root directory. 
 > The `IdxClient` , which is provided to the application via dependency injection in the `Program.cs` file, grabs the required configuration from the yaml file.
 
-
 ### Run the web application from Visual Studio
 
 When you run this project in Visual Studio it starts the web application on port 44314 using HTTPS. 
