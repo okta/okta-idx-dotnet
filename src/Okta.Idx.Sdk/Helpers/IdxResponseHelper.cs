@@ -32,22 +32,31 @@ namespace Okta.Idx.Sdk.Helpers
             return authenticatorOptions;
         }
 
-        internal static IList<IAuthenticator> ConvertEnrollmentsToAuthenticators(IList<IAuthenticatorValue> authenticators, IList<IAuthenticatorEnrollment> authenticatorEnrollments = null)
+        internal static IList<IAuthenticator> ConvertEnrollmentsToAuthenticators(IList<IAuthenticatorValue> authenticators, IList<IAuthenticatorEnrollment> authenticatorEnrollments)
         {
             var authenticatorOptions = new List<IAuthenticator>();
 
-            foreach (var enrollment in authenticatorEnrollments)
+            if (authenticatorEnrollments != null)
             {
-                var authenticator = authenticators?.FirstOrDefault(x => x.Key == enrollment.Key);
-                authenticatorOptions.Add(new Authenticator
+                foreach (var enrollment in authenticatorEnrollments)
                 {
-                    Id = authenticator.Id,
-                    Name = authenticator.DisplayName,
-                    MethodTypes = authenticator.Methods?.Select(x => x.Type).ToList(),
-                    EnrollmentId = enrollment?.Id,
-                    Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
-                    CredentialId = string.Equals(authenticator.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase) ? enrollment?.CredentialId : null,
-                });
+                    var authenticator = authenticators?.FirstOrDefault(x => x.Key == enrollment.Key);
+                    authenticatorOptions.Add(new Authenticator
+                    {
+                        Id = authenticator?.Id,
+                        Name = authenticator?.DisplayName,
+                        MethodTypes = authenticator?.Methods?.Select(x => x.Type).ToList(),
+                        EnrollmentId = enrollment?.Id,
+                        Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
+                        CredentialId =
+                            string.Equals(
+                                authenticator?.Key,
+                                AuthenticatorType.WebAuthn.ToString(),
+                                StringComparison.OrdinalIgnoreCase)
+                                ? enrollment?.CredentialId
+                                : null,
+                    });
+                }
             }
 
             return authenticatorOptions;
