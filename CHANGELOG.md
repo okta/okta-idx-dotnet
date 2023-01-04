@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.7
+
+### Bug Fixes
+
+* Fix issue with Phone factor when enrolled with multiple contact numbers (#169)
+* Fix issue with Reset password workflow (#174)
+
 ## 2.2.6
 
 ### Bug Fixes
