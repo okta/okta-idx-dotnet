@@ -32,6 +32,36 @@ namespace Okta.Idx.Sdk.Helpers
             return authenticatorOptions;
         }
 
+        internal static IList<IAuthenticator> ConvertEnrollmentsToAuthenticators(IList<IAuthenticatorValue> authenticators, IList<IAuthenticatorEnrollment> authenticatorEnrollments)
+        {
+            var authenticatorOptions = new List<IAuthenticator>();
+
+            if (authenticatorEnrollments != null)
+            {
+                foreach (var enrollment in authenticatorEnrollments)
+                {
+                    var authenticator = authenticators?.FirstOrDefault(x => x.Key == enrollment.Key);
+                    authenticatorOptions.Add(new Authenticator
+                    {
+                        Id = authenticator?.Id,
+                        Name = authenticator?.DisplayName,
+                        MethodTypes = authenticator?.Methods?.Select(x => x.Type).ToList(),
+                        EnrollmentId = enrollment?.Id,
+                        Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
+                        CredentialId =
+                            string.Equals(
+                                authenticator?.Key,
+                                AuthenticatorType.WebAuthn.ToString(),
+                                StringComparison.OrdinalIgnoreCase)
+                                ? enrollment?.CredentialId
+                                : null,
+                    });
+                }
+            }
+
+            return authenticatorOptions;
+        }
+
         internal static IAuthenticator ConvertToAuthenticator(IList<IAuthenticatorValue> authenticators, IAuthenticatorEnrollment authenticatorEnrollment)
         {
             return new Authenticator
