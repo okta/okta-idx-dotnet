@@ -1,0 +1,18 @@
+﻿@model IEnumerable<System.Security.Claims.Claim>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@if(Context.User.Identity.IsAuthenticated)
+{
+    @await Html.PartialAsync("_ProfilePartial", Model)
+}
+else
+{
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        @Html.ActionLink("Sign In", "SignInWidget", "Account", routeValues: null, htmlAttributes: new { @class = "btn btn-primary", @id = "LoginBtn" })
+    </div>
+}
