@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace embedded_auth_with_sdk.Controllers
 {

@@ -30,11 +30,11 @@ To see this library working in a sample, check out our [ASP.NET Samples](samples
 
 This library uses semantic versioning and follows Okta's [Library Version Policy][okta-library-versioning].
 
-✔️ The current stable major version series is: 1.x
+✔️ The current stable major version series is: 2.x
 
 | Version | Status                             |
 | ------- | ---------------------------------- |
-| 2.0.0    | ✔️ Stable |
+| 2.x   | ✔️ Stable |
 
 The latest release can always be found on the [releases page][github-releases].
 
@@ -119,7 +119,7 @@ The user was successfully authenticated and you can retrieve the tokens from the
 
 Type: `AuthenticationStatus.PasswordExpired`
 
-The user needs to change their password to continue with the authentication flow and retrieve tokens.
+The user needs to change their password to continue with the authentication flow and retrieve tokens. Check for possible messages to the user by calling `authnResponse.Messages` and `authnResponse.CanSkip` to verify the user can skip the current step in the authentication process.
 
 #### Awaiting for authenticator enrollment
 

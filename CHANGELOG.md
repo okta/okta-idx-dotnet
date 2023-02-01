@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.8
+
+### Bug Fixes
+
+* Fix issue with `AuthenticateAsync()` method failing when a Users Password is in Warn Before Expires State (#182).
+* Marking `AuthenticationResponse.MessageToUser` as deprecated.
+
+
 ## 2.2.7
 
 ### Bug Fixes

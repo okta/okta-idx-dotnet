@@ -595,12 +595,15 @@ namespace Okta.Idx.Sdk
                 if (!identifyResponse.IsLoginSuccess)
                 {
                     // Verify if password expired
-                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, identifyResponse))
+                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, identifyResponse) 
+                        || IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticatorWarning, identifyResponse))
                     {
                         return new AuthenticationResponse
                         {
                             AuthenticationStatus = AuthenticationStatus.PasswordExpired,
                             IdxContext = idxContext,
+                            Messages = identifyResponse.IdxMessages?.Messages,
+                            CanSkip = identifyResponse.ContainsRemediationOption(RemediationType.Skip),
                         };
                     }
 
@@ -628,6 +631,7 @@ namespace Okta.Idx.Sdk
                             new List<string>
                             {
                                 RemediationType.ReenrollAuthenticator,
+                                RemediationType.ReenrollAuthenticatorWarning,
                                 RemediationType.SelectAuthenticatorAuthenticate,
                                 RemediationType.SelectAuthenticatorEnroll,
                             }, identifyResponse);
@@ -698,12 +702,15 @@ namespace Okta.Idx.Sdk
                 if (!challengeResponse.IsLoginSuccess)
                 {
                     // Verify if password expired
-                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, challengeResponse))
+                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, challengeResponse) ||
+                        IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticatorWarning, challengeResponse))
                     {
                         return new AuthenticationResponse
                         {
                             AuthenticationStatus = AuthenticationStatus.PasswordExpired,
                             IdxContext = idxContext,
+                            Messages = challengeResponse.IdxMessages?.Messages,
+                            CanSkip = challengeResponse.ContainsRemediationOption(RemediationType.Skip),
                         };
                     }
 
@@ -731,6 +738,7 @@ namespace Okta.Idx.Sdk
                             new List<string>
                             {
                                 RemediationType.ReenrollAuthenticator,
+                                RemediationType.ReenrollAuthenticatorWarning,
                                 RemediationType.SelectAuthenticatorEnroll,
                                 RemediationType.SelectAuthenticatorAuthenticate,
                             }, challengeResponse);
@@ -758,6 +766,10 @@ namespace Okta.Idx.Sdk
             {
                 currentRemediationType = RemediationType.ReenrollAuthenticator;
             }
+            else if (introspectResponse.ContainsRemediationOption(RemediationType.ReenrollAuthenticatorWarning))
+            {
+                currentRemediationType = RemediationType.ReenrollAuthenticatorWarning;
+            }
             else if (introspectResponse.ContainsRemediationOption(RemediationType.ResetAuthenticator))
             {
                 currentRemediationType = RemediationType.ResetAuthenticator;
@@ -769,12 +781,18 @@ namespace Okta.Idx.Sdk
                 {
                     throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticator, introspectResponse);
                 }
+                else if (currentRemediationType == RemediationType.ReenrollAuthenticatorWarning &&
+                    !IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticatorWarning, introspectResponse))
+                {
+                    throw new UnexpectedRemediationException(RemediationType.ReenrollAuthenticatorWarning, introspectResponse);
+                }
                 else
                 {
                     throw new UnexpectedRemediationException(
                         new List<string>
                         {
                             RemediationType.ReenrollAuthenticator,
+                            RemediationType.ReenrollAuthenticatorWarning,
                             RemediationType.ResetAuthenticator,
                         },
                         introspectResponse);

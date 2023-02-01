@@ -8,6 +8,8 @@ using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 using Okta.Sdk.Abstractions;
 using System.Configuration;
+using System.Text;
+using WebGrease.Css.Extensions;
 
 namespace embedded_auth_with_sdk.Controllers
 {
@@ -82,6 +84,9 @@ namespace embedded_auth_with_sdk.Controllers
                             return RedirectToAction("Index", "Home");
 
                     case AuthenticationStatus.PasswordExpired:
+                        var sbMessages = new StringBuilder();
+                        authnResponse.Messages?.ForEach(x => sbMessages.AppendLine(x.Text));
+                        TempData["MessageToUser"] = sbMessages.ToString();
                         return RedirectToAction("ChangePassword", "Manage");
 
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
