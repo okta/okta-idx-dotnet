@@ -243,6 +243,7 @@ namespace Okta.Idx.Sdk
                 Authenticators = authenticators,
                 CurrentAuthenticator = idxResponse.CurrentAuthenticator?.Value == null ? null : IdxResponseHelper.ConvertToAuthenticator(idxResponse.Authenticators.Value, idxResponse.CurrentAuthenticator?.Value),
                 CanSkip = idxResponse.ContainsRemediationOption(RemediationType.Skip),
+                Messages = idxResponse.IdxMessages?.Messages,
             };
         }
 
@@ -598,13 +599,7 @@ namespace Okta.Idx.Sdk
                     if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, identifyResponse) 
                         || IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticatorWarning, identifyResponse))
                     {
-                        return new AuthenticationResponse
-                        {
-                            AuthenticationStatus = AuthenticationStatus.PasswordExpired,
-                            IdxContext = idxContext,
-                            Messages = identifyResponse.IdxMessages?.Messages,
-                            CanSkip = identifyResponse.ContainsRemediationOption(RemediationType.Skip),
-                        };
+                        return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, identifyResponse, AuthenticationStatus.PasswordExpired);
                     }
 
                     if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
@@ -705,13 +700,7 @@ namespace Okta.Idx.Sdk
                     if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, challengeResponse) ||
                         IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticatorWarning, challengeResponse))
                     {
-                        return new AuthenticationResponse
-                        {
-                            AuthenticationStatus = AuthenticationStatus.PasswordExpired,
-                            IdxContext = idxContext,
-                            Messages = challengeResponse.IdxMessages?.Messages,
-                            CanSkip = challengeResponse.ContainsRemediationOption(RemediationType.Skip),
-                        };
+                        return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, challengeResponse, AuthenticationStatus.PasswordExpired);
                     }
 
                     if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
