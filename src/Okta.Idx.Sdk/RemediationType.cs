@@ -26,6 +26,11 @@ namespace Okta.Idx.Sdk
         public static readonly string ReenrollAuthenticator = "reenroll-authenticator";
 
         /// <summary>
+        /// reenroll-authenticator-warning
+        /// </summary>
+        public static readonly string ReenrollAuthenticatorWarning = "reenroll-authenticator-warning";
+
+        /// <summary>
         /// challenge-authenticator
         /// </summary>
         public static readonly string ChallengeAuthenticator = "challenge-authenticator";
