@@ -27,8 +27,8 @@ namespace Okta.Idx.Sdk
         /// <param name="idxConfiguration">The IDX configuration.</param>
         public SignInWidgetAuthParams(IdxConfiguration idxConfiguration)
         {
-            Issuer = idxConfiguration.Issuer;
-            Scopes = new List<string>(idxConfiguration.Scopes);
+            Issuer = idxConfiguration?.Issuer;
+            Scopes = idxConfiguration?.Scopes == null ? new List<string>() : new List<string>(idxConfiguration.Scopes);
         }
 
         /// <summary>
