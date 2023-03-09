@@ -17,19 +17,42 @@ namespace Okta.Idx.Sdk.Helpers
 
             foreach (var authenticator in authenticators)
             {
-                var enrollment = authenticatorEnrollments?.FirstOrDefault(x => x.Key == authenticator.Key);
-                authenticatorOptions.Add(new Authenticator
+                var enrollments = authenticatorEnrollments?.Where(x => x.Key == authenticator.Key);
+
+                // WebAuthn with multiple enrollments
+                if (string.Equals(authenticator.Key, AuthenticatorType.WebAuthn.ToString(),
+                        StringComparison.OrdinalIgnoreCase) && enrollments != null)
                 {
-                    Id = authenticator.Id,
-                    Name = authenticator.DisplayName,
-                    MethodTypes = authenticator.Methods?.Select(x => x.Type).ToList(),
-                    EnrollmentId = enrollment?.Id,
-                    Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
-                    CredentialId = string.Equals(authenticator.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase) ? enrollment?.CredentialId : null,
-                });
+                    foreach (var enrollment in enrollments)
+                    {
+                        authenticatorOptions.Add(CreateAuthenticatorOptions(authenticator, enrollment));
+                    }
+                }
+                else
+                {
+                    var enrollment = authenticatorEnrollments?.FirstOrDefault(x => x.Key == authenticator.Key);
+                    authenticatorOptions.Add(CreateAuthenticatorOptions(authenticator, enrollment));
+                }
             }
 
             return authenticatorOptions;
+        }
+
+        private static Authenticator CreateAuthenticatorOptions(IAuthenticatorValue authenticator, IAuthenticatorEnrollment enrollment)
+        {
+            return new Authenticator
+            {
+                Id = authenticator.Id,
+                Name = enrollment?.DisplayName ?? authenticator.DisplayName,
+                DisplayName = enrollment?.DisplayName,
+                MethodTypes = authenticator.Methods?.Select(x => x.Type).ToList(),
+                EnrollmentId = enrollment?.Id,
+                Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
+                CredentialId =
+                    string.Equals(authenticator.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase)
+                        ? enrollment?.CredentialId
+                        : null,
+            };
         }
 
         internal static IAuthenticator ConvertToAuthenticator(IList<IAuthenticatorValue> authenticators, IAuthenticatorEnrollment authenticatorEnrollment)
