@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.9
+
+### Bug Fixes
+
+* Fix issue with authenticators response not getting webauthn authenticator enrollments name.
+
 ## 2.2.8
 
 ### Bug Fixes
