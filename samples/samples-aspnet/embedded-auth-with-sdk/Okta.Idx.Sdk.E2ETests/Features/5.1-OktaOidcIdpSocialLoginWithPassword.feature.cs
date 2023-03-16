@@ -100,16 +100,15 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="5.1.1: Mary Logs in with Social IDP", Skip="Ignored")]
+        [Xunit.SkippableFactAttribute(DisplayName="5.1.1: Mary Logs in with Social IDP")]
         [Xunit.TraitAttribute("FeatureTitle", "5.1: Direct Auth Social Login with 1 Social IDP")]
         [Xunit.TraitAttribute("Description", "5.1.1: Mary Logs in with Social IDP")]
         public void _5_1_1MaryLogsInWithSocialIDP()
         {
-            string[] tagsOfScenario = new string[] {
-                    "Ignore"};
+            string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("5.1.1: Mary Logs in with Social IDP", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 10
+#line 9
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -122,22 +121,22 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 3
  this.FeatureBackground();
 #line hidden
-#line 11
+#line 10
  testRunner.Given("Mary navigates to the Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 12
+#line 11
  testRunner.When("she clicks the Login with Okta button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 13
+#line 12
  testRunner.And("logs in to Okta", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 14
+#line 13
  testRunner.Then("she is redirected to the Root View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 15
+#line 14
     testRunner.And("she sees a table with her profile info", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
+#line 15
     testRunner.And("the cell for the value of email is shown and contains her email", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
