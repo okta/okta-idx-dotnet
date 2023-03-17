@@ -29,6 +29,11 @@ namespace Okta.Idx.Sdk
         string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the authenticator display name.
+        /// </summary>
+        string DisplayName { get; set; }
+
+        /// <summary>
         /// Gets or sets the profile.
         /// </summary>
         string Profile { get; set; }

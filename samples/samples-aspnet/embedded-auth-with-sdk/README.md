@@ -85,3 +85,28 @@ Example of the settings.json:
 
 ### Recover Password with Recovery Token flow
 This functionality uses [Okta .NET management SDK](https://github.com/okta/okta-sdk-dotnet) to get the recovery token and requires additional configuration parameters to be provided. Detailed information on Okta SDK Client configuration can be found in this [reference](https://github.com/okta/okta-sdk-dotnet#configuration-reference).
+
+
+### Troubleshooting
+
+#### All tests are failing
+
+* Make sure you are using the latest version of the `Selenium.WebDriver.ChromeDrive` dependency and try again. 
+
+* Make sure all the required API tokens (Test org API token, Okta as external IDP org API token, A18n API Key) are still valid.
+
+#### Social Login scenarios are failing
+
+* Make sure Okta as external IDP is properly configured (5.x scenarios). Check out [here](https://developer.okta.com/docs/guides/add-an-external-idp/oktatookta/main/#create-an-app-at-the-identity-provider) for details on how to configure Okta as your external IDP. The UserInfo endpoint should be provided.
+
+* Make sure the required ENV VARs are properly set and still valid:
+
+```
+SETX okta_testing_OktaSocialIdpMfaUserPassword <VALUE>
+SETX okta_testing_OktaSocialIdpMfaUserEmail <VALUE>
+SETX okta_testing_OktaOidcIdpToken <VALUE>
+SETX okta_testing_OktaOidcIdpDomain <VALUE>
+SETX okta_testing_GoogleUserPassword <VALUE>
+SETX okta_testing_GoogleUserEmail <VALUE>
+
+```

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0
+
+### Bug Fixes
+
+* Add `Authenticator.DisplayName` property to expose authenticator's friendly name.
+
 ## 2.2.8
 
 ### Bug Fixes
