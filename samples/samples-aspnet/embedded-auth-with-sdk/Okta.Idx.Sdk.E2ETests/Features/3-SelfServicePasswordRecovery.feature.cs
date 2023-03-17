@@ -164,13 +164,12 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="3.1.2 Mary tries to reset a password with the wrong email", Skip="Ignored")]
+        [Xunit.SkippableFactAttribute(DisplayName="3.1.2 Mary tries to reset a password with the wrong email")]
         [Xunit.TraitAttribute("FeatureTitle", "3.1: Direct Auth Password Recovery")]
         [Xunit.TraitAttribute("Description", "3.1.2 Mary tries to reset a password with the wrong email")]
         public void _3_1_2MaryTriesToResetAPasswordWithTheWrongEmail()
         {
-            string[] tagsOfScenario = new string[] {
-                    "Ignore"};
+            string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("3.1.2 Mary tries to reset a password with the wrong email", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 26

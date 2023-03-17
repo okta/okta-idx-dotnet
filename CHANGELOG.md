@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-* Fix issue with authenticators response not getting webauthn authenticator enrollments name.
+* Add `Authenticator.DisplayName` property to expose authenticator's friendly name.
 
 ## 2.2.8
 
