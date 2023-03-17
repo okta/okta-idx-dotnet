@@ -6,7 +6,6 @@
     And a user named "Mary"
     And Mary does not have an account in the org
   
-  @ignore #OKTA-497289
   Scenario: 10.4.1: Mary signs up for an account and enrolls in Password and a predefined Security Question
     Given Mary navigates to the Self Service Registration View
     When she fills out her First Name

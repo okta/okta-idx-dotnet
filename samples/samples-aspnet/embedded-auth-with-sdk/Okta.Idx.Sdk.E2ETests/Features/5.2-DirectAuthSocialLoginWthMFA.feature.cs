@@ -102,16 +102,15 @@ namespace embedded_auth_with_sdk.E2ETests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="5.2.1: Mary logs in with a social IDP and gets an error message", Skip="Ignored")]
+        [Xunit.SkippableFactAttribute(DisplayName="5.2.1: Mary logs in with a social IDP and gets an error message")]
         [Xunit.TraitAttribute("FeatureTitle", "5.2: Direct Auth Social Login with MFA")]
         [Xunit.TraitAttribute("Description", "5.2.1: Mary logs in with a social IDP and gets an error message")]
         public void _5_2_1MaryLogsInWithASocialIDPAndGetsAnErrorMessage()
         {
-            string[] tagsOfScenario = new string[] {
-                    "Ignore"};
+            string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("5.2.1: Mary logs in with a social IDP and gets an error message", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 11
+#line 10
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -124,16 +123,16 @@ namespace embedded_auth_with_sdk.E2ETests.Features
 #line 3
   this.FeatureBackground();
 #line hidden
-#line 12
+#line 11
  testRunner.Given("Mary navigates to the Basic Login View", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 13
+#line 12
  testRunner.When("she clicks the Login with Okta button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 14
+#line 13
  testRunner.And("logs in to Okta", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 15
+#line 14
  testRunner.Then("Mary should see an error message \"Multifactor Authentication and Social Identity " +
                         "Providers is not currently supported, Authentication failed.\"", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

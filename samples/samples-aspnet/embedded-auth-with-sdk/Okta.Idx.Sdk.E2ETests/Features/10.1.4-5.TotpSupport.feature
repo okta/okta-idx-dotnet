@@ -5,7 +5,6 @@
     And a user named "Mary"
     And Mary does not have an account in the org
 
-  @ignore
   Scenario: 10.1.4: Mary signs up for an account with Password, setups up required Google Authenticator by scanning a QR Code
     Given Mary navigates to the Self Service Registration View
     When she fills out her First Name
@@ -42,7 +41,6 @@
     And the cell for the value of email is shown and contains her email
     And the cell for the value of name is shown and contains her first name and last name
   
-  @ignore
   Scenario: 10.1.5: Mary signs up for an account with Password, setups up required Google Authenticator by entering a shared secret
     Given Mary navigates to the Self Service Registration View
     When she fills out her First Name

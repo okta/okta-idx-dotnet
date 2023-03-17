@@ -18,14 +18,17 @@ namespace Okta.Idx.Sdk.Helpers
             foreach (var authenticator in authenticators)
             {
                 var enrollment = authenticatorEnrollments?.FirstOrDefault(x => x.Key == authenticator.Key);
+                var isWebAuthn = string.Equals(authenticator.Key, AuthenticatorType.WebAuthn.ToString(),
+                    StringComparison.OrdinalIgnoreCase);
                 authenticatorOptions.Add(new Authenticator
                 {
                     Id = authenticator.Id,
+                    DisplayName = isWebAuthn ? enrollment?.DisplayName ?? authenticator.DisplayName : authenticator.DisplayName,
                     Name = authenticator.DisplayName,
                     MethodTypes = authenticator.Methods?.Select(x => x.Type).ToList(),
                     EnrollmentId = enrollment?.Id,
                     Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
-                    CredentialId = string.Equals(authenticator.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase) ? enrollment?.CredentialId : null,
+                    CredentialId = isWebAuthn ? enrollment?.CredentialId : null,
                 });
             }
 
@@ -41,18 +44,19 @@ namespace Okta.Idx.Sdk.Helpers
                 foreach (var enrollment in authenticatorEnrollments)
                 {
                     var authenticator = authenticators?.FirstOrDefault(x => x.Key == enrollment.Key);
+                    var isWebAuthn = string.Equals(authenticator.Key, AuthenticatorType.WebAuthn.ToString(),
+                        StringComparison.OrdinalIgnoreCase);
+
                     authenticatorOptions.Add(new Authenticator
                     {
                         Id = authenticator?.Id,
+                        DisplayName = isWebAuthn ? enrollment?.DisplayName ?? authenticator?.DisplayName : authenticator?.DisplayName,
                         Name = authenticator?.DisplayName,
                         MethodTypes = authenticator?.Methods?.Select(x => x.Type).ToList(),
                         EnrollmentId = enrollment?.Id,
                         Profile = (enrollment != null) ? GetAuthenticatorProfile(enrollment) : string.Empty,
                         CredentialId =
-                            string.Equals(
-                                authenticator?.Key,
-                                AuthenticatorType.WebAuthn.ToString(),
-                                StringComparison.OrdinalIgnoreCase)
+                            isWebAuthn
                                 ? enrollment?.CredentialId
                                 : null,
                     });
@@ -64,10 +68,15 @@ namespace Okta.Idx.Sdk.Helpers
 
         internal static IAuthenticator ConvertToAuthenticator(IList<IAuthenticatorValue> authenticators, IAuthenticatorEnrollment authenticatorEnrollment)
         {
+            var authenticator = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment.Key);
+            var isWebAuthn = string.Equals(authenticator?.Key, AuthenticatorType.WebAuthn.ToString(),
+                StringComparison.OrdinalIgnoreCase);
+
             return new Authenticator
             {
-                Id = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment.Key)?.Id,
+                Id = authenticator?.Id,
                 Name = authenticatorEnrollment.DisplayName,
+                DisplayName = isWebAuthn ? authenticatorEnrollment?.DisplayName ?? authenticator?.DisplayName : authenticator?.DisplayName,
                 MethodTypes = authenticatorEnrollment.Methods?.Select(x => x.Type).ToList(),
                 EnrollmentId = authenticatorEnrollment.Id,
                 Profile = GetAuthenticatorProfile(authenticatorEnrollment),
@@ -107,10 +116,15 @@ namespace Okta.Idx.Sdk.Helpers
                     string.Equals(x.Key, AuthenticatorType.WebAuthn.ToString(), StringComparison.OrdinalIgnoreCase))?.CredentialId;
             }
 
+            var authenticator = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment?.Key);
+            var isWebAuthn = string.Equals(authenticator?.Key, AuthenticatorType.WebAuthn.ToString(),
+                StringComparison.OrdinalIgnoreCase);
+
             return new Authenticator
             {
-                Id = authenticators?.FirstOrDefault(x => x.Key == authenticatorEnrollment?.Key)?.Id,
-                Name = authenticatorEnrollment?.DisplayName,
+                Id = authenticator?.Id,
+                Name = authenticatorEnrollment.DisplayName,
+                DisplayName = isWebAuthn ? authenticatorEnrollment?.DisplayName ?? authenticator?.DisplayName : authenticator?.DisplayName,
                 MethodTypes = authenticatorEnrollment?.Methods?.Select(x => x.Type).ToList(),
                 EnrollmentId = authenticatorEnrollment?.Id,
                 Profile = (authenticatorEnrollment != null) ? GetAuthenticatorProfile(authenticatorEnrollment) : string.Empty,
