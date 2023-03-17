@@ -122,6 +122,7 @@ namespace Okta.Idx.Sdk.Helpers
 
             return new Authenticator
             {
+                Id = authenticator?.Id,
                 Name = authenticatorEnrollment.DisplayName,
                 DisplayName = isWebAuthn ? authenticatorEnrollment?.DisplayName ?? authenticator?.DisplayName : authenticator?.DisplayName,
                 MethodTypes = authenticatorEnrollment?.Methods?.Select(x => x.Type).ToList(),
