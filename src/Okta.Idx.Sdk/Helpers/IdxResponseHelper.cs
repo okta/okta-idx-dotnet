@@ -81,6 +81,7 @@ namespace Okta.Idx.Sdk.Helpers
                 EnrollmentId = authenticatorEnrollment.Id,
                 Profile = GetAuthenticatorProfile(authenticatorEnrollment),
                 ContextualData = authenticatorEnrollment.AuthenticatorContextualData,
+                Settings = authenticatorEnrollment.Settings,
             };
         }
 
