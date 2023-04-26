@@ -58,6 +58,9 @@ namespace Okta.Idx.Sdk
         /// </summary>
         string CredentialId { get; }
 
+        /// <summary>
+        /// Gets the settings.
+        /// </summary>
         AuthenticatorSettings Settings { get; }
     }
 }
