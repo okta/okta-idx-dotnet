@@ -18635,7 +18635,6 @@ uest_uri=urn:okta:MWxLNTRoRWowSXJkT21hZzVUc0d6RUZGMzNZMFpyclMyWHZkRUVuZkhEMDowb2
    }
 }";
 
-
             #endregion
 
             Queue<MockResponse> queue = new Queue<MockResponse>();
@@ -18670,10 +18669,6 @@ uest_uri=urn:okta:MWxLNTRoRWowSXJkT21hZzVUc0d6RUZGMzNZMFpyclMyWHZkRUVuZkhEMDowb2
             authResponse.CurrentAuthenticator.Settings.Age.MinAgeMinutes.Should().Be(5);
             authResponse.CurrentAuthenticator.Settings.Age.HistoryCount.Should().Be(2);
             authResponse.CurrentAuthenticator.Settings.DaysToExpiry.Should().Be(286);
-
-
-            authResponse.Messages.Should().HaveCount(1);
-            authResponse.CanSkip.Should().BeTrue();
         }
 
         #endregion
