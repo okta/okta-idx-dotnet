@@ -38,6 +38,7 @@ namespace Okta.Idx.Sdk
         /// <inheritdoc/>
         public string CredentialId => GetStringProperty("credentialId");
 
+        /// <inheritdoc/>
         public AuthenticatorSettings Settings => GetResourceProperty<AuthenticatorSettings>("settings");
     }
 }
