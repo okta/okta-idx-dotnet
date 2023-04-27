@@ -36,5 +36,8 @@ namespace Okta.Idx.Sdk
 
         /// <inheritdoc/>
         public string CredentialId { get; set; }
+
+        /// <inheritdoc/>
+        public IAuthenticatorSettings Settings { get; set; }
     }
 }

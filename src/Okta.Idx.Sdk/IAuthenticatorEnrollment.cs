@@ -57,5 +57,10 @@ namespace Okta.Idx.Sdk
         /// Gets the credential Id. This is only applicable for Web Authn.
         /// </summary>
         string CredentialId { get; }
+
+        /// <summary>
+        /// Gets the settings.
+        /// </summary>
+        AuthenticatorSettings Settings { get; }
     }
 }
