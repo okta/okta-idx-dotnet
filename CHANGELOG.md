@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.3.2
+
+### Bug Fixes
+
+* Include (password) complexity in response when present.
+
+## 2.3.1
+
+### Bug Fixes
+
+* Fix NullReferenceException in SignInWidgetConfiguration deserialization.
+
 ## 2.3.0
 
 ### Bug Fixes
