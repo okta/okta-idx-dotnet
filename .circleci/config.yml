@@ -12,13 +12,13 @@ jobs:
   build:
     description: Build, test and pack 
     executor:
-      name: windows/server-2019
+      name: windows/default
     steps:
       - checkout
       - run:
           name: "Install required components"
           command: |
-              choco install -y dotnetcore-sdk
+              choco install -y dotnet-6.0-sdk
       - run:
           name: "Test Runner"
           command: |
