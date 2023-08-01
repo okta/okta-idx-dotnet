@@ -11,11 +11,18 @@ namespace Okta.Idx.Sdk
             throw new NotImplementedException();
         }
 
+        private static IPasswordWarnStateResolver _defaultResolver = new FalsePasswordWarnStateResolver();
+
         public static IPasswordWarnStateResolver Default
         {
             get
             {
-                return new PasswordWarnStateResolver();
+                return _defaultResolver;
+            }
+
+            set
+            {
+                _defaultResolver = value;
             }
         }
     }

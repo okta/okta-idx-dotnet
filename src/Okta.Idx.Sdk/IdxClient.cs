@@ -135,7 +135,7 @@ namespace Okta.Idx.Sdk
 
             this.httpClient = serviceProvider.GetRequiredService<HttpClient>();
             this._dataStore = serviceProvider.GetRequiredService<IDataStore>();
-            this._passwordWarnStateResolver = serviceProvider.GetRequiredService<PasswordWarnStateResolver>();
+            this._passwordWarnStateResolver = serviceProvider.GetRequiredService<IPasswordWarnStateResolver>();
             this._services = services;
         }
 

@@ -15,6 +15,13 @@ namespace Okta.Idx.Sdk.UnitTests
 
     public class IdxClientShould
     {
+        [Fact]
+        public async  Task CreateClient()
+        {
+            IdxClient idxClient = IdxClient.Create();
+            idxClient.Should().NotBeNull();
+        }
+
         #region Basic Login
         
         [Fact]
