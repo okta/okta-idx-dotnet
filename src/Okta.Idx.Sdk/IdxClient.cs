@@ -167,6 +167,7 @@ namespace Okta.Idx.Sdk
             services.AddTransient<IDataStore>((serviceProvider) => new DefaultDataStore(serviceProvider.GetRequiredService<IRequestExecutor>(), serviceProvider.GetRequiredService<ISerializer>(), serviceProvider.GetRequiredService<ResourceFactory>(), serviceProvider.GetRequiredService<ILogger>(), serviceProvider.GetRequiredService<UserAgentBuilder>()));
 
             services.AddTransient((serviceProvider) => PasswordWarnStateResolver.Default);
+
             return services;
         }
 
@@ -953,6 +954,11 @@ namespace Okta.Idx.Sdk
                     AuthenticationStatus = AuthenticationStatus.Success,
                     TokenInfo = tokenResponse,
                 };
+            }
+
+            if (_passwordWarnStateResolver.IsInPasswordWarnState(skipResponse))
+            {
+                return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, skipResponse, AuthenticationStatus.PasswordWarn);
             }
 
             throw new UnexpectedRemediationException(RemediationType.SuccessWithInteractionCode, skipResponse);

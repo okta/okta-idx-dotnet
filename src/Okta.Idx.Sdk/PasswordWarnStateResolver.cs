@@ -6,7 +6,7 @@ namespace Okta.Idx.Sdk
 {
     public class PasswordWarnStateResolver : IPasswordWarnStateResolver
     {
-        public bool IsInPasswordWarnState(IAuthenticationResponse authenticationResponse)
+        public bool IsInPasswordWarnState(IIdxResponse authenticationResponse)
         {
             throw new NotImplementedException();
         }

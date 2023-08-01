@@ -6,6 +6,6 @@ namespace Okta.Idx.Sdk
 {
     public interface IPasswordWarnStateResolver
     {
-        bool IsInPasswordWarnState(IAuthenticationResponse authenticationResponse);
+        bool IsInPasswordWarnState(IIdxResponse authenticationResponse);
     }
 }
