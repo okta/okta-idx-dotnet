@@ -20,8 +20,6 @@ namespace Okta.Idx.Sdk
         /// </summary>
         PasswordExpired,
 
-        PasswordWarn,
-
         /// <summary>
         /// Waiting for authenticator verification
         /// </summary>

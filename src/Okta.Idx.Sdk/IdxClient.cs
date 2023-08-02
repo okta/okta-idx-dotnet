@@ -102,30 +102,18 @@ namespace Okta.Idx.Sdk
                 _logger,
                 userAgentBuilder);
 
-            _passwordWarnStateResolver = PasswordWarnStateResolver.Default;
+            _passwordWarnStateResolver = Sdk.PasswordWarnStateResolver.Default;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="IdxClient"/> class.
-        /// </summary>
-        /// <param name="services">The services.</param>
-        public IdxClient(IServiceCollection services)
+        internal IdxClient(bool initialize)
         {
-            this._services = services;
-            this.Initialize(this._services);
+            if (initialize)
+            {
+                this.Initialize(GetDefaultServiceCollection());
+            }
         }
 
-        /// <summary>
-        /// Create a new IdxClient using the specified service collection.
-        /// </summary>
-        /// <param name="services">The service collection.</param>
-        /// <returns>IdxClient.</returns>
-        public static IdxClient Create(IServiceCollection services = null)
-        {
-            return new IdxClient(services);
-        }
-
-        private void Initialize(IServiceCollection services = null)
+        internal void Initialize(IServiceCollection services = null)
         {
             services = services ?? GetDefaultServiceCollection();
             IServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -152,21 +140,22 @@ namespace Okta.Idx.Sdk
             ILogger logger = null)
         {
             ServiceCollection services = new ServiceCollection();
-            services.AddTransient((serviceProvider) => configuration ?? GetConfigurationOrDefault(configuration));
-            services.AddTransient((serviceProvider) => logger ?? NullLogger.Instance);
-            services.AddTransient((serviceProvider) => new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version));
-            services.AddTransient((serviceProvider) => httpClient ?? DefaultHttpClient.Create(
+            services.AddSingleton((svcProvider) => configuration ?? GetConfigurationOrDefault(configuration));
+            services.AddSingleton((svcProvider) => logger ?? NullLogger.Instance);
+            services.AddSingleton((svcProvider) => new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version));
+            services.AddSingleton((svcProvider) => httpClient ?? DefaultHttpClient.Create(
                 connectionTimeout: null,
                 proxyConfiguration: null,
-                logger: serviceProvider.GetService<ILogger>()));
-            services.AddTransient((serviceProvider) => OktaConfigurationConverter.Convert(serviceProvider.GetRequiredService<IdxConfiguration>()));
-            services.AddTransient((serviceProvider) => new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
-            services.AddTransient<IRequestExecutor>((serviceProvider) => new DefaultRequestExecutor(serviceProvider.GetRequiredService<OktaClientConfiguration>(), serviceProvider.GetRequiredService<HttpClient>(), serviceProvider.GetService<ILogger>()));
-            services.AddTransient((serviceProvider) => new ResourceFactory(this, serviceProvider.GetService<ILogger>(), serviceProvider.GetService<AbstractResourceTypeResolverFactory>()));
-            services.AddTransient<ISerializer>((serviceProvider) => new DefaultSerializer());
-            services.AddTransient<IDataStore>((serviceProvider) => new DefaultDataStore(serviceProvider.GetRequiredService<IRequestExecutor>(), serviceProvider.GetRequiredService<ISerializer>(), serviceProvider.GetRequiredService<ResourceFactory>(), serviceProvider.GetRequiredService<ILogger>(), serviceProvider.GetRequiredService<UserAgentBuilder>()));
+                logger: svcProvider.GetService<ILogger>()));
 
-            services.AddTransient((serviceProvider) => PasswordWarnStateResolver.Default);
+            services.AddSingleton((svcProvider) => OktaConfigurationConverter.Convert(svcProvider.GetRequiredService<IdxConfiguration>()));
+            services.AddSingleton((svcProvider) => new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
+            services.AddSingleton<IRequestExecutor>((svcProvider) => new DefaultRequestExecutor(svcProvider.GetRequiredService<OktaClientConfiguration>(), svcProvider.GetRequiredService<HttpClient>(), svcProvider.GetService<ILogger>()));
+            services.AddSingleton((svcProvider) => new ResourceFactory(this, svcProvider.GetService<ILogger>(), svcProvider.GetService<AbstractResourceTypeResolverFactory>()));
+            services.AddSingleton<ISerializer>((svcProvider) => new DefaultSerializer());
+            services.AddSingleton<IDataStore>((svcProvider) => new DefaultDataStore(svcProvider.GetRequiredService<IRequestExecutor>(), svcProvider.GetRequiredService<ISerializer>(), svcProvider.GetRequiredService<ResourceFactory>(), svcProvider.GetRequiredService<ILogger>(), svcProvider.GetRequiredService<UserAgentBuilder>()));
+
+            services.AddSingleton((svcProvider) => Sdk.PasswordWarnStateResolver.Default);
 
             return services;
         }
@@ -176,7 +165,7 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="configuration">The IDX configuration.</param>
         /// <returns>The built configuration</returns>
-        protected static IdxConfiguration GetConfigurationOrDefault(IdxConfiguration configuration)
+        protected internal static IdxConfiguration GetConfigurationOrDefault(IdxConfiguration configuration)
         {
             string configurationFileRoot = Directory.GetCurrentDirectory();
 
@@ -246,6 +235,14 @@ namespace Okta.Idx.Sdk
                 resourceFactory,
                 NullLogger.Instance,
                 userAgentBuilder);
+        }
+
+        public IPasswordWarnStateResolver PasswordWarnStateResolver
+        {
+            get
+            {
+                return _passwordWarnStateResolver;
+            }
         }
 
         private IdxConfiguration configuration;
@@ -943,6 +940,11 @@ namespace Okta.Idx.Sdk
 
             var skipResponse = await skipOption.ProceedAsync(skipRequest, cancellationToken);
 
+            if (_passwordWarnStateResolver.IsInPasswordWarnState(skipResponse) && !skipResponse.IsLoginSuccess)
+            {
+                return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, skipResponse, AuthenticationStatus.AwaitingAuthenticatorSelection);
+            }
+
             skipResponse.AssertNotInTerminalState();
 
             if (skipResponse.IsLoginSuccess)
@@ -954,11 +956,6 @@ namespace Okta.Idx.Sdk
                     AuthenticationStatus = AuthenticationStatus.Success,
                     TokenInfo = tokenResponse,
                 };
-            }
-
-            if (_passwordWarnStateResolver.IsInPasswordWarnState(skipResponse))
-            {
-                return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, skipResponse, AuthenticationStatus.PasswordWarn);
             }
 
             throw new UnexpectedRemediationException(RemediationType.SuccessWithInteractionCode, skipResponse);

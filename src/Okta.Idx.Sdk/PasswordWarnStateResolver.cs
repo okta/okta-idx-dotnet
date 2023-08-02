@@ -4,15 +4,20 @@ using System.Text;
 
 namespace Okta.Idx.Sdk
 {
+    /// <inheritdoc />
     public class PasswordWarnStateResolver : IPasswordWarnStateResolver
     {
+        /// <inheritdoc />
         public bool IsInPasswordWarnState(IIdxResponse authenticationResponse)
         {
-            throw new NotImplementedException();
+            return authenticationResponse.FindRemediationOption(RemediationType.ReenrollAuthenticatorWarning, false) != null;
         }
 
-        private static IPasswordWarnStateResolver _defaultResolver = new FalsePasswordWarnStateResolver();
+        private static IPasswordWarnStateResolver _defaultResolver = new PasswordWarnStateResolver();
 
+        /// <summary>
+        /// Gets or sets the default instance.
+        /// </summary>
         public static IPasswordWarnStateResolver Default
         {
             get
