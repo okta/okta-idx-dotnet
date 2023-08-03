@@ -12,16 +12,6 @@ namespace Okta.Idx.Sdk.UnitTests
     public class IdxClientBuilderShould
     {
         [Fact]
-        public async Task BuildClient()
-        {
-            IdxClient client = new IdxClientBuilder()
-                .Build();
-
-            client.Should().NotBeNull();
-            client.PasswordWarnStateResolver.Should().NotBeNull();
-        }
-
-        [Fact]
         public async Task UseConfiguration()
         {
             string testIssuer = "http://fake.com";
@@ -43,9 +33,37 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
+        public async Task BuildClient()
+        {
+            string testIssuer = "http://fake.com";
+            string testClientId = Guid.NewGuid().ToString();
+            string testRedirectUri = "http://fake.com/callback";
+            IdxClient client = new IdxClientBuilder()
+                .UseConfiguration(new IdxConfiguration
+                {
+                    Issuer = testIssuer,
+                    ClientId = testClientId,
+                    RedirectUri = testRedirectUri
+                })
+                .Build();
+
+            client.Should().NotBeNull();
+            client.PasswordWarnStateResolver.Should().NotBeNull();
+        }
+
+        [Fact]
         public async Task UsePasswordWarnStateResolver()
         {
+            string testIssuer = "http://fake.com";
+            string testClientId = Guid.NewGuid().ToString();
+            string testRedirectUri = "http://fake.com/callback";
             IdxClient client = new IdxClientBuilder()
+                .UseConfiguration(new IdxConfiguration
+                {
+                    Issuer = testIssuer,
+                    ClientId = testClientId,
+                    RedirectUri = testRedirectUri
+                })
                 .UsePasswordWarnStateResolver((idxResponse) => true)                
                 .Build();
 

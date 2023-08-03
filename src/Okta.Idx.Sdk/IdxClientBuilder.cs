@@ -29,7 +29,6 @@ namespace Okta.Idx.Sdk
         public IdxClientBuilder()
         {
             this._services = new ServiceCollection();
-            this.UseConfiguration(IdxClient.GetConfigurationOrDefault(null));
             this.UseLogger(NullLogger.Instance);
             this.UseUserAgentBuilder(new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version));
 
@@ -41,6 +40,8 @@ namespace Okta.Idx.Sdk
             this.UsePasswordWarnStateResolver(PasswordWarnStateResolver.Default);
         }
 
+        private bool _configured = false;
+
         /// <summary>
         /// Use the specified configuration.
         /// </summary>
@@ -48,6 +49,7 @@ namespace Okta.Idx.Sdk
         /// <returns>IdxClientBuilder.</returns>
         public IdxClientBuilder UseConfiguration(IdxConfiguration configuration)
         {
+            _configured = true;
             this.Remove<IdxConfiguration>();
             this.Remove<OktaClientConfiguration>();
             this._services.AddSingleton(configuration);
@@ -121,6 +123,11 @@ namespace Okta.Idx.Sdk
         /// <returns>IdxClient.</returns>
         public IdxClient Build(bool validate = false)
         {
+            if (!_configured)
+            {
+                UseConfiguration(IdxClient.GetConfigurationOrDefault(null));
+            }
+
             IdxClient client = new IdxClient(false);
             client.Initialize(GetServiceCollection(client));
             if (validate)
