@@ -15,7 +15,6 @@ namespace Okta.Idx.Sdk.UnitTests
 
     public class IdxClientShould
     {
-
         #region Basic Login
         
         [Fact]
