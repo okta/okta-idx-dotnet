@@ -118,7 +118,6 @@ namespace Okta.Idx.Sdk
             services = services ?? GetDefaultServiceCollection();
             IServiceProvider serviceProvider = services.BuildServiceProvider();
             Configuration = serviceProvider.GetService<IdxConfiguration>();
-            IdxConfigurationValidator.Validate(Configuration);
             _logger = serviceProvider.GetRequiredService<ILogger>();
 
             this.httpClient = serviceProvider.GetRequiredService<HttpClient>();

@@ -29,7 +29,7 @@ namespace Okta.Idx.Sdk
         public IdxClientBuilder()
         {
             this._services = new ServiceCollection();
-            this.UseConfiguration(IdxClient.GetConfigurationOrDefault(new IdxConfiguration()));
+            this.UseConfiguration(IdxClient.GetConfigurationOrDefault(null));
             this.UseLogger(NullLogger.Instance);
             this.UseUserAgentBuilder(new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version));
 
@@ -117,12 +117,27 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Build the IdxClient.
         /// </summary>
+        /// <param name="validate">A value indicating whether to validate the configuration.</param>
         /// <returns>IdxClient.</returns>
-        public IdxClient Build()
+        public IdxClient Build(bool validate = false)
         {
             IdxClient client = new IdxClient(false);
             client.Initialize(GetServiceCollection(client));
+            if (validate)
+            {
+                ValidateConfigurationOrDie(client);
+            }
+
             return client;
+        }
+
+        /// <summary>
+        /// Throws an ArgumentException if the configuration is not valid.
+        /// </summary>
+        /// <param name="client">The client whose configuration is checked.</param>
+        public void ValidateConfigurationOrDie(IdxClient client)
+        {
+            IdxConfigurationValidator.Validate(client.Configuration);
         }
 
         /// <summary>
