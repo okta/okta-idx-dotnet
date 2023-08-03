@@ -29,7 +29,7 @@ namespace Okta.Idx.Sdk
         public IdxClientBuilder()
         {
             this._services = new ServiceCollection();
-            this.UseConfiguration(IdxClient.GetConfigurationOrDefault(null));
+            this.UseConfiguration(IdxClient.GetConfigurationOrDefault(new IdxConfiguration()));
             this.UseLogger(NullLogger.Instance);
             this.UseUserAgentBuilder(new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version));
 
