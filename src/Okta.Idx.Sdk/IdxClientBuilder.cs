@@ -132,7 +132,7 @@ namespace Okta.Idx.Sdk
             client.Initialize(GetServiceCollection(client));
             if (validate)
             {
-                ValidateConfigurationOrDie(client);
+                ValidateConfigurationOrThrow(client);
             }
 
             return client;
@@ -142,7 +142,7 @@ namespace Okta.Idx.Sdk
         /// Throws an ArgumentException if the configuration is not valid.
         /// </summary>
         /// <param name="client">The client whose configuration is checked.</param>
-        public void ValidateConfigurationOrDie(IdxClient client)
+        public void ValidateConfigurationOrThrow(IdxClient client)
         {
             IdxConfigurationValidator.Validate(client.Configuration);
         }
