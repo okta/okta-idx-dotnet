@@ -939,7 +939,8 @@ namespace Okta.Idx.Sdk
 
             var skipResponse = await skipOption.ProceedAsync(skipRequest, cancellationToken);
 
-            if (_passwordWarnStateResolver.IsInPasswordWarnState(skipResponse) && !skipResponse.IsLoginSuccess)
+            if ((_passwordWarnStateResolver.IsInPasswordWarnState(skipResponse) || _passwordWarnStateResolver.IsInPasswordWarnState(introspectResponse))
+                && !skipResponse.IsLoginSuccess)
             {
                 return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, skipResponse, AuthenticationStatus.AwaitingAuthenticatorSelection);
             }
