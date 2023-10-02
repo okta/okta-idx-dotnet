@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
@@ -22,6 +23,7 @@ using Okta.Idx.Sdk.Configuration;
 using Okta.Idx.Sdk.Extensions;
 using Okta.Idx.Sdk.Helpers;
 using Okta.Sdk.Abstractions;
+using Okta.Sdk.Abstractions.Configuration;
 using Okta.Sdk.Abstractions.Configuration.Providers.EnvironmentVariables;
 using Okta.Sdk.Abstractions.Configuration.Providers.Object;
 using Okta.Sdk.Abstractions.Configuration.Providers.Yaml;
@@ -45,8 +47,11 @@ namespace Okta.Idx.Sdk
         /// </summary>
         private Okta.Sdk.Abstractions.RequestContext _deprecatedRequestContext;
 
-
         private ILogger _logger;
+
+        private IPasswordWarnStateResolver _passwordWarnStateResolver;
+
+        private IServiceCollection _services;
 
         static IdxClient()
         {
@@ -96,6 +101,62 @@ namespace Okta.Idx.Sdk
                 resourceFactory,
                 _logger,
                 userAgentBuilder);
+
+            _passwordWarnStateResolver = Sdk.PasswordWarnStateResolver.Default;
+        }
+
+        internal IdxClient(bool initialize)
+        {
+            if (initialize)
+            {
+                this.Initialize(GetDefaultServiceCollection());
+            }
+        }
+
+        internal void Initialize(IServiceCollection services = null)
+        {
+            services = services ?? GetDefaultServiceCollection();
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+            Configuration = serviceProvider.GetService<IdxConfiguration>();
+            _logger = serviceProvider.GetRequiredService<ILogger>();
+
+            this.httpClient = serviceProvider.GetRequiredService<HttpClient>();
+            this._dataStore = serviceProvider.GetRequiredService<IDataStore>();
+            this._passwordWarnStateResolver = serviceProvider.GetRequiredService<IPasswordWarnStateResolver>();
+            this._services = services;
+        }
+
+        /// <summary>
+        /// Gets the default service collection.
+        /// </summary>
+        /// <param name="configuration">The idx configuration.</param>
+        /// <param name="httpClient">The http client.</param>
+        /// <param name="logger">The logger.</param>
+        /// <returns>IServiceCollection.</returns>
+        protected IServiceCollection GetDefaultServiceCollection(
+            IdxConfiguration configuration = null,
+            HttpClient httpClient = null,
+            ILogger logger = null)
+        {
+            ServiceCollection services = new ServiceCollection();
+            services.AddSingleton((svcProvider) => configuration ?? GetConfigurationOrDefault(configuration));
+            services.AddSingleton((svcProvider) => logger ?? NullLogger.Instance);
+            services.AddSingleton((svcProvider) => new UserAgentBuilder("okta-idx-dotnet", typeof(IdxClient).GetTypeInfo().Assembly.GetName().Version));
+            services.AddSingleton((svcProvider) => httpClient ?? DefaultHttpClient.Create(
+                connectionTimeout: null,
+                proxyConfiguration: null,
+                logger: svcProvider.GetService<ILogger>()));
+
+            services.AddSingleton((svcProvider) => OktaConfigurationConverter.Convert(svcProvider.GetRequiredService<IdxConfiguration>()));
+            services.AddSingleton((svcProvider) => new AbstractResourceTypeResolverFactory(ResourceTypeHelper.GetAllDefinedTypes(typeof(Resource))));
+            services.AddSingleton<IRequestExecutor>((svcProvider) => new DefaultRequestExecutor(svcProvider.GetRequiredService<OktaClientConfiguration>(), svcProvider.GetRequiredService<HttpClient>(), svcProvider.GetService<ILogger>()));
+            services.AddSingleton((svcProvider) => new ResourceFactory(this, svcProvider.GetService<ILogger>(), svcProvider.GetService<AbstractResourceTypeResolverFactory>()));
+            services.AddSingleton<ISerializer>((svcProvider) => new DefaultSerializer());
+            services.AddSingleton<IDataStore>((svcProvider) => new DefaultDataStore(svcProvider.GetRequiredService<IRequestExecutor>(), svcProvider.GetRequiredService<ISerializer>(), svcProvider.GetRequiredService<ResourceFactory>(), svcProvider.GetRequiredService<ILogger>(), svcProvider.GetRequiredService<UserAgentBuilder>()));
+
+            services.AddSingleton((svcProvider) => Sdk.PasswordWarnStateResolver.Default);
+
+            return services;
         }
 
         /// <summary>
@@ -103,7 +164,7 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="configuration">The IDX configuration.</param>
         /// <returns>The built configuration</returns>
-        protected static IdxConfiguration GetConfigurationOrDefault(IdxConfiguration configuration)
+        protected internal static IdxConfiguration GetConfigurationOrDefault(IdxConfiguration configuration)
         {
             string configurationFileRoot = Directory.GetCurrentDirectory();
 
@@ -173,6 +234,14 @@ namespace Okta.Idx.Sdk
                 resourceFactory,
                 NullLogger.Instance,
                 userAgentBuilder);
+        }
+
+        public IPasswordWarnStateResolver PasswordWarnStateResolver
+        {
+            get
+            {
+                return _passwordWarnStateResolver;
+            }
         }
 
         private IdxConfiguration configuration;
@@ -869,6 +938,12 @@ namespace Okta.Idx.Sdk
             };
 
             var skipResponse = await skipOption.ProceedAsync(skipRequest, cancellationToken);
+
+            if ((_passwordWarnStateResolver.IsInPasswordWarnState(skipResponse) || _passwordWarnStateResolver.IsInPasswordWarnState(introspectResponse))
+                && !skipResponse.IsLoginSuccess)
+            {
+                return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, skipResponse, AuthenticationStatus.AwaitingAuthenticatorSelection);
+            }
 
             skipResponse.AssertNotInTerminalState();
 

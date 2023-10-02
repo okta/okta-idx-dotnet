@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.4.0
+
+### Additions
+
+* Add IdxClientBuilder to simplify configuration of IdxClient.
+* Add PasswordWarnStateResolver to account for password warn state.
+* Add CustomPasswordWarnStateResolver enabling custom resolution of password warn state.
+
+### Bug Fixes
+
+* Check password warn state on skip to prevent exception.
+
 ## 2.3.2
 
 ### Bug Fixes
