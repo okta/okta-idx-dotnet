@@ -31,7 +31,7 @@ jobs:
                 name: "Pack test package"
                 command: |
                   $Env:githash = git rev-parse --short HEAD 
-                  dotnet pack ./src/Okta.Idx.Sdk/Okta.Idx.Sdk.csproj --version-suffix $Env:githash --output ./artifacts
+                  dotnet pack ./src/Okta.Idx.Sdk/Okta.Idx.Sdk.csproj --configuration release --version-suffix $Env:githash --output ./artifacts
             - general-platform-helpers/step-artifacts-prepare-and-upload-windows:
                 files-to-upload: "artifacts"
                 location: "com/okta/devex/okta-idx-dotnet"
@@ -39,6 +39,10 @@ jobs:
           condition:
             equal: [ "<<pipeline.git.branch>>", "master" ]
           steps:
+            - run:
+                name: "Pack release package"
+                command: |
+                  dotnet pack ./src/Okta.Idx.Sdk/Okta.Idx.Sdk.csproj --configuration release --output ./artifacts
             - general-platform-helpers/step-artifacts-prepare-and-upload-windows:
                 files-to-upload: "artifacts"
                 location: "com/okta/devex/okta-idx-dotnet"

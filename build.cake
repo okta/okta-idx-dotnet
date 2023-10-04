@@ -189,8 +189,7 @@ Task("Default")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
     .IsDependentOn("Build")
-    .IsDependentOn("Test")
-    .IsDependentOn("Pack");
+    .IsDependentOn("Test");
 
 Task("EmbeddedWidgetTest")
     .IsDependentOn("RestoreEmbeddedWidgetSampleApp")
