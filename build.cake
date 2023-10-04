@@ -51,7 +51,7 @@ Task("Pack")
 .IsDependentOn("Build")
 .Does(() =>
 {
-    DotNetPack("./src/Okta.Idx.Sdk/Okta.Idx.Sdk.csproj", new DotNetCorePackSettings
+    DotNetCorePack("./src/Okta.Idx.Sdk/Okta.Idx.Sdk.csproj", new DotNetCorePackSettings
     {
         Configuration = configuration,
         OutputDirectory = "./artifacts/"
