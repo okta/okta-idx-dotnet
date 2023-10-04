@@ -29,9 +29,9 @@ jobs:
           steps:
             - run:
                 name: "Pack test package"
-                  command: |
-                    $Env:githash = git rev-parse --short HEAD 
-                    dotnet pack ./src/Okta.Idx.Sdk/Okta.Idx.Sdk.csproj --version-suffix $Env:githash --output ./artifacts
+                command: |
+                  $Env:githash = git rev-parse --short HEAD 
+                  dotnet pack ./src/Okta.Idx.Sdk/Okta.Idx.Sdk.csproj --version-suffix $Env:githash --output ./artifacts
             - general-platform-helpers/step-artifacts-prepare-and-upload-windows:
                 files-to-upload: "nupkg"
                 location: "com/okta/devex/okta-idx-dotnet"
