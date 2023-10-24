@@ -1,0 +1,40 @@
+@model embedded_auth_with_sdk.Models.OktaVerifySelectAuthenticatorMethodModel
+@using embedded_auth_with_sdk.Models;
+@using Okta.Idx.Sdk;
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Authenticate with Okta Verify";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+        <h3>Push Sent</h3>
+        @if (!string.IsNullOrEmpty(Model.CorrectAnswer))
+        {
+            <div>
+                <span>@Model.CorrectAnswer</span>
+            </div>
+        }
+        @Html.ActionLink("Verify with something else", "SelectAuthenticatorMethod")
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+    function poll() {
+        fetch('@Model.PollEndpoint')
+            .then(response => response.json())
+            .then(data => {
+                if (data.ContinuePolling) {
+                    setTimeout(poll, data.Refresh);
+                } else {
+                    window.location.href = data.Next;
+                }
+            });
+    }
+
+    setTimeout(poll, @Model.RefreshInterval);
+</script>

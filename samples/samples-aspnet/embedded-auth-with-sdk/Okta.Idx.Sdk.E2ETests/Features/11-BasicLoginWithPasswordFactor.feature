@@ -21,7 +21,7 @@
 	When she fills in her incorrect username
 	And she fills in her password
 	And she submits the Login form
-	Then she should see the message "There is no account with the Username"
+	Then she should see the message "Authentication failed"
 	
   Scenario: 1.1.3: Mary doesn't know her password
 	Given Mary navigates to the Basic Login View

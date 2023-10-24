@@ -1,0 +1,77 @@
+﻿@model embedded_auth_with_sdk.Models.EnrollWebAuthnViewModel
+@{
+    ViewBag.Title = ViewBag.Title ?? "Enroll your Web Authn authenticator.";
+}
+
+<hr />
+
+<div class="row d-center">
+    <div class="col-md-8">
+        <section id="forgotPasswordForm">
+            <h4>Enroll your Web Authn authenticator.</h4>
+        </section>
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const challenge = '@Model.Challenge';
+        const userId = '@Model.UserId';
+        const username = '@Model.Username';
+        const displayName = '@Model.DisplayName';
+
+        const publicKeyCredentialCreationOptions = {
+            rp: {
+                name: "localhost",
+                id: "localhost",
+            },
+            challenge: strToBin(challenge),
+            user: {
+                id: strToBin(userId),
+                name: name,
+                displayName: displayName,
+            },
+            pubKeyCredParams: [{alg: -7, type: "public-key"}],
+        };
+
+        navigator.credentials.create({
+            publicKey: publicKeyCredentialCreationOptions
+        }).then((newCredential) => {
+            const clientDataJSON = binToStr(newCredential.response.clientDataJSON);
+            const attestationObject = binToStr(newCredential.response.attestationObject);
+
+            const params = {
+                "clientData": clientDataJSON,
+                "attestation": attestationObject,
+                "challenge": challenge,
+                "userId": userId,
+                "username": username,
+                "displayName": displayName
+            };
+
+            const options = {
+                method: 'POST',
+                body: JSON.stringify(params),
+                headers: { "Content-type": "application/json; charset=UTF-8" }
+            };
+
+            fetch("@Url.Action("EnrollWebAuthnAuthenticatorAsync", "Manage")", options)
+                .then(res => {
+                    console.log("Request successful! Response:", res);
+                    location.href = '@Url.Action("EnrollWebAuthnAuthenticator", "Manage", new { verificationCompleted = true})';
+                }).catch(function(err) {
+                    console.error(err);
+                    }
+                );
+        }).catch(function (err) {
+            console.error(err);
+        });
+    }, false);
+
+
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/idx-utils")
+}

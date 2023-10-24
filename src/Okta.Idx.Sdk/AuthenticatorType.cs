@@ -24,5 +24,10 @@ namespace Okta.Idx.Sdk
         /// Password
         /// </summary>
         Password,
+
+        /// <summary>
+        /// WebAuthn
+        /// </summary>
+        WebAuthn,
     }
 }

@@ -5,7 +5,7 @@
 	And a configured IDP object for Okta
 	And an IDP routing rule defined to allow users in the Sample App to use the IDP
 	And a user named Mary does not have an account in the org but has an Okta OIDC IDP account
-
+  
   Scenario: 5.1.1: Mary Logs in with Social IDP
 	Given Mary navigates to the Login View
 	When she clicks the Login with Okta button

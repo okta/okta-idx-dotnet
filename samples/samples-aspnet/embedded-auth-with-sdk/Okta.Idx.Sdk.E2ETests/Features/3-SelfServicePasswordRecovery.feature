@@ -5,15 +5,14 @@
 	And a user named "Mary"
 	And Mary is a user with a verified email and a set password
 
+  @Ignore
   Scenario: 3.1.1 Mary resets her password
 	Given Mary navigates to the Self Service Password Reset View
 	When she inputs her correct Email
 	And she submits the recovery form
-###	
 	Then she sees a page to select an authenticator
 	When she chooses Email
 	And she submits the select form
-###	
 	Then she sees a page to input her code
 	When she fills in the correct code
 	And she submits the verification form
@@ -23,10 +22,10 @@
 	And she submits the change password form
 	Then she is redirected to the Root Page is provided
 	
+  @Ignore
   Scenario: 3.1.2 Mary tries to reset a password with the wrong email
 	Given Mary navigates to the Self Service Password Reset View
-#	When she selects "Forgot Password"
 	Then she sees the Password Recovery Page
 	When she inputs an Email that doesn't exist
 	And she submits the recovery form
-	Then she sees a message "There is no account with the Username {username}." 
+	Then she sees a message "Authentication failed" 

@@ -67,6 +67,7 @@ namespace embedded_sign_in_widget
             }
             session[idxContext.State] = idxContext;
             session[IdxStateKey] = idxContext.State;
+            session["siwConfig"] = signInWidgetConfiguration;
             return signInWidgetConfiguration;
         }
     }

@@ -1,0 +1,41 @@
+@model embedded_auth_with_sdk.Models.OktaVerifySelectAuthenticatorMethodModel
+@using embedded_auth_with_sdk.Models;
+@using Okta.Idx.Sdk;
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Authenticate with Okta Verify";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">
+        <h3>Verify it's you with a security method</h3>
+        <div>Select from the following options</div>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @using (Html.BeginForm("SelectAuthenticatorMethodAsync", "OktaVerify", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.AuthenticatorId)
+            <div class="form-group">
+                @foreach (var methodType in Model.MethodTypes)
+                {
+                    <div>
+                        <label>
+                            @Html.RadioButtonFor(m => m.MethodType, methodType)
+                            @methodType
+                        </label>
+                    </div>
+                }
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-0 col-md-10">
+                    <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
+                </div>
+            </div>
+        }   
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

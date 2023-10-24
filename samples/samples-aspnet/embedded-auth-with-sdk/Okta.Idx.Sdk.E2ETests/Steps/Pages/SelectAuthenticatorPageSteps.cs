@@ -50,6 +50,13 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
             _selectAuthenticatorPageModel.PhoneAuthenticator.Displayed.Should().BeTrue();
         }
 
+        [Then(@"she sees the list of optional factors")]
+        public void ThenSheSeesTheListOfOptionalFactors()
+        {
+            _selectAuthenticatorPageModel.AssertPageOpenedAndValid();
+        }
+
+
         [Then(@"she is presented with an option to select SMS to verify")]
         public void ThenSheIsPresentedWithAnOptionToSelectSmsToVerify()
         {
@@ -85,6 +92,7 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
         }
 
         [Then(@"she sees the Select Authenticator page with password as the only option")]
+        [Then(@"she sees the Select Authenticator page")]
         public void ThenSheSeesTheSelectAuthenticatorPageWithPasswordAsAnOnlyOption()
         {
             _selectAuthenticatorPageModel.AssertPageOpenedAndValid();
@@ -98,16 +106,52 @@ namespace embedded_auth_with_sdk.E2ETests.Steps.Pages
             _selectAuthenticatorPageModel.PasswordAuthenticator.Click();
         }
 
+        [When(@"she selects Security Question")]
+        public void WhenSheSelectsSecurityQuestion()
+        {
+            _selectAuthenticatorPageModel.SecurityQuestion.Click();
+            _selectAuthenticatorAsyncPageModel.SubmitButton.Click();
+        }
+
         [When(@"she submits the select authenticator form")]
         public void WhenSheSubmitsTheSelectAuthenticatorForm()
         {
             _selectAuthenticatorPageModel.SubmitButton.Click();
         }
 
-        [When(@"she selects ""(.*)"" on SMS")]
-        public void WhenSheSelectsOnSMS(string p0)
+        [When(@"she selects Skip")]
+        public void WhenSheSelectsOnSMS()
         {
             _selectAuthenticatorPageModel.SkipThisStepButton.Click();
         }
+
+
+        [When(@"she skips optional authenticators if prompted")]
+        public void WhenSheSkipsOptionalAuthenticatorsIfPrompted()
+        {
+            if (_selectAuthenticatorPageModel.IsPageOpened)
+            {
+                _selectAuthenticatorPageModel.SkipThisStepButton.Click();
+            }
+        }
+
+
+        [Then(@"she sees the list of required factors \(Google Authenticator\) to enroll")]
+
+        [Then(@"she is presented with an option to select Google Authenticator to verify")]
+        public void ThenSheSeesTheListOfRequiredFactorsGoogleAuthenticatorToEnroll()
+        {
+            _selectAuthenticatorPageModel.AssertPageOpenedAndValid();
+            Func<IWebElement> getPasswordFunc = () => _selectAuthenticatorPageModel.GoogleAuthenticator;
+            getPasswordFunc.Should().NotThrow<NoSuchElementException>();
+        }
+
+        [When(@"She selects Google Authenticator from the list")]
+        public void WhenSheSelectsGoogleAuthenticatorFromTheList()
+        {
+            _selectAuthenticatorPageModel.GoogleAuthenticator.Click();
+            _selectAuthenticatorPageModel.SubmitButton.Click();
+        }
+
     }
 }

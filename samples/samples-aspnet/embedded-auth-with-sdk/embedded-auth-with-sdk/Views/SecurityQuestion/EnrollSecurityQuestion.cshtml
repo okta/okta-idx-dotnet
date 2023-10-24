@@ -1,0 +1,47 @@
+﻿@model embedded_auth_with_sdk.Models.EnrollSecurityQuestionModel
+@using Okta.Idx.Sdk
+@using embedded_auth_with_sdk.Models
+
+@{
+    ViewBag.Title = ViewBag.Title ?? "Select Security Question";
+}
+
+<div class="row d-center">
+    <div class="col-md-8">       
+    @using (Html.BeginForm("EnrollSecurityQuestionAsync", "SecurityQuestion", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        <h4>Setup Security Question</h4>
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="form-group">
+            <div class="col-md-10">
+                @Html.ActionLink("Create my own security question", "EnrollCustomSecurityQuestion")
+                <div class="row row-no-gutters">
+                    @Html.LabelFor(m => m.QuestionKey, new { @class = "control-label" })
+                </div>
+                <div class="row row-no-gutters">
+                    @Html.DropDownList("QuestionKey", Model.SelectListItems)
+                </div>
+                <div class="row row-no-gutters">
+                    @Html.LabelFor(m => m.Answer, new { @class = "control-label" })
+                </div>
+                <div class="row row-no-gutters">
+                    @Html.TextBoxFor(m => m.Answer, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-10">
+                <input type="submit" value="Submit" class="btn btn-primary btn-stretch-wide" />
+            </div>
+        </div>
+        }
+        <hr />
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+

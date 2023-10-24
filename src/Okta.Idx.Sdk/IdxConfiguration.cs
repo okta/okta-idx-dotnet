@@ -21,6 +21,12 @@ namespace Okta.Idx.Sdk.Configuration
         public string ClientSecret { get; set; }
 
         /// <summary>
+        /// Gets or Sets the Device token. Optional setting, only effective when the ClientSecret is set.
+        /// </summary>
+        [Obsolete("This property has been deprecated and will be removed in the next major version. Use DeviceContext via client's constructor instead.")]
+        public string DeviceToken { get; set; }
+
+        /// <summary>
         /// Gets or sets a list of string based scopes.
         /// </summary>
         public List<string> Scopes { get; set; } = new List<string>(OktaDefaults.Scopes);
@@ -35,19 +41,12 @@ namespace Okta.Idx.Sdk.Configuration
         /// </summary>
         public string RedirectUri { get; set; }
 
-        public bool IsConfidentialClient
-        {
-            get
-            {
-                var isConfidentialClient = false;
+        /// <summary>
+        /// Gets or sets the acrvalue URI.
+        /// </summary>
+        public string AcrValue { get; set; }
 
-                if (!string.IsNullOrEmpty(ClientSecret) && ClientSecret.IndexOf("{ClientSecret}", StringComparison.OrdinalIgnoreCase) == -1)
-                {
-                    isConfidentialClient = true;
-                }
-
-                return isConfidentialClient;
-            }
-        }
+        public bool IsConfidentialClient => !string.IsNullOrEmpty(ClientSecret) &&
+                                                ClientSecret.IndexOf("{ClientSecret}", StringComparison.OrdinalIgnoreCase) == -1;
     }
 }

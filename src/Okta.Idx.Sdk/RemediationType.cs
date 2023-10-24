@@ -26,14 +26,29 @@ namespace Okta.Idx.Sdk
         public static readonly string ReenrollAuthenticator = "reenroll-authenticator";
 
         /// <summary>
+        /// reenroll-authenticator-warning
+        /// </summary>
+        public static readonly string ReenrollAuthenticatorWarning = "reenroll-authenticator-warning";
+
+        /// <summary>
         /// challenge-authenticator
         /// </summary>
         public static readonly string ChallengeAuthenticator = "challenge-authenticator";
 
         /// <summary>
+        /// challenge-poll
+        /// </summary>
+        public static readonly string ChallengePoll = "challenge-poll";
+
+        /// <summary>
         /// select-authenticator-authenticate
         /// </summary>
         public static readonly string SelectAuthenticatorAuthenticate = "select-authenticator-authenticate";
+
+        /// <summary>
+        /// resend
+        /// </summary>
+        public static readonly string Resend = "resend";
 
         /// <summary>
         /// reset-authenticator
@@ -59,6 +74,21 @@ namespace Okta.Idx.Sdk
         /// enroll-authenticator
         /// </summary>
         public static readonly string EnrollAuthenticator = "enroll-authenticator";
+
+        /// <summary>
+        /// enroll-poll
+        /// </summary>
+        public static readonly string EnrollPoll = "enroll-poll";
+
+        /// <summary>
+        /// select-enrollment-channel
+        /// </summary>
+        public static readonly string SelectEnrollmentChannel = "select-enrollment-channel";
+
+        /// <summary>
+        /// enrollment-channel-data
+        /// </summary>
+        public static readonly string EnrollmentChannelData = "enrollment-channel-data";
 
         /// <summary>
         /// skip

@@ -44,16 +44,18 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="authenticationOptions">The authentication options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default);
+        Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Initiates the password recovery flow
         /// </summary>
         /// <param name="recoverPasswordOptions">The password recovery options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default);
+        Task<AuthenticationResponse> RecoverPasswordAsync(RecoverPasswordOptions recoverPasswordOptions, CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Resend Code
@@ -73,6 +75,32 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Poll the status of a push request. This is only applicable to Okta Verify.
+        /// </summary>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<PollResponse> PollAuthenticatorPushStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Verify an Okta Verify authenticator.
+        /// </summary>
+        /// <param name="verifyAuthenticatorOptions">The options to verify an Okta Verify authenticator.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> VerifyAuthenticatorAsync(OktaVerifyVerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Challenge a  web authn authenticator
+        /// </summary>
+        /// <param name="verifyAuthenticatorOptions">The options to verify an authenticator.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> ChallengeAuthenticatorAsync(ChallengeWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Revoke tokens. Revoking an access token doesn't revoke the associated refresh token. However, revoking a refresh token does revoke the associated access token.
         /// </summary>
         /// <see href="https://developer.okta.com/docs/guides/revoke-tokens/revokeatrt/"/>
@@ -87,8 +115,9 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="userProfile">The user profile. Contains all the dynamic properties required for registration.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
         /// <returns>The authentication response.</returns>
-        Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default);
+        Task<AuthenticationResponse> RegisterAsync(UserProfile userProfile, CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Select an authenticator to start the enrollment flow.
@@ -98,6 +127,15 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> SelectEnrollAuthenticatorAsync(SelectEnrollAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Select Okta Verify channel to start the enrollment flow.
+        /// </summary>
+        /// <param name="enrollAuthenticatorOptions">The options for enrollment.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> SelectEnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Starts the password recovery process with the recovery authenticator.
@@ -118,6 +156,24 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollPhoneAuthenticatorOptions enrollAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Enroll a Web Authn authenticator
+        /// </summary>
+        /// <param name="verifyAuthenticatorOptions">The options to enroll an authenticator.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollWebAuthnAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Enroll Okta Verify authenticator.
+        /// </summary>
+        /// <param name="verifyAuthenticatorOptions">The options to enroll an authenticator.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollOktaVerifyAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Select an authenticator to continue with the challenge process.
         /// </summary>
         /// <param name="selectAuthenticatorOptions">The options for authenticator selection.</param>
@@ -136,6 +192,15 @@ namespace Okta.Idx.Sdk
         Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(SelectPhoneAuthenticatorOptions selectAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Selects the Okta Verify authenticator for a challenge.
+        /// </summary>
+        /// <param name="selectAuthenticatorOptions">The options for selecting an authenticator challenge.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> SelectChallengeAuthenticatorAsync(SelectOktaVerifyAuthenticatorOptions selectAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Challenge a phone authenticator.
         /// </summary>
         /// <param name="challengeAuthenticatorOptions">The options for authenticator challenge.</param>
@@ -148,8 +213,9 @@ namespace Okta.Idx.Sdk
         /// Start an interaction to be completed by the sign-in widget.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param> 
         /// <returns>The widget sign in response.</returns>
-        Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default);
+        Task<WidgetSignInResponse> StartWidgetSignInAsync(CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Skips optional authenticators
@@ -164,8 +230,9 @@ namespace Okta.Idx.Sdk
         /// </summary>
         /// <param name="state">The state handle to use or null to autogenerate.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
         /// <returns>The identity providers response.</returns>
-        Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default);
+        Task<IdentityProvidersResponse> GetIdentityProvidersAsync(string state = null, CancellationToken cancellationToken = default, RequestContext requestContext = null);
 
         /// <summary>
         /// Gets available identity providers.
@@ -174,5 +241,48 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The identity providers response.</returns>
         Task<IdentityProvidersResponse> GetIdentityProvidersAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Poll the status of an Okta Verify enrollment.
+        /// </summary>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<PollResponse> PollAuthenticatorEnrollmentStatusAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Determines if password is required.
+        /// </summary>
+        /// <param name="state">The state handle to use or null to autogenerate.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="requestContext">The request context.</param>
+        /// <returns>The password required response.</returns>
+        Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(string state = null, CancellationToken cancellationToken = default, RequestContext requestContext = null);
+
+        /// <summary>
+        /// Determines if password is required.
+        /// </summary>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The password required response.</returns>
+        Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Enroll a security question.
+        /// </summary>
+        /// <param name="verifyAuthenticatorOptions">The options to verify a security question.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> EnrollAuthenticatorAsync(EnrollSecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Verify a security question.
+        /// </summary>
+        /// <param name="verifyAuthenticatorOptions">The options to verify a security question.</param>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifySecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }

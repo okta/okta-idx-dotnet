@@ -3,6 +3,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
@@ -28,6 +29,11 @@ namespace Okta.Idx.Sdk
         string Name { get; set; }
 
         /// <summary>
+        /// Gets or sets the authenticator display name.
+        /// </summary>
+        string DisplayName { get; set; }
+
+        /// <summary>
         /// Gets or sets the profile.
         /// </summary>
         string Profile { get; set; }
@@ -36,5 +42,25 @@ namespace Okta.Idx.Sdk
         /// Gets or sets the authenticator method types if applicable.
         /// </summary>
         IList<AuthenticatorMethodType> MethodTypes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the authenticator channels if applicable (i.e. Okta Verify channels).
+        /// </summary>
+        IList<AuthenticatorChannelType> ChannelTypes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the authenticator contextual data. This is only applicable for Web Authn authenticators.
+        /// </summary>
+        IAuthenticatorContextualData ContextualData { get; set; }
+
+        /// <summary>
+        /// Gets or sets the credential Id. This is only applicable for Web Authn authenticators.
+        /// </summary>
+        string CredentialId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the settings.  This is only applicable for password authenticators in a warning state.
+        /// </summary>
+        IAuthenticatorSettings Settings { get; set; }
     }
 }

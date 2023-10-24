@@ -52,5 +52,10 @@ namespace Okta.Idx.Sdk
         /// Gets a message to user
         /// </summary>
         string MessageToUser { get; }
+
+        /// <summary>
+        /// Gets the correct answer for Okta Verify push challenge if number challenge is required.
+        /// </summary>
+        string CorrectAnswer { get; }
     }
 }

@@ -3,6 +3,7 @@
 // Licensed under the Apache 2.0 license. See the LICENSE file in the project root for full license information.
 // </copyright>
 
+using System;
 using System.Collections.Generic;
 
 namespace Okta.Idx.Sdk
@@ -50,6 +51,20 @@ namespace Okta.Idx.Sdk
         /// <summary>
         /// Gets the message to user
         /// </summary>
+        [Obsolete("This property will be removed in the next major release. Use Messages instead.")]
         public string MessageToUser { get; internal set; }
+
+        /// <summary>
+        /// Gets the list of messages for the user
+        /// </summary>
+        public IList<IMessage> Messages { get; internal set; }
+
+        /// <summary>
+        /// Gets the correct answer for Okta Verify push challenge if number challenge is required.
+        /// </summary>
+        public string CorrectAnswer
+        {
+            get => CurrentAuthenticator?.ContextualData?.CorrectAnswer;
+        }
     }
 }

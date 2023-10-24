@@ -7,6 +7,9 @@ using embedded_auth_with_sdk.Models;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 using Okta.Sdk.Abstractions;
+using System.Configuration;
+using System.Text;
+using WebGrease.Css.Extensions;
 
 namespace embedded_auth_with_sdk.Controllers
 {
@@ -30,7 +33,9 @@ namespace embedded_auth_with_sdk.Controllers
         public async Task<ActionResult> Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
+            bool alwaysRenderPasswordField = bool.Parse(ConfigurationManager.AppSettings["RenderPasswordField"] ?? "false");
             IdentityProvidersResponse identityProvidersResponse = await _idxClient.GetIdentityProvidersAsync();
+            bool shouldRenderPasswordField = (await _idxClient.CheckIsPasswordRequiredAsync(identityProvidersResponse.Context)).IsPasswordRequired || alwaysRenderPasswordField;
 
             // save the context in session, keyed by state handle, so it can be retrieved on callback.  See InteractionCodeController.Callback
             Session[identityProvidersResponse.State] = identityProvidersResponse.Context;
@@ -38,6 +43,7 @@ namespace embedded_auth_with_sdk.Controllers
             LoginViewModel loginViewModel = new LoginViewModel
             {
                 IdpOptions = identityProvidersResponse.IdpOptions,  // You can keep IdpOptions unset (set to null) if you don't want or need social login buttons
+                ShouldRenderPasswordField = shouldRenderPasswordField,
             };
 
             if (TempData.ContainsKey("TerminalStateMessage"))
@@ -58,7 +64,7 @@ namespace embedded_auth_with_sdk.Controllers
                 return View("Login");
             }
 
-            var authnOptions = new AuthenticationOptions()
+            var authnOptions = new AuthenticationOptions
                                    {
                                        Username = model.UserName,
                                        Password = model.Password,
@@ -68,6 +74,7 @@ namespace embedded_auth_with_sdk.Controllers
             {
                 var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
                 Session["idxContext"] = authnResponse.IdxContext;
+                Session[authnResponse?.IdxContext?.State] = authnResponse?.IdxContext; // save context in session keyed by state for retrieval by magiclink, see MagicLinkController.Callback.
 
                 switch (authnResponse?.AuthenticationStatus)
                 {
@@ -77,6 +84,9 @@ namespace embedded_auth_with_sdk.Controllers
                             return RedirectToAction("Index", "Home");
 
                     case AuthenticationStatus.PasswordExpired:
+                        var sbMessages = new StringBuilder();
+                        authnResponse.Messages?.ForEach(x => sbMessages.AppendLine(x.Text));
+                        TempData["MessageToUser"] = sbMessages.ToString();
                         return RedirectToAction("ChangePassword", "Manage");
 
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
@@ -195,6 +205,38 @@ namespace embedded_auth_with_sdk.Controllers
                 ModelState.AddModelError(string.Empty, exception.Message);
                 return View("ForgotPassword", model);
             }
+        }
+
+        [AllowAnonymous]
+        public ActionResult RecoverPasswordWithToken()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RecoverPasswordWithTokenAsync(RecoverPasswordWithTokenViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("RecoverPasswordWithToken", model);
+            }
+
+            var recoveryToken = await OktaSdkHelper.ForgotPasswordGenerateToken(model.UserName);
+            if (recoveryToken == null)
+            {
+                ModelState.AddModelError(string.Empty, $"Unable to get recovery token. Check if the user name is spelled correctly.");
+                return View("RecoverPasswordWithToken", model);
+            }
+
+            var changePasswordViewModel = new ChangePasswordWithRecoveryTokenViewModel
+            {
+                RecoveryToken = recoveryToken,
+                UserName = model.UserName,
+            };
+
+            return View("~/Views/Manage/ChangePasswordWithRecoveryToken.cshtml", changePasswordViewModel);
         }
     }
 }

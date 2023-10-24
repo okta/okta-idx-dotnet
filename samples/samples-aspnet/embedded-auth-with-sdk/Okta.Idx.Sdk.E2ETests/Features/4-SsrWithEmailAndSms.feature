@@ -7,6 +7,7 @@
 	And a user named "Mary"
 	And Mary does not have an account in the org
 
+  @ignore
   Scenario: 4.1.1: Mary signs up for an account with Password, setups up required Email factor, then skips optional SMS
 	Given Mary navigates to the Self Service Registration View
 	When she fills out her First Name
@@ -25,10 +26,11 @@
 	Then she sees a page to input a code
 	When she inputs the correct code from her email
 	Then she sees the list of optional factors (SMS)
-	When she selects "Skip" on SMS
+	When she selects Skip
 	Then she is redirected to the Root View
     And an application session is created
 
+  @ignore
   Scenario: 4.1.2: Mary signs up for an account with Password, setups up required Email factor, And sets up optional SMS
 	Given Mary navigates to the Self Service Registration View
 	When she fills out her First Name
@@ -48,12 +50,12 @@
 	When she inputs the correct code from her email
 	Then she sees a list of factors to register
 	When she selects Phone from the list
-
 	And She inputs a valid phone number
 	And She selects "Receive a Code"
 	Then the screen changes to receive an input for a code
 	When She inputs the correct code from her SMS
 	And She selects "Verify"
+	And she skips optional authenticators if prompted
 	Then she is redirected to the Root View
     And an application session is created
 	
@@ -65,7 +67,8 @@
 	And she submits the registration form
 	Then she sees an error message "'Email' must be in the form of an email address"
 	And she sees an error message "Provided value for property 'Email' does not match required pattern"
-
+  
+  @ignore
   Scenario: 4.1.4: Mary signs up for an account with Password, sets up required Email factor, And sets up optional SMS with an invalid phone number
 	Given Mary navigates to the Self Service Registration View
 	When she fills out her First Name

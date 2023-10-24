@@ -35,7 +35,7 @@
             }
         </section>
         <section id="resendCodeForm">
-            @using (Html.BeginForm("ResendAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+@using (Html.BeginForm("ResendAuthenticatorAsync", "Manage", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
             {
                 @Html.AntiForgeryToken()
                 <div class="form-group">

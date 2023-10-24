@@ -8,7 +8,7 @@ to request to gain access to the Okta Identity Engine, please reach out to your 
 do not have an account manager, please reach out to oie@okta.com for more information.
 
 This Sample Application will show you the best practices for integrating Authentication into your app
-using [Okta's Identity Engine](https://developer.okta.com/docs/concepts/ie-intro/). Specifically, this 
+using [Okta's Identity Engine](https://developer.okta.com/docs/guides/oie-intro/). Specifically, this 
 application will cover some basic needed use cases to get you up and running quickly with Okta.
 These Examples are:
 1. Sign In
@@ -17,8 +17,8 @@ These Examples are:
 4. Sign In/Sign Up with Social Identity Providers
 5. Sign In with Multifactor Authentication using Email or Phone
 
-For information and guides on how to build your app with this sample, please take a look at the [.NET 
-guides for Embedded Authentication](https://developer.okta.com/docs/guides/oie-embedded-sdk-use-cases/aspnet/oie-embedded-sdk-use-case-overview/#start-with-a-use-case)
+For information and guides on how to build your app with this sample, please take a look at the .NET 
+guides for Embedded Authentication, starting with [Get set up](https://developer.okta.com/docs/guides/oie-embedded-common-org-setup/aspnet/main/)
 
 ## Prerequisites
 
@@ -44,7 +44,7 @@ You can login with the same account that you created when signing up for your De
 To see some examples for use cases using this sample application, please take a look at the [.NET guides
 for Embedded Authentication](TBD)
 
-[OIDC Web Application Setup Instructions]: https://developer.okta.com/authentication-guide/implementing-authentication/auth-code#1-setting-up-your-application
+[OIDC Web Application Setup Instructions]: https://developer.okta.com/docs/guides/implement-grant-type/authcode/main/#set-up-your-app
 
 ## Running UI automation tests
 
@@ -81,4 +81,32 @@ Example of the settings.json:
     }
   }
 }
+```
+
+### Recover Password with Recovery Token flow
+This functionality uses [Okta .NET management SDK](https://github.com/okta/okta-sdk-dotnet) to get the recovery token and requires additional configuration parameters to be provided. Detailed information on Okta SDK Client configuration can be found in this [reference](https://github.com/okta/okta-sdk-dotnet#configuration-reference).
+
+
+### Troubleshooting
+
+#### All tests are failing
+
+* Make sure you are using the latest version of the `Selenium.WebDriver.ChromeDrive` dependency and try again. 
+
+* Make sure all the required API tokens (Test org API token, Okta as external IDP org API token, A18n API Key) are still valid.
+
+#### Social Login scenarios are failing
+
+* Make sure Okta as external IDP is properly configured (5.x scenarios). Check out [here](https://developer.okta.com/docs/guides/add-an-external-idp/oktatookta/main/#create-an-app-at-the-identity-provider) for details on how to configure Okta as your external IDP. The UserInfo endpoint should be provided.
+
+* Make sure the required ENV VARs are properly set and still valid:
+
+```
+SETX okta_testing_OktaSocialIdpMfaUserPassword <VALUE>
+SETX okta_testing_OktaSocialIdpMfaUserEmail <VALUE>
+SETX okta_testing_OktaOidcIdpToken <VALUE>
+SETX okta_testing_OktaOidcIdpDomain <VALUE>
+SETX okta_testing_GoogleUserPassword <VALUE>
+SETX okta_testing_GoogleUserEmail <VALUE>
+
 ```
