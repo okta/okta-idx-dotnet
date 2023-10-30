@@ -90,6 +90,8 @@ var authResponse = await _idxClient..AuthenticateAsync(authenticationOptions: op
 
 ### Authenticate users
 
+#### Authenticate users with username and password
+
 ```csharp
 var authnOptions = new AuthenticationOptions
                     {
@@ -102,6 +104,22 @@ var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAw
 if (authn.AuthenticationStatus == AuthenticationStatus.Success)
 {
     var accessToken = authnResponse.TokenInfo.AccessToken;
+}
+```
+
+#### Authenticate users with activation token
+
+```csharp
+var authnOptions = new AuthenticationOptions
+                    {
+                        ActivationToken = "myToken",
+                    };
+            
+var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
+
+if (authn.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorEnrollment)
+{
+    // Redirect users to the enrollment view
 }
 ```
 

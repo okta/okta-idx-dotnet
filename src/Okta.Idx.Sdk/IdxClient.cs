@@ -294,8 +294,8 @@ namespace Okta.Idx.Sdk
 
             if (authenticationStatus == AuthenticationStatus.AwaitingChallengeAuthenticatorSelection)
             {
-                authenticators = idxResponse.Authenticators?.Value == null 
-                    ? null 
+                authenticators = idxResponse.Authenticators?.Value == null
+                    ? null
                     : IdxResponseHelper.ConvertEnrollmentsToAuthenticators(idxResponse.Authenticators?.Value, idxResponse.AuthenticatorEnrollments?.Value);
             }
             else
@@ -576,6 +576,12 @@ namespace Okta.Idx.Sdk
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
             var isPasswordFlow = !string.IsNullOrEmpty(authenticationOptions.Password);
+            var isActivationTokenFlow = !string.IsNullOrEmpty(authenticationOptions.ActivationToken);
+
+            if (isActivationTokenFlow)
+            {
+                return await AuthenticateWithActivationTokenAsync(authenticationOptions, cancellationToken);
+            }
 
             if (isPasswordFlow)
             {
@@ -584,7 +590,7 @@ namespace Okta.Idx.Sdk
 
             // assume users will log in with the authenticator they want
 
-            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken, userName: authenticationOptions.Username);
+            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken, userName: authenticationOptions.Username, activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Common request payload
@@ -630,9 +636,30 @@ namespace Okta.Idx.Sdk
                     introspectResponse);
         }
 
+        private async Task<AuthenticationResponse> AuthenticateWithActivationTokenAsync(
+           AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default)
+        {
+            var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+            {
+                return new AuthenticationResponse
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators.Value),
+                };
+            }
+
+            throw new UnexpectedRemediationException(
+                    RemediationType.SelectAuthenticatorEnroll,
+                    introspectResponse);
+        }
+
         private async Task<AuthenticationResponse> AuthenticateWithPasswordAsync(AuthenticationOptions authenticationOptions, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
-            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken);
+            var idxContext = await InteractAsync(requestContext: requestContext, cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
             // Check if identify flow include credentials
@@ -665,7 +692,7 @@ namespace Okta.Idx.Sdk
                 if (!identifyResponse.IsLoginSuccess)
                 {
                     // Verify if password expired
-                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, identifyResponse) 
+                    if (IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticator, identifyResponse)
                         || IsRemediationRequireCredentials(RemediationType.ReenrollAuthenticatorWarning, identifyResponse))
                     {
                         return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, identifyResponse, AuthenticationStatus.PasswordExpired);
