@@ -24,10 +24,10 @@ jobs:
           command: |
               ./build.ps1;
       - persist_to_workspace: # Allows for sharing of build-workspace (containing downloaded dependencies) (optional)
-        root: ~/project
-        paths:
-          - src
-          - .git
+          root: ~/project
+          paths:
+            - src
+            - .git
       - when:
           condition:
             matches : { pattern: "^test-.+$", value: << pipeline.git.branch >> }
