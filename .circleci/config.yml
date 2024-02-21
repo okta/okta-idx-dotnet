@@ -10,7 +10,7 @@ orbs:
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
   build:
-    description: Build, test and pack 
+    description: Build, test and pack
     executor:
       name: windows/default
     steps:
@@ -18,14 +18,14 @@ jobs:
       - run:
           name: "Install required components"
           command: |
-              choco install -y dotnet-6.0-sdk
+            choco install -y dotnet-6.0-sdk
       - run:
           name: "Test Runner"
           command: |
-              ./build.ps1;
+            ./build.ps1;
       - when:
           condition:
-            matches : { pattern: "^test-.+$", value: << pipeline.git.branch >> }
+            matches: {pattern: "^test-.+$", value: << pipeline.git.branch >>}
           steps:
             - run:
                 name: "Pack test package"
@@ -37,7 +37,7 @@ jobs:
                 location: "com/okta/devex/okta-idx-dotnet"
       - when:
           condition:
-            matches : { pattern: "^release-.+$", value: << pipeline.git.branch >> }
+            matches: {pattern: "^release-.+$", value: << pipeline.git.branch >>}
           steps:
             - run:
                 name: "Pack release package"
@@ -48,7 +48,7 @@ jobs:
                 location: "com/okta/devex/okta-idx-dotnet"
       - when:
           condition:
-            equal: [ "<<pipeline.git.branch>>", "master" ]
+            equal: ["<<pipeline.git.branch>>", "master"]
           steps:
             - run:
                 name: "Pack release package"
@@ -66,3 +66,11 @@ workflows:
       - build
 
 # VS Code Extension Version: 1.4.0
+  semgrep:
+    jobs:
+      - general-platform-helpers/job-semgrep-prepare:
+          name: semgrep-prepare
+      - general-platform-helpers/job-semgrep-scan:
+          name: semgrep-scan
+          requires:
+            - semgrep-prepare
