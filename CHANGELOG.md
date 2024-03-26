@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.4.2
+
+### Updates
+
+* Update vuln dependencies
+
+## 2.4.1
+
+### Additions 
+
+* Add support for the activation token flow
+
 ## 2.4.0
 
 ### Additions
