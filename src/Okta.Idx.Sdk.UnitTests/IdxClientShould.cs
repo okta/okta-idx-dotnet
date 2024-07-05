@@ -705,6 +705,442 @@ namespace Okta.Idx.Sdk.UnitTests
         }
 
         [Fact]
+        public async Task SelectChallengePollByDefaultIfAvailableAfterIdentify()
+        {
+
+            #region mocks
+
+            var interactResponse = @"{ 'interaction_handle' : 'foo' }";
+            var introspectResponse = @"{
+  ""version"": ""1.0.0"",
+  ""stateHandle"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+  ""expiresAt"": ""2024-07-02T21:35:46.000Z"",
+  ""intent"": ""LOGIN"",
+  ""remediation"": {
+    ""type"": ""array"",
+    ""value"": [
+      {
+        ""rel"": [
+          ""create-form""
+        ],
+        ""name"": ""identify"",
+        ""href"": ""https://foo.okta.com/idp/idx/identify"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+          {
+            ""name"": ""identifier"",
+            ""label"": ""Username"",
+            ""required"": true
+          },
+          {
+            ""name"": ""stateHandle"",
+            ""required"": true,
+            ""value"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+            ""visible"": false,
+            ""mutable"": false
+          }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+      },
+      {
+        ""rel"": [
+          ""create-form""
+        ],
+        ""name"": ""select-enroll-profile"",
+        ""href"": ""https://foo.okta.com/idp/idx/enroll"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+          {
+            ""name"": ""stateHandle"",
+            ""required"": true,
+            ""value"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+            ""visible"": false,
+            ""mutable"": false
+          }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+      },
+      {
+        ""rel"": [
+          ""create-form""
+        ],
+        ""name"": ""unlock-account"",
+        ""href"": ""https://foo.okta.com/idp/idx/unlock-account"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+          {
+            ""name"": ""stateHandle"",
+            ""required"": true,
+            ""value"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+            ""visible"": false,
+            ""mutable"": false
+          }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+      },
+      {
+        ""name"": ""redirect-idp"",
+        ""type"": ""OIDC"",
+        ""idp"": {
+          ""id"": ""0oa1qd4m68G3QcAfv1d7"",
+          ""name"": ""foo.okta.com""
+        },
+        ""href"": ""https://foo.okta.com/oauth2/aus1qcwynhEv3AflW1d7/v1/authorize?client_id=0oa2cpl777xczKzL21d7&request_uri=urn:okta:SWVfR1JRYmJRNXBhcW1XRlJTemp3c2R1V19XVDBLOXNrX2xwMmNSWXZYQTowb2ExcWQ0bTY4RzNRY0FmdjFkNw"",
+        ""method"": ""GET""
+      },
+      {
+        ""name"": ""redirect-idp"",
+        ""type"": ""MICROSOFT"",
+        ""idp"": {
+          ""id"": ""0oa2kc4yjqW50K7Zq1d7"",
+          ""name"": ""Azure emanor.okta""
+        },
+        ""href"": ""https://foo.okta.com/oauth2/aus1qcwynhEv3AflW1d7/v1/authorize?client_id=0oa2cpl777xczKzL21d7&request_uri=urn:okta:SWVfR1JRYmJRNXBhcW1XRlJTemp3c2R1V19XVDBLOXNrX2xwMmNSWXZYQTowb2Eya2M0eWpxVzUwSzdacTFkNw"",
+        ""method"": ""GET""
+      },
+      {
+        ""name"": ""redirect-idp"",
+        ""type"": ""OIDC"",
+        ""idp"": {
+          ""id"": ""0oa2kc6gweIl3rA011d7"",
+          ""name"": ""Azure Generic OIDC""
+        },
+        ""href"": ""https://foo.okta.com/oauth2/aus1qcwynhEv3AflW1d7/v1/authorize?client_id=0oa2cpl777xczKzL21d7&request_uri=urn:okta:SWVfR1JRYmJRNXBhcW1XRlJTemp3c2R1V19XVDBLOXNrX2xwMmNSWXZYQTowb2Eya2M2Z3dlSWwzckEwMTFkNw"",
+        ""method"": ""GET""
+      },
+      {
+        ""name"": ""redirect-idp"",
+        ""type"": ""APPLE"",
+        ""idp"": {
+          ""id"": ""0oa57eqzjgztgLoWN1d7"",
+          ""name"": ""SignInWithApple""
+        },
+        ""href"": ""https://foo.okta.com/oauth2/aus1qcwynhEv3AflW1d7/v1/authorize?client_id=0oa2cpl777xczKzL21d7&request_uri=urn:okta:SWVfR1JRYmJRNXBhcW1XRlJTemp3c2R1V19XVDBLOXNrX2xwMmNSWXZYQTowb2E1N2VxempnenRnTG9XTjFkNw"",
+        ""method"": ""GET""
+      },
+      {
+        ""name"": ""redirect-idp"",
+        ""type"": ""FACEBOOK"",
+        ""idp"": {
+          ""id"": ""0oa3x3qiyblcFjnXC1d7"",
+          ""name"": ""Facebook - test""
+        },
+        ""href"": ""https://foo.okta.com/oauth2/aus1qcwynhEv3AflW1d7/v1/authorize?client_id=0oa2cpl777xczKzL21d7&request_uri=urn:okta:SWVfR1JRYmJRNXBhcW1XRlJTemp3c2R1V19XVDBLOXNrX2xwMmNSWXZYQTowb2EzeDNxaXlibGNGam5YQzFkNw"",
+        ""method"": ""GET""
+      },
+      {
+        ""name"": ""redirect-idp"",
+        ""type"": ""SAML2"",
+        ""idp"": {
+          ""id"": ""0oa7rl38g6yj9NAkM1d7"",
+          ""name"": ""Keycloak Docker""
+        },
+        ""href"": ""https://foo.okta.com/oauth2/aus1qcwynhEv3AflW1d7/v1/authorize?client_id=0oa2cpl777xczKzL21d7&request_uri=urn:okta:SWVfR1JRYmJRNXBhcW1XRlJTemp3c2R1V19XVDBLOXNrX2xwMmNSWXZYQTowb2E3cmwzOGc2eWo5TkFrTTFkNw"",
+        ""method"": ""GET""
+      }
+    ]
+  },
+  ""cancel"": {
+    ""rel"": [
+      ""create-form""
+    ],
+    ""name"": ""cancel"",
+    ""href"": ""https://foo.okta.com/idp/idx/cancel"",
+    ""method"": ""POST"",
+    ""produces"": ""application/ion+json; okta-version=1.0.0"",
+    ""value"": [
+      {
+        ""name"": ""stateHandle"",
+        ""required"": true,
+        ""value"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+        ""visible"": false,
+        ""mutable"": false
+      }
+    ],
+    ""accepts"": ""application/json; okta-version=1.0.0""
+  }
+}";
+            var identifyResponse = @"{
+  ""version"": ""1.0.0"",
+  ""stateHandle"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+  ""expiresAt"": ""2024-07-02T19:40:47.000Z"",
+  ""intent"": ""LOGIN"",
+  ""remediation"": {
+    ""type"": ""array"",
+    ""value"": [
+      {
+        ""rel"": [
+          ""create-form""
+        ],
+        ""name"": ""challenge-poll"",
+        ""relatesTo"": [
+          ""$.currentAuthenticator""
+        ],
+        ""href"": ""https://foo.okta.com/idp/idx/authenticators/poll"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""refresh"": 4000,
+        ""value"": [
+          {
+            ""name"": ""autoChallenge"",
+            ""type"": ""boolean"",
+            ""label"": ""Send push automatically"",
+            ""required"": false,
+            ""value"": true,
+            ""mutable"": true
+          },
+          {
+            ""name"": ""stateHandle"",
+            ""required"": true,
+            ""value"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+            ""visible"": false,
+            ""mutable"": false
+          }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+      },
+      {
+        ""rel"": [
+          ""create-form""
+        ],
+        ""name"": ""select-authenticator-authenticate"",
+        ""href"": ""https://foo.okta.com/idp/idx/challenge"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+          {
+            ""name"": ""authenticator"",
+            ""type"": ""object"",
+            ""options"": [
+              {
+                ""label"": ""Email"",
+                ""value"": {
+                  ""form"": {
+                    ""value"": [
+                      {
+                        ""name"": ""id"",
+                        ""required"": true,
+                        ""value"": ""aut1qct8vyPDDlgXq1d7"",
+                        ""mutable"": false
+                      },
+                      {
+                        ""name"": ""methodType"",
+                        ""required"": false,
+                        ""value"": ""email"",
+                        ""mutable"": false
+                      }
+                    ]
+                  }
+                },
+                ""relatesTo"": ""$.authenticatorEnrollments.value[0]""
+              },
+              {
+                ""label"": ""Okta Verify"",
+                ""value"": {
+                  ""form"": {
+                    ""value"": [
+                      {
+                        ""name"": ""id"",
+                        ""required"": true,
+                        ""value"": ""aut1qct8w2wija8Tw1d7"",
+                        ""mutable"": false
+                      },
+                      {
+                        ""name"": ""methodType"",
+                        ""type"": ""string"",
+                        ""required"": false,
+                        ""options"": [
+                          {
+                            ""label"": ""Enter a code"",
+                            ""value"": ""totp""
+                          },
+                          {
+                            ""label"": ""Get a push notification"",
+                            ""value"": ""push""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                ""relatesTo"": ""$.authenticators.value[1]""
+              }
+            ]
+          },
+          {
+            ""name"": ""stateHandle"",
+            ""required"": true,
+            ""value"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+            ""visible"": false,
+            ""mutable"": false
+          }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+      }
+    ]
+  },
+  ""currentAuthenticator"": {
+    ""type"": ""object"",
+    ""value"": {
+      ""resend"": {
+        ""rel"": [
+          ""create-form""
+        ],
+        ""name"": ""resend"",
+        ""href"": ""https://foo.okta.com/idp/idx/challenge"",
+        ""method"": ""POST"",
+        ""produces"": ""application/ion+json; okta-version=1.0.0"",
+        ""value"": [
+          {
+            ""name"": ""authenticator"",
+            ""required"": true,
+            ""value"": {
+              ""methodType"": ""push"",
+              ""id"": ""aut1qct8w2wija8Tw1d7""
+            },
+            ""visible"": false,
+            ""mutable"": false
+          },
+          {
+            ""name"": ""stateHandle"",
+            ""required"": true,
+            ""value"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+            ""visible"": false,
+            ""mutable"": false
+          }
+        ],
+        ""accepts"": ""application/json; okta-version=1.0.0""
+      },
+      ""type"": ""app"",
+      ""key"": ""okta_verify"",
+      ""id"": ""aut1qct8w2wija8Tw1d7"",
+      ""displayName"": ""Okta Verify"",
+      ""methods"": [
+        {
+          ""type"": ""push""
+        }
+      ]
+    }
+  },
+  ""authenticators"": {
+    ""type"": ""array"",
+    ""value"": [
+      {
+        ""type"": ""email"",
+        ""key"": ""okta_email"",
+        ""id"": ""aut1qct8vyPDDlgXq1d7"",
+        ""displayName"": ""Email"",
+        ""methods"": [
+          {
+            ""type"": ""email""
+          }
+        ],
+        ""allowedFor"": ""any""
+      },
+      {
+        ""type"": ""app"",
+        ""key"": ""okta_verify"",
+        ""id"": ""aut1qct8w2wija8Tw1d7"",
+        ""displayName"": ""Okta Verify"",
+        ""methods"": [
+          {
+            ""type"": ""push""
+          },
+          {
+            ""type"": ""totp""
+          }
+        ],
+        ""allowedFor"": ""sso""
+      }
+    ]
+  },
+  ""authenticatorEnrollments"": {
+    ""type"": ""array"",
+    ""value"": [
+      {
+        ""profile"": {
+          ""email"": ""foo@mail.com""
+        },
+        ""type"": ""email"",
+        ""key"": ""okta_email"",
+        ""id"": ""eaefh41h9cPaULzQD1d7"",
+        ""displayName"": ""Email"",
+        ""methods"": [
+          {
+            ""type"": ""email""
+          }
+        ]
+      },
+      {
+        ""profile"": {
+          ""deviceName"": ""Pixel 7 Pro""
+        },
+        ""type"": ""app"",
+        ""key"": ""okta_verify"",
+        ""id"": ""pfdfh4rqzvEFeP77Y1d7"",
+        ""displayName"": ""Okta Verify"",
+        ""methods"": [
+          {
+            ""type"": ""push""
+          },
+          {
+            ""type"": ""totp""
+          }
+        ]
+      }
+    ]
+  },
+  ""user"": {
+    ""type"": ""object"",
+    ""value"": {
+      ""identifier"": ""foo@foo.com""
+    }
+  },
+  ""cancel"": {
+    ""rel"": [
+      ""create-form""
+    ],
+    ""name"": ""cancel"",
+    ""href"": ""https://foo.okta.com/idp/idx/cancel"",
+    ""method"": ""POST"",
+    ""produces"": ""application/ion+json; okta-version=1.0.0"",
+    ""value"": [
+      {
+        ""name"": ""stateHandle"",
+        ""required"": true,
+        ""value"": ""02.id.f9VRSO1usB3Vqvi2KyuViF2_wvkH4Fp1sg30Dmvl~c.0RNf8PiKc8A5CYKE8NiGmATv1tMpN6_VLNl4_nZMgwDMjGXArLnCKqAeYyIvIi5-7s6WpvzUgWp_pyG8txrcR6-W1zatmg5YdI243BjVY51CMaW3E0Rcg6aoxlDop57Bly_GS12Vqls58kj33NFCEyR86JmDFESGXDfFg8x9YzYHCkSYhbP3NttqmC67GlwWJFHT7ez5gbePFS3DwDtz7EUSw-nNW8A-Vil47GvFTqdC4pPGf2q6sJRtC8I-NQAf3YCzQUz0vhLkNr5ck9YQx2dVEuhdvAqZQfIkzAPDoRh2yyxcMQV5fgr_4WIBa1sJ9bflKNA3tiqNtlwBgBlkl3p7-mOgkWBIiKWnwEn4kvqQYOwiA5-Ymr528P0rDtQfO0iATvzQCCOAVQIuk5pfm7JBxmjyCxf_R-DF_PrMCEcSlfxm3aeCsfZF8JS8Z6uqeOqP8xEsZeMkvl-GIXS7KmGDHXIdsyOq9_WOlP8ih0mFGwF6HPo4EHCKKq1Ug8Hq-dbtObrEQ4ufKPyssvtJldNltnmroYL9ZrGi2SqoJOz7bQ71j1D54gcH7iozEwlqBoUgsdUr0IGtfWNtZrUXHhOETCVDYWQ8N0QbYQFu6plWVpBC_DaCtISGs8J8pl9UCB2j0Da52G8s36_NiTqOroyshxGNDf3MmZTDSpGSTKZUKBa0ZHRV7agUHaXuKzA_NmiL7xJEuZkvR_lq6YaIGzdfY7teu7DsXdfEDRD8peeojOjJf9oJLeYnoPckk9PBN8BEOUxQXLs6XlLVRSgkM30JPLQhz49zWH4ExVksMlz1YwkL1hoka-k-o5KD7oHNOEGFRn8w_uY2PC_9Gxya4l9Xpo4-zi0Ccj3aBfj3ivI"",
+        ""visible"": false,
+        ""mutable"": false
+      }
+    ],
+    ""accepts"": ""application/json; okta-version=1.0.0""
+  }
+}";
+           
+            #endregion
+
+            Queue<MockResponse> queue = new Queue<MockResponse>();
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = interactResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = introspectResponse });
+            queue.Enqueue(new MockResponse { StatusCode = 200, Response = identifyResponse });
+
+            var mockRequestExecutor = new MockedQueueRequestExecutor(queue);
+            var testClient = new TesteableIdxClient(mockRequestExecutor);
+
+            var authResponse = await testClient.AuthenticateAsync(
+                new AuthenticationOptions
+                {
+                    Username = "user@mail.com"
+                });
+
+            authResponse.AuthenticationStatus.Should().Be(AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse);
+            authResponse.CurrentAuthenticator.Name.Should().Be("Okta Verify");
+        }
+
+        [Fact]
         public async Task ThrowWhenWithWrongUsername()
         {
 

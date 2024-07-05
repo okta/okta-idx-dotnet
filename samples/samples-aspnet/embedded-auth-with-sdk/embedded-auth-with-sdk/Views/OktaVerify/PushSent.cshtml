@@ -15,7 +15,12 @@
                 <span>@Model.CorrectAnswer</span>
             </div>
         }
-        @Html.ActionLink("Verify with something else", "SelectAuthenticatorMethod")
+        <div>
+            @Html.ActionLink("Verify with something else", "SelectAuthenticatorMethod")
+        </div>
+        <div>
+        @Html.ActionLink("Sign in with something else", "SelectAuthenticator", "Manage")
+        </div>
     </div>
 </div>
 

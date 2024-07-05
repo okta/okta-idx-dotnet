@@ -401,20 +401,32 @@ namespace embedded_auth_with_sdk.Controllers
         {
             var authenticators = (IList<AuthenticatorViewModel>)Session["authenticators"] ?? new List<AuthenticatorViewModel>();
 
+            var viewModel = BuildSelectAuthenticatorViewModel((IList<AuthenticatorViewModel>)Session["authenticators"], authenticators.FirstOrDefault()?.AuthenticatorId,
+                TempData["canSkip"] != null && (bool)TempData["canSkip"]);
+
+
+            return View(viewModel);
+        }
+
+
+        private static SelectAuthenticatorViewModel BuildSelectAuthenticatorViewModel(IList<AuthenticatorViewModel> authenticators, string authenticatorId, bool canSkip = false)
+        {
+            authenticators = authenticators ?? new List<AuthenticatorViewModel>();
+
             var viewModel = new SelectAuthenticatorViewModel
             {
                 Authenticators = authenticators,
-                AuthenticatorId = authenticators.FirstOrDefault()?.AuthenticatorId,
+                AuthenticatorId = authenticatorId,
                 PasswordId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "password")?.AuthenticatorId,
                 PhoneId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "phone")?.AuthenticatorId,
                 WebAuthnId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security key or biometric")?.AuthenticatorId,
                 TotpId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "google authenticator")?.AuthenticatorId,
                 OktaVerifyId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "okta verify")?.AuthenticatorId,
                 SecurityQuestionId = authenticators.FirstOrDefault(x => x.Name.ToLower() == "security question")?.AuthenticatorId,
-                CanSkip = TempData["canSkip"] != null && (bool)TempData["canSkip"]
+                CanSkip = canSkip
             };
 
-            return View(viewModel);
+            return viewModel;
         }
 
         [HttpPost]

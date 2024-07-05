@@ -197,7 +197,18 @@
 
             return View(new OktaVerifySelectAuthenticatorMethodModel());
         }
-        
+
+        public ActionResult PushSent()
+        {
+            return View("PushSent", new OktaVerifySelectAuthenticatorMethodModel());
+        }
+
+        public ActionResult EnterCode()
+        {
+            return View("EnterCode");
+        }
+
+
         [HttpPost]
         public async Task<ActionResult> EnterCodeAsync(OktaVerifyEnterCodeModel oktaVerifyEnterCodeModel)
         {

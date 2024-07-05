@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -97,7 +98,12 @@ namespace embedded_auth_with_sdk.Controllers
                         Session["isChallengeFlow"] = false;
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         return RedirectToAction("SelectAuthenticator", "Manage");
-
+                    case AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse:
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        Session["isChallengeFlow"] = true;
+                        // RLUF data can found here
+                        var currentAuthenticator = authnResponse.CurrentAuthenticator;
+                        return RedirectToAction("PushSent", "OktaVerify");
                     default:
                         return View("Login", model);
                 }
