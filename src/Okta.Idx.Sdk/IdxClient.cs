@@ -311,6 +311,7 @@ namespace Okta.Idx.Sdk
                 AuthenticationStatus = authenticationStatus,
                 Authenticators = authenticators,
                 CurrentAuthenticator = idxResponse.CurrentAuthenticator?.Value == null ? null : IdxResponseHelper.ConvertToAuthenticator(idxResponse.Authenticators.Value, idxResponse.CurrentAuthenticator?.Value),
+                CurrentAuthenticatorEnrollment = idxResponse.CurrentAuthenticatorEnrollment?.Value == null ? null : IdxResponseHelper.ConvertToAuthenticator(idxResponse.Authenticators.Value, idxResponse.CurrentAuthenticatorEnrollment?.Value),
                 CanSkip = idxResponse.ContainsRemediationOption(RemediationType.Skip),
                 Messages = idxResponse.IdxMessages?.Messages,
             };
@@ -607,6 +608,12 @@ namespace Okta.Idx.Sdk
                                             .ProceedAsync(identifyRequest, cancellationToken);
             }
 
+            // When RLUF is enabled, a challenge is automatically sent after identify
+            if (identifyResponse.ContainsRemediationOption(RemediationType.ChallengePoll))
+            {
+                return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, identifyResponse, AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse);
+            }
+
             if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
             {
                 return new AuthenticationResponse
@@ -632,6 +639,7 @@ namespace Okta.Idx.Sdk
                     {
                         RemediationType.SelectAuthenticatorAuthenticate,
                         RemediationType.SelectAuthenticatorEnroll,
+                        RemediationType.ChallengePoll,
                     },
                     introspectResponse);
         }
@@ -698,6 +706,12 @@ namespace Okta.Idx.Sdk
                         return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, identifyResponse, AuthenticationStatus.PasswordExpired);
                     }
 
+                    // When RLUF is enabled, a challenge is automatically sent after identify
+                    if (identifyResponse.ContainsRemediationOption(RemediationType.ChallengePoll))
+                    {
+                        return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, identifyResponse, AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse);
+                    }
+
                     if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
                     {
                         return new AuthenticationResponse
@@ -707,7 +721,8 @@ namespace Okta.Idx.Sdk
                             Authenticators = IdxResponseHelper.ConvertToAuthenticators(identifyResponse.Authenticators.Value),
                         };
                     }
-                    else if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+
+                    if (identifyResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
                     {
                         return new AuthenticationResponse
                         {
@@ -716,17 +731,16 @@ namespace Okta.Idx.Sdk
                             Authenticators = IdxResponseHelper.ConvertEnrollmentsToAuthenticators(identifyResponse.Authenticators.Value, identifyResponse.AuthenticatorEnrollments.Value),
                         };
                     }
-                    else
-                    {
-                        throw new UnexpectedRemediationException(
-                            new List<string>
-                            {
-                                RemediationType.ReenrollAuthenticator,
-                                RemediationType.ReenrollAuthenticatorWarning,
-                                RemediationType.SelectAuthenticatorAuthenticate,
-                                RemediationType.SelectAuthenticatorEnroll,
-                            }, identifyResponse);
-                    }
+
+                    throw new UnexpectedRemediationException(
+                        new List<string>
+                        {
+                            RemediationType.ReenrollAuthenticator,
+                            RemediationType.ReenrollAuthenticatorWarning,
+                            RemediationType.SelectAuthenticatorAuthenticate,
+                            RemediationType.SelectAuthenticatorEnroll,
+                            RemediationType.ChallengePoll,
+                        }, identifyResponse);
                 }
 
                 var tokenResponse = await identifyResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
@@ -798,6 +812,11 @@ namespace Okta.Idx.Sdk
                     {
                         return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, challengeResponse, AuthenticationStatus.PasswordExpired);
                     }
+                    // When RLUF is enabled, a challenge is automatically sent after identify
+                    if (identifyResponse.ContainsRemediationOption(RemediationType.ChallengePoll))
+                    {
+                        return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, identifyResponse, AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse);
+                    }
 
                     if (challengeResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
                     {
@@ -826,6 +845,7 @@ namespace Okta.Idx.Sdk
                                 RemediationType.ReenrollAuthenticatorWarning,
                                 RemediationType.SelectAuthenticatorEnroll,
                                 RemediationType.SelectAuthenticatorAuthenticate,
+                                RemediationType.ChallengePoll,
                             }, challengeResponse);
                     }
                 }
