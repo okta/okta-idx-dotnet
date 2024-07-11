@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.3
+
+### Bug fixes
+
+* Fix issue: "Multiple OV pushes when RLUF is enabled."
+
 ## 2.4.2
 
 ### Updates
