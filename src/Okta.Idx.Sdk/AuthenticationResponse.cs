@@ -20,8 +20,9 @@ namespace Okta.Idx.Sdk
 
         /// <summary>
         /// Gets the authentication status.
+        /// Virtual to support mocking in unit tests
         /// </summary>
-        public AuthenticationStatus AuthenticationStatus { get; internal set; }
+        public virtual AuthenticationStatus AuthenticationStatus { get; internal set; }
 
         /// <summary>
         /// Gets the IDX context.
@@ -30,8 +31,9 @@ namespace Okta.Idx.Sdk
 
         /// <summary>
         /// Gets the authenticators.
+        /// Virtual to support mocking in unit tests
         /// </summary>
-        public IList<IAuthenticator> Authenticators { get; internal set; }
+        public virtual IList<IAuthenticator> Authenticators { get; internal set; }
 
         /// <summary>
         /// Gets the current authenticator enrollment.
