@@ -83,22 +83,18 @@ workflows:
   "Circle CI Build & Snyk Scan":
     jobs:
       - build
-      - general-platform-helpers/job-snyk-prepare:
-          name: prepare-snyk
-          requires:
-            - build
       - snyk-scan:
           name: execute-snyk
+          context:
+            - static-analysis
           requires:
-            - prepare-snyk
+            - build
   "Semgrep":
     jobs:
-      - general-platform-helpers/job-semgrep-prepare:
-          name: semgrep-prepare
       - general-platform-helpers/job-semgrep-scan:
           name: "Scan with Semgrep"
-          requires:
-            - semgrep-prepare
+          context:
+            - static-analysis
 
 
 # VS Code Extension Version: 1.4.0
