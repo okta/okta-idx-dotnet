@@ -140,7 +140,7 @@ workflows:
     jobs:
       - reversing-labs:
           context:
-            - okta-dcp 
+            - static-analysis
   "Circle CI Build & Snyk Scan":
     jobs:
       - build
