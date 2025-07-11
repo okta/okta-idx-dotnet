@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -8,9 +7,6 @@ using embedded_auth_with_sdk.Models;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 using Okta.Sdk.Abstractions;
-using System.Configuration;
-using System.Text;
-using WebGrease.Css.Extensions;
 
 namespace embedded_auth_with_sdk.Controllers
 {
@@ -27,93 +23,88 @@ namespace embedded_auth_with_sdk.Controllers
             _authenticationManager = authenticationManager;
             _idxClient = idxClient;
         }
-        
 
-        // GET: Account
+
+        // The GET action is simplified to only display the view.
         [AllowAnonymous]
-        public async Task<ActionResult> Login(string returnUrl)
+        public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
-            bool alwaysRenderPasswordField = bool.Parse(ConfigurationManager.AppSettings["RenderPasswordField"] ?? "false");
-            IdentityProvidersResponse identityProvidersResponse = await _idxClient.GetIdentityProvidersAsync();
-            bool shouldRenderPasswordField = (await _idxClient.CheckIsPasswordRequiredAsync(identityProvidersResponse.Context)).IsPasswordRequired || alwaysRenderPasswordField;
-
-            // save the context in session, keyed by state handle, so it can be retrieved on callback.  See InteractionCodeController.Callback
-            Session[identityProvidersResponse.State] = identityProvidersResponse.Context;
-
-            LoginViewModel loginViewModel = new LoginViewModel
-            {
-                IdpOptions = identityProvidersResponse.IdpOptions,  // You can keep IdpOptions unset (set to null) if you don't want or need social login buttons
-                ShouldRenderPasswordField = shouldRenderPasswordField,
-            };
-
-            if (TempData.ContainsKey("TerminalStateMessage"))
-            {
-                ModelState.AddModelError(string.Empty, (string)TempData["TerminalStateMessage"]);
-            }
-
-            return View(loginViewModel);
+            return View(new LoginViewModel());
         }
 
+        // The POST action now handles the multi-step logic.
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> LoginAsync(LoginViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (string.IsNullOrEmpty(model.UserName))
             {
-                return View("Login");
+                ModelState.AddModelError(string.Empty, "Username is required.");
+                return View("Login", model);
             }
-
-            var authnOptions = new AuthenticationOptions
-                                   {
-                                       Username = model.UserName,
-                                       Password = model.Password,
-                                   };
 
             try
             {
+                var authnOptions = new AuthenticationOptions { Username = model.UserName };
                 var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
-                Session["idxContext"] = authnResponse.IdxContext;
-                Session[authnResponse?.IdxContext?.State] = authnResponse?.IdxContext; // save context in session keyed by state for retrieval by magiclink, see MagicLinkController.Callback.
+                var idxContext = authnResponse.IdxContext;
+                Session["idxContext"] = idxContext;
 
-                switch (authnResponse?.AuthenticationStatus)
+                var idpResponse = await _idxClient.GetIdentityProvidersAsync(idxContext);
+
+                if (idpResponse.IdpOptions?.Count > 0)
                 {
-                    case AuthenticationStatus.Success:
-                            ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
-                            _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, identity);
-                            return RedirectToAction("Index", "Home");
+                    var idpRedirectUrl = idpResponse.IdpOptions.First().Href;
+                    return Redirect(idpRedirectUrl);
+                }
 
-                    case AuthenticationStatus.PasswordExpired:
-                        var sbMessages = new StringBuilder();
-                        authnResponse.Messages?.ForEach(x => sbMessages.AppendLine(x.Text));
-                        TempData["MessageToUser"] = sbMessages.ToString();
-                        return RedirectToAction("ChangePassword", "Manage");
-
+                switch (authnResponse.AuthenticationStatus)
+                {
                     case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
+                        var passwordAuthenticator = authnResponse.Authenticators.FirstOrDefault(auth => auth.DisplayName == "Password");
+                        if (passwordAuthenticator != null)
+                        {
+                            if (!string.IsNullOrEmpty(model.Password))
+                            {
+                                var challengeOptions = new AuthenticationOptions
+                                {
+                                    Username = model.UserName,
+                                    Password = model.Password,
+                                };
+                                var challengeAuthnResponse = await _idxClient.AuthenticateAsync(challengeOptions).ConfigureAwait(false);
+                                if (challengeAuthnResponse.AuthenticationStatus == AuthenticationStatus.Success)
+                                {
+                                    ClaimsIdentity successIdentity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, challengeAuthnResponse.TokenInfo);
+                                    _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, successIdentity);
+                                    return RedirectToAction("Index", "Home");
+                                }
+                            }
+
+                            model.ShouldRenderPasswordField = true;
+                            return View("Login", model);
+                        }
+                        
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
                         return RedirectToAction("SelectAuthenticator", "Manage");
-                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
-                        Session["isChallengeFlow"] = false;
-                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
-                        return RedirectToAction("SelectAuthenticator", "Manage");
-                    case AuthenticationStatus.AwaitingChallengeAuthenticatorPollResponse:
-                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
-                        Session["isChallengeFlow"] = true;
-                        // RLUF data can found here
-                        var currentAuthenticator = authnResponse.CurrentAuthenticator;
-                        return RedirectToAction("PushSent", "OktaVerify");
+
+                    case AuthenticationStatus.Success:
+                        ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
+                        _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, identity);
+                        return RedirectToAction("Index", "Home");
+
                     default:
+                        ModelState.AddModelError(string.Empty, "An unexpected authentication status was received.");
                         return View("Login", model);
                 }
             }
             catch (OktaException exception)
             {
-                ModelState.AddModelError(string.Empty, $"Invalid login attempt: {exception.Message}");
+                ModelState.AddModelError(string.Empty, $"Error: {exception.Message}");
                 return View("Login", model);
             }
-
         }
 
         [HttpPost]
@@ -121,7 +112,7 @@ namespace embedded_auth_with_sdk.Controllers
         public async Task<ActionResult> LogOut()
         {
             var accessToken = HttpContext.GetOwinContext().Authentication.User.Claims.FirstOrDefault(x => x.Type == "access_token");
-            await _idxClient.RevokeTokensAsync(TokenType.AccessToken, accessToken.Value);
+            if (accessToken != null) await _idxClient.RevokeTokensAsync(TokenType.AccessToken, accessToken.Value);
             _authenticationManager.SignOut();
             return RedirectToAction("Index", "Home");
         }
