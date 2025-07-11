@@ -5,6 +5,7 @@ version: 2.1
 orbs:
   windows: circleci/windows@5.0
   general-platform-helpers: okta/general-platform-helpers@1.9
+  platform-helpers: okta/platform-helpers@1
   python: circleci/python@2.0.3
   aws-cli: circleci/aws-cli@5.1
 
@@ -98,7 +99,8 @@ jobs:
                 location: "com/okta/devex/okta-idx-dotnet"
       - when:
           condition:
-            matches : { pattern: "^release-.+$", value: << pipeline.git.branch >> }
+            or:
+              - equal: [ "<<pipeline.git.branch>>", "master" ]
           steps:
             - run:
                 name: "Pack release package"
@@ -136,12 +138,7 @@ jobs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  "Malware Scanner":
-    jobs:
-      - reversing-labs:
-          context:
-            - static-analysis
-  "Circle CI Build & Snyk Scan":
+  "Circle CI Tests":
     jobs:
       - build
       - snyk-scan:
@@ -152,10 +149,8 @@ workflows:
             - build
   "Semgrep":
     jobs:
-      - general-platform-helpers/job-semgrep-scan:
-          name: "Scan with Semgrep"
+      - platform-helpers/job-semgrep-scan:
           context:
             - static-analysis
-
-
+          name: "Scan with Semgrep"
 # VS Code Extension Version: 1.4.0
