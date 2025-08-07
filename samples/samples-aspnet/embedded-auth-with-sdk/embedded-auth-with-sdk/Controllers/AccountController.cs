@@ -2,28 +2,16 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Mvc;
-using embedded_auth_with_sdk.Models;
 using Microsoft.Owin.Security;
 using Okta.Idx.Sdk;
 using Okta.Sdk.Abstractions;
 
 namespace embedded_auth_with_sdk.Controllers
 {
-    using AuthenticationOptions = Okta.Idx.Sdk.AuthenticationOptions;
-
     public class AccountController : Controller
     {
         private readonly IAuthenticationManager _authenticationManager;
-
         private readonly IIdxClient _idxClient;
-
-        public AccountController(IAuthenticationManager authenticationManager, IIdxClient idxClient)
-        {
-            _authenticationManager = authenticationManager;
-            _idxClient = idxClient;
-        }
-
 
         // The GET action is simplified to only display the view.
         [AllowAnonymous]
@@ -44,7 +32,6 @@ namespace embedded_auth_with_sdk.Controllers
                 ModelState.AddModelError(string.Empty, "Username is required.");
                 return View("Login", model);
             }
-
             try
             {
                 var authnOptions = new AuthenticationOptions { Username = model.UserName };
@@ -159,7 +146,7 @@ namespace embedded_auth_with_sdk.Controllers
                 return View("Register", model);
             }
         }
-        
+
         [AllowAnonymous]
         public ActionResult ForgotPassword()
         {
