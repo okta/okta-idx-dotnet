@@ -15,6 +15,15 @@
     <hr />
     </div>
 }
+
+@if(TempData["ErrorMessage"]!=null)
+{
+    <div class="alert alert-danger">
+    <h4>@TempData["ErrorMessage"]</h4>
+    <hr />
+    </div>
+}
+
 <div class="row d-center">
 
     <div class="col-md-8">
@@ -91,11 +100,12 @@
         <section id="recoverPasswordWithToken">
             @using (Html.BeginForm("RecoverPasswordWithToken", "Account", FormMethod.Get, new { @class = "form-horizontal", role = "form" }))
             {
-                    <div class="form-group">
-                        <div class="col-md-offset-2 col-md-10">
-                            <input type="submit" value="Recover Password with Recovery Token" class="btn btn-info btn-stretch-wide" id="RecoverPasswordWithTokenBtn" />
-                        </div>
-                    </div>            
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Recover Password with Recovery Token" class="btn btn-info btn-stretch-wide" id="RecoverPasswordWithTokenBtn" />
+                    </div>
+                </div>            
              }
         </section>
     </div>

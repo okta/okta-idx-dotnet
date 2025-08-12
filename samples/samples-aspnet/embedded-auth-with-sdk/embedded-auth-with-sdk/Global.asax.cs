@@ -21,7 +21,10 @@ namespace embedded_auth_with_sdk
 
             UnityConfig.RegisterComponents();
 
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.Name;
+            // Configure anti-forgery tokens for better compatibility with authentication flows
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
+            AntiForgeryConfig.CookieName = "__RequestVerificationToken";
+            AntiForgeryConfig.RequireSsl = false; // Set to true in production if using HTTPS
         }
     }
 }
