@@ -14,20 +14,16 @@ jobs:
   reversing-labs:
     steps:
       - checkout
-  
       - run: dotnet --version
-
-      - run: 
+      - run:
           name: build Binary to scan
           command: dotnet build ./src/Okta.Idx.Sdk.sln
-       
       - run:
           name: Install Python
           command: |
             sudo apt-get update
             sudo apt-get install -y python3 python3-pip
             sudo pip install --upgrade pip
-  
       - run:
           name: Download Reverse Labs Scanner
           command: |
@@ -38,15 +34,12 @@ jobs:
           name: Install RL Wrapper
           command: |
             pip install ./rl_wrapper-0.0.2+35ababa-py3-none-any.whl
-  
       - aws-cli/setup:
           profile_name: default
           role_arn: $AWS_ARN
           region: us-east-1
-  
       - run: >-
           eval "$(aws configure export-credentials --profile default --format env)" 2> /dev/null
-  
       - run:
           name: Run Reversing Labs Wrapper Scanner
           command: |
