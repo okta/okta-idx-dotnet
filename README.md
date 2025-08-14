@@ -26,7 +26,6 @@ To see this library working in a sample, check out our [ASP.NET Samples](samples
 * [Building the SDK](#building-the-sdk)
 * [Contributing](#contributing)
 
-
 ## Release status
 
 This library uses semantic versioning and follows Okta's [Library Version Policy][okta-library-versioning].
