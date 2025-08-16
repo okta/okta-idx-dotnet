@@ -1150,6 +1150,16 @@ namespace Okta.Idx.Sdk
                     var resetResponse = await resetAuthenticatorOption
                         .ProceedAsync(resetAuthenticatorRequest, cancellationToken);
 
+                    if (resetResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+                    {
+                        return new AuthenticationResponse
+                        {
+                            IdxContext = idxContext,
+                            AuthenticationStatus = AuthenticationStatus.AwaitingChallengeAuthenticatorSelection,
+                            Authenticators = IdxResponseHelper.ConvertEnrollmentsToAuthenticators(resetResponse.Authenticators.Value, resetResponse.AuthenticatorEnrollments.Value),
+                        };
+                    }
+
                     if (resetResponse.IsLoginSuccess)
                     {
                         var tokenResponse = await resetResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
