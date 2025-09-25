@@ -51,17 +51,6 @@ jobs:
             - general-platform-helpers/step-artifacts-prepare-and-upload-windows:
                 files-to-upload: "artifacts"
                 location: "com/okta/devex/okta-idx-dotnet"
-      - when:
-          condition:
-            equal: [ "<<pipeline.git.branch>>", "master" ]
-          steps:
-            - run:
-                name: "Pack release package"
-                command: |
-                  dotnet pack ./src/Okta.Idx.Sdk/Okta.Idx.Sdk.csproj --configuration release --output ./artifacts
-            - general-platform-helpers/step-artifacts-prepare-and-upload-windows:
-                files-to-upload: "artifacts"
-                location: "com/okta/devex/okta-idx-dotnet"
 
   snyk-scan:
     docker:
