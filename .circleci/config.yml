@@ -143,12 +143,14 @@ workflows:
             - static-analysis
   "Circle CI Build & Snyk Scan":
     jobs:
-      - build
       - snyk-scan:
           name: execute-snyk
           context:
             - static-analysis
+      - build:
           requires:
-            - build
+            - reversing-labs
+            - execute-snyk
+
 
 # VS Code Extension Version: 1.4.0
