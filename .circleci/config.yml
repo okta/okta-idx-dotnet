@@ -138,17 +138,18 @@ jobs:
 workflows:
   "Circle CI Build & Malware Scans":
     jobs:
-      - snyk-scan:
-          name: execute-snyk
-          context:
-            - static-analysis
       - reversing-labs:
           context:
             - static-analysis
       - build:
           requires:
-            - execute-snyk
             - reversing-labs
+      - snyk-scan:
+          name: execute-snyk
+          context:
+            - static-analysis
+          requires:
+            - build
 
 
 # VS Code Extension Version: 1.4.0
