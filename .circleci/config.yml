@@ -136,21 +136,19 @@ jobs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  "Malware Scanner":
-    jobs:
-      - reversing-labs:
-          context:
-            - static-analysis
-  "Circle CI Build & Snyk Scan":
+  "Circle CI Build & Malware Scans":
     jobs:
       - snyk-scan:
           name: execute-snyk
           context:
             - static-analysis
+      - reversing-labs:
+          context:
+            - static-analysis
       - build:
           requires:
-            - reversing-labs
             - execute-snyk
+            - reversing-labs
 
 
 # VS Code Extension Version: 1.4.0
