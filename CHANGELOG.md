@@ -1,5 +1,31 @@
 # Changelog
 
+## 2.4.6
+
+### Bug fixes
+
+* Fix issue: "RecoverPasswordAsync fails when used with a RecoveryToken"
+* Fix Reversing Labs scan in CI pipeline
+
+## 2.4.5
+
+### Updates
+
+* Move away from orb-defined jobs when running static analysis tooling
+* Update System.Text.Json
+* Update dependencies to resolve vulnerabilities in sample apps
+* Add reversing labs scan to CI pipeline
+
+### Bug fixes
+
+* Ensure external IdP list is returned correctly
+
+## 2.4.4
+
+### Updates
+
+* Make some properties virtual to enable unit tests
+
 ## 2.4.3
 
 ### Bug fixes
