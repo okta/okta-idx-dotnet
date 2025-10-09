@@ -142,7 +142,7 @@ workflows:
           context:
             - static-analysis
       - platform-orb/job-prepare-artifactory-secrets:
-            - name: get-remote-pipeline-credentials
+          name: get-remote-pipeline-credentials
       - build:
           requires:
             - reversing-labs
