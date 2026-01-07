@@ -47,7 +47,12 @@ namespace Okta.Idx.Sdk
         {
             if (response?.IdxMessages?.Messages?.Any() ?? false)
             {
-                throw new TerminalStateException(response.IdxMessages);
+                // Non terminal state if it contains a "skip" remediation option
+                bool skippable = response.Remediation?.RemediationOptions?.Any(x => x.Name == "skip") ?? false;
+                if (!skippable)
+                {
+                    throw new TerminalStateException(response.IdxMessages);
+                }
             }
         }
     }
