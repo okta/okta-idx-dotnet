@@ -692,7 +692,11 @@ namespace Okta.Idx.Sdk
                                             .FirstOrDefault(x => x.Name == RemediationType.Identify)
                                             .ProceedAsync(identifyRequest, cancellationToken);
 
-            identifyResponse.AssertNotInTerminalState();
+            // If there is a skip remediation option, we are not in terminal state
+            if (!identifyResponse?.Remediation?.RemediationOptions?.Any(x => x.Name == RemediationType.Skip) ?? true)
+            {
+                identifyResponse.AssertNotInTerminalState();
+            }
 
             if (isIdentifyInOneStep)
             {
