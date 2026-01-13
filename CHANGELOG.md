@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.4.7
+
+### Bug fixes
+
+* Fix issue: Getting exception instead of PasswordExpired status
+
+
 ## 2.4.6
 
 ### Bug fixes
