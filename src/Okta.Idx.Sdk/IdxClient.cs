@@ -2150,6 +2150,12 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
+        public async Task<AuthenticationResponse> SkipPasswordChangeAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
         public async Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(string state = null, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
             var idxContext = await this.InteractAsync(requestContext: requestContext, state: state, cancellationToken: cancellationToken);
