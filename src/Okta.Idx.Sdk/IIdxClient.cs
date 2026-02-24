@@ -287,9 +287,6 @@ namespace Okta.Idx.Sdk
 
         /// <summary>
         /// Skips a password change when the user is in a password warn state.
-        /// This should be called after <see cref="AuthenticateAsync"/> returns <see cref="AuthenticationStatus.PasswordExpired"/> with CanSkip = true.
-        /// For 1FA flows, this completes authentication and returns tokens.
-        /// For MFA flows, this presents the user with a list of enrolled authenticators for the next factor.
         /// </summary>
         /// <param name="idxContext">The IDX context.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
