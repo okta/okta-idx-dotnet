@@ -137,7 +137,7 @@ The user was successfully authenticated and you can retrieve the tokens from the
 
 Type: `AuthenticationStatus.PasswordExpired`
 
-The user needs to change their password to continue with the authentication flow and retrieve tokens. Check for possible messages to the user by calling `authnResponse.Messages` and `authnResponse.CanSkip` to verify the user can skip the current step in the authentication process.
+The user needs to change their password to continue with the authentication flow and retrieve tokens. Check for possible messages to the user by calling `authnResponse.Messages` and `authnResponse.CanSkip` to verify the user can skip the current step in the authentication process. If allowed, proceed with skipping the password change by calling `_idxClient.SkipPasswordChangeAsync(authnResponse.IdxContext)`
 
 #### Awaiting for authenticator enrollment
 

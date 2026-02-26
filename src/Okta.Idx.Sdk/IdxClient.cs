@@ -2150,6 +2150,46 @@ namespace Okta.Idx.Sdk
         }
 
         /// <inheritdoc/>
+        public async Task<AuthenticationResponse> SkipPasswordChangeAsync(IIdxContext idxContext, CancellationToken cancellationToken = default)
+        {
+            // Re-entry flow with context
+            var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
+
+            var skipOption = introspectResponse.FindRemediationOption(RemediationType.Skip, true);
+
+            var skipRequest = new IdxRequestPayload
+            {
+                StateHandle = introspectResponse.StateHandle,
+            };
+
+            var skipResponse = await skipOption.ProceedAsync(skipRequest, cancellationToken);
+
+            if (skipResponse.IsLoginSuccess)
+            {
+                var tokenResponse = await skipResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+
+            if (skipResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorAuthenticate))
+            {
+                return CreateAuthenticationResponse<AuthenticationResponse>(idxContext, skipResponse, AuthenticationStatus.AwaitingChallengeAuthenticatorSelection);
+            }
+
+            throw new UnexpectedRemediationException(
+                new List<string>
+                {
+                    RemediationType.SuccessWithInteractionCode,
+                    RemediationType.SelectAuthenticatorAuthenticate,
+                },
+                skipResponse);
+        }
+
+        /// <inheritdoc/>
         public async Task<PasswordRequiredResponse> CheckIsPasswordRequiredAsync(string state = null, CancellationToken cancellationToken = default, RequestContext requestContext = null)
         {
             var idxContext = await this.InteractAsync(requestContext: requestContext, state: state, cancellationToken: cancellationToken);

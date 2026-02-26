@@ -284,5 +284,13 @@ namespace Okta.Idx.Sdk
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The authentication response.</returns>
         Task<AuthenticationResponse> VerifyAuthenticatorAsync(VerifySecurityQuestionAuthenticatorOptions verifyAuthenticatorOptions, IIdxContext idxContext, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Skips a password change when the user is in a password warn state.
+        /// </summary>
+        /// <param name="idxContext">The IDX context.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The authentication response.</returns>
+        Task<AuthenticationResponse> SkipPasswordChangeAsync(IIdxContext idxContext, CancellationToken cancellationToken = default);
     }
 }
