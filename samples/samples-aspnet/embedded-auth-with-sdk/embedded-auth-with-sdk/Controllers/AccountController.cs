@@ -47,7 +47,7 @@ namespace embedded_auth_with_sdk.Controllers
 
             try
             {
-                var authnOptions = new AuthenticationOptions { Username = model.UserName, Password = model.Password };
+                var authnOptions = new AuthenticationOptions { Username = model.UserName };
                 var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
                 var idxContext = authnResponse.IdxContext;
                 Session["idxContext"] = idxContext;
@@ -89,19 +89,7 @@ namespace embedded_auth_with_sdk.Controllers
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
                         return RedirectToAction("SelectAuthenticator", "Manage");
-                    case AuthenticationStatus.PasswordExpired:
-                        if (authnResponse.CanSkip)
-                        {
-                            var response = await _idxClient.SkipAuthenticatorSelectionAsync(authnResponse.IdxContext);
-                            if (response.AuthenticationStatus == AuthenticationStatus.Success)
-                            {
-                                ClaimsIdentity newIdentity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, response.TokenInfo);
-                                _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = false }, newIdentity);
-                                return RedirectToAction("Index", "Home");
-                            }
-                        }
-                        ModelState.AddModelError(string.Empty, "An unexpected authentication status was received.");
-                        return View("Login", model);
+
                     case AuthenticationStatus.Success:
                         ClaimsIdentity identity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, authnResponse.TokenInfo);
                         _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, identity);
