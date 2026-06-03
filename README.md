@@ -19,6 +19,7 @@ To see this library working in a sample, check out our [ASP.NET Samples](samples
 > This library is currently GA. See [release status](#release-status) for more information.
 
 * [Release status](#release-status)
+* [Known limitations](#known-limitations)
 * [Need help?](#need-help)
 * [Getting started](#getting-started)
 * [Usage guide](#usage-guide)
@@ -37,6 +38,33 @@ This library uses semantic versioning and follows Okta's [Library Version Policy
 | 2.x   | ✔️ Stable |
 
 The latest release can always be found on the [releases page][github-releases].
+
+## Known limitations
+
+### Automatic IdP routing (IdP Discovery / Org2Org routing rules)
+
+The embedded .NET SDK does **not** support automatically redirecting a user to a
+third-party Identity Provider (IdP) based on an Org2Org routing rule (IdP Discovery) —
+for example, routing a user to an external IdP based on their email domain without any
+user interaction.
+
+The supported pattern is a **manual IdP redirect**: call `GetIdentityProvidersAsync` to
+retrieve the available IdP options and present them to the user as "Sign in with &lt;IdP&gt;"
+buttons. When the user selects an option, redirect them to the returned `Href`.
+
+```csharp
+var idpResponse = await _idxClient.GetIdentityProvidersAsync(idxContext);
+
+if (idpResponse.IdpOptions?.Count > 0)
+{
+    // Present idpResponse.IdpOptions to the user as buttons, then redirect to the
+    // selected option's Href. The SDK does not evaluate routing rules to auto-select an IdP.
+    var idpRedirectUrl = idpResponse.IdpOptions.First().Href;
+}
+```
+
+See the [ASP.NET sample](samples/samples-aspnet/embedded-auth-with-sdk) for a working
+example of the manual IdP redirect flow.
 
 ## Need help?
 
