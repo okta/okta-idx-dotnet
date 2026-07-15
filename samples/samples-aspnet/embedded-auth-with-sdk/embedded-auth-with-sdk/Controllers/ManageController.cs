@@ -544,21 +544,11 @@ namespace embedded_auth_with_sdk.Controllers
                     }
                     else if (model.IsOktaVerifySelected)
                     {
-
-                        var selectAuthenticatorOptions = new SelectOktaVerifyAuthenticatorOptions
-                        {
-                            AuthenticatorId = model.AuthenticatorId,
-                        };
-
-
-                        selectAuthenticatorResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions, (IIdxContext)Session["IdxContext"]);
-
-
+                        var oktaVerifyAuthenticator = authenticators.FirstOrDefault(x => x.AuthenticatorId == model.AuthenticatorId);
                         var viewModel = new OktaVerifySelectAuthenticatorMethodModel
                         {
                             AuthenticatorId = model.AuthenticatorId,
-                            MethodTypes = selectAuthenticatorResponse.CurrentAuthenticator.MethodTypes,
-                            
+                            MethodTypes = oktaVerifyAuthenticator?.MethodTypes,
                         };
 
                         Session[nameof(OktaVerifySelectAuthenticatorMethodModel)] = viewModel;
@@ -670,6 +660,7 @@ namespace embedded_auth_with_sdk.Controllers
                             return RedirectToAction("EnrollPhoneAuthenticator", "Manage");
 
                         default:
+                            model.Authenticators = authenticators;
                             return View("SelectAuthenticator", model);
                     }
                 }
@@ -677,6 +668,7 @@ namespace embedded_auth_with_sdk.Controllers
             catch (OktaException exception)
             {
                 ModelState.AddModelError(string.Empty, exception.Message);
+                model.Authenticators = authenticators;
                 return View("SelectAuthenticator", model);
             }
         }

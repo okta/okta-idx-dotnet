@@ -16,6 +16,7 @@ namespace embedded_auth_with_sdk.Models
                                 AuthenticatorId = x.Id,
                                 Name = x.Name,
                                 EnrollmentId = x.EnrollmentId,
+                                MethodTypes = x.MethodTypes,
                             })
                 .ToList() ?? new List<AuthenticatorViewModel>();
     }

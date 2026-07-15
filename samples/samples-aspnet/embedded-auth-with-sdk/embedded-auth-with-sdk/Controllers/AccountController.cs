@@ -74,11 +74,22 @@ namespace embedded_auth_with_sdk.Controllers
                                     Password = model.Password,
                                 };
                                 var challengeAuthnResponse = await _idxClient.AuthenticateAsync(challengeOptions).ConfigureAwait(false);
-                                if (challengeAuthnResponse.AuthenticationStatus == AuthenticationStatus.Success)
+                                switch (challengeAuthnResponse.AuthenticationStatus)
                                 {
-                                    ClaimsIdentity successIdentity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, challengeAuthnResponse.TokenInfo);
-                                    _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, successIdentity);
-                                    return RedirectToAction("Index", "Home");
+                                    case AuthenticationStatus.Success:
+                                        ClaimsIdentity successIdentity = await AuthenticationHelper.GetIdentityFromTokenResponseAsync(_idxClient.Configuration, challengeAuthnResponse.TokenInfo);
+                                        _authenticationManager.SignIn(new AuthenticationProperties { IsPersistent = model.RememberMe }, successIdentity);
+                                        return RedirectToAction("Index", "Home");
+                                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                                        Session["isChallengeFlow"] = false;
+                                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(challengeAuthnResponse.Authenticators);
+                                        Session["IdxContext"] = challengeAuthnResponse.IdxContext;
+                                        return RedirectToAction("SelectAuthenticator", "Manage");
+                                    case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
+                                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(challengeAuthnResponse.Authenticators);
+                                        Session["isChallengeFlow"] = true;
+                                        Session["IdxContext"] = challengeAuthnResponse.IdxContext;
+                                        return RedirectToAction("SelectAuthenticator", "Manage");
                                 }
                             }
 
@@ -88,6 +99,13 @@ namespace embedded_auth_with_sdk.Controllers
                         
                         Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
                         Session["isChallengeFlow"] = true;
+                        Session["IdxContext"] = authnResponse.IdxContext;
+                        return RedirectToAction("SelectAuthenticator", "Manage");
+
+                    case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
+                        Session["isChallengeFlow"] = false;
+                        Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authnResponse.Authenticators);
+                        Session["IdxContext"] = authnResponse.IdxContext;
                         return RedirectToAction("SelectAuthenticator", "Manage");
 
                     case AuthenticationStatus.Success:

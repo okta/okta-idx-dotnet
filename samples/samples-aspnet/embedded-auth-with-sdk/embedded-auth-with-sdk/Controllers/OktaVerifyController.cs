@@ -175,6 +175,7 @@
                 var authnResponse = await _idxClient.SelectChallengeAuthenticatorAsync(selectAuthenticatorOptions,
                     (IIdxContext)Session["IdxContext"]);
 
+                Session["idxContext"] = authnResponse.IdxContext;
                 model.CorrectAnswer = authnResponse.CorrectAnswer;
 
                 if (authnResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification ||
@@ -185,6 +186,7 @@
                         case "totp":
                             return View("EnterCode");
                         case "push":
+                            model.RefreshInterval = 4000;
                             return View("PushSent", model);
                     }
                 }
@@ -227,6 +229,7 @@
                 case AuthenticationStatus.AwaitingChallengeAuthenticatorSelection:
                     Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(authenticationResponse.Authenticators);
                     Session["isChallengeFlow"] = true;
+                    Session["IdxContext"] = authenticationResponse.IdxContext;
                     return RedirectToAction("SelectAuthenticator", "Manage");
                 case AuthenticationStatus.AwaitingAuthenticatorEnrollment:
                     Session["isChallengeFlow"] = false;
