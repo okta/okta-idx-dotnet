@@ -14,7 +14,6 @@ namespace embedded_auth_with_sdk.Models
             this.ShouldRenderPasswordField = true;
         }
 
-        [Required]
         [Display(Name = "Username")]
         public string UserName { get; set; }
 
@@ -24,6 +23,9 @@ namespace embedded_auth_with_sdk.Models
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; } = false;
+
+        [Display(Name = "Activation Token")]
+        public string ActivationToken { get; set; }
 
         public List<IdpOption> IdpOptions { get; set; } = new List<IdpOption>();
 

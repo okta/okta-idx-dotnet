@@ -650,13 +650,33 @@ namespace Okta.Idx.Sdk
             var idxContext = await InteractAsync(cancellationToken: cancellationToken, activationToken: authenticationOptions.ActivationToken);
             var introspectResponse = await IntrospectAsync(idxContext, cancellationToken);
 
-            if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+            if (introspectResponse.IsLoginSuccess)
+            {
+                var tokenResponse = await introspectResponse.SuccessWithInteractionCode.ExchangeCodeAsync(idxContext, cancellationToken);
+                return new AuthenticationResponse
+                {
+                    AuthenticationStatus = AuthenticationStatus.Success,
+                    TokenInfo = tokenResponse,
+                };
+            }
+            else if (introspectResponse.ContainsRemediationOption(RemediationType.EnrollAuthenticator) &&
+     introspectResponse.Remediation.RemediationOptions.First().Name == RemediationType.EnrollAuthenticator)
+            {
+                return new AuthenticationResponse
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
+                    CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(introspectResponse.Authenticators.Value, introspectResponse.CurrentAuthenticator.Value, introspectResponse.AuthenticatorEnrollments.Value),
+                };
+            }
+            else if (introspectResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
             {
                 return new AuthenticationResponse
                 {
                     IdxContext = idxContext,
                     AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
                     Authenticators = IdxResponseHelper.ConvertToAuthenticators(introspectResponse.Authenticators.Value),
+                    CanSkip = introspectResponse.ContainsRemediationOption(RemediationType.Skip),
                 };
             }
 
@@ -1642,18 +1662,28 @@ namespace Okta.Idx.Sdk
 
             var enrollNewProfileResponse = await enrollProfileResponse.ProceedWithRemediationOptionAsync(RemediationType.EnrollProfile, enrollNewProfileRequest, cancellationToken);
 
-            if (!enrollNewProfileResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+            if (enrollNewProfileResponse.ContainsRemediationOption(RemediationType.EnrollAuthenticator) && 
+                enrollNewProfileResponse.Remediation.RemediationOptions.First().Name == RemediationType.EnrollAuthenticator)
             {
-                throw new UnexpectedRemediationException(RemediationType.SelectAuthenticatorEnroll, enrollNewProfileResponse);
+                return new AuthenticationResponse
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorVerification,
+                    CurrentAuthenticator = IdxResponseHelper.ConvertToAuthenticator(enrollNewProfileResponse.Authenticators.Value, enrollNewProfileResponse.CurrentAuthenticator.Value, enrollNewProfileResponse.AuthenticatorEnrollments.Value),
+                };
+            }
+            else if (enrollNewProfileResponse.ContainsRemediationOption(RemediationType.SelectAuthenticatorEnroll))
+            {
+                return new AuthenticationResponse
+                {
+                    IdxContext = idxContext,
+                    AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
+                    Authenticators = IdxResponseHelper.ConvertToAuthenticators(enrollNewProfileResponse.Authenticators.Value),
+                    CanSkip = enrollNewProfileResponse.ContainsRemediationOption(RemediationType.Skip),
+                };
             }
 
-            return new AuthenticationResponse
-            {
-                IdxContext = idxContext,
-                AuthenticationStatus = AuthenticationStatus.AwaitingAuthenticatorEnrollment,
-                Authenticators = IdxResponseHelper.ConvertToAuthenticators(enrollNewProfileResponse.Authenticators.Value),
-                CanSkip = enrollNewProfileResponse.ContainsRemediationOption(RemediationType.Skip),
-            };
+            throw new UnexpectedRemediationException(RemediationType.SelectAuthenticatorEnroll, enrollNewProfileResponse);
         }
 
         /// <inheritdoc/>

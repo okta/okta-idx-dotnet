@@ -51,6 +51,22 @@
                         </div>
                     </div>
                 }
+                <div class="hstack gap-3 align-items-center">
+                    <div class="border-top border-2 w-50"></div>
+                    <div class="px-2 text-muted">or</div>
+                    <div class="border-top border-2 w-50"></div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-10 col-md-offset-2">
+                        <div class="row row-no-gutters">
+                            @Html.LabelFor(m => m.ActivationToken, new { @class = "control-label" })
+                        </div>
+                        <div class="row row-no-gutters">
+                            @Html.TextBoxFor(m => m.ActivationToken, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ActivationToken, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group">
                     <div class="col-md-offset-2 col-md-10">
                         <input type="submit" value="Sign In" class="btn btn-primary btn-stretch-wide" id="LoginBtn" />

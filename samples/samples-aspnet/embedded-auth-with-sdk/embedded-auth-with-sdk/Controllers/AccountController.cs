@@ -39,25 +39,32 @@ namespace embedded_auth_with_sdk.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> LoginAsync(LoginViewModel model)
         {
-            if (string.IsNullOrEmpty(model.UserName))
+            if (string.IsNullOrEmpty(model.UserName) && string.IsNullOrEmpty(model.ActivationToken))
             {
-                ModelState.AddModelError(string.Empty, "Username is required.");
+                ModelState.AddModelError(string.Empty, "Either Username or Activation Token is required.");
                 return View("Login", model);
             }
 
             try
             {
                 var authnOptions = new AuthenticationOptions { Username = model.UserName };
+                if (model.ActivationToken != null) {
+                    authnOptions = new AuthenticationOptions { ActivationToken = model.ActivationToken };
+                }
+
                 var authnResponse = await _idxClient.AuthenticateAsync(authnOptions).ConfigureAwait(false);
                 var idxContext = authnResponse.IdxContext;
                 Session["idxContext"] = idxContext;
 
-                var idpResponse = await _idxClient.GetIdentityProvidersAsync(idxContext);
-
-                if (idpResponse.IdpOptions?.Count > 0)
+                if (model.ActivationToken == null)
                 {
-                    var idpRedirectUrl = idpResponse.IdpOptions.First().Href;
-                    return Redirect(idpRedirectUrl);
+                    var idpResponse = await _idxClient.GetIdentityProvidersAsync(idxContext);
+
+                    if (idpResponse.IdpOptions?.Count > 0)
+                    {
+                        var idpRedirectUrl = idpResponse.IdpOptions.First().Href;
+                        return Redirect(idpRedirectUrl);
+                    }
                 }
 
                 switch (authnResponse.AuthenticationStatus)
@@ -158,6 +165,7 @@ namespace embedded_auth_with_sdk.Controllers
                 userProfile.SetProperty("firstName", model.FirstName);
                 userProfile.SetProperty("lastName", model.LastName);
                 userProfile.SetProperty("email", model.Email);
+                userProfile.SetProperty("login", model.Email);
 
                 var registerResponse = await _idxClient.RegisterAsync(userProfile);
 
@@ -166,6 +174,13 @@ namespace embedded_auth_with_sdk.Controllers
                     Session["idxContext"] = registerResponse.IdxContext;
                     Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(registerResponse.Authenticators);
                     return RedirectToAction("SelectAuthenticator", "Manage");
+                }
+
+                if (registerResponse.AuthenticationStatus == AuthenticationStatus.AwaitingAuthenticatorVerification)
+                {
+                    Session["idxContext"] = registerResponse.IdxContext;
+                    Session["authenticators"] = ViewModelHelper.ConvertToAuthenticatorViewModelList(registerResponse.Authenticators);
+                    return RedirectToAction("VerifyAuthenticator", "Manage");
                 }
 
                 ModelState.AddModelError(string.Empty, $"Oops! Something went wrong.");
