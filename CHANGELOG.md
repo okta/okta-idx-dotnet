@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.9
+
+### Bug fixes
+
+* Fix registration status misreporting when an enrollment policy auto-challenges a single authenticator (e.g. email)
+
 ## 2.4.8
 
 ### Additions
